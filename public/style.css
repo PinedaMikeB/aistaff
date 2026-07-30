@@ -1188,6 +1188,7 @@ tr:hover td { background: #fbf9ff; }
 }
 .modern-home .closer-caption-eyebrow { margin: 0; opacity: 0; color: var(--cyan); font: 500 13px "DM Mono"; letter-spacing: .16em; text-transform: uppercase; }
 .modern-home .closer-caption-title { margin: 0; perspective: 600px; color: #f4f8ff; font: 500 clamp(30px, 3vw, 42px)/1.16 "Space Grotesk"; letter-spacing: -.03em; }
+.modern-home .closer-caption-title .word-group { display: inline-block; white-space: nowrap; }
 .modern-home .closer-caption-title .letter { display: inline-block; opacity: 0; transform-style: preserve-3d; }
 .modern-home .closer-caption-body { margin: 0; opacity: 0; color: #86a3b7; font: 17px/1.6 "Manrope"; max-width: 38ch; }
 .modern-home .closer-caption-cta { display: inline-flex; align-items: center; gap: 10px; width: fit-content; opacity: 0; color: #9edfff; font: 600 13px "DM Mono"; letter-spacing: .05em; transition: gap .2s ease, color .2s ease; }
@@ -1258,6 +1259,7 @@ tr:hover td { background: #fbf9ff; }
 @keyframes signal-grow { from { opacity: 0; transform: scaleX(0); } to { opacity: 1; transform: scaleX(1); } }
 @keyframes live-pulse { 0%, 100% { box-shadow: 0 0 0 rgba(93, 208, 255, 0); } 45% { box-shadow: 0 0 18px rgba(93, 208, 255, .9); } }
 @media (max-width: 1400px) {
+  .modern-home .service-card-media { width: min(720px, 88%) !important; margin-left: auto !important; margin-right: auto !important; }
   .modern-home .agent-brandee.service-card-media { display: flex; flex-direction: column; }
   .modern-home .agent-brandee .brandee-caption {
     position: static;

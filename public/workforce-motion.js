@@ -170,11 +170,15 @@ document.querySelectorAll("[data-carousel]").forEach((carousel) => {
   const cta = caption.querySelector(".closer-caption-cta");
   const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
-  // Wrap every character in a span, preserving spaces as real spaces (not spans) so wrapping still works
+  // Group letters inside a per-word wrapper so the browser treats each word as one
+  // atomic unit for line-wrapping (fixes mid-word breaks like "Messeng" | "er").
   title.innerHTML = title.textContent
-    .split("")
-    .map((ch) => (ch === " " ? " " : `<span class="letter">${ch}</span>`))
-    .join("");
+    .split(" ")
+    .map((word) => {
+      const letterSpans = word.split("").map((ch) => `<span class="letter">${ch}</span>`).join("");
+      return `<span class="word-group">${letterSpans}</span>`;
+    })
+    .join(" ");
   const letters = title.querySelectorAll(".letter");
 
   if (reduceMotion || typeof window.Motion === "undefined") {
