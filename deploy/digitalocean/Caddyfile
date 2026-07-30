@@ -1,0 +1,11 @@
+{
+    auto_https off
+}
+
+aistaff.click, www.aistaff.click {
+    reverse_proxy aistaff-api:3000
+}
+
+:80 {
+    reverse_proxy marga-app:9100
+}

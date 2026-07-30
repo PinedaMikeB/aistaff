@@ -1,0 +1,592 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Company {
+  id                 String                  @id @default(uuid())
+  name               String
+  industry           String?
+  website            String?
+  contact_email      String?
+  contact_number     String?
+  status             String                  @default("active")
+  created_at         DateTime                @default(now())
+  updated_at         DateTime                @updatedAt
+  users              User[]
+  settings           CompanySetting?
+  facebook_pages     FacebookPage[]
+  knowledge_base     KnowledgeBase[]
+  qualification_questions QualificationQuestion[]
+  conversations      Conversation[]
+  messages           Message[]
+  leads              Lead[]
+  quotation_templates QuotationTemplate[]
+  quotations         Quotation[]
+  follow_ups         FollowUp[]
+  human_handoffs     HumanHandoff[]
+  ai_logs            AiLog[]
+
+  @@map("companies")
+}
+
+model User {
+  id            String    @id @default(uuid())
+  company_id    String
+  name          String
+  email         String    @unique
+  password_hash String
+  role          String    @default("admin")
+  status        String    @default("active")
+  created_at    DateTime  @default(now())
+  updated_at    DateTime  @updatedAt
+  company       Company   @relation(fields: [company_id], references: [id], onDelete: Cascade)
+  assigned_leads Lead[]   @relation("LeadAssignedTo")
+  prepared_quotations Quotation[] @relation("QuotationPreparedBy")
+  approved_quotations Quotation[] @relation("QuotationApprovedBy")
+  assigned_followups FollowUp[] @relation("FollowUpAssignedTo")
+  assigned_handoffs HumanHandoff[] @relation("HandoffAssignedTo")
+  carts         Cart[]
+  customers     Customer[]
+
+  @@map("users")
+}
+
+model CompanySetting {
+  id                                String   @id @default(uuid())
+  company_id                        String   @unique
+  ai_enabled                        Boolean  @default(true)
+  auto_reply_enabled                Boolean  @default(true)
+  business_hours_only               Boolean  @default(false)
+  human_handoff_enabled             Boolean  @default(true)
+  default_language                  String   @default("en")
+  tone                              String   @default("polite_professional")
+  quotation_mode                    String   @default("approval_required")
+  allow_ai_quotation_drafts         Boolean  @default(true)
+  allow_auto_send_quotation         Boolean  @default(false)
+  quotation_requires_admin_approval Boolean  @default(true)
+  notify_email                      String?
+  ai_custom_instructions            String?  @db.Text
+  created_at                        DateTime @default(now())
+  updated_at                        DateTime @updatedAt
+  company                           Company  @relation(fields: [company_id], references: [id], onDelete: Cascade)
+
+  @@map("company_settings")
+}
+
+model FacebookPage {
+  id                          String         @id @default(uuid())
+  company_id                  String
+  page_id                     String         @unique
+  page_name                   String
+  page_access_token_encrypted String
+  status                      String         @default("active")
+  created_at                  DateTime       @default(now())
+  updated_at                  DateTime       @updatedAt
+  company                     Company        @relation(fields: [company_id], references: [id], onDelete: Cascade)
+  conversations               Conversation[]
+
+  @@map("facebook_pages")
+}
+
+model KnowledgeBase {
+  id         String   @id @default(uuid())
+  company_id String
+  category   String
+  question   String
+  answer     String
+  tags       String[] @default([])
+  active     Boolean  @default(true)
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+  company    Company  @relation(fields: [company_id], references: [id], onDelete: Cascade)
+
+  @@map("knowledge_base")
+}
+
+model QualificationQuestion {
+  id            String   @id @default(uuid())
+  company_id    String
+  question      String
+  field_key     String
+  required      Boolean  @default(true)
+  display_order Int      @default(0)
+  active        Boolean  @default(true)
+  created_at    DateTime @default(now())
+  updated_at    DateTime @updatedAt
+  company       Company  @relation(fields: [company_id], references: [id], onDelete: Cascade)
+
+  @@map("qualification_questions")
+}
+
+model Conversation {
+  id               String         @id @default(uuid())
+  company_id       String
+  facebook_page_id String?
+  psid             String
+  customer_name    String?
+  channel          String         @default("facebook_messenger")
+  status           String         @default("open")
+  intent           String?
+  lead_score       String         @default("cold")
+  needs_human      Boolean        @default(false)
+  last_message_at  DateTime       @default(now())
+  created_at       DateTime       @default(now())
+  updated_at       DateTime       @updatedAt
+  company          Company        @relation(fields: [company_id], references: [id], onDelete: Cascade)
+  facebook_page    FacebookPage?  @relation(fields: [facebook_page_id], references: [id], onDelete: SetNull)
+  messages         Message[]
+  leads            Lead[]
+  quotations       Quotation[]
+  follow_ups       FollowUp[]
+  human_handoffs   HumanHandoff[]
+  ai_logs          AiLog[]
+
+  @@unique([company_id, psid])
+  @@map("conversations")
+}
+
+model Message {
+  id              String       @id @default(uuid())
+  company_id      String
+  conversation_id String
+  sender_type     String
+  sender_id       String?
+  message_text    String
+  ai_generated    Boolean      @default(false)
+  created_at      DateTime     @default(now())
+  company         Company      @relation(fields: [company_id], references: [id], onDelete: Cascade)
+  conversation    Conversation @relation(fields: [conversation_id], references: [id], onDelete: Cascade)
+
+  @@map("messages")
+}
+
+model Lead {
+  id                String       @id @default(uuid())
+  company_id        String
+  conversation_id   String
+  customer_name     String?
+  mobile_number     String?
+  email             String?
+  company_name      String?
+  location          String?
+  service_needed    String?
+  budget            String?
+  urgency           String?
+  notes             String?
+  lead_status       String       @default("new")
+  lead_score        String       @default("cold")
+  quotation_ready   Boolean      @default(false)
+  assigned_to       String?
+  follow_up_date    DateTime?
+  created_at        DateTime     @default(now())
+  updated_at        DateTime     @updatedAt
+  company           Company      @relation(fields: [company_id], references: [id], onDelete: Cascade)
+  conversation      Conversation @relation(fields: [conversation_id], references: [id], onDelete: Cascade)
+  assigned_user     User?        @relation("LeadAssignedTo", fields: [assigned_to], references: [id], onDelete: SetNull)
+  quotations        Quotation[]
+  follow_ups        FollowUp[]
+
+  @@map("leads")
+}
+
+model QuotationTemplate {
+  id                String    @id @default(uuid())
+  company_id        String
+  template_name     String
+  service_type      String
+  description       String?
+  pricing_type      String    @default("range")
+  fixed_price       Decimal?  @db.Decimal(12, 2)
+  price_min         Decimal?  @db.Decimal(12, 2)
+  price_max         Decimal?  @db.Decimal(12, 2)
+  terms             String?
+  validity_days     Int       @default(15)
+  auto_send_allowed Boolean   @default(false)
+  active            Boolean   @default(true)
+  created_at        DateTime  @default(now())
+  updated_at        DateTime  @updatedAt
+  company           Company   @relation(fields: [company_id], references: [id], onDelete: Cascade)
+
+  @@map("quotation_templates")
+}
+
+model Quotation {
+  id                 String          @id @default(uuid())
+  company_id         String
+  lead_id            String
+  conversation_id    String
+  quotation_number   String          @unique
+  customer_name      String?
+  customer_company   String?
+  service_needed     String?
+  quotation_details  String
+  amount             Decimal?        @db.Decimal(12, 2)
+  terms              String?
+  status             String          @default("draft")
+  mode               String          @default("approval_required")
+  prepared_by        String?
+  approved_by        String?
+  sent_at            DateTime?
+  created_at         DateTime        @default(now())
+  updated_at         DateTime        @updatedAt
+  company            Company         @relation(fields: [company_id], references: [id], onDelete: Cascade)
+  lead               Lead            @relation(fields: [lead_id], references: [id], onDelete: Cascade)
+  conversation       Conversation    @relation(fields: [conversation_id], references: [id], onDelete: Cascade)
+  prepared_user      User?           @relation("QuotationPreparedBy", fields: [prepared_by], references: [id], onDelete: SetNull)
+  approved_user      User?           @relation("QuotationApprovedBy", fields: [approved_by], references: [id], onDelete: SetNull)
+  items              QuotationItem[]
+
+  @@map("quotations")
+}
+
+model QuotationItem {
+  id            String    @id @default(uuid())
+  quotation_id  String
+  item_name     String
+  description   String?
+  quantity      Decimal   @default(1) @db.Decimal(10, 2)
+  unit_price    Decimal?  @db.Decimal(12, 2)
+  total_price   Decimal?  @db.Decimal(12, 2)
+  created_at    DateTime  @default(now())
+  quotation     Quotation @relation(fields: [quotation_id], references: [id], onDelete: Cascade)
+
+  @@map("quotation_items")
+}
+
+model FollowUp {
+  id              String       @id @default(uuid())
+  company_id      String
+  lead_id         String
+  conversation_id String
+  due_date        DateTime
+  status          String       @default("pending")
+  note            String?
+  assigned_to     String?
+  created_at      DateTime     @default(now())
+  updated_at      DateTime     @updatedAt
+  company         Company      @relation(fields: [company_id], references: [id], onDelete: Cascade)
+  lead            Lead         @relation(fields: [lead_id], references: [id], onDelete: Cascade)
+  conversation    Conversation @relation(fields: [conversation_id], references: [id], onDelete: Cascade)
+  assigned_user   User?        @relation("FollowUpAssignedTo", fields: [assigned_to], references: [id], onDelete: SetNull)
+
+  @@map("follow_ups")
+}
+
+model HumanHandoff {
+  id              String       @id @default(uuid())
+  company_id      String
+  conversation_id String
+  reason          String
+  status          String       @default("open")
+  assigned_to     String?
+  created_at      DateTime     @default(now())
+  resolved_at     DateTime?
+  company         Company      @relation(fields: [company_id], references: [id], onDelete: Cascade)
+  conversation    Conversation @relation(fields: [conversation_id], references: [id], onDelete: Cascade)
+  assigned_user   User?        @relation("HandoffAssignedTo", fields: [assigned_to], references: [id], onDelete: SetNull)
+
+  @@map("human_handoffs")
+}
+
+model AiLog {
+  id                String       @id @default(uuid())
+  company_id        String
+  conversation_id   String?
+  model             String
+  prompt_tokens     Int          @default(0)
+  completion_tokens Int          @default(0)
+  cost_estimate     Decimal?     @db.Decimal(10, 6)
+  created_at        DateTime     @default(now())
+  company           Company      @relation(fields: [company_id], references: [id], onDelete: Cascade)
+  conversation      Conversation? @relation(fields: [conversation_id], references: [id], onDelete: SetNull)
+
+  @@map("ai_logs")
+}
+
+model Product {
+  id            String        @id @default(uuid())
+  name          String
+  slug          String        @unique
+  description   String       @db.Text
+  status        String        @default("active")
+  created_at    DateTime      @default(now())
+  updated_at    DateTime      @updatedAt
+  pricing_plans PricingPlan[]
+
+  @@map("products")
+}
+
+model PricingPlan {
+  id                  String        @id @default(uuid())
+  product_id          String
+  name                String
+  slug                String        @unique
+  monthly_price       Decimal       @db.Decimal(12, 2)
+  annual_price        Decimal       @db.Decimal(12, 2)
+  currency            String        @default("PHP")
+  conversation_limit  Int
+  facebook_page_limit Int
+  features            Json
+  active              Boolean       @default(true)
+  created_at          DateTime      @default(now())
+  updated_at          DateTime      @updatedAt
+  product             Product       @relation(fields: [product_id], references: [id], onDelete: Cascade)
+  subscriptions       Subscription[]
+
+  @@index([product_id])
+  @@index([active])
+  @@map("pricing_plans")
+}
+
+model AddOn {
+  id          String   @id @default(uuid())
+  name        String
+  slug        String   @unique
+  description String   @db.Text
+  price       Decimal  @db.Decimal(12, 2)
+  currency    String   @default("PHP")
+  billing_type String
+  active      Boolean  @default(true)
+  created_at  DateTime @default(now())
+  updated_at  DateTime @updatedAt
+
+  @@index([active])
+  @@map("add_ons")
+}
+
+model Cart {
+  id          String     @id @default(uuid())
+  user_id     String?
+  guest_token String?
+  status      String     @default("active")
+  currency    String     @default("PHP")
+  subtotal    Decimal    @default(0) @db.Decimal(12, 2)
+  tax         Decimal    @default(0) @db.Decimal(12, 2)
+  total       Decimal    @default(0) @db.Decimal(12, 2)
+  created_at  DateTime   @default(now())
+  updated_at  DateTime   @updatedAt
+  user        User?      @relation(fields: [user_id], references: [id], onDelete: SetNull)
+  items       CartItem[]
+  orders      Order[]
+
+  @@index([user_id])
+  @@index([guest_token])
+  @@index([status])
+  @@map("carts")
+}
+
+model CartItem {
+  id                String   @id @default(uuid())
+  cart_id           String
+  item_type         String
+  item_id           String
+  item_name         String
+  billing_frequency String
+  unit_price        Decimal  @db.Decimal(12, 2)
+  quantity          Int      @default(1)
+  line_total        Decimal  @db.Decimal(12, 2)
+  created_at        DateTime @default(now())
+  updated_at        DateTime @updatedAt
+  cart              Cart     @relation(fields: [cart_id], references: [id], onDelete: Cascade)
+
+  @@index([cart_id])
+  @@index([item_type, item_id])
+  @@map("cart_items")
+}
+
+model Customer {
+  id                          String         @id @default(uuid())
+  user_id                     String?
+  full_name                   String
+  company_name                String?
+  business_name               String?
+  email                       String
+  mobile_number               String
+  billing_address             String
+  city                        String
+  province                    String
+  postal_code                 String
+  country                     String
+  tax_id                      String?
+  company_registration_number String?
+  business_website            String?
+  facebook_page_url           String?
+  industry                    String?
+  estimated_monthly_inquiries String?
+  main_products_or_services   String?
+  preferred_onboarding_date   DateTime?
+  created_at                  DateTime       @default(now())
+  updated_at                  DateTime       @updatedAt
+  user                        User?          @relation(fields: [user_id], references: [id], onDelete: SetNull)
+  orders                      Order[]
+  subscriptions               Subscription[]
+  invoices                    Invoice[]
+
+  @@index([user_id])
+  @@index([email])
+  @@map("customers")
+}
+
+model Order {
+  id                    String      @id @default(uuid())
+  order_number          String      @unique
+  customer_id           String
+  cart_id               String?
+  subtotal              Decimal     @db.Decimal(12, 2)
+  tax                   Decimal     @default(0) @db.Decimal(12, 2)
+  total                 Decimal     @db.Decimal(12, 2)
+  currency              String      @default("PHP")
+  billing_frequency     String
+  payment_provider      String
+  payment_status        String      @default("pending")
+  order_status          String      @default("awaiting_payment")
+  external_payment_id   String?
+  external_checkout_url String?
+  paid_at               DateTime?
+  created_at            DateTime    @default(now())
+  updated_at            DateTime    @updatedAt
+  customer              Customer    @relation(fields: [customer_id], references: [id], onDelete: Restrict)
+  cart                  Cart?       @relation(fields: [cart_id], references: [id], onDelete: SetNull)
+  items                 OrderItem[]
+  payments              Payment[]
+  subscriptions         Subscription[]
+  invoices              Invoice[]
+  manual_payment_proofs ManualPaymentProof[]
+
+  @@index([customer_id])
+  @@index([cart_id])
+  @@index([payment_status])
+  @@index([order_status])
+  @@index([external_payment_id])
+  @@map("orders")
+}
+
+model OrderItem {
+  id                String   @id @default(uuid())
+  order_id          String
+  item_type         String
+  item_id           String
+  item_name         String
+  billing_frequency String
+  unit_price        Decimal  @db.Decimal(12, 2)
+  quantity          Int      @default(1)
+  line_total        Decimal  @db.Decimal(12, 2)
+  created_at        DateTime @default(now())
+  order             Order    @relation(fields: [order_id], references: [id], onDelete: Cascade)
+
+  @@index([order_id])
+  @@map("order_items")
+}
+
+model Payment {
+  id                  String    @id @default(uuid())
+  order_id            String
+  provider            String
+  provider_payment_id String?
+  payment_method      String?
+  amount              Decimal   @db.Decimal(12, 2)
+  currency            String    @default("PHP")
+  status              String    @default("pending")
+  provider_response   Json?
+  paid_at             DateTime?
+  failed_at           DateTime?
+  created_at          DateTime  @default(now())
+  updated_at          DateTime  @updatedAt
+  order               Order     @relation(fields: [order_id], references: [id], onDelete: Cascade)
+
+  @@index([order_id])
+  @@index([provider, provider_payment_id])
+  @@index([status])
+  @@map("payments")
+}
+
+model Subscription {
+  id                       String      @id @default(uuid())
+  customer_id              String
+  order_id                 String
+  pricing_plan_id          String
+  provider                 String
+  provider_subscription_id String?
+  billing_frequency        String
+  amount                   Decimal     @db.Decimal(12, 2)
+  currency                 String      @default("PHP")
+  status                   String      @default("pending")
+  current_period_start     DateTime?
+  current_period_end       DateTime?
+  cancel_at_period_end     Boolean     @default(false)
+  cancelled_at             DateTime?
+  created_at               DateTime    @default(now())
+  updated_at               DateTime    @updatedAt
+  customer                 Customer    @relation(fields: [customer_id], references: [id], onDelete: Restrict)
+  order                    Order       @relation(fields: [order_id], references: [id], onDelete: Cascade)
+  pricing_plan             PricingPlan @relation(fields: [pricing_plan_id], references: [id], onDelete: Restrict)
+
+  @@index([customer_id])
+  @@index([order_id])
+  @@index([pricing_plan_id])
+  @@index([status])
+  @@map("subscriptions")
+}
+
+model WebhookEvent {
+  id                 String    @id @default(uuid())
+  provider           String
+  external_event_id  String
+  event_type         String
+  payload            Json
+  signature_verified Boolean   @default(false)
+  processing_status  String    @default("received")
+  processed_at       DateTime?
+  created_at         DateTime  @default(now())
+
+  @@unique([provider, external_event_id])
+  @@index([provider, event_type])
+  @@index([processing_status])
+  @@map("webhook_events")
+}
+
+model Invoice {
+  id             String    @id @default(uuid())
+  order_id       String
+  invoice_number String    @unique
+  customer_id    String
+  amount         Decimal   @db.Decimal(12, 2)
+  currency       String    @default("PHP")
+  status         String    @default("pending")
+  due_date       DateTime?
+  paid_at        DateTime?
+  invoice_url    String?
+  created_at     DateTime  @default(now())
+  updated_at     DateTime  @updatedAt
+  order          Order     @relation(fields: [order_id], references: [id], onDelete: Cascade)
+  customer       Customer  @relation(fields: [customer_id], references: [id], onDelete: Restrict)
+
+  @@index([order_id])
+  @@index([customer_id])
+  @@index([status])
+  @@map("invoices")
+}
+
+model ManualPaymentProof {
+  id                    String    @id @default(uuid())
+  order_id              String
+  transaction_reference String
+  payment_date          DateTime
+  sender_name           String
+  amount_sent           Decimal   @db.Decimal(12, 2)
+  proof_file_url        String?
+  status                String    @default("awaiting_verification")
+  admin_notes           String?   @db.Text
+  created_at            DateTime  @default(now())
+  updated_at            DateTime  @updatedAt
+  order                 Order     @relation(fields: [order_id], references: [id], onDelete: Cascade)
+
+  @@index([order_id])
+  @@index([status])
+  @@map("manual_payment_proofs")
+}

@@ -1,0 +1,130 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>AIChat Sales Agent Pricing | AIStaff</title>
+    <meta name="description" content="Choose an AIStaff package for 24/7 customer replies, lead qualification, automated follow-up, and sales support through Facebook Messenger and website chat." />
+    <link rel="icon" href="/aistaff-logo-square.png" type="image/png" />
+    <link rel="stylesheet" href="/style.css" />
+  </head>
+  <body class="commerce-page">
+    <header class="commerce-header">
+      <a class="brand" href="/"><img class="brand-logo" src="/aistaff-logo-square.png" alt="AIStaff" width="34" height="34" />AIStaff</a>
+      <nav class="site-nav" aria-label="Commerce navigation">
+        <a href="/pricing/">Pricing</a><a href="/contact/">Contact</a><a href="/terms/">Terms</a><a href="/privacy/">Privacy</a>
+      </nav>
+      <a class="button button-primary" href="#packages">Select Package</a>
+    </header>
+    <main>
+      <section class="commerce-hero">
+        <p class="eyebrow">AIChat Sales Agent</p>
+        <h1>AI sales support packages built for real customer inquiries.</h1>
+        <p>Your 24/7 AI sales assistant for Facebook Messenger and website inquiries. It replies, qualifies leads, captures contact details, prepares follow-ups, and keeps your sales team in control.</p>
+        <div class="merchant-strip">
+          <span>Digital subscription service</span><span>PHP pricing</span><span>Monthly or annual billing</span><span>Demo checkout until payment credentials are configured</span>
+        </div>
+      </section>
+
+      <section id="packages" class="commerce-section">
+        <div class="commerce-section-head">
+          <div>
+            <p class="eyebrow">Packages</p>
+            <h2>Choose your AIChat Sales Agent plan</h2>
+          </div>
+          <div class="billing-toggle" role="group" aria-label="Billing frequency">
+            <button class="active" type="button" data-billing="monthly">Monthly</button>
+            <button type="button" data-billing="annual">Annual <small>Save 10%</small></button>
+          </div>
+        </div>
+        <div id="pricingCards" class="commerce-pricing-grid" aria-live="polite"></div>
+      </section>
+
+      <section class="commerce-section">
+        <div class="enterprise-panel">
+          <div>
+            <p class="eyebrow">Enterprise</p>
+            <h2>Custom pricing for complex AI sales and support operations</h2>
+            <p>Starting at ₱100,000 per month for large companies, hotels, clinics, property developers, multi-branch businesses, high-volume support, private deployments, custom workflows, and dedicated infrastructure.</p>
+          </div>
+          <form id="enterpriseForm" class="enterprise-form">
+            <input required name="full_name" placeholder="Full name" />
+            <input required name="company_name" placeholder="Company name" />
+            <input required type="email" name="business_email" placeholder="Business email" />
+            <input required name="mobile_number" placeholder="Mobile number" />
+            <input name="industry" placeholder="Industry" />
+            <input name="number_of_branches" placeholder="Number of branches" />
+            <input name="estimated_monthly_inquiries" placeholder="Estimated monthly inquiries" />
+            <input name="required_integrations" placeholder="Required integrations" />
+            <input name="preferred_contact_schedule" placeholder="Preferred contact schedule" />
+            <textarea name="additional_requirements" placeholder="Additional requirements"></textarea>
+            <button class="button button-primary full" type="submit">Request an Enterprise Proposal</button>
+            <p class="success-message" hidden>Enterprise request prepared. Our team will contact you through the details provided.</p>
+          </form>
+        </div>
+      </section>
+
+      <section id="cart" class="commerce-section checkout-layout">
+        <form id="checkoutForm" class="checkout-form">
+          <div class="checkout-block">
+            <p class="eyebrow">Customer Details</p>
+            <div class="checkout-grid">
+              <label>Full name<input required name="full_name" autocomplete="name" /></label>
+              <label>Company name<input name="company_name" /></label>
+              <label>Business name<input name="business_name" /></label>
+              <label>Email address<input required type="email" name="email" autocomplete="email" /></label>
+              <label>Mobile number<input required name="mobile_number" autocomplete="tel" /></label>
+              <label>Billing address<input required name="billing_address" autocomplete="street-address" /></label>
+              <label>City<input required name="city" /></label>
+              <label>Province or state<input required name="province" /></label>
+              <label>Postal code<input required name="postal_code" /></label>
+              <label>Country<input required name="country" value="Philippines" /></label>
+              <label>Tax Identification Number, optional<input name="tax_id" /></label>
+              <label>Company registration number, optional<input name="company_registration_number" /></label>
+            </div>
+          </div>
+
+          <div class="checkout-block">
+            <p class="eyebrow">Business Information</p>
+            <div class="checkout-grid">
+              <label>Business website<input name="business_website" /></label>
+              <label>Facebook Page URL<input name="facebook_page_url" /></label>
+              <label>Industry<input name="industry" /></label>
+              <label>Estimated monthly inquiries<input name="estimated_monthly_inquiries" /></label>
+              <label>Main products or services<textarea name="main_products_or_services"></textarea></label>
+              <label>Preferred onboarding date<input type="date" name="preferred_onboarding_date" /></label>
+            </div>
+          </div>
+
+          <div class="checkout-block">
+            <p class="eyebrow">Payment Method</p>
+            <div id="paymentMethods" class="payment-methods"></div>
+            <p id="paymentModeNote" class="note"></p>
+          </div>
+
+          <div class="checkout-block agreement-block">
+            <label><input required type="checkbox" name="terms" /> I agree to the <a href="/terms/" target="_blank">Terms and Conditions</a></label>
+            <label><input required type="checkbox" name="privacy" /> I acknowledge the <a href="/privacy/" target="_blank">Privacy Policy</a></label>
+            <label><input required type="checkbox" name="renewal" /> I understand that subscription charges renew automatically unless cancelled</label>
+            <label><input required type="checkbox" name="correct" /> I confirm that the information provided is correct</label>
+          </div>
+        </form>
+        <aside class="order-summary">
+          <div class="summary-head">
+            <p class="eyebrow">Order Summary</p>
+            <button id="clearCartBtn" class="button button-soft" type="button">Remove item</button>
+          </div>
+          <div id="orderSummary" class="summary-lines empty-state"><p>Select a package to begin checkout.</p></div>
+          <div class="coupon-row"><input placeholder="Coupon code for future use" disabled /><button class="button button-soft" disabled>Apply</button></div>
+          <button id="checkoutBtn" class="button button-primary full" type="button" disabled>Checkout</button>
+          <p class="note">No card information is stored by AIStaff. Payment provider secrets are never exposed in frontend code.</p>
+        </aside>
+      </section>
+    </main>
+    <button id="mobileSummaryBtn" class="mobile-summary-btn" type="button">View order summary</button>
+    <footer class="commerce-footer">
+      <span>AIStaff Solutions Corporation</span><span>Registration details pending verified business profile</span><a href="/about/">About Us</a><a href="/contact/">Contact Us</a><a href="/support/">Support</a><a href="/refund-policy/">Refund Policy</a><a href="/cancellation-policy/">Cancellation Policy</a><a href="/service-fulfillment-policy/">Service Fulfillment Policy</a><a href="/terms/">Terms</a><a href="/privacy/">Privacy</a>
+    </footer>
+    <script src="/pricing-checkout.js"></script>
+  </body>
+</html>

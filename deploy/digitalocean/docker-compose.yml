@@ -1,0 +1,25 @@
+# AIStaff on DigitalOcean — separate container from marga-app / marga-api.
+# Joins the existing marga-deploy network so Caddy can reverse-proxy aistaff.click.
+services:
+  aistaff-api:
+    image: node:22-bookworm-slim
+    restart: unless-stopped
+    working_dir: /srv/aistaff
+    env_file:
+      - /opt/aistaff/.env
+    environment:
+      APP_PORT: 3000
+      NODE_ENV: production
+    volumes:
+      - /opt/aistaff:/srv/aistaff
+    command: >
+      sh -lc 'if [ ! -d node_modules ]; then npm ci --omit=dev; fi;
+      npx prisma generate;
+      exec node src/server.js'
+    networks:
+      - marga
+
+networks:
+  marga:
+    external: true
+    name: marga-deploy_marga

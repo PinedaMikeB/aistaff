@@ -1,0 +1,113 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Brandee — Draft 2: Split Product Demo Hero</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link href="https://fonts.googleapis.com/css2?family=Nunito+Sans:wght@400;500;600;700&family=Rubik:wght@500;600;700;800&display=swap" rel="stylesheet" />
+<style>
+  :root {
+    --color-primary: #7C3AED; --color-secondary: #6366F1; --color-accent: #EC4899;
+    --color-background: #FAF5FF; --color-foreground: #0F172A;
+    --color-muted: #F7F3FD; --color-border: #EFE7FC;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Nunito Sans', sans-serif; background: var(--color-background);
+    color: var(--color-foreground); }
+  h1, h2, h3 { font-family: 'Rubik', sans-serif; }
+</style>
+</head>
+<body>
+<style>
+  .hero { min-height: 100vh; display: grid; grid-template-columns: 1fr 1fr;
+    align-items: center; gap: 40px; padding: 0 60px; }
+  @media (max-width: 900px) { .hero { grid-template-columns: 1fr; padding: 100px 24px; } }
+  .copy { opacity: 0; }
+  .eyebrow { display: inline-flex; align-items: center; gap: 8px; font: 600 12px 'Nunito Sans';
+    letter-spacing: .08em; text-transform: uppercase; color: var(--color-primary);
+    margin-bottom: 20px; }
+  .eyebrow .dot { width: 6px; height: 6px; border-radius: 50%; background: var(--color-accent);
+    box-shadow: 0 0 8px var(--color-accent); }
+  h1 { font-size: clamp(34px, 4.2vw, 54px); font-weight: 700; line-height: 1.12;
+    letter-spacing: -0.02em; }
+  h1 .grad { background: linear-gradient(120deg, var(--color-primary), var(--color-accent));
+    -webkit-background-clip: text; background-clip: text; color: transparent; }
+  .sub { margin-top: 20px; font-size: 17px; color: #52607a; max-width: 480px; }
+  .steps { margin-top: 28px; display: flex; flex-direction: column; gap: 12px; }
+  .step { display: flex; align-items: center; gap: 12px; font: 500 14px 'Nunito Sans'; }
+  .step .num { width: 26px; height: 26px; border-radius: 50%; background: var(--color-muted);
+    border: 1px solid var(--color-border); display: grid; place-items: center;
+    font: 700 12px 'Rubik'; color: var(--color-primary); flex-shrink: 0; }
+  .cta-row { margin-top: 32px; display: flex; gap: 14px; }
+  .btn { font: 600 15px 'Nunito Sans'; padding: 14px 28px; border-radius: 12px;
+    border: none; cursor: pointer; transition: transform .2s; }
+  .btn:hover { transform: translateY(-2px); }
+  .btn-primary { background: linear-gradient(120deg, var(--color-primary), var(--color-secondary));
+    color: #fff; box-shadow: 0 10px 30px rgba(124,58,237,.35); }
+  .btn-ghost { background: #fff; border: 1px solid var(--color-border); color: var(--color-foreground); }
+</style>
+<style>
+  .preview { position: relative; opacity: 0; }
+  .phone-frame { width: 100%; max-width: 320px; margin: 0 auto; aspect-ratio: 9/16;
+    border-radius: 32px; background: linear-gradient(160deg, #1e1b3a, #0F172A);
+    border: 6px solid #0F172A; box-shadow: 0 30px 70px rgba(124,58,237,.25);
+    position: relative; overflow: hidden; }
+  .phone-glow { position: absolute; inset: 0; background:
+    radial-gradient(circle at 30% 20%, rgba(124,58,237,.4), transparent 50%),
+    radial-gradient(circle at 70% 80%, rgba(236,72,153,.35), transparent 50%); }
+  .caption-bar { position: absolute; bottom: 60px; left: 16px; right: 16px;
+    background: rgba(255,255,255,.95); border-radius: 12px; padding: 10px 14px;
+    font: 700 13px 'Nunito Sans'; text-align: center; color: var(--color-foreground); }
+  .float-card { position: absolute; background: #fff; border-radius: 14px; padding: 12px 16px;
+    box-shadow: 0 20px 40px rgba(15,23,42,.15); font: 600 12px 'Nunito Sans';
+    display: flex; align-items: center; gap: 8px; opacity: 0; }
+  .float-1 { top: 8%; right: -8%; }
+  .float-2 { bottom: 12%; left: -10%; }
+  .float-card svg { width: 16px; height: 16px; flex-shrink: 0; }
+</style>
+<section class="hero">
+  <div class="copy">
+    <div class="eyebrow"><span class="dot"></span> Brandee · AI UGC Ad Generator</div>
+    <h1>Your product.<br/>A <span class="grad">believable face</span>.<br/>A finished ad.</h1>
+    <p class="sub">No filming, no talent booking, no editing software. Upload a product photo
+      and Brandee builds the avatar, script, voice, and video for you.</p>
+    <div class="steps">
+      <div class="step"><span class="num">1</span> Choose an avatar and scene</div>
+      <div class="step"><span class="num">2</span> Upload your product photo</div>
+      <div class="step"><span class="num">3</span> Get a ready-to-post video</div>
+    </div>
+    <div class="cta-row">
+      <button class="btn btn-primary">Start creating free</button>
+      <button class="btn btn-ghost">See a sample video</button>
+    </div>
+  </div>
+  <div class="preview">
+    <div class="phone-frame">
+      <div class="phone-glow"></div>
+      <div class="caption-bar">"...talagang nakatulong sa negosyo namin"</div>
+    </div>
+    <div class="float-card float-1">
+      <svg viewBox="0 0 24 24" fill="none"><path d="M5 13l4 4L19 7" stroke="#7C3AED" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      Script generated
+    </div>
+    <div class="float-card float-2">
+      <svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="9" stroke="#EC4899" stroke-width="2.5"/><path d="M9 12l2 2 4-4" stroke="#EC4899" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      Voice matched
+    </div>
+  </div>
+</section>
+<script type="module">
+  import { animate } from "https://cdn.jsdelivr.net/npm/motion@11/+esm";
+
+  animate(".copy", { opacity: [0, 1], x: [-24, 0] }, { duration: 0.6, easing: "ease-out" });
+  animate(".preview", { opacity: [0, 1], x: [24, 0] }, { duration: 0.6, delay: 0.15 });
+  animate(".float-1", { opacity: [0, 1], y: [-10, 0] }, { duration: 0.5, delay: 0.7 });
+  animate(".float-2", { opacity: [0, 1], y: [10, 0] }, { duration: 0.5, delay: 0.9 });
+
+  // Gentle continuous float on the cards for a "living" product feel
+  animate(".float-1", { y: [0, -8, 0] }, { duration: 3.5, repeat: Infinity, easing: "ease-in-out", delay: 1.2 });
+  animate(".float-2", { y: [0, 8, 0] }, { duration: 4, repeat: Infinity, easing: "ease-in-out", delay: 1.4 });
+</script>
+</body>
+</html>

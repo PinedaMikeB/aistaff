@@ -1,0 +1,123 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Brandee — Draft 1: Wave Gradient Hero</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link href="https://fonts.googleapis.com/css2?family=Nunito+Sans:wght@400;500;600;700&family=Rubik:wght@500;600;700;800&display=swap" rel="stylesheet" />
+<style>
+  :root {
+    --color-primary: #7C3AED;
+    --color-secondary: #6366F1;
+    --color-accent: #EC4899;
+    --color-background: #FAF5FF;
+    --color-foreground: #0F172A;
+    --color-muted: #F7F3FD;
+    --color-border: #EFE7FC;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: 'Nunito Sans', sans-serif;
+    background: var(--color-background);
+    color: var(--color-foreground);
+    overflow-x: hidden;
+  }
+  h1, h2, h3 { font-family: 'Rubik', sans-serif; }
+</style>
+</head>
+<body>
+<main id="hero-root"></main>
+<style>
+  .hero { position: relative; min-height: 100vh; display: flex; flex-direction: column;
+    align-items: center; justify-content: center; text-align: center; padding: 80px 24px; }
+  .wave-bg { position: absolute; inset: 0; z-index: 0; overflow: hidden; }
+  .wave-bg svg { position: absolute; width: 140%; left: -20%; opacity: 0.35; }
+  .wave-1 { top: -10%; animation: drift 22s ease-in-out infinite; }
+  .wave-2 { bottom: -15%; animation: drift 28s ease-in-out infinite reverse; }
+  @keyframes drift { 0%,100% { transform: translateX(0) rotate(0deg); }
+    50% { transform: translateX(3%) rotate(1.5deg); } }
+  .eyebrow { position: relative; z-index: 1; font: 600 13px 'Nunito Sans'; letter-spacing: .08em;
+    text-transform: uppercase; color: var(--color-primary); background: #fff;
+    border: 1px solid var(--color-border); padding: 6px 16px; border-radius: 999px; margin-bottom: 24px; }
+  h1 { position: relative; z-index: 1; font-size: clamp(38px, 6vw, 72px); font-weight: 700;
+    line-height: 1.08; letter-spacing: -0.02em; max-width: 900px; }
+  h1 .word { display: inline-block; opacity: 0; }
+  h1 .grad { background: linear-gradient(120deg, var(--color-primary), var(--color-accent));
+    -webkit-background-clip: text; background-clip: text; color: transparent; }
+  .sub { position: relative; z-index: 1; margin-top: 22px; font-size: 18px; color: #52607a;
+    max-width: 560px; opacity: 0; }
+  .cta-row { position: relative; z-index: 1; margin-top: 36px; display: flex; gap: 14px; opacity: 0; }
+  .btn { font: 600 15px 'Nunito Sans'; padding: 14px 28px; border-radius: 12px; cursor: pointer;
+    border: none; transition: transform .2s; }
+  .btn:hover { transform: translateY(-2px); }
+  .btn-primary { background: linear-gradient(120deg, var(--color-primary), var(--color-secondary));
+    color: #fff; box-shadow: 0 10px 30px rgba(124,58,237,.35); }
+  .btn-ghost { background: #fff; color: var(--color-foreground); border: 1px solid var(--color-border); }
+</style>
+<style>
+  .gallery { position: relative; z-index: 1; margin-top: 64px; display: grid;
+    grid-template-columns: repeat(5, 1fr); gap: 16px; max-width: 900px; width: 100%; }
+  .avatar-card { aspect-ratio: 3/4; border-radius: 16px; background: var(--color-muted);
+    border: 1px solid var(--color-border); overflow: hidden; opacity: 0; cursor: pointer;
+    position: relative; transition: border-color .25s, transform .25s; }
+  .avatar-card:hover { transform: translateY(-6px); border-color: var(--color-primary); }
+  .avatar-card img { width: 100%; height: 100%; object-fit: cover; }
+  .avatar-card .scene-tag { position: absolute; bottom: 8px; left: 8px; right: 8px;
+    background: rgba(15,23,42,.65); color: #fff; font: 600 11px 'Nunito Sans';
+    padding: 5px 8px; border-radius: 8px; text-align: center; backdrop-filter: blur(4px); }
+</style>
+<section class="hero">
+  <div class="wave-bg">
+    <svg class="wave-1" viewBox="0 0 1200 400" xmlns="http://www.w3.org/2000/svg">
+      <path fill="#7C3AED" fill-opacity="0.5" d="M0,160 C300,260 900,60 1200,160 L1200,0 L0,0 Z"/>
+    </svg>
+    <svg class="wave-2" viewBox="0 0 1200 400" xmlns="http://www.w3.org/2000/svg">
+      <path fill="#EC4899" fill-opacity="0.4" d="M0,240 C300,140 900,340 1200,240 L1200,400 L0,400 Z"/>
+    </svg>
+  </div>
+  <p class="eyebrow">Brandee · AI UGC Ad Generator</p>
+  <h1 id="headline">Turn one product photo<br/>into <span class="grad">scroll-stopping</span> UGC ads.</h1>
+  <p class="sub">Pick an avatar, pick a scene, upload your product. Brandee handles the script,
+    the voice, and the video — ready in minutes.</p>
+  <div class="cta-row">
+    <button class="btn btn-primary">Start creating free</button>
+    <button class="btn btn-ghost">See a sample video</button>
+  </div>
+  <div class="gallery" id="gallery"></div>
+</section>
+<script type="module">
+  import { animate, stagger } from "https://cdn.jsdelivr.net/npm/motion@11/+esm";
+
+  // Split headline into words for staggered reveal
+  const headline = document.getElementById('headline');
+  headline.innerHTML = headline.innerHTML
+    .split(/(<[^>]+>|\s+)/)
+    .map(chunk => (chunk.trim() && !chunk.startsWith('<'))
+      ? `<span class="word">${chunk}</span>` : chunk)
+    .join(' ');
+
+  animate(".word", { opacity: [0, 1], y: [16, 0] },
+    { delay: stagger(0.045), duration: 0.5, easing: "ease-out" });
+  animate(".sub", { opacity: [0, 1], y: [10, 0] }, { delay: 0.5, duration: 0.5 });
+  animate(".cta-row", { opacity: [0, 1], y: [10, 0] }, { delay: 0.65, duration: 0.5 });
+
+  // Scene gallery — 5 curated presets (placeholder gradients until real renders exist)
+  const scenes = [
+    { name: "Home", color: "#DDD6FE" }, { name: "Beach", color: "#FBCFE8" },
+    { name: "Kitchen", color: "#C7D2FE" }, { name: "Office", color: "#E9D5FF" },
+    { name: "Car", color: "#FDE68A" }
+  ];
+  const gallery = document.getElementById('gallery');
+  scenes.forEach(s => {
+    const card = document.createElement('div');
+    card.className = 'avatar-card';
+    card.innerHTML = `<div style="width:100%;height:100%;background:${s.color}"></div>
+      <div class="scene-tag">${s.name}</div>`;
+    gallery.appendChild(card);
+  });
+  animate(".avatar-card", { opacity: [0, 1], y: [20, 0] },
+    { delay: stagger(0.08, { startDelay: 0.8 }), duration: 0.45 });
+</script>
+</body>
+</html>

@@ -1,0 +1,1738 @@
+require("dotenv").config({ override: true });
+
+const crypto = require("crypto");
+const path = require("path");
+const express = require("express");
+const helmet = require("helmet");
+const cors = require("cors");
+const cookieParser = require("cookie-parser");
+const morgan = require("morgan");
+const { z } = require("zod");
+
+const { prisma } = require("./db");
+const { encryptSecret } = require("./crypto");
+const {
+  verifyPassword,
+  signSession,
+  requireAuth,
+  setSessionCookie,
+  clearSessionCookie
+} = require("./auth");
+const { generateSalesReply, scoreLead, quotationReady } = require("./ai");
+const { verifyMessengerSignature, handleMessengerWebhook, sendMessengerText } = require("./messenger-webhook");
+const { generateAistaffDemoReply, getAistaffSession } = require("./aistaff-demo");
+const {
+  loadAistaffAiConfig,
+  clearAistaffAiConfigCache,
+  getMessengerMemoryForPsid,
+  buildAdminPromptPreview,
+  DEFAULT_AI_GOAL
+} = require("./aistaff-ai-config");
+const { buildPresenceSnapshot, formatSnapshotForMessenger } = require("./page-intelligence");
+const {
+  getMarketingOverview,
+  listCreatives,
+  updateChecklistItem,
+  updateAdReview,
+  updateMarketingNotes,
+  renderCreative,
+  renderPreviewStill,
+  generateVoiceover,
+  getRenderJobs,
+  getRenderStatus,
+  getLatestJobForComposition
+} = require("./marketing");
+const {
+  PAYMENT_MODE,
+  BUSINESS_IDENTITY,
+  PRODUCT,
+  PRICING_PLANS,
+  ADD_ONS,
+  calculateCart,
+  getPaymentProvider,
+  nextBillingDate,
+  paymentProviderForCountry,
+  providerReady,
+  verifyWebhookSignature
+} = require("./payments");
+
+const app = express();
+const port = Number(process.env.APP_PORT || 3000);
+const metaVerifyToken = process.env.META_VERIFY_TOKEN || "aistaff_verify_2026";
+const metaOauthStates = new Map();
+const metaAuthorizedPagesByUser = new Map();
+
+app.use(helmet({ contentSecurityPolicy: false }));
+app.use(cors({ origin: true, credentials: true }));
+
+function messengerWebhookVerify(req, res) {
+  const mode = req.query["hub.mode"];
+  const token = req.query["hub.verify_token"];
+  const challenge = req.query["hub.challenge"];
+  if (mode === "subscribe" && token === metaVerifyToken) {
+    return res.status(200).type("text/plain").send(String(challenge || ""));
+  }
+  return res.sendStatus(403);
+}
+
+function messengerWebhookReceive(req, res) {
+  if (!verifyMessengerSignature(req.rawBody, req.get("X-Hub-Signature-256"))) {
+    console.warn("Rejected Messenger webhook with invalid signature");
+    return res.sendStatus(403);
+  }
+
+  let payload;
+  try {
+    payload = JSON.parse(req.rawBody.toString("utf8"));
+  } catch {
+    return res.sendStatus(400);
+  }
+
+  console.log("Incoming Messenger webhook payload:", JSON.stringify(payload, null, 2));
+  res.sendStatus(200);
+
+  handleMessengerWebhook(payload, { maybeCreateQuotationDraft }).catch((error) => {
+    console.error("Messenger webhook processing failed:", error);
+  });
+}
+
+app.get("/api/webhooks/messenger", messengerWebhookVerify);
+app.post("/api/webhooks/messenger", express.raw({ type: "application/json", limit: "1mb" }), (req, res, next) => {
+  req.rawBody = req.body;
+  next();
+}, messengerWebhookReceive);
+
+app.get("/webhooks/meta/messenger", messengerWebhookVerify);
+app.post("/webhooks/meta/messenger", express.raw({ type: "application/json", limit: "1mb" }), (req, res, next) => {
+  req.rawBody = req.body;
+  next();
+}, messengerWebhookReceive);
+
+app.post("/api/webhooks/xendit", express.raw({ type: "application/json", limit: "1mb" }), (req, res) => {
+  processPaymentWebhook("xendit", req, res).catch((error) => {
+    console.error("Xendit webhook failed:", error);
+    res.status(500).json({ error: "Webhook processing failed" });
+  });
+});
+
+app.post("/api/webhooks/stripe", express.raw({ type: "application/json", limit: "1mb" }), (req, res) => {
+  processPaymentWebhook("stripe", req, res).catch((error) => {
+    console.error("Stripe webhook failed:", error);
+    res.status(500).json({ error: "Webhook processing failed" });
+  });
+});
+
+app.use(express.json({ limit: "1mb" }));
+app.use(express.urlencoded({ extended: true }));
+app.use(cookieParser());
+app.use(morgan("dev"));
+app.use(express.static(path.join(__dirname, "..", "public"), {
+  setHeaders(res, filePath) {
+    if (filePath.endsWith("app.js") || filePath.endsWith("index.html") || filePath.endsWith("style.css") || filePath.endsWith("workforce-motion.js")) {
+      res.setHeader("Cache-Control", "no-cache");
+    }
+  }
+}));
+app.use("/marketing-assets", express.static(path.join(__dirname, "..", "remotion", "out")));
+app.use("/marketing-assets", express.static(path.join(__dirname, "..", "remotion", "public")));
+
+function asyncHandler(fn) {
+  return (req, res, next) => Promise.resolve(fn(req, res, next)).catch(next);
+}
+
+function getAppUrl(req) {
+  return (process.env.APP_PUBLIC_URL || process.env.APP_BASE_URL || `${req.protocol}://${req.get("host")}`).replace(/\/$/, "");
+}
+
+function getMetaRedirectUri(req) {
+  return `${getAppUrl(req)}/api/meta/facebook/callback`;
+}
+
+function pruneExpiredMetaAuth() {
+  const now = Date.now();
+  for (const [state, auth] of metaOauthStates.entries()) {
+    if (auth.expiresAt <= now) metaOauthStates.delete(state);
+  }
+  for (const [userId, auth] of metaAuthorizedPagesByUser.entries()) {
+    if (auth.expiresAt <= now) metaAuthorizedPagesByUser.delete(userId);
+  }
+}
+
+function setMetaAuthForUser(userId, value) {
+  pruneExpiredMetaAuth();
+  metaAuthorizedPagesByUser.set(userId, {
+    ...value,
+    expiresAt: Date.now() + (15 * 60 * 1000)
+  });
+}
+
+function getMetaAuthForUser(userId) {
+  pruneExpiredMetaAuth();
+  return metaAuthorizedPagesByUser.get(userId) || null;
+}
+
+function facebookConnectionPath(params = {}) {
+  const query = new URLSearchParams(params);
+  const suffix = query.toString() ? `?${query.toString()}` : "";
+  return `/admin/settings/facebook-page-connection${suffix}`;
+}
+
+function sanitizeManagedPage(page) {
+  return {
+    id: page.id,
+    name: page.name,
+    category: page.category || "",
+    tasks: Array.isArray(page.tasks) ? page.tasks : []
+  };
+}
+
+function publicCompanySelect() {
+  return {
+    id: true,
+    name: true,
+    industry: true,
+    website: true,
+    contact_email: true,
+    contact_number: true,
+    status: true,
+    created_at: true,
+    updated_at: true
+  };
+}
+
+async function getDefaultCompanyId() {
+  const company = await prisma.company.findFirst({ where: { status: "active" }, orderBy: { created_at: "asc" } });
+  if (!company) throw new Error("No active company found. Run npm run seed first.");
+  return company.id;
+}
+
+function requireFinance(req, res, next) {
+  if (!["admin", "finance", "owner"].includes(req.user?.role)) {
+    return res.status(403).json({ error: "Finance permission required" });
+  }
+  next();
+}
+
+function decimalNumber(value) {
+  return Number(value || 0);
+}
+
+function serializeCart(cart) {
+  return {
+    ...cart,
+    subtotal: decimalNumber(cart.subtotal),
+    tax: decimalNumber(cart.tax),
+    total: decimalNumber(cart.total),
+    items: (cart.items || []).map((item) => ({
+      ...item,
+      unit_price: decimalNumber(item.unit_price),
+      line_total: decimalNumber(item.line_total)
+    }))
+  };
+}
+
+function serializeOrder(order) {
+  return {
+    ...order,
+    subtotal: decimalNumber(order.subtotal),
+    tax: decimalNumber(order.tax),
+    total: decimalNumber(order.total),
+    items: (order.items || []).map((item) => ({
+      ...item,
+      unit_price: decimalNumber(item.unit_price),
+      line_total: decimalNumber(item.line_total)
+    })),
+    payments: (order.payments || []).map((payment) => ({
+      ...payment,
+      amount: decimalNumber(payment.amount)
+    })),
+    subscriptions: (order.subscriptions || []).map((subscription) => ({
+      ...subscription,
+      amount: decimalNumber(subscription.amount)
+    })),
+    invoices: (order.invoices || []).map((invoice) => ({
+      ...invoice,
+      amount: decimalNumber(invoice.amount)
+    }))
+  };
+}
+
+async function ensurePricingCatalog() {
+  const product = await prisma.product.upsert({
+    where: { slug: PRODUCT.slug },
+    update: {
+      name: PRODUCT.name,
+      description: PRODUCT.description,
+      status: "active"
+    },
+    create: {
+      name: PRODUCT.name,
+      slug: PRODUCT.slug,
+      description: PRODUCT.description,
+      status: "active"
+    }
+  });
+
+  await Promise.all(PRICING_PLANS.map((plan) => prisma.pricingPlan.upsert({
+    where: { slug: plan.slug },
+    update: {
+      product_id: product.id,
+      name: plan.name,
+      monthly_price: plan.monthlyPrice,
+      annual_price: plan.annualPrice,
+      currency: "PHP",
+      conversation_limit: plan.conversationLimit,
+      facebook_page_limit: plan.facebookPageLimit,
+      features: plan.features,
+      active: true
+    },
+    create: {
+      product_id: product.id,
+      name: plan.name,
+      slug: plan.slug,
+      monthly_price: plan.monthlyPrice,
+      annual_price: plan.annualPrice,
+      currency: "PHP",
+      conversation_limit: plan.conversationLimit,
+      facebook_page_limit: plan.facebookPageLimit,
+      features: plan.features,
+      active: true
+    }
+  })));
+
+  await Promise.all(ADD_ONS.map((addon) => prisma.addOn.upsert({
+    where: { slug: addon.slug },
+    update: {
+      name: addon.name,
+      description: addon.description,
+      price: addon.price,
+      currency: "PHP",
+      billing_type: addon.billingType,
+      active: true
+    },
+    create: {
+      name: addon.name,
+      slug: addon.slug,
+      description: addon.description,
+      price: addon.price,
+      currency: "PHP",
+      billing_type: addon.billingType,
+      active: true
+    }
+  })));
+}
+
+function publicPricingPayload() {
+  return {
+    product: PRODUCT,
+    businessIdentity: BUSINESS_IDENTITY,
+    paymentMode: PAYMENT_MODE,
+    providerStatus: {
+      xendit: providerReady("xendit") ? "configured" : "test_mode",
+      stripe: providerReady("stripe") ? "configured" : "test_mode",
+      manual_bank_transfer: "prepared"
+    },
+    plans: PRICING_PLANS,
+    addOns: ADD_ONS,
+    enterprise: {
+      name: "Enterprise",
+      priceLabel: "Custom pricing",
+      rangeLabel: "Starting at ₱100,000 per month",
+      cta: "Request an Enterprise Proposal",
+      bestFor: [
+        "Large companies",
+        "Hotels",
+        "Clinics",
+        "Property developers",
+        "Multi-branch businesses",
+        "High-volume customer support",
+        "Custom AI integrations",
+        "Private deployment",
+        "Custom workflows",
+        "Dedicated infrastructure"
+      ]
+    },
+    policies: {
+      tax: "Taxes are shown as ₱0 in demo checkout until tax configuration is finalized.",
+      refund: "Setup fees may become non-refundable once onboarding work begins. Subscription charges are reviewed under the Refund Policy.",
+      cancellation: "Customers may cancel future renewals before the next billing date. Cancellation does not automatically refund the current billing period."
+    }
+  };
+}
+
+function orderNumber() {
+  const stamp = new Date().toISOString().slice(0, 10).replaceAll("-", "");
+  return `AS-${stamp}-${crypto.randomBytes(3).toString("hex").toUpperCase()}`;
+}
+
+function invoiceNumber() {
+  const stamp = new Date().toISOString().slice(0, 10).replaceAll("-", "");
+  return `INV-${stamp}-${crypto.randomBytes(3).toString("hex").toUpperCase()}`;
+}
+
+async function processPaymentWebhook(provider, req, res) {
+  const rawBody = Buffer.isBuffer(req.body) ? req.body : Buffer.from(JSON.stringify(req.body || {}));
+  const signature = provider === "xendit" ? req.get("x-callback-token") : req.get("stripe-signature");
+  const signatureVerified = verifyWebhookSignature(provider, rawBody, signature);
+  if (!signatureVerified) return res.status(400).json({ error: "Invalid webhook signature" });
+
+  let payload = {};
+  try {
+    payload = JSON.parse(rawBody.toString("utf8"));
+  } catch {
+    return res.status(400).json({ error: "Invalid JSON payload" });
+  }
+
+  const externalEventId = String(payload.id || payload.event_id || payload.data?.id || crypto.createHash("sha256").update(rawBody).digest("hex"));
+  const eventType = String(payload.event || payload.type || payload.status || "payment_event");
+  const existing = await prisma.webhookEvent.findUnique({ where: { provider_external_event_id: { provider, external_event_id: externalEventId } } });
+  if (existing?.processing_status === "processed") return res.json({ ok: true, duplicate: true });
+
+  await prisma.webhookEvent.upsert({
+    where: { provider_external_event_id: { provider, external_event_id: externalEventId } },
+    update: { payload, signature_verified: true, processing_status: "processing" },
+    create: { provider, external_event_id: externalEventId, event_type: eventType, payload, signature_verified: true, processing_status: "processing" }
+  });
+
+  const externalPaymentId = String(payload.external_id || payload.id || payload.data?.object?.id || payload.data?.id || "");
+  const paid = ["PAID", "SUCCEEDED", "paid", "succeeded", "checkout.session.completed", "invoice.paid"].includes(payload.status || payload.type);
+  const failed = ["FAILED", "EXPIRED", "failed", "expired", "payment_intent.payment_failed"].includes(payload.status || payload.type);
+
+  if (externalPaymentId && (paid || failed)) {
+    const order = await prisma.order.findFirst({ where: { external_payment_id: externalPaymentId } });
+    if (order) {
+      if (paid) {
+        const periodEnd = nextBillingDate(order.billing_frequency);
+        await prisma.$transaction([
+          prisma.payment.updateMany({ where: { order_id: order.id, provider }, data: { status: "paid", paid_at: new Date(), provider_response: payload } }),
+          prisma.order.update({ where: { id: order.id }, data: { payment_status: "paid", order_status: "onboarding_required", paid_at: new Date() } }),
+          prisma.subscription.updateMany({ where: { order_id: order.id }, data: { status: "active", current_period_start: new Date(), current_period_end: periodEnd } }),
+          prisma.invoice.updateMany({ where: { order_id: order.id }, data: { status: "paid", paid_at: new Date() } })
+        ]);
+      } else {
+        await prisma.$transaction([
+          prisma.payment.updateMany({ where: { order_id: order.id, provider }, data: { status: "failed", failed_at: new Date(), provider_response: payload } }),
+          prisma.order.update({ where: { id: order.id }, data: { payment_status: "failed", order_status: "awaiting_payment" } })
+        ]);
+      }
+    }
+  }
+
+  await prisma.webhookEvent.update({
+    where: { provider_external_event_id: { provider, external_event_id: externalEventId } },
+    data: { processing_status: "processed", processed_at: new Date() }
+  });
+  res.json({ ok: true });
+}
+
+function numberOrNull(value) {
+  if (value === undefined || value === null || value === "") return null;
+  return Number(value);
+}
+
+async function nextQuotationNumber(companyId) {
+  const count = await prisma.quotation.count({ where: { company_id: companyId } });
+  return `Q-${new Date().getFullYear()}-${String(count + 1).padStart(5, "0")}`;
+}
+
+async function maybeCreateQuotationDraft({ companyId, lead, conversationId, preparedBy = null }) {
+  if (!lead.quotation_ready) return null;
+  const existing = await prisma.quotation.findFirst({
+    where: { company_id: companyId, lead_id: lead.id, status: { in: ["draft", "pending_approval"] } }
+  });
+  if (existing) return existing;
+
+  const settings = await prisma.companySetting.findUnique({ where: { company_id: companyId } });
+  if (!settings?.allow_ai_quotation_drafts) return null;
+
+  return prisma.quotation.create({
+    data: {
+      company_id: companyId,
+      lead_id: lead.id,
+      conversation_id: conversationId,
+      quotation_number: await nextQuotationNumber(companyId),
+      customer_name: lead.customer_name,
+      customer_company: lead.company_name,
+      service_needed: lead.service_needed,
+      quotation_details: `Draft quotation request for ${lead.service_needed || "requested service"}.\nLocation: ${lead.location || "TBD"}\nUrgency: ${lead.urgency || "TBD"}\nNotes: ${lead.notes || "Created by AI after Messenger qualification."}`,
+      terms: "Subject to admin review and official approval.",
+      status: settings.quotation_requires_admin_approval ? "pending_approval" : "draft",
+      mode: settings.quotation_mode || "approval_required",
+      prepared_by: preparedBy
+    }
+  });
+}
+
+app.get("/api/health", asyncHandler(async (req, res) => {
+  let database = "ok";
+  try {
+    await prisma.$queryRaw`SELECT 1`;
+  } catch {
+    database = "error";
+  }
+  res.json({
+    ok: database === "ok",
+    database,
+    messengerWebhook: "/api/webhooks/messenger",
+    publicUrl: process.env.APP_PUBLIC_URL || null,
+    signatureVerification: Boolean(process.env.META_APP_SECRET)
+  });
+}));
+
+app.get("/api/public-config", (req, res) => {
+  const pageId = process.env.META_PAGE_ID || "";
+  res.json({
+    messengerUrl: pageId ? `https://m.me/${pageId}` : null,
+    pageId: pageId || null
+  });
+});
+
+app.get("/api/pricing", asyncHandler(async (req, res) => {
+  await ensurePricingCatalog();
+  res.json(publicPricingPayload());
+}));
+
+app.post("/api/cart", asyncHandler(async (req, res) => {
+  await ensurePricingCatalog();
+  const body = z.object({
+    planSlug: z.string().min(1),
+    billingFrequency: z.enum(["monthly", "annual"]).default("monthly"),
+    addOnSlugs: z.array(z.string()).default([]),
+    guestToken: z.string().optional().nullable()
+  }).parse(req.body);
+  const guestToken = body.guestToken || crypto.randomUUID();
+  const calculated = calculateCart(body);
+  const cart = await prisma.cart.create({
+    data: {
+      guest_token: guestToken,
+      status: "active",
+      currency: calculated.currency,
+      subtotal: calculated.subtotal,
+      tax: calculated.tax,
+      total: calculated.total,
+      items: {
+        create: calculated.items.map((item) => ({
+          item_type: item.itemType,
+          item_id: item.itemId,
+          item_name: item.itemName,
+          billing_frequency: item.billingFrequency,
+          unit_price: item.unitPrice,
+          quantity: item.quantity,
+          line_total: item.lineTotal
+        }))
+      }
+    },
+    include: { items: true }
+  });
+  res.json({ guestToken, cart: serializeCart(cart) });
+}));
+
+app.get("/api/cart/:id", asyncHandler(async (req, res) => {
+  const cart = await prisma.cart.findUnique({ where: { id: req.params.id }, include: { items: { orderBy: { created_at: "asc" } } } });
+  if (!cart) return res.status(404).json({ error: "Cart not found" });
+  res.json(serializeCart(cart));
+}));
+
+app.patch("/api/cart/:id", asyncHandler(async (req, res) => {
+  await ensurePricingCatalog();
+  const body = z.object({
+    planSlug: z.string().min(1).optional(),
+    billingFrequency: z.enum(["monthly", "annual"]).optional(),
+    addOnSlugs: z.array(z.string()).optional()
+  }).parse(req.body);
+  const existing = await prisma.cart.findUnique({ where: { id: req.params.id }, include: { items: true } });
+  if (!existing) return res.status(404).json({ error: "Cart not found" });
+  const currentPlan = existing.items.find((item) => item.item_type === "pricing_plan");
+  const currentAddOns = existing.items.filter((item) => item.item_type === "add_on").map((item) => item.item_id);
+  const calculated = calculateCart({
+    planSlug: body.planSlug || currentPlan?.item_id,
+    billingFrequency: body.billingFrequency || currentPlan?.billing_frequency || "monthly",
+    addOnSlugs: body.addOnSlugs || currentAddOns
+  });
+  const cart = await prisma.$transaction(async (tx) => {
+    await tx.cartItem.deleteMany({ where: { cart_id: existing.id } });
+    return tx.cart.update({
+      where: { id: existing.id },
+      data: {
+        currency: calculated.currency,
+        subtotal: calculated.subtotal,
+        tax: calculated.tax,
+        total: calculated.total,
+        items: {
+          create: calculated.items.map((item) => ({
+            item_type: item.itemType,
+            item_id: item.itemId,
+            item_name: item.itemName,
+            billing_frequency: item.billingFrequency,
+            unit_price: item.unitPrice,
+            quantity: item.quantity,
+            line_total: item.lineTotal
+          }))
+        }
+      },
+      include: { items: { orderBy: { created_at: "asc" } } }
+    });
+  });
+  res.json(serializeCart(cart));
+}));
+
+app.delete("/api/cart/:id/items/:itemId", asyncHandler(async (req, res) => {
+  const cart = await prisma.cart.findUnique({ where: { id: req.params.id }, include: { items: true } });
+  if (!cart) return res.status(404).json({ error: "Cart not found" });
+  const remainingAddOns = cart.items
+    .filter((item) => item.item_type === "add_on" && item.id !== req.params.itemId)
+    .map((item) => item.item_id);
+  const plan = cart.items.find((item) => item.item_type === "pricing_plan");
+  if (plan?.id === req.params.itemId) {
+    await prisma.cart.update({ where: { id: cart.id }, data: { status: "empty", subtotal: 0, tax: 0, total: 0 } });
+    await prisma.cartItem.deleteMany({ where: { cart_id: cart.id } });
+    return res.json({ ok: true, empty: true });
+  }
+  const calculated = calculateCart({ planSlug: plan.item_id, billingFrequency: plan.billing_frequency, addOnSlugs: remainingAddOns });
+  const updated = await prisma.$transaction(async (tx) => {
+    await tx.cartItem.deleteMany({ where: { cart_id: cart.id } });
+    return tx.cart.update({
+      where: { id: cart.id },
+      data: {
+        subtotal: calculated.subtotal,
+        tax: calculated.tax,
+        total: calculated.total,
+        items: {
+          create: calculated.items.map((item) => ({
+            item_type: item.itemType,
+            item_id: item.itemId,
+            item_name: item.itemName,
+            billing_frequency: item.billingFrequency,
+            unit_price: item.unitPrice,
+            quantity: item.quantity,
+            line_total: item.lineTotal
+          }))
+        }
+      },
+      include: { items: true }
+    });
+  });
+  res.json(serializeCart(updated));
+}));
+
+const checkoutCustomerSchema = z.object({
+  full_name: z.string().min(2),
+  company_name: z.string().optional().nullable(),
+  business_name: z.string().optional().nullable(),
+  email: z.string().email(),
+  mobile_number: z.string().min(5),
+  billing_address: z.string().min(3),
+  city: z.string().min(1),
+  province: z.string().min(1),
+  postal_code: z.string().min(1),
+  country: z.string().min(1),
+  tax_id: z.string().optional().nullable(),
+  company_registration_number: z.string().optional().nullable(),
+  business_website: z.string().optional().nullable(),
+  facebook_page_url: z.string().optional().nullable(),
+  industry: z.string().optional().nullable(),
+  estimated_monthly_inquiries: z.string().optional().nullable(),
+  main_products_or_services: z.string().optional().nullable(),
+  preferred_onboarding_date: z.string().optional().nullable()
+});
+
+app.post("/api/checkout", asyncHandler(async (req, res) => {
+  await ensurePricingCatalog();
+  const body = z.object({
+    cartId: z.string().min(1),
+    customer: checkoutCustomerSchema,
+    agreements: z.object({
+      terms: z.boolean(),
+      privacy: z.boolean(),
+      renewal: z.boolean(),
+      correct: z.boolean()
+    }),
+    requestedProvider: z.string().optional().nullable(),
+    paymentMethod: z.string().optional().nullable()
+  }).parse(req.body);
+
+  if (!Object.values(body.agreements).every(Boolean)) {
+    return res.status(400).json({ error: "Required checkout agreements must be accepted" });
+  }
+
+  const cart = await prisma.cart.findUnique({ where: { id: body.cartId }, include: { items: true } });
+  if (!cart || !cart.items.length) return res.status(400).json({ error: "Cart is empty or unavailable" });
+  const planItem = cart.items.find((item) => item.item_type === "pricing_plan");
+  if (!planItem) return res.status(400).json({ error: "A subscription package is required" });
+  const official = calculateCart({
+    planSlug: planItem.item_id,
+    billingFrequency: planItem.billing_frequency,
+    addOnSlugs: cart.items.filter((item) => item.item_type === "add_on").map((item) => item.item_id)
+  });
+  const provider = paymentProviderForCountry(body.customer.country, body.requestedProvider || "");
+  const customerData = {
+    ...body.customer,
+    preferred_onboarding_date: body.customer.preferred_onboarding_date ? new Date(body.customer.preferred_onboarding_date) : null
+  };
+
+  const result = await prisma.$transaction(async (tx) => {
+    const customer = await tx.customer.create({ data: customerData });
+    const order = await tx.order.create({
+      data: {
+        order_number: orderNumber(),
+        customer_id: customer.id,
+        cart_id: cart.id,
+        subtotal: official.subtotal,
+        tax: official.tax,
+        total: official.total,
+        currency: official.currency,
+        billing_frequency: official.billingFrequency,
+        payment_provider: provider,
+        payment_status: "pending",
+        order_status: provider === "manual_bank_transfer" ? "awaiting_payment" : "awaiting_payment",
+        items: {
+          create: official.items.map((item) => ({
+            item_type: item.itemType,
+            item_id: item.itemId,
+            item_name: item.itemName,
+            billing_frequency: item.billingFrequency,
+            unit_price: item.unitPrice,
+            quantity: item.quantity,
+            line_total: item.lineTotal
+          }))
+        }
+      },
+      include: { items: true }
+    });
+    await tx.cart.update({ where: { id: cart.id }, data: { status: "checked_out", subtotal: official.subtotal, tax: official.tax, total: official.total } });
+    const paymentReference = `${provider}_${order.order_number}`;
+    await tx.payment.create({
+      data: {
+        order_id: order.id,
+        provider,
+        provider_payment_id: paymentReference,
+        payment_method: body.paymentMethod || provider,
+        amount: official.total,
+        currency: official.currency,
+        status: "pending",
+        provider_response: { mode: PAYMENT_MODE }
+      }
+    });
+    const pricingPlan = await tx.pricingPlan.findUnique({ where: { slug: planItem.item_id } });
+    await tx.subscription.create({
+      data: {
+        customer_id: customer.id,
+        order_id: order.id,
+        pricing_plan_id: pricingPlan.id,
+        provider,
+        provider_subscription_id: null,
+        billing_frequency: official.billingFrequency,
+        amount: Number(planItem.unit_price),
+        currency: official.currency,
+        status: "pending"
+      }
+    });
+    await tx.invoice.create({
+      data: {
+        order_id: order.id,
+        invoice_number: invoiceNumber(),
+        customer_id: customer.id,
+        amount: official.total,
+        currency: official.currency,
+        status: "pending",
+        due_date: new Date(Date.now() + 3 * 24 * 60 * 60 * 1000),
+        invoice_url: `/api/orders/${order.order_number}/invoice`
+      }
+    });
+    return tx.order.findUnique({
+      where: { id: order.id },
+      include: { customer: true, items: true, payments: true, subscriptions: true, invoices: true }
+    });
+  });
+
+  const providerClient = getPaymentProvider(provider);
+  const paymentSession = await providerClient.createCheckoutSession(result);
+  const updated = await prisma.order.update({
+    where: { id: result.id },
+    data: {
+      external_payment_id: paymentSession.providerPaymentId,
+      external_checkout_url: paymentSession.checkoutUrl
+    },
+    include: { customer: true, items: true, payments: true, subscriptions: true, invoices: true }
+  });
+  await prisma.payment.updateMany({
+    where: { order_id: result.id, provider },
+    data: { provider_payment_id: paymentSession.providerPaymentId, provider_response: paymentSession }
+  });
+
+  res.json({
+    order: serializeOrder(updated),
+    checkout: {
+      provider,
+      providerConfigured: providerReady(provider),
+      mode: PAYMENT_MODE,
+      status: paymentSession.status,
+      checkoutUrl: paymentSession.checkoutUrl,
+      message: paymentSession.message || (providerReady(provider) ? "Payment session prepared." : "Secure online payment integration is currently in test mode."),
+      instructions: paymentSession.instructions || null
+    }
+  });
+}));
+
+app.post("/api/checkout/xendit", (req, res, next) => {
+  req.body.requestedProvider = "xendit";
+  req.url = "/api/checkout";
+  app.handle(req, res, next);
+});
+
+app.post("/api/checkout/stripe", (req, res, next) => {
+  req.body.requestedProvider = "stripe";
+  req.url = "/api/checkout";
+  app.handle(req, res, next);
+});
+
+app.post("/api/checkout/manual-bank-transfer", asyncHandler(async (req, res) => {
+  req.body.requestedProvider = "manual_bank_transfer";
+  const body = req.body;
+  req.url = "/api/checkout";
+  req.method = "POST";
+  req.body = body;
+  app.handle(req, res);
+}));
+
+app.get("/api/orders/:orderNumber", asyncHandler(async (req, res) => {
+  const order = await prisma.order.findUnique({
+    where: { order_number: req.params.orderNumber },
+    include: { customer: true, items: true, payments: true, subscriptions: true, invoices: true }
+  });
+  if (!order) return res.status(404).json({ error: "Order not found" });
+  res.json({ order: serializeOrder(order), businessIdentity: BUSINESS_IDENTITY });
+}));
+
+app.get("/api/orders/:orderNumber/status", asyncHandler(async (req, res) => {
+  const order = await prisma.order.findUnique({
+    where: { order_number: req.params.orderNumber },
+    include: { payments: true, subscriptions: true }
+  });
+  if (!order) return res.status(404).json({ error: "Order not found" });
+  res.json({
+    orderNumber: order.order_number,
+    paymentStatus: order.payment_status,
+    orderStatus: order.order_status,
+    subscriptionStatus: order.subscriptions[0]?.status || "pending",
+    provider: order.payment_provider,
+    paidAt: order.paid_at,
+    nextBillingDate: order.payment_status === "paid" ? nextBillingDate(order.billing_frequency, order.paid_at || order.created_at) : null
+  });
+}));
+
+app.post("/api/orders/:orderNumber/manual-payment-proof", asyncHandler(async (req, res) => {
+  const order = await prisma.order.findUnique({ where: { order_number: req.params.orderNumber } });
+  if (!order) return res.status(404).json({ error: "Order not found" });
+  const body = z.object({
+    transaction_reference: z.string().min(1),
+    payment_date: z.string().min(1),
+    sender_name: z.string().min(1),
+    amount_sent: z.number().positive(),
+    proof_file_url: z.string().optional().nullable()
+  }).parse(req.body);
+  const proof = await prisma.manualPaymentProof.create({
+    data: {
+      order_id: order.id,
+      transaction_reference: body.transaction_reference,
+      payment_date: new Date(body.payment_date),
+      sender_name: body.sender_name,
+      amount_sent: body.amount_sent,
+      proof_file_url: body.proof_file_url || null,
+      status: "awaiting_verification"
+    }
+  });
+  await prisma.order.update({ where: { id: order.id }, data: { order_status: "awaiting_payment", payment_status: "processing" } });
+  res.json({ proof, message: "Payment proof received and awaiting verification." });
+}));
+
+app.post("/api/subscriptions/:id/cancel", requireAuth, requireFinance, asyncHandler(async (req, res) => {
+  const subscription = await prisma.subscription.update({
+    where: { id: req.params.id },
+    data: { cancel_at_period_end: true, status: "cancelled", cancelled_at: new Date() }
+  });
+  res.json(subscription);
+}));
+
+app.post("/api/subscriptions/:id/reactivate", requireAuth, requireFinance, asyncHandler(async (req, res) => {
+  const subscription = await prisma.subscription.update({
+    where: { id: req.params.id },
+    data: { cancel_at_period_end: false, status: "active", cancelled_at: null }
+  });
+  res.json(subscription);
+}));
+
+app.get("/api/admin/payments/dashboard", requireAuth, requireFinance, asyncHandler(async (req, res) => {
+  const startToday = new Date();
+  startToday.setHours(0, 0, 0, 0);
+  const startMonth = new Date(startToday.getFullYear(), startToday.getMonth(), 1);
+  const [paidToday, paidMonth, pendingPayments, failedPayments, activeSubscriptions, pastDueSubscriptions, cancelledSubscriptions, upcomingRenewals, orders] = await Promise.all([
+    prisma.payment.aggregate({ where: { status: "paid", paid_at: { gte: startToday } }, _sum: { amount: true } }),
+    prisma.payment.aggregate({ where: { status: "paid", paid_at: { gte: startMonth } }, _sum: { amount: true } }),
+    prisma.payment.count({ where: { status: { in: ["pending", "processing"] } } }),
+    prisma.payment.count({ where: { status: "failed" } }),
+    prisma.subscription.count({ where: { status: "active" } }),
+    prisma.subscription.count({ where: { status: "past_due" } }),
+    prisma.subscription.count({ where: { status: "cancelled" } }),
+    prisma.subscription.count({ where: { current_period_end: { lte: new Date(Date.now() + 14 * 24 * 60 * 60 * 1000) }, status: "active" } }),
+    prisma.order.findMany({
+      orderBy: { created_at: "desc" },
+      take: 50,
+      include: { customer: true, items: true, payments: true, subscriptions: true }
+    })
+  ]);
+  res.json({
+    cards: {
+      revenueToday: decimalNumber(paidToday._sum.amount),
+      revenueThisMonth: decimalNumber(paidMonth._sum.amount),
+      pendingPayments,
+      failedPayments,
+      activeSubscriptions,
+      pastDueSubscriptions,
+      cancelledSubscriptions,
+      upcomingRenewals
+    },
+    orders: orders.map(serializeOrder)
+  });
+}));
+
+app.post("/api/public/audit-request", asyncHandler(async (req, res) => {
+  const body = z.object({
+    company: z.string().min(1),
+    person: z.string().min(1),
+    mobile: z.string().min(1),
+    email: z.string().email(),
+    page: z.string().min(1),
+    business: z.string().optional().nullable(),
+    inquiries: z.string().optional().nullable(),
+    quotations: z.string().optional().nullable(),
+    message: z.string().optional().nullable()
+  }).parse(req.body);
+
+  const companyId = await getDefaultCompanyId();
+  const psid = `audit_${Date.now()}`;
+
+  const conversation = await prisma.conversation.create({
+    data: {
+      company_id: companyId,
+      psid,
+      customer_name: body.person,
+      channel: "website_audit",
+      status: "open",
+      intent: "website_audit_request",
+      lead_score: "warm",
+      last_message_at: new Date()
+    }
+  });
+
+  await prisma.message.create({
+    data: {
+      company_id: companyId,
+      conversation_id: conversation.id,
+      sender_type: "customer",
+      sender_id: psid,
+      message_text: [
+        `Audit request from ${body.person} (${body.company})`,
+        `Mobile: ${body.mobile}`,
+        `Email: ${body.email}`,
+        `Page: ${body.page}`,
+        body.business ? `Business: ${body.business}` : "",
+        body.inquiries ? `Inquiries/week: ${body.inquiries}` : "",
+        body.quotations ? `Sends quotations: ${body.quotations}` : "",
+        body.message ? `Notes: ${body.message}` : ""
+      ].filter(Boolean).join("\n")
+    }
+  });
+
+  await prisma.lead.create({
+    data: {
+      company_id: companyId,
+      conversation_id: conversation.id,
+      customer_name: body.person,
+      mobile_number: body.mobile,
+      email: body.email,
+      company_name: body.company,
+      location: body.page,
+      service_needed: body.business || "AI Facebook inbox sales assistant",
+      budget: body.inquiries,
+      urgency: body.quotations,
+      notes: body.message,
+      lead_status: "new",
+      lead_score: "warm"
+    }
+  });
+
+  buildPresenceSnapshot({ facebookInput: body.page, requestedPageName: body.company })
+    .then(async (snapshot) => {
+      if (!snapshot.ok) return;
+      await prisma.lead.updateMany({
+        where: { company_id: companyId, conversation_id: conversation.id },
+        data: {
+          notes: [
+            body.message || "",
+            "Public presence preview:",
+            JSON.stringify(snapshot, null, 2)
+          ].filter(Boolean).join("\n\n")
+        }
+      });
+    })
+    .catch((error) => {
+      console.warn("Audit presence preview failed:", error.message);
+    });
+
+  res.json({ ok: true, message: "Audit request received" });
+}));
+
+app.post("/api/page-intelligence/preview", requireAuth, asyncHandler(async (req, res) => {
+  const body = z.object({
+    facebookPage: z.string().optional().nullable(),
+    website: z.string().optional().nullable(),
+    pageName: z.string().optional().nullable()
+  }).parse(req.body);
+
+  const snapshot = await buildPresenceSnapshot({
+    facebookInput: body.facebookPage || body.pageName,
+    websiteInput: body.website,
+    requestedPageName: body.pageName || ""
+  });
+
+  res.json({
+    ok: snapshot.ok,
+    snapshot,
+    messengerPreview: formatSnapshotForMessenger(snapshot)
+  });
+}));
+
+app.get("/api/onboarding-status", requireAuth, asyncHandler(async (req, res) => {
+  const [company, settings, kbCount, questionCount, pages, leadCount] = await Promise.all([
+    prisma.company.findUnique({ where: { id: req.companyId } }),
+    prisma.companySetting.findUnique({ where: { company_id: req.companyId } }),
+    prisma.knowledgeBase.count({ where: { company_id: req.companyId, active: true } }),
+    prisma.qualificationQuestion.count({ where: { company_id: req.companyId, active: true } }),
+    prisma.facebookPage.count({ where: { company_id: req.companyId, status: "active" } }),
+    prisma.lead.count({ where: { company_id: req.companyId } })
+  ]);
+
+  res.json({
+    companyProfile: Boolean(company?.name && company?.industry),
+    settingsConfigured: Boolean(settings?.ai_enabled && settings?.auto_reply_enabled),
+    knowledgeBase: kbCount >= 3,
+    knowledgeBaseCount: kbCount,
+    qualificationQuestions: questionCount >= 3,
+    qualificationQuestionCount: questionCount,
+    facebookPageConnected: pages > 0,
+    facebookPageCount: pages,
+    hasLeads: leadCount > 0,
+    leadCount,
+    notifyEmail: settings?.notify_email || null
+  });
+}));
+
+app.post("/api/auth/login", asyncHandler(async (req, res) => {
+  const body = z.object({ email: z.string().email(), password: z.string().min(1) }).parse(req.body);
+  const user = await prisma.user.findUnique({ where: { email: body.email } });
+  if (!user || user.status !== "active") return res.status(401).json({ error: "Invalid email or password" });
+  const ok = await verifyPassword(user.password_hash, body.password);
+  if (!ok) return res.status(401).json({ error: "Invalid email or password" });
+  const token = signSession(user);
+  setSessionCookie(res, token);
+  res.json({ user: { id: user.id, company_id: user.company_id, name: user.name, email: user.email, role: user.role } });
+}));
+
+app.post("/api/auth/logout", (req, res) => {
+  clearSessionCookie(res);
+  res.json({ ok: true });
+});
+
+app.get("/api/auth/me", requireAuth, asyncHandler(async (req, res) => {
+  const company = await prisma.company.findUnique({ where: { id: req.companyId }, select: publicCompanySelect() });
+  res.json({ user: req.user, company });
+}));
+
+app.get("/api/dashboard", requireAuth, asyncHandler(async (req, res) => {
+  const start = new Date();
+  start.setHours(0, 0, 0, 0);
+  const [
+    leadsToday,
+    hotLeads,
+    quotationReady,
+    pendingApprovals,
+    needsHuman,
+    pendingFollowUps,
+    recentConversations
+  ] = await Promise.all([
+    prisma.lead.count({ where: { company_id: req.companyId, created_at: { gte: start } } }),
+    prisma.lead.count({ where: { company_id: req.companyId, lead_score: "hot" } }),
+    prisma.lead.count({ where: { company_id: req.companyId, quotation_ready: true } }),
+    prisma.quotation.count({ where: { company_id: req.companyId, status: "pending_approval" } }),
+    prisma.conversation.count({ where: { company_id: req.companyId, needs_human: true } }),
+    prisma.followUp.count({ where: { company_id: req.companyId, status: "pending" } }),
+    prisma.conversation.findMany({
+      where: { company_id: req.companyId },
+      orderBy: { last_message_at: "desc" },
+      take: 8,
+      include: { messages: { orderBy: { created_at: "desc" }, take: 1 } }
+    })
+  ]);
+  res.json({ leadsToday, hotLeads, quotationReady, pendingApprovals, needsHuman, pendingFollowUps, recentConversations });
+}));
+
+app.get("/api/company", requireAuth, asyncHandler(async (req, res) => {
+  const company = await prisma.company.findUnique({ where: { id: req.companyId }, select: publicCompanySelect() });
+  res.json(company);
+}));
+
+app.put("/api/company", requireAuth, asyncHandler(async (req, res) => {
+  const body = z.object({
+    name: z.string().min(1),
+    industry: z.string().optional().nullable(),
+    website: z.string().optional().nullable(),
+    contact_email: z.string().optional().nullable(),
+    contact_number: z.string().optional().nullable(),
+    status: z.string().optional()
+  }).parse(req.body);
+  const company = await prisma.company.update({ where: { id: req.companyId }, data: body, select: publicCompanySelect() });
+  res.json(company);
+}));
+
+app.get("/api/settings", requireAuth, asyncHandler(async (req, res) => {
+  res.json(await prisma.companySetting.findUnique({ where: { company_id: req.companyId } }));
+}));
+
+app.put("/api/settings", requireAuth, asyncHandler(async (req, res) => {
+  const allowed = [
+    "ai_enabled", "auto_reply_enabled", "business_hours_only", "human_handoff_enabled",
+    "default_language", "tone", "quotation_mode", "allow_ai_quotation_drafts",
+    "allow_auto_send_quotation", "quotation_requires_admin_approval", "notify_email",
+    "ai_custom_instructions"
+  ];
+  const data = Object.fromEntries(Object.entries(req.body).filter(([key]) => allowed.includes(key)));
+  if (data.quotation_mode !== "auto_send") data.allow_auto_send_quotation = false;
+  const settings = await prisma.companySetting.update({ where: { company_id: req.companyId }, data });
+  clearAistaffAiConfigCache();
+  res.json(settings);
+}));
+
+app.get("/api/facebook-pages", requireAuth, asyncHandler(async (req, res) => {
+  const pages = await prisma.facebookPage.findMany({
+    where: { company_id: req.companyId },
+    orderBy: { created_at: "desc" },
+    select: { id: true, company_id: true, page_id: true, page_name: true, status: true, created_at: true, updated_at: true }
+  });
+  res.json(pages);
+}));
+
+app.get("/api/facebook-page-connection", requireAuth, asyncHandler(async (req, res) => {
+  const [connectedPage, pages] = await Promise.all([
+    prisma.facebookPage.findFirst({
+      where: { company_id: req.companyId, status: "active" },
+      orderBy: { updated_at: "desc" },
+      select: { id: true, page_id: true, page_name: true, status: true, updated_at: true }
+    }),
+    prisma.facebookPage.findMany({
+      where: { company_id: req.companyId },
+      orderBy: [{ status: "asc" }, { updated_at: "desc" }],
+      select: { id: true, page_id: true, page_name: true, status: true, updated_at: true }
+    })
+  ]);
+
+  const metaAuth = getMetaAuthForUser(req.user.id);
+  res.json({
+    connectedPage: connectedPage ? {
+      id: connectedPage.id,
+      pageId: connectedPage.page_id,
+      name: connectedPage.page_name,
+      status: connectedPage.status,
+      messengerReplies: connectedPage.status === "active" ? "Enabled" : "Disabled",
+      updatedAt: connectedPage.updated_at
+    } : null,
+    connectionStatus: connectedPage?.status === "active" ? "Connected" : "Not connected",
+    savedPages: pages.map((page) => ({
+      id: page.id,
+      pageId: page.page_id,
+      name: page.page_name,
+      status: page.status,
+      updatedAt: page.updated_at
+    })),
+    managedPages: metaAuth?.companyId === req.companyId
+      ? metaAuth.pages.map(sanitizeManagedPage)
+      : [],
+    authFreshUntil: metaAuth?.companyId === req.companyId ? metaAuth.expiresAt : null
+  });
+}));
+
+app.get("/api/meta/facebook/connect", requireAuth, asyncHandler(async (req, res) => {
+  const appId = process.env.META_APP_ID;
+  const appSecret = process.env.META_APP_SECRET;
+  if (!appId || !appSecret) {
+    return res.redirect(302, facebookConnectionPath({ meta_error: "Meta app is not configured yet." }));
+  }
+
+  const state = crypto.randomUUID();
+  metaOauthStates.set(state, {
+    userId: req.user.id,
+    companyId: req.companyId,
+    expiresAt: Date.now() + (10 * 60 * 1000)
+  });
+
+  const authUrl = new URL("https://www.facebook.com/v20.0/dialog/oauth");
+  authUrl.searchParams.set("client_id", appId);
+  authUrl.searchParams.set("redirect_uri", getMetaRedirectUri(req));
+  authUrl.searchParams.set("state", state);
+  authUrl.searchParams.set("response_type", "code");
+  authUrl.searchParams.set("scope", "pages_show_list,pages_messaging,pages_manage_metadata");
+  res.redirect(302, authUrl.toString());
+}));
+
+app.get("/api/meta/facebook/callback", asyncHandler(async (req, res) => {
+  pruneExpiredMetaAuth();
+  const code = String(req.query.code || "");
+  const state = String(req.query.state || "");
+  const errorReason = String(req.query.error_message || req.query.error_description || req.query.error || "");
+  const authRequest = metaOauthStates.get(state);
+
+  if (!authRequest) {
+    return res.redirect(302, facebookConnectionPath({ meta_error: "Facebook authorization expired. Please try again." }));
+  }
+  metaOauthStates.delete(state);
+
+  if (!code) {
+    return res.redirect(302, facebookConnectionPath({ meta_error: errorReason || "Facebook authorization was not completed." }));
+  }
+
+  const redirectUri = getMetaRedirectUri(req);
+  const tokenUrl = new URL("https://graph.facebook.com/v20.0/oauth/access_token");
+  tokenUrl.searchParams.set("client_id", process.env.META_APP_ID || "");
+  tokenUrl.searchParams.set("client_secret", process.env.META_APP_SECRET || "");
+  tokenUrl.searchParams.set("redirect_uri", redirectUri);
+  tokenUrl.searchParams.set("code", code);
+
+  const tokenResponse = await fetch(tokenUrl);
+  const tokenJson = await tokenResponse.json();
+  if (!tokenResponse.ok || !tokenJson.access_token) {
+    const message = tokenJson?.error?.message || "Could not complete Facebook authorization.";
+    return res.redirect(302, facebookConnectionPath({ meta_error: message.slice(0, 180) }));
+  }
+
+  const pagesUrl = new URL("https://graph.facebook.com/v20.0/me/accounts");
+  pagesUrl.searchParams.set("access_token", tokenJson.access_token);
+  pagesUrl.searchParams.set("fields", "id,name,category,tasks,access_token");
+  const pagesResponse = await fetch(pagesUrl);
+  const pagesJson = await pagesResponse.json();
+  if (!pagesResponse.ok) {
+    const message = pagesJson?.error?.message || "Could not load Facebook Pages.";
+    return res.redirect(302, facebookConnectionPath({ meta_error: message.slice(0, 180) }));
+  }
+
+  const pages = Array.isArray(pagesJson.data)
+    ? pagesJson.data
+      .filter((page) => page?.id && page?.name && page?.access_token)
+      .map((page) => ({
+        id: String(page.id),
+        name: String(page.name),
+        category: String(page.category || ""),
+        tasks: Array.isArray(page.tasks) ? page.tasks.map((task) => String(task)) : [],
+        accessToken: String(page.access_token)
+      }))
+    : [];
+
+  setMetaAuthForUser(authRequest.userId, {
+    companyId: authRequest.companyId,
+    pages
+  });
+
+  res.redirect(302, facebookConnectionPath({
+    meta_auth: pages.length ? "success" : "empty"
+  }));
+}));
+
+app.post("/api/facebook-page-connection/select", requireAuth, asyncHandler(async (req, res) => {
+  const body = z.object({
+    pageId: z.string().min(1)
+  }).parse(req.body);
+
+  const metaAuth = getMetaAuthForUser(req.user.id);
+  if (!metaAuth || metaAuth.companyId !== req.companyId) {
+    return res.status(400).json({ error: "Please connect Facebook first to load your managed Pages." });
+  }
+
+  const selected = metaAuth.pages.find((page) => page.id === body.pageId);
+  if (!selected) {
+    return res.status(404).json({ error: "Selected Facebook Page was not found in the authorized list." });
+  }
+
+  await prisma.facebookPage.updateMany({
+    where: { company_id: req.companyId, page_id: { not: selected.id } },
+    data: { status: "inactive" }
+  });
+
+  const page = await prisma.facebookPage.upsert({
+    where: { page_id: selected.id },
+    create: {
+      company_id: req.companyId,
+      page_id: selected.id,
+      page_name: selected.name,
+      page_access_token_encrypted: encryptSecret(selected.accessToken),
+      status: "active"
+    },
+    update: {
+      company_id: req.companyId,
+      page_name: selected.name,
+      page_access_token_encrypted: encryptSecret(selected.accessToken),
+      status: "active"
+    },
+    select: { id: true, page_id: true, page_name: true, status: true, updated_at: true }
+  });
+
+  res.json({
+    ok: true,
+    connectedPage: {
+      id: page.id,
+      pageId: page.page_id,
+      name: page.page_name,
+      status: page.status,
+      messengerReplies: "Enabled",
+      updatedAt: page.updated_at
+    }
+  });
+}));
+
+app.post("/api/facebook-pages", requireAuth, asyncHandler(async (req, res) => {
+  const body = z.object({
+    page_id: z.string().min(1),
+    page_name: z.string().min(1),
+    page_access_token: z.string().min(1),
+    status: z.string().default("active")
+  }).parse(req.body);
+  const page = await prisma.facebookPage.upsert({
+    where: { page_id: body.page_id },
+    create: {
+      company_id: req.companyId,
+      page_id: body.page_id,
+      page_name: body.page_name,
+      page_access_token_encrypted: encryptSecret(body.page_access_token),
+      status: body.status
+    },
+    update: {
+      page_name: body.page_name,
+      page_access_token_encrypted: encryptSecret(body.page_access_token),
+      status: body.status
+    },
+    select: { id: true, page_id: true, page_name: true, status: true, created_at: true, updated_at: true }
+  });
+  res.json(page);
+}));
+
+app.get("/api/knowledge-base", requireAuth, asyncHandler(async (req, res) => {
+  res.json(await prisma.knowledgeBase.findMany({ where: { company_id: req.companyId }, orderBy: { updated_at: "desc" } }));
+}));
+
+app.post("/api/knowledge-base", requireAuth, asyncHandler(async (req, res) => {
+  const body = z.object({
+    category: z.string().min(1),
+    question: z.string().min(1),
+    answer: z.string().min(1),
+    tags: z.array(z.string()).optional().default([]),
+    active: z.boolean().optional().default(true)
+  }).parse(req.body);
+  clearAistaffAiConfigCache();
+  res.json(await prisma.knowledgeBase.create({ data: { ...body, company_id: req.companyId } }));
+}));
+
+app.put("/api/knowledge-base/:id", requireAuth, asyncHandler(async (req, res) => {
+  clearAistaffAiConfigCache();
+  res.json(await prisma.knowledgeBase.update({ where: { id: req.params.id, company_id: req.companyId }, data: req.body }));
+}));
+
+app.delete("/api/knowledge-base/:id", requireAuth, asyncHandler(async (req, res) => {
+  await prisma.knowledgeBase.delete({ where: { id: req.params.id, company_id: req.companyId } });
+  clearAistaffAiConfigCache();
+  res.json({ ok: true });
+}));
+
+app.get("/api/ai-studio", requireAuth, asyncHandler(async (req, res) => {
+  const config = await loadAistaffAiConfig(req.companyId);
+  res.json({
+    defaultGoal: DEFAULT_AI_GOAL,
+    customInstructions: config.customInstructions,
+    tone: config.tone,
+    defaultLanguage: config.defaultLanguage,
+    knowledgeBaseCount: config.knowledgeBase.length,
+    knowledgeBase: config.knowledgeBase
+  });
+}));
+
+app.put("/api/ai-studio/instructions", requireAuth, asyncHandler(async (req, res) => {
+  const body = z.object({
+    ai_custom_instructions: z.string().max(12000).optional().nullable()
+  }).parse(req.body);
+  const settings = await prisma.companySetting.update({
+    where: { company_id: req.companyId },
+    data: { ai_custom_instructions: body.ai_custom_instructions || null }
+  });
+  clearAistaffAiConfigCache();
+  res.json({ ok: true, ai_custom_instructions: settings.ai_custom_instructions || "" });
+}));
+
+app.get("/api/ai-studio/memory", requireAuth, asyncHandler(async (req, res) => {
+  const psid = String(req.query.psid || "").trim();
+  if (!psid) return res.status(400).json({ error: "psid query parameter is required" });
+  const memory = await getMessengerMemoryForPsid(psid, req.companyId);
+  if (!memory) return res.status(404).json({ error: "No Messenger memory found for this PSID" });
+  res.json(memory);
+}));
+
+app.get("/api/ai-studio/prompt-preview", requireAuth, asyncHandler(async (req, res) => {
+  const psid = String(req.query.psid || "prompt_preview").trim();
+  const messageText = String(req.query.message || "Hi").trim();
+  const config = await loadAistaffAiConfig(req.companyId);
+  const session = getAistaffSession(psid);
+  const memory = await getMessengerMemoryForPsid(psid, req.companyId);
+  if (memory?.memory) Object.assign(session, memory.memory);
+  res.json({
+    prompt: buildAdminPromptPreview(session, {}, messageText, config),
+    psid,
+    messageText
+  });
+}));
+
+app.get("/api/qualification-questions", requireAuth, asyncHandler(async (req, res) => {
+  res.json(await prisma.qualificationQuestion.findMany({ where: { company_id: req.companyId }, orderBy: { display_order: "asc" } }));
+}));
+
+app.post("/api/qualification-questions", requireAuth, asyncHandler(async (req, res) => {
+  const body = z.object({
+    question: z.string().min(1),
+    field_key: z.string().min(1),
+    required: z.boolean().optional().default(true),
+    display_order: z.number().optional().default(0),
+    active: z.boolean().optional().default(true)
+  }).parse(req.body);
+  res.json(await prisma.qualificationQuestion.create({ data: { ...body, company_id: req.companyId } }));
+}));
+
+app.put("/api/qualification-questions/:id", requireAuth, asyncHandler(async (req, res) => {
+  res.json(await prisma.qualificationQuestion.update({ where: { id: req.params.id, company_id: req.companyId }, data: req.body }));
+}));
+
+app.get("/api/conversations", requireAuth, asyncHandler(async (req, res) => {
+  res.json(await prisma.conversation.findMany({
+    where: { company_id: req.companyId },
+    orderBy: { last_message_at: "desc" },
+    include: {
+      _count: { select: { messages: true } },
+      messages: { orderBy: { created_at: "desc" }, take: 1 },
+      leads: { orderBy: { created_at: "desc" }, take: 1 }
+    }
+  }));
+}));
+
+app.get("/api/conversations/:id", requireAuth, asyncHandler(async (req, res) => {
+  const conversation = await prisma.conversation.findFirst({
+    where: { id: req.params.id, company_id: req.companyId },
+    include: {
+      messages: { orderBy: { created_at: "asc" } },
+      leads: { orderBy: { created_at: "desc" }, take: 1 },
+      human_handoffs: { orderBy: { created_at: "desc" }, take: 3 }
+    }
+  });
+  if (!conversation) return res.status(404).json({ error: "Conversation not found" });
+  res.json(conversation);
+}));
+
+app.post("/api/conversations/:id/handoff", requireAuth, asyncHandler(async (req, res) => {
+  const body = z.object({ reason: z.string().default("Admin requested human handoff") }).parse(req.body);
+  const conversation = await prisma.conversation.update({
+    where: { id: req.params.id, company_id: req.companyId },
+    data: { needs_human: true, status: "handoff" }
+  });
+  const handoff = await prisma.humanHandoff.create({
+    data: { company_id: req.companyId, conversation_id: conversation.id, reason: body.reason, assigned_to: req.user.id }
+  });
+  res.json(handoff);
+}));
+
+app.get("/api/leads", requireAuth, asyncHandler(async (req, res) => {
+  res.json(await prisma.lead.findMany({
+    where: { company_id: req.companyId },
+    orderBy: { updated_at: "desc" },
+    include: { assigned_user: { select: { name: true, email: true } } }
+  }));
+}));
+
+app.get("/api/leads/:id", requireAuth, asyncHandler(async (req, res) => {
+  const lead = await prisma.lead.findFirst({
+    where: { id: req.params.id, company_id: req.companyId },
+    include: {
+      conversation: { include: { messages: { orderBy: { created_at: "asc" } }, human_handoffs: true } },
+      quotations: { orderBy: { created_at: "desc" }, include: { items: true } },
+      follow_ups: { orderBy: { due_date: "asc" } }
+    }
+  });
+  if (!lead) return res.status(404).json({ error: "Lead not found" });
+  res.json(lead);
+}));
+
+app.put("/api/leads/:id", requireAuth, asyncHandler(async (req, res) => {
+  const data = { ...req.body };
+  if (data.follow_up_date) data.follow_up_date = new Date(data.follow_up_date);
+  data.lead_score = scoreLead(data);
+  data.quotation_ready = quotationReady(data);
+  const lead = await prisma.lead.update({ where: { id: req.params.id, company_id: req.companyId }, data });
+  await maybeCreateQuotationDraft({ companyId: req.companyId, lead, conversationId: lead.conversation_id, preparedBy: req.user.id });
+  res.json(lead);
+}));
+
+app.get("/api/quotations", requireAuth, asyncHandler(async (req, res) => {
+  res.json(await prisma.quotation.findMany({
+    where: { company_id: req.companyId },
+    orderBy: { created_at: "desc" },
+    include: { lead: { select: { customer_name: true, company_name: true, service_needed: true } } }
+  }));
+}));
+
+app.post("/api/quotations", requireAuth, asyncHandler(async (req, res) => {
+  const body = z.object({
+    lead_id: z.string(),
+    quotation_details: z.string().min(1),
+    amount: z.any().optional(),
+    terms: z.string().optional().nullable()
+  }).parse(req.body);
+  const lead = await prisma.lead.findFirstOrThrow({ where: { id: body.lead_id, company_id: req.companyId } });
+  const quotation = await prisma.quotation.create({
+    data: {
+      company_id: req.companyId,
+      lead_id: lead.id,
+      conversation_id: lead.conversation_id,
+      quotation_number: await nextQuotationNumber(req.companyId),
+      customer_name: lead.customer_name,
+      customer_company: lead.company_name,
+      service_needed: lead.service_needed,
+      quotation_details: body.quotation_details,
+      amount: numberOrNull(body.amount),
+      terms: body.terms,
+      status: "pending_approval",
+      mode: "approval_required",
+      prepared_by: req.user.id
+    }
+  });
+  res.json(quotation);
+}));
+
+app.get("/api/quotations/:id", requireAuth, asyncHandler(async (req, res) => {
+  const quotation = await prisma.quotation.findFirst({
+    where: { id: req.params.id, company_id: req.companyId },
+    include: { items: true, lead: true, conversation: { include: { messages: { orderBy: { created_at: "asc" } } } } }
+  });
+  if (!quotation) return res.status(404).json({ error: "Quotation not found" });
+  res.json(quotation);
+}));
+
+app.put("/api/quotations/:id", requireAuth, asyncHandler(async (req, res) => {
+  const data = { ...req.body };
+  if ("amount" in data) data.amount = numberOrNull(data.amount);
+  res.json(await prisma.quotation.update({ where: { id: req.params.id, company_id: req.companyId }, data }));
+}));
+
+app.post("/api/quotations/:id/approve", requireAuth, asyncHandler(async (req, res) => {
+  const quotation = await prisma.quotation.update({
+    where: { id: req.params.id, company_id: req.companyId },
+    data: { status: "approved", approved_by: req.user.id }
+  });
+  res.json(quotation);
+}));
+
+app.post("/api/quotations/:id/reject", requireAuth, asyncHandler(async (req, res) => {
+  const quotation = await prisma.quotation.update({
+    where: { id: req.params.id, company_id: req.companyId },
+    data: { status: "rejected" }
+  });
+  res.json(quotation);
+}));
+
+app.post("/api/quotations/:id/send", requireAuth, asyncHandler(async (req, res) => {
+  const quotation = await prisma.quotation.findFirstOrThrow({
+    where: { id: req.params.id, company_id: req.companyId },
+    include: { conversation: { include: { facebook_page: true } } }
+  });
+  if (!["approved", "sent"].includes(quotation.status)) {
+    return res.status(409).json({ error: "Quotation must be approved before sending." });
+  }
+  const text = [
+    `Official quotation ${quotation.quotation_number}`,
+    quotation.service_needed ? `Service: ${quotation.service_needed}` : "",
+    quotation.amount ? `Amount: PHP ${quotation.amount}` : "Amount: Please see quotation details.",
+    quotation.quotation_details,
+    quotation.terms ? `Terms: ${quotation.terms}` : ""
+  ].filter(Boolean).join("\n\n");
+
+  if (quotation.conversation.facebook_page) {
+    await sendMessengerText(quotation.conversation.facebook_page, quotation.conversation.psid, text);
+  }
+  const sent = await prisma.quotation.update({
+    where: { id: quotation.id },
+    data: { status: "sent", sent_at: new Date() }
+  });
+  await prisma.message.create({
+    data: {
+      company_id: req.companyId,
+      conversation_id: quotation.conversation_id,
+      sender_type: "admin",
+      sender_id: req.user.id,
+      message_text: text,
+      ai_generated: false
+    }
+  });
+  res.json(sent);
+}));
+
+app.get("/api/follow-ups", requireAuth, asyncHandler(async (req, res) => {
+  res.json(await prisma.followUp.findMany({
+    where: { company_id: req.companyId },
+    orderBy: { due_date: "asc" },
+    include: { lead: true, assigned_user: { select: { name: true } } }
+  }));
+}));
+
+app.post("/api/follow-ups", requireAuth, asyncHandler(async (req, res) => {
+  const body = z.object({
+    lead_id: z.string(),
+    due_date: z.string(),
+    note: z.string().optional(),
+    assigned_to: z.string().optional().nullable()
+  }).parse(req.body);
+  const lead = await prisma.lead.findFirstOrThrow({ where: { id: body.lead_id, company_id: req.companyId } });
+  res.json(await prisma.followUp.create({
+    data: {
+      company_id: req.companyId,
+      lead_id: lead.id,
+      conversation_id: lead.conversation_id,
+      due_date: new Date(body.due_date),
+      note: body.note,
+      assigned_to: body.assigned_to || req.user.id
+    }
+  }));
+}));
+
+app.get("/api/marketing", requireAuth, asyncHandler(async (req, res) => {
+  res.json(getMarketingOverview());
+}));
+
+app.patch("/api/marketing/checklist", requireAuth, asyncHandler(async (req, res) => {
+  const body = z.object({ id: z.string().min(1), done: z.boolean() }).parse(req.body);
+  res.json({ checklist: updateChecklistItem(body.id, body.done) });
+}));
+
+app.patch("/api/marketing/ad-review", requireAuth, asyncHandler(async (req, res) => {
+  const body = z.object({
+    id: z.string().min(1),
+    status: z.enum(["draft", "approved", "needs_changes"]).optional(),
+    note: z.string().optional()
+  }).parse(req.body);
+  res.json({ review: updateAdReview(body.id, body) });
+}));
+
+app.put("/api/marketing/notes", requireAuth, asyncHandler(async (req, res) => {
+  const body = z.object({ notes: z.string() }).parse(req.body);
+  res.json({ notes: updateMarketingNotes(body.notes) });
+}));
+
+app.post("/api/marketing/generate-voiceover", requireAuth, asyncHandler(async (req, res) => {
+  const body = z.object({ compositionId: z.string().min(1) }).parse(req.body);
+  await generateVoiceover(body.compositionId);
+  res.json({ ok: true, message: "Voiceover audio generated. You can export MP4 now." });
+}));
+
+app.get("/api/marketing/render-status", requireAuth, asyncHandler(async (req, res) => {
+  res.json({ items: getRenderStatus() });
+}));
+
+app.post("/api/marketing/render", requireAuth, asyncHandler(async (req, res) => {
+  const body = z.object({ compositionId: z.string().min(1), kind: z.enum(["video", "still"]).default("video") }).parse(req.body);
+  const existing = getRenderStatus().find((item) => item.compositionId === body.compositionId);
+  if (existing?.exportJob?.status === "running") {
+    return res.json({ ok: true, alreadyRunning: true, exportJob: existing.exportJob });
+  }
+
+  const fn = body.kind === "still" ? renderPreviewStill : renderCreative;
+  fn(body.compositionId).catch((error) => {
+    console.error("Marketing render failed:", error.message);
+  });
+  res.json({
+    ok: true,
+    started: true,
+    compositionId: body.compositionId,
+    kind: body.kind,
+    exportJob: getLatestJobForComposition(body.compositionId)
+  });
+}));
+
+app.post("/api/marketing/test-bot", requireAuth, asyncHandler(async (req, res) => {
+  const body = z.object({
+    message: z.string().min(1),
+    psid: z.string().default("admin_bot_test")
+  }).parse(req.body);
+  const reply = await generateAistaffDemoReply(body.message, body.psid);
+  res.json({ reply });
+}));
+
+app.get("/api/marketing/review-summary", requireAuth, asyncHandler(async (req, res) => {
+  const [auditLeads, demoInquiries, websiteAudits, recentDemoMessages] = await Promise.all([
+    prisma.lead.count({ where: { company_id: req.companyId, lead_status: "new" } }),
+    prisma.conversation.count({ where: { company_id: req.companyId, intent: "aistaff_demo_inquiry" } }),
+    prisma.conversation.count({ where: { company_id: req.companyId, channel: "website_audit" } }),
+    prisma.conversation.findMany({
+      where: { company_id: req.companyId, intent: "aistaff_demo_inquiry" },
+      orderBy: { last_message_at: "desc" },
+      take: 5,
+      include: { messages: { orderBy: { created_at: "desc" }, take: 4 } }
+    })
+  ]);
+  res.json({ auditLeads, demoInquiries, websiteAudits, recentDemoMessages });
+}));
+
+app.post("/api/demo/inbound-message", requireAuth, asyncHandler(async (req, res) => {
+  const page = await prisma.facebookPage.findFirst({ where: { company_id: req.companyId } });
+  const conversation = await prisma.conversation.upsert({
+    where: { company_id_psid: { company_id: req.companyId, psid: body.psid } },
+    create: { company_id: req.companyId, facebook_page_id: page?.id, psid: body.psid, channel: "facebook_messenger", last_message_at: new Date() },
+    update: { last_message_at: new Date() }
+  });
+  await prisma.message.create({ data: { company_id: req.companyId, conversation_id: conversation.id, sender_type: "customer", sender_id: body.psid, message_text: body.message } });
+  let lead = await prisma.lead.findFirst({ where: { company_id: req.companyId, conversation_id: conversation.id } });
+  if (!lead) lead = await prisma.lead.create({ data: { company_id: req.companyId, conversation_id: conversation.id } });
+  const ai = await generateSalesReply({ companyId: req.companyId, conversationId: conversation.id, message: body.message });
+  const updatedLead = await prisma.lead.update({
+    where: { id: lead.id },
+    data: { ...ai.leadPatch, lead_score: ai.leadScore, quotation_ready: ai.quotationReady, lead_status: ai.quotationReady ? "quotation_ready" : "contacted" }
+  });
+  await prisma.message.create({ data: { company_id: req.companyId, conversation_id: conversation.id, sender_type: "ai", sender_id: "ai_sales_assistant", message_text: ai.reply, ai_generated: true } });
+  await maybeCreateQuotationDraft({ companyId: req.companyId, lead: updatedLead, conversationId: conversation.id, preparedBy: req.user.id });
+  res.json({ conversation_id: conversation.id, reply: ai.reply, lead: updatedLead });
+}));
+
+app.get("/admin", (req, res) => {
+  res.redirect(302, "/admin/dashboard");
+});
+
+app.get("/privacy", (req, res) => {
+  res.sendFile(path.join(__dirname, "..", "public", "privacy", "index.html"));
+});
+
+app.get("/terms", (req, res) => {
+  res.sendFile(path.join(__dirname, "..", "public", "terms", "index.html"));
+});
+
+app.get("*", (req, res) => {
+  res.sendFile(path.join(__dirname, "..", "public", "index.html"));
+});
+
+app.use((error, req, res, next) => {
+  console.error(error);
+  if (error.name === "ZodError") return res.status(400).json({ error: "Validation failed", details: error.errors });
+  res.status(500).json({ error: error.message || "Server error" });
+});
+
+app.listen(port, () => {
+  console.log(`AI Inbox Sales Assistant running at http://localhost:${port}`);
+});

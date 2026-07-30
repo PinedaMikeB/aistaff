@@ -1,0 +1,26 @@
+{
+  "name": "aistaff-ads",
+  "version": "0.1.0",
+  "private": true,
+  "description": "AIStaff.click Remotion ad creatives",
+  "scripts": {
+    "studio": "remotion studio src/index.ts",
+    "render:feed": "remotion render src/index.ts AdLostSales-Feed out/ad-lost-sales-feed.mp4",
+    "render:story": "remotion render src/index.ts AdLostSales-Story out/ad-lost-sales-story.mp4",
+    "render:quotation-feed": "remotion render src/index.ts AdQuotation-Feed out/ad-quotation-feed.mp4",
+    "render:feed-vo": "remotion render src/index.ts AdLostSales-Feed-VO out/ad-lost-sales-feed-vo.mp4",
+    "generate:voiceover": "node scripts/generate-voiceover.js",
+    "render:all": "npm run render:feed && npm run render:story && npm run render:quotation-feed"
+  },
+  "dependencies": {
+    "@remotion/cli": "^4.0.286",
+    "@remotion/google-fonts": "^4.0.286",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "remotion": "^4.0.286"
+  },
+  "devDependencies": {
+    "@types/react": "^18.3.18",
+    "typescript": "^5.7.3"
+  }
+}
