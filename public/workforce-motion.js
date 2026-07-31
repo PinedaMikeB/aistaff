@@ -98,6 +98,22 @@ document.querySelectorAll("[data-carousel]").forEach((carousel) => {
 
   show(0);
 
+  // Carousel's own entrance reveal — independent timing/easing from the caption text beside it.
+  // Resets to hidden on leave so it replays every time it re-enters the viewport.
+  if (typeof window.Motion !== "undefined" && !reduceMotion) {
+    window.Motion.inView(carousel, () => {
+      window.Motion.animate(carousel, { opacity: [0, 1], scale: [0.88, 1] },
+        { duration: 0.9, easing: [0.34, 1.4, 0.64, 1] });
+      return () => {
+        carousel.style.opacity = 0;
+        carousel.style.transform = "scale(0.88)";
+      };
+    }, { margin: "-10% 0px -10% 0px" });
+  } else {
+    carousel.style.opacity = 1;
+    carousel.style.transform = "none";
+  }
+
   segments.forEach((seg, n) => seg.addEventListener("click", (e) => {
     e.preventDefault();
     e.stopPropagation();
@@ -126,52 +142,20 @@ document.querySelectorAll("[data-carousel]").forEach((carousel) => {
   }, { passive: true });
 });
 
-// Brandee caption — sequenced blur+scale entrance, triggered when the card enters view
-(function () {
-  const caption = document.querySelector(".brandee-caption");
-  const title = document.getElementById("brandeeCaptionTitle");
+// Caption text reveal (Brandee + Closer) — shared letter-by-letter 3D flip entrance.
+// Resets to hidden on leave so it replays every time the caption re-enters the viewport.
+function initCaptionReveal(prefix, titleId) {
+  const caption = document.querySelector(`.${prefix}`);
+  const title = document.getElementById(titleId);
   if (!caption || !title) return;
 
-  const eyebrow = caption.querySelector(".brandee-caption-eyebrow");
-  const body = caption.querySelector(".brandee-caption-body");
-  const cta = caption.querySelector(".brandee-caption-cta");
-  const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-
-  title.innerHTML = title.textContent
-    .split(" ")
-    .map((w) => `<span class="word">${w}</span>`)
-    .join(" ");
-  const words = title.querySelectorAll(".word");
-
-  const allEls = [eyebrow, ...words, body, cta].filter(Boolean);
-  if (reduceMotion || typeof window.Motion === "undefined") {
-    allEls.forEach((el) => (el.style.opacity = 1));
-    return;
-  }
-
-  const { inView, animate, stagger } = window.Motion;
-  inView(caption, () => {
-    animate(eyebrow, { opacity: [0, 1], y: [-8, 0] }, { duration: 0.4, easing: "ease-out" });
-    animate(words, { opacity: [0, 1], y: [26, 0], scale: [0.94, 1], filter: ["blur(6px)", "blur(0px)"] },
-      { delay: stagger(0.07, { startDelay: 0.12 }), duration: 0.6, easing: [0.16, 1, 0.3, 1] });
-    animate(body, { opacity: [0, 1], y: [12, 0] }, { delay: 0.55, duration: 0.5, easing: "ease-out" });
-    animate(cta, { opacity: [0, 1], y: [10, 0] }, { delay: 0.72, duration: 0.45, easing: "ease-out" });
-  }, { margin: "-10% 0px -10% 0px" });
-})();
-
-// Closer caption — letter-by-letter 3D flip entrance, distinct from Brandee's word reveal
-(function () {
-  const caption = document.querySelector(".closer-caption");
-  const title = document.getElementById("closerCaptionTitle");
-  if (!caption || !title) return;
-
-  const eyebrow = caption.querySelector(".closer-caption-eyebrow");
-  const body = caption.querySelector(".closer-caption-body");
-  const cta = caption.querySelector(".closer-caption-cta");
+  const eyebrow = caption.querySelector(`.${prefix}-eyebrow`);
+  const body = caption.querySelector(`.${prefix}-body`);
+  const cta = caption.querySelector(`.${prefix}-cta`);
   const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
   // Group letters inside a per-word wrapper so the browser treats each word as one
-  // atomic unit for line-wrapping (fixes mid-word breaks like "Messeng" | "er").
+  // atomic unit for line-wrapping (prevents mid-word breaks like "Messeng" | "er").
   title.innerHTML = title.textContent
     .split(" ")
     .map((word) => {
@@ -180,13 +164,17 @@ document.querySelectorAll("[data-carousel]").forEach((carousel) => {
     })
     .join(" ");
   const letters = title.querySelectorAll(".letter");
+  const allEls = [eyebrow, ...letters, body, cta].filter(Boolean);
 
   if (reduceMotion || typeof window.Motion === "undefined") {
-    [eyebrow, ...letters, body, cta].filter(Boolean).forEach((el) => (el.style.opacity = 1));
+    allEls.forEach((el) => (el.style.opacity = 1));
     return;
   }
 
   const { inView, animate, stagger } = window.Motion;
+  const setHidden = () => allEls.forEach((el) => (el.style.opacity = 0));
+  setHidden();
+
   inView(caption, () => {
     animate(eyebrow, { opacity: [0, 1], y: [-8, 0] }, { duration: 0.4, easing: "ease-out" });
     animate(letters, { opacity: [0, 1], rotateX: [-90, 0], y: [14, 0] },
@@ -195,5 +183,9 @@ document.querySelectorAll("[data-carousel]").forEach((carousel) => {
       { delay: 0.15 + letters.length * 0.015 + 0.15, duration: 0.5, easing: "ease-out" });
     animate(cta, { opacity: [0, 1], y: [10, 0] },
       { delay: 0.15 + letters.length * 0.015 + 0.32, duration: 0.45, easing: "ease-out" });
+    return setHidden;
   }, { margin: "-10% 0px -10% 0px" });
-})();
+}
+
+initCaptionReveal("brandee-caption", "brandeeCaptionTitle");
+initCaptionReveal("closer-caption", "closerCaptionTitle");

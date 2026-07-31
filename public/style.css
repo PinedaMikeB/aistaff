@@ -1052,22 +1052,10 @@ tr:hover td { background: #fbf9ff; }
   position: relative;
   z-index: 1;
   margin: 5vh 0 2vh;
-  padding: 12px 0;
+  padding: 8px 0;
   overflow: hidden;
-  border-top: 1px solid rgba(117, 204, 255, .16);
-  border-bottom: 1px solid rgba(117, 204, 255, .16);
-  background: linear-gradient(90deg, rgba(11, 25, 36, .1), rgba(19, 39, 54, .38), rgba(11, 25, 36, .1));
-  backdrop-filter: blur(14px);
-  -webkit-backdrop-filter: blur(14px);
   -webkit-mask-image: linear-gradient(90deg, transparent, #000 10%, #000 90%, transparent);
   mask-image: linear-gradient(90deg, transparent, #000 10%, #000 90%, transparent);
-}
-.modern-home .workforce-ticker::before {
-  content: "";
-  position: absolute;
-  inset: 0;
-  background: radial-gradient(ellipse 60% 100% at 50% 50%, rgba(36, 169, 255, .1), transparent 70%);
-  pointer-events: none;
 }
 .modern-home .ticker-track {
   display: flex;
@@ -1080,7 +1068,7 @@ tr:hover td { background: #fbf9ff; }
 @keyframes ticker-scroll { from { transform: translateX(0); } to { transform: translateX(-33.333%); } }
 .modern-home .ticker-track span {
   color: #eaf6ff;
-  font: 600 19px/1 "Space Grotesk";
+  font: 400 15px/1 "Space Grotesk";
   letter-spacing: -.01em;
   white-space: nowrap;
   opacity: .88;
@@ -1154,40 +1142,51 @@ tr:hover td { background: #fbf9ff; }
 .modern-home .service-card.is-visible .agent-scene::before { animation: scene-scan 4.8s 1.2s ease-in-out infinite; }
 .modern-home .closer-carousel { padding: 0; min-height: 260px; border-color: rgba(72, 193, 255, .3); background: #030810; }
 .modern-home .service-card-media { padding: 0; display: flex; flex-direction: column; }
-.modern-home .service-card-media .closer-carousel { position: relative; width: 100%; aspect-ratio: 1 / 1; height: auto; min-height: 0; border: none; cursor: pointer; }
+.modern-home .agent-brandee.service-card-media,
+.modern-home .agent-chat.service-live.service-card-media {
+  width: fit-content !important;
+  max-width: 96% !important;
+  margin-left: auto !important;
+  margin-right: auto !important;
+  min-height: 0 !important;
+  border: none !important;
+  background: transparent !important;
+  box-shadow: none !important;
+}
+.modern-home .agent-brandee.service-card-media:hover,
+.modern-home .agent-chat.service-live.service-card-media:hover {
+  transform: none;
+  border: none;
+  background: transparent;
+}
+.modern-home .media-row { display: flex; align-items: center; justify-content: center; gap: 36px; width: fit-content; max-width: 100%; }
+.modern-home .service-card-media .closer-carousel { position: relative; width: 440px; flex-shrink: 0; aspect-ratio: 1 / 1; height: auto; min-height: 0; border: none; cursor: pointer; opacity: 0; transform: scale(.88); }
 .modern-home .service-card-media .carousel-track { height: 100%; min-height: 0; }
-.modern-home .agent-brandee { overflow: visible; }
 .modern-home .brandee-caption {
-  position: absolute;
-  top: 50%;
-  left: calc(100% + 48px);
-  transform: translateY(-50%);
-  width: 460px;
   display: flex;
   flex-direction: column;
-  gap: 20px;
+  gap: 16px;
+  width: 380px;
+  flex-shrink: 0;
 }
 .modern-home .brandee-caption-eyebrow { margin: 0; opacity: 0; color: var(--cyan); font: 500 13px "DM Mono"; letter-spacing: .16em; text-transform: uppercase; }
-.modern-home .brandee-caption-title { margin: 0; color: #f4f8ff; font: 500 clamp(40px, 4vw, 56px)/1.06 "Space Grotesk"; letter-spacing: -.03em; }
-.modern-home .brandee-caption-title .word { display: inline-block; opacity: 0; }
+.modern-home .brandee-caption-title { margin: 0; perspective: 600px; color: #f4f8ff; font: 500 clamp(28px, 2.8vw, 38px)/1.1 "Space Grotesk"; letter-spacing: -.03em; }
+.modern-home .brandee-caption-title .word-group { display: inline-block; white-space: nowrap; }
+.modern-home .brandee-caption-title .letter { display: inline-block; opacity: 0; transform-style: preserve-3d; }
 .modern-home .brandee-caption-body { margin: 0; opacity: 0; color: #86a3b7; font: 18px/1.6 "Manrope"; max-width: 36ch; }
 .modern-home .brandee-caption-cta { display: inline-flex; align-items: center; gap: 10px; width: fit-content; opacity: 0; color: #9edfff; font: 600 14px "DM Mono"; letter-spacing: .05em; transition: gap .2s ease, color .2s ease; }
 .modern-home .brandee-caption-cta:hover { gap: 14px; color: #fff; }
-.modern-home .agent-chat.service-live { overflow: visible; }
 .modern-home .closer-caption {
-  position: absolute;
-  top: 50%;
-  right: calc(100% + 48px);
-  transform: translateY(-50%);
-  width: 460px;
   display: flex;
   flex-direction: column;
   align-items: flex-end;
   text-align: right;
-  gap: 20px;
+  gap: 16px;
+  width: 380px;
+  flex-shrink: 0;
 }
 .modern-home .closer-caption-eyebrow { margin: 0; opacity: 0; color: var(--cyan); font: 500 13px "DM Mono"; letter-spacing: .16em; text-transform: uppercase; }
-.modern-home .closer-caption-title { margin: 0; perspective: 600px; color: #f4f8ff; font: 500 clamp(30px, 3vw, 42px)/1.16 "Space Grotesk"; letter-spacing: -.03em; }
+.modern-home .closer-caption-title { margin: 0; perspective: 600px; color: #f4f8ff; font: 500 clamp(24px, 2.4vw, 32px)/1.18 "Space Grotesk"; letter-spacing: -.03em; }
 .modern-home .closer-caption-title .word-group { display: inline-block; white-space: nowrap; }
 .modern-home .closer-caption-title .letter { display: inline-block; opacity: 0; transform-style: preserve-3d; }
 .modern-home .closer-caption-body { margin: 0; opacity: 0; color: #86a3b7; font: 17px/1.6 "Manrope"; max-width: 38ch; }
@@ -1202,7 +1201,7 @@ tr:hover td { background: #fbf9ff; }
 .modern-home .carousel-track { position: relative; width: 100%; height: 260px; overflow: hidden; }
 .modern-home .carousel-track img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; opacity: 0; will-change: opacity, transform; }
 .modern-home .carousel-track img.active { opacity: 1; z-index: 1; }
-.modern-home .carousel-progress { position: absolute; z-index: 2; top: 14px; left: 14px; right: 14px; display: flex; gap: 5px; }
+.modern-home .carousel-progress { position: absolute; z-index: 2; bottom: 14px; left: 14px; right: 14px; display: flex; gap: 5px; }
 .modern-home .carousel-progress span { flex: 1; height: 2.5px; border-radius: 2px; background: rgba(199, 236, 255, .22); overflow: hidden; box-shadow: 0 0 8px rgba(0, 0, 0, .3); }
 .modern-home .carousel-progress span i { display: block; height: 100%; width: 0%; border-radius: 2px; background: linear-gradient(90deg, #5dd0ff, #b8e9ff); box-shadow: 0 0 8px rgba(93, 208, 255, .6); }
 .modern-home .carousel-progress span.done i { width: 100%; transition: none; }
@@ -1258,37 +1257,20 @@ tr:hover td { background: #fbf9ff; }
 @keyframes voice-pulse { to { opacity: 1; transform: scaleY(1.4); } }
 @keyframes signal-grow { from { opacity: 0; transform: scaleX(0); } to { opacity: 1; transform: scaleX(1); } }
 @keyframes live-pulse { 0%, 100% { box-shadow: 0 0 0 rgba(93, 208, 255, 0); } 45% { box-shadow: 0 0 18px rgba(93, 208, 255, .9); } }
-@media (max-width: 1400px) {
-  .modern-home .service-card-media { width: min(720px, 88%) !important; margin-left: auto !important; margin-right: auto !important; }
-  .modern-home .agent-brandee.service-card-media { display: flex; flex-direction: column; }
-  .modern-home .agent-brandee .brandee-caption {
-    position: static;
-    top: auto;
-    left: auto;
-    transform: none;
-    width: 100%;
-    order: -1;
-    margin: 0 0 8px;
-    padding: 28px 24px 24px;
-    border-bottom: 1px solid rgba(117, 204, 255, .16);
-  }
-  .modern-home .agent-brandee .closer-carousel { order: 0; }
-  .modern-home .agent-brandee .service-card-media-footer { order: 1; }
+@media (max-width: 1100px) {
+  .modern-home .service-card-media { width: min(500px, 88%) !important; margin-left: auto !important; margin-right: auto !important; }
+  .modern-home .media-row { flex-direction: column; width: 100%; }
+  .modern-home .service-card-media .closer-carousel { width: 100%; }
+  .modern-home .brandee-caption,
   .modern-home .closer-caption {
-    position: static;
-    top: auto;
-    right: auto;
-    transform: none;
     width: 100%;
     order: -1;
     align-items: flex-start;
     text-align: left;
-    margin: 0 0 8px;
-    padding: 28px 24px 24px;
+    margin: 0 0 20px;
+    padding-bottom: 20px;
     border-bottom: 1px solid rgba(117, 204, 255, .16);
   }
-  .modern-home .agent-chat .closer-carousel { order: 0; }
-  .modern-home .agent-chat .service-card-media-footer { order: 1; }
 }
 @media (max-width: 1100px) {
   .modern-home .service-grid { gap: 14vh; }
@@ -1296,8 +1278,8 @@ tr:hover td { background: #fbf9ff; }
 }
 @media (max-width: 600px) {
   .modern-home .service-grid { gap: 8vh; padding: 2vh 0 6vh; }
-  .modern-home .ticker-track span { font-size: 15px; }
-  .modern-home .workforce-ticker { padding: 10px 0; }
+  .modern-home .ticker-track span { font-size: 13px; }
+  .modern-home .workforce-ticker { padding: 8px 0; }
   .modern-home .service-card {
     position: static;
     width: 100%;
