@@ -247,3 +247,13 @@ get added).
    "planned," not built. Ticker references them by name
    ("AI Voice Sales Agent" etc.) — keep that consistent if/when they
    actually ship
+
+## Reusable skill created this session
+
+`.claude/skills/aistaff-homepage-style/SKILL.md` — captures the design
+tokens, the `initCaptionReveal` letter-flip animation pattern (with the
+critical `return setHidden` replay fix), the independent-element-reveal
+approach, the centering-a-variable-width-row fix, and a pre-ship
+checklist. **Read this skill before styling any new AIStaff marketing
+page or section** — it's the "how to apply it" companion to this
+handoff doc's "what we learned and why."
