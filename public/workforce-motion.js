@@ -189,3 +189,41 @@ function initCaptionReveal(prefix, titleId) {
 
 initCaptionReveal("brandee-caption", "brandeeCaptionTitle");
 initCaptionReveal("closer-caption", "closerCaptionTitle");
+
+// Services section heading — same letter-flip technique, its own trigger/target
+(function () {
+  const kicker = document.querySelector(".section-heading-compact .section-kicker");
+  const title = document.getElementById("workforceHeadingTitle");
+  const support = document.querySelector(".section-heading-compact .section-support");
+  if (!title) return;
+
+  const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+  title.innerHTML = title.textContent
+    .split(" ")
+    .map((word) => {
+      const letterSpans = word.split("").map((ch) => `<span class="letter">${ch}</span>`).join("");
+      return `<span class="word-group">${letterSpans}</span>`;
+    })
+    .join(" ");
+  const letters = title.querySelectorAll(".letter");
+  const allEls = [kicker, ...letters, support].filter(Boolean);
+
+  if (reduceMotion || typeof window.Motion === "undefined") {
+    allEls.forEach((el) => (el.style.opacity = 1));
+    return;
+  }
+
+  const { inView, animate, stagger } = window.Motion;
+  const setHidden = () => allEls.forEach((el) => (el.style.opacity = 0));
+  setHidden();
+
+  inView(title, () => {
+    animate(kicker, { opacity: [0, 1], y: [-8, 0] }, { duration: 0.4, easing: "ease-out" });
+    animate(letters, { opacity: [0, 1], rotateX: [-90, 0], y: [16, 0] },
+      { delay: stagger(0.02, { startDelay: 0.15 }), duration: 0.45, easing: "ease-out" });
+    animate(support, { opacity: [0, 1], y: [10, 0] },
+      { delay: 0.15 + letters.length * 0.02 + 0.15, duration: 0.5, easing: "ease-out" });
+    return setHidden;
+  }, { margin: "-10% 0px -10% 0px" });
+})();

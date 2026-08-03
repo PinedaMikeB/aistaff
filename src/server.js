@@ -128,7 +128,7 @@ app.use(cookieParser());
 app.use(morgan("dev"));
 app.use(express.static(path.join(__dirname, "..", "public"), {
   setHeaders(res, filePath) {
-    if (filePath.endsWith("app.js") || filePath.endsWith("index.html") || filePath.endsWith("style.css") || filePath.endsWith("workforce-motion.js")) {
+    if (filePath.endsWith("app.js") || filePath.endsWith("index.html") || filePath.endsWith("style.css") || filePath.endsWith("workforce-motion.js") || filePath.endsWith("site-chat.js")) {
       res.setHeader("Cache-Control", "no-cache");
     }
   }
@@ -981,6 +981,86 @@ app.post("/api/public/audit-request", asyncHandler(async (req, res) => {
     });
 
   res.json({ ok: true, message: "Audit request received" });
+}));
+
+const SITE_CHAT_SYSTEM_PROMPT = [
+  "You are the AIStaff website assistant, embedded as a chat widget on aistaff.click.",
+  "You represent AIStaff, an AI workforce platform for Philippine businesses. Answer only using the facts below. Never invent pricing, features, or timelines.",
+  "",
+  "COMPANY: AIStaff (aistaff.click) builds specialized AI agents for business growth. Two agents are live today; more are planned (AI Voice Sales, AI Marketing, AI Facebook Ads).",
+  "",
+  "AGENT 1 — CLOSER (AI Chat Sales Agent), LIVE, has real pricing:",
+  "Handles written sales inquiries on Facebook Messenger and website chat. Understands customer needs, asks qualifying questions, captures leads (name, contact, requirements), recommends offers, handles objections, prepares quotation drafts for owner approval, and keeps leads moving toward a sale. Runs 24/7.",
+  "Pricing (monthly): Starter ₱4,999/mo (1 Facebook Page, up to 1,500 AI conversations/mo, basic qualification, lead dashboard). Growth ₱24,999/mo, most popular (up to 3 Facebook Pages, 8,000 conversations/mo, advanced qualification, follow-up automation, quotation handling, CRM-style pipeline). Scale ₱59,999/mo (up to 10 Facebook Pages, 25,000 conversations/mo, multi-branch, API/webhook access, dedicated onboarding). Enterprise: custom, starting ₱100,000/mo for large companies, hotels, clinics, multi-branch operations, private deployments. Annual billing saves 10%. Full details and checkout: /pricing/",
+  "",
+  "AGENT 2 — BRANDEE (AI UGC Brand Agent), NEW, pricing not finalized:",
+  "Turns one product photo into a finished UGC-style ad video. Client picks an avatar and a scene (home, kitchen, office, car, etc.), uploads a product photo, and Brandee writes the script, matches the voice, and generates the video — no filming, no talent booking, no editing software needed. Same presenter identity stays consistent across every video and every product. If asked about Brandee's price, say pricing is being finalized and to check /agents/brandee/ or contact the team — do not state specific numbers for Brandee.",
+  "",
+  "HOW TO ENGAGE: For a live demo of how Closer actually talks to customers, direct people to the Messenger chat link on the site (the 'Chat with Closer' button) or /agents/closer/. For Brandee details, point to /agents/brandee/. For full pricing/checkout, point to /pricing/. For anything about a specific account, billing issue, or something you don't know, tell them to use the contact form at /contact/ or email support@aistaff.click.",
+  "",
+  "TONE: Warm, concise, helpful — like a knowledgeable teammate, not a pushy salesperson. Keep answers short (2-4 sentences) unless the person asks for detail. Never make up features, integrations, or launch dates for agents that aren't live yet (Voice, Marketing, Facebook Ads) — say they're planned/in development if asked.",
+  "Respond in the same language the visitor uses (English or Taglish is fine)."
+].join("\n");
+
+const siteChatRateLimitStore = new Map();
+function checkSiteChatRateLimit(ip) {
+  const now = Date.now();
+  const windowMs = 10 * 60 * 1000;
+  const maxRequests = 20;
+  const entry = siteChatRateLimitStore.get(ip) || [];
+  const recent = entry.filter((t) => now - t < windowMs);
+  if (recent.length >= maxRequests) return false;
+  recent.push(now);
+  siteChatRateLimitStore.set(ip, recent);
+  return true;
+}
+
+app.post("/api/public/site-chat", asyncHandler(async (req, res) => {
+  const ip = req.ip || req.headers["x-forwarded-for"] || "unknown";
+  if (!checkSiteChatRateLimit(ip)) {
+    return res.status(429).json({ ok: false, error: "Too many messages. Please wait a bit and try again." });
+  }
+
+  const body = z.object({
+    messages: z.array(z.object({
+      role: z.enum(["user", "assistant"]),
+      content: z.string().min(1).max(2000)
+    })).min(1).max(20)
+  }).parse(req.body);
+
+  if (!process.env.OPENAI_API_KEY) {
+    return res.status(503).json({ ok: false, error: "Chat is not configured yet." });
+  }
+
+  const fetch = (...args) => import("node-fetch").then(({ default: f }) => f(...args));
+  const response = await fetch("https://api.openai.com/v1/chat/completions", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${process.env.OPENAI_API_KEY}`
+    },
+    body: JSON.stringify({
+      model: "gpt-5.6-luna",
+      messages: [
+        { role: "system", content: SITE_CHAT_SYSTEM_PROMPT },
+        ...body.messages
+      ],
+      temperature: 0.4,
+      max_tokens: 400
+    })
+  });
+
+  if (!response.ok) {
+    const errText = await response.text().catch(() => "");
+    console.error("Site chat OpenAI error:", response.status, errText);
+    return res.status(502).json({ ok: false, error: "Could not reach the chat agent." });
+  }
+
+  const json = await response.json();
+  const reply = json.choices?.[0]?.message?.content?.trim();
+  if (!reply) return res.status(502).json({ ok: false, error: "Empty response from chat agent." });
+
+  res.json({ ok: true, reply });
 }));
 
 app.post("/api/page-intelligence/preview", requireAuth, asyncHandler(async (req, res) => {
