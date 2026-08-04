@@ -628,6 +628,24 @@ model StaticAdTemplate {
   description           String    @db.Text
   category              String
   frameworkKey          String?
+  // PRODUCT | SERVICE | UNIVERSAL — which example this specific template
+  // visual is (most frameworks were imported with one product-oriented and
+  // one service-oriented real example; see templateImport.js).
+  audienceType          String    @default("UNIVERSAL")
+  // Short "best for X" customer-facing label (PART 4/7), distinct from the
+  // longer `description`.
+  idealFor              String?   @db.Text
+  // Dominant colors sampled from the source asset at import time, hex
+  // strings — used for personalized-thumbnail color hints (PART 8) and
+  // Super Admin preview only, never as the sole indicator of anything.
+  dominantColors        String[]  @default([])
+  // SHA-256 of the original imported file's bytes — lets the importer
+  // (scripts/brandee-import-static-templates.js) detect an already-imported
+  // file on a safe rerun without depending on filename stability.
+  sourceChecksum        String?
+  // Original filename from the import source, kept for provenance/audit only
+  // (never used at runtime, never exposed as a public asset path).
+  importedFromFilename  String?
   previewImageUrl       String?
   thumbnailUrl          String?
   sourceAssetUrl        String?
@@ -661,6 +679,7 @@ model StaticAdTemplate {
   @@index([status])
   @@index([category])
   @@index([parentTemplateId])
+  @@index([sourceChecksum])
   @@map("static_ad_templates")
 }
 

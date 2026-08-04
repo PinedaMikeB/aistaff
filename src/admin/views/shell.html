@@ -470,22 +470,51 @@
     return `<span class="badge badge-${map[status] || "inactive"}">${escapeHtml(status)}</span>`;
   }
 
-  async function renderTemplateList(kind) {
+  function audienceBadge(audienceType) {
+    const map = { PRODUCT: "active", SERVICE: "notvalidated", UNIVERSAL: "inactive" };
+    const value = audienceType || "UNIVERSAL";
+    return `<span class="badge badge-${map[value] || "inactive"}">${escapeHtml(value)}</span>`;
+  }
+
+  // Imported real-photo templates (from the static-asset importer script)
+  // all set importedFromFilename — used here to surface a quick "needs
+  // review" filter so a Super Admin can find the batch of 21 DRAFT imports
+  // without hunting through everything else (PART 30).
+  async function renderTemplateList(kind, { audienceFilter = "", importedOnly = false, search = "" } = {}) {
     const label = TEMPLATE_LABELS[kind];
     content.innerHTML = `<h1>${label}</h1><p>Loading…</p>`;
-    const { templates } = await api(`/brandee/templates/${kind}`);
+    const { templates: all } = await api(`/brandee/templates/${kind}`);
+    const templates = all.filter((t) => {
+      if (audienceFilter && (t.audienceType || "UNIVERSAL") !== audienceFilter) return false;
+      if (importedOnly && !t.importedFromFilename) return false;
+      if (search && !`${t.name} ${t.slug} ${t.frameworkKey || ""}`.toLowerCase().includes(search.toLowerCase())) return false;
+      return true;
+    });
+    const importedCount = all.filter((t) => t.importedFromFilename).length;
+    const draftImportedCount = all.filter((t) => t.importedFromFilename && t.status === "DRAFT").length;
     content.innerHTML = `
       <h1>${label}</h1>
-      <p class="page-sub">${templates.length} template(s). Only ACTIVE templates are shown to customers.</p>
-      <div class="toolbar">
+      <p class="page-sub">${all.length} template(s) total (${templates.length} shown). Only ACTIVE templates are shown to customers.
+        ${importedCount ? ` ${importedCount} imported from real photos, ${draftImportedCount} still DRAFT awaiting review.` : ""}</p>
+      <div class="toolbar" style="flex-wrap:wrap;gap:8px">
         <a class="action" style="text-decoration:none;display:inline-block" href="/superadmin/brandee/templates/${kind}/new">New Template</a>
+        <select id="filterAudience">
+          <option value="">All audience types</option>
+          <option value="PRODUCT" ${audienceFilter === "PRODUCT" ? "selected" : ""}>Product</option>
+          <option value="SERVICE" ${audienceFilter === "SERVICE" ? "selected" : ""}>Service</option>
+          <option value="UNIVERSAL" ${audienceFilter === "UNIVERSAL" ? "selected" : ""}>Universal</option>
+        </select>
+        <label style="display:inline-flex;align-items:center;gap:4px"><input type="checkbox" id="filterImported" ${importedOnly ? "checked" : ""} /> Imported only</label>
+        <input id="filterSearch" placeholder="Search name, slug, framework…" value="${escapeHtml(search)}" style="min-width:220px" />
       </div>
       <div class="table-wrap"><table>
-        <thead><tr><th>Name</th><th>Category</th><th>Slug</th><th>Version</th><th>Status</th><th>Featured</th><th>Updated</th><th></th></tr></thead>
+        <thead><tr><th></th><th>Name</th><th>Framework</th><th>Audience</th><th>Slug</th><th>Version</th><th>Status</th><th>Featured</th><th>Updated</th><th></th></tr></thead>
         <tbody>${templates.map((t) => `
           <tr>
-            <td>${escapeHtml(t.name)}</td>
-            <td>${escapeHtml(t.category)}</td>
+            <td>${t.thumbnailUrl ? `<img src="${escapeHtml(t.thumbnailUrl)}" alt="" style="width:44px;height:44px;object-fit:cover;border-radius:6px" />` : "—"}</td>
+            <td>${escapeHtml(t.name)}${t.importedFromFilename ? ` <span class="sub" title="Imported from ${escapeHtml(t.importedFromFilename)}">(imported)</span>` : ""}</td>
+            <td>${escapeHtml(t.frameworkKey || "—")}</td>
+            <td>${audienceBadge(t.audienceType)}</td>
             <td><code class="mono">${escapeHtml(t.slug)}</code></td>
             <td>v${t.version}${t.parentTemplateId ? ` <span class="sub">(supersedes a prior version)</span>` : ""}</td>
             <td>${templateStatusBadge(t.status)}</td>
@@ -501,19 +530,55 @@
       const btn = content.querySelector(`[data-id="${t.id}"]`);
       btn.addEventListener("click", () => openTemplateManageDrawer(kind, t));
     });
+    const reload = () => renderTemplateList(kind, {
+      audienceFilter: document.getElementById("filterAudience").value,
+      importedOnly: document.getElementById("filterImported").checked,
+      search: document.getElementById("filterSearch").value
+    });
+    content.querySelector("#filterAudience").addEventListener("change", reload);
+    content.querySelector("#filterImported").addEventListener("change", reload);
+    let searchTimer;
+    content.querySelector("#filterSearch").addEventListener("input", () => { clearTimeout(searchTimer); searchTimer = setTimeout(reload, 250); });
   }
 
   function openTemplateManageDrawer(kind, t) {
+    const sourceImg = kind === "static" && (t.sourceAssetUrl || t.thumbnailUrl)
+      ? `<img src="${escapeHtml(t.sourceAssetUrl || t.thumbnailUrl)}" alt="" style="max-width:100%;border-radius:8px;margin-bottom:12px" />`
+      : "";
     openDrawer(t.name, `
+      ${sourceImg}
       <dl class="kv">
         <dt>Slug</dt><dd><code class="mono">${escapeHtml(t.slug)}</code></dd>
         <dt>Category</dt><dd>${escapeHtml(t.category)}</dd>
+        <dt>Framework</dt><dd>${escapeHtml(t.frameworkKey || "—")}</dd>
         <dt>Description</dt><dd>${escapeHtml(t.description)}</dd>
         <dt>Status</dt><dd>${templateStatusBadge(t.status)}</dd>
         <dt>Version</dt><dd>v${t.version}</dd>
         <dt>Aspect ratios</dt><dd>${(t.supportedAspectRatios || []).join(", ") || "—"}</dd>
+        ${t.importedFromFilename ? `<dt>Imported from</dt><dd><code class="mono">${escapeHtml(t.importedFromFilename)}</code></dd>` : ""}
+        ${(t.dominantColors || []).length ? `<dt>Dominant colors</dt><dd>${(t.dominantColors || []).map((c) => `<span style="display:inline-block;width:16px;height:16px;border-radius:3px;background:${escapeHtml(c)};vertical-align:middle;margin-right:4px" title="${escapeHtml(c)}"></span>`).join("")}</dd>` : ""}
       </dl>
-      <div class="toolbar">
+      ${kind === "static" ? `
+        <h2>Classification (PART 30 — Product / Service / Universal, ideal use)</h2>
+        <form id="classifyForm">
+          <div class="field"><label for="f_audienceType">Audience type</label>
+            <select id="f_audienceType">
+              <option value="PRODUCT" ${t.audienceType === "PRODUCT" ? "selected" : ""}>Product</option>
+              <option value="SERVICE" ${t.audienceType === "SERVICE" ? "selected" : ""}>Service</option>
+              <option value="UNIVERSAL" ${(!t.audienceType || t.audienceType === "UNIVERSAL") ? "selected" : ""}>Universal</option>
+            </select>
+          </div>
+          <div class="field"><label for="f_idealFor">Ideal for (short customer-facing description)</label>
+            <input id="f_idealFor" maxlength="300" value="${escapeHtml(t.idealFor || "")}" placeholder="e.g. Products with a clear before/after transformation" />
+          </div>
+          <div class="field"><label for="f_frameworkKey">Framework key</label>
+            <input id="f_frameworkKey" value="${escapeHtml(t.frameworkKey || "")}" placeholder="e.g. before_and_after" />
+          </div>
+          <button class="action" type="submit">Save classification</button>
+        </form>
+        <div id="classifyResult"></div>
+      ` : ""}
+      <div class="toolbar" style="margin-top:14px">
         ${t.status !== "ACTIVE" ? `<button class="action" data-status="ACTIVE">Activate</button>` : `<button class="action" data-status="INACTIVE">Deactivate</button>`}
         ${t.status !== "ARCHIVED" ? `<button class="action danger" data-status="ARCHIVED">Archive</button>` : ""}
         <button class="action" id="dupBtn">Duplicate</button>
@@ -522,6 +587,56 @@
       <div id="templateActionResult"></div>
       ${kind === "static" ? `<img alt="" style="max-width:100%;border-radius:8px;margin-top:10px" id="testPreviewImg" />` : ""}
     `);
+    if (kind === "static") {
+      const classifyForm = document.getElementById("classifyForm");
+      const classifyResult = document.getElementById("classifyResult");
+      classifyForm.addEventListener("submit", async (e) => {
+        e.preventDefault();
+        const submitBtn = classifyForm.querySelector('button[type="submit"]');
+        submitBtn.disabled = true;
+        try {
+          const updated = await api(`/brandee/templates/${kind}/${t.id}`, {
+            method: "PATCH",
+            body: JSON.stringify({
+              // Full-payload PATCH — send the fields the schema requires
+              // plus the ones being changed, so unrelated fields survive.
+              slug: t.slug,
+              name: t.name,
+              description: t.description,
+              category: t.category,
+              frameworkKey: document.getElementById("f_frameworkKey").value || null,
+              audienceType: document.getElementById("f_audienceType").value,
+              idealFor: document.getElementById("f_idealFor").value || null,
+              dominantColors: t.dominantColors || [],
+              sourceChecksum: t.sourceChecksum || null,
+              importedFromFilename: t.importedFromFilename || null,
+              previewImageUrl: t.previewImageUrl || null,
+              thumbnailUrl: t.thumbnailUrl || null,
+              sourceAssetUrl: t.sourceAssetUrl || null,
+              overlaySchema: t.overlaySchema || {},
+              requiredFieldsSchema: t.requiredFieldsSchema || [],
+              optionalFieldsSchema: t.optionalFieldsSchema || [],
+              proofRequirements: t.proofRequirements || [],
+              supportedAspectRatios: t.supportedAspectRatios && t.supportedAspectRatios.length ? t.supportedAspectRatios : ["4:5"],
+              defaultAspectRatio: t.defaultAspectRatio || "4:5",
+              defaultLanguage: t.defaultLanguage || "english",
+              renderMode: t.renderMode || "COMPOSITE_TEMPLATE",
+              tags: t.tags || [],
+              sortOrder: t.sortOrder || 0,
+              isFeatured: !!t.isFeatured,
+              isPremium: !!t.isPremium
+            })
+          });
+          classifyResult.innerHTML = `<div class="banner">Saved${updated.template.status === "DRAFT" && t.status !== "DRAFT" ? " as a new draft version (the published version is unchanged)." : "."}</div>`;
+          closeDrawer();
+          renderTemplateList(kind);
+        } catch (error) {
+          classifyResult.innerHTML = `<div class="banner banner-error">${escapeHtml(error.body?.details ? JSON.stringify(error.body.details) : error.message)}</div>`;
+        } finally {
+          submitBtn.disabled = false;
+        }
+      });
+    }
     const resultEl = document.getElementById("templateActionResult");
     document.querySelectorAll("[data-status]").forEach((btn) => {
       btn.addEventListener("click", async () => {

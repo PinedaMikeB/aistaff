@@ -36,13 +36,31 @@ const ALLOWED_EVENTS = new Set([
   "subscription_started",
   "subscription_completed",
   "final_generation_started",
-  "final_generation_completed"
+  "final_generation_completed",
+
+  // PART 32 — template gallery + revision funnel events.
+  "image_product_step_completed",
+  "template_gallery_opened",
+  "template_filter_selected",
+  "template_preview_opened",
+  "preview_generation_started",
+  "preview_generation_completed",
+  "preview_generation_failed",
+  "revision_started",
+  "revision_completed",
+  "revision_failed",
+  "save_finish_clicked",
+  "registration_gate_shown",
+  "pricing_gate_shown",
+  "plan_selected",
+  "checkout_started",
+  "final_downloaded"
 ]);
 
 // Only these keys are ever allowed onto an event, and every value is
 // coerced to a primitive — this is a hard boundary against accidentally
 // logging product photos, descriptions, or any other customer content.
-const ALLOWED_PROPERTY_KEYS = new Set(["templateId", "styleId", "kind", "planSlug", "goal", "platform", "language", "reason", "durationMs"]);
+const ALLOWED_PROPERTY_KEYS = new Set(["templateId", "styleId", "kind", "planSlug", "goal", "platform", "language", "reason", "durationMs", "frameworkKey", "audienceType", "filterType", "filterValue"]);
 
 function sanitizeProperties(properties = {}) {
   const clean = {};

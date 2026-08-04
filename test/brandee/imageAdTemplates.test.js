@@ -1,6 +1,8 @@
-// Image-ad template library tests (PART 8/9).
-// Confirms all 10 specified templates exist with the required shape, and
-// that Testimonial Style stays gated behind a real testimonial.
+// Image-ad template library tests (PART 8/9, extended by the template
+// gallery task with 3 more frameworks: iPhone Notes, Reasons Why, Sticky
+// Notes — see imageAdTemplates.js's header and templateRecommender.js).
+// Confirms all specified templates exist with the required shape, and that
+// proof-gated templates stay gated behind real evidence.
 
 const test = require("node:test");
 const assert = require("node:assert/strict");
@@ -22,10 +24,13 @@ const EXPECTED_IDS = [
   "minimal_ecommerce",
   "testimonial_style",
   "before_and_after",
-  "bold_claim"
+  "bold_claim",
+  "iphone_notes",
+  "reasons_why",
+  "sticky_notes"
 ];
 
-test("exactly the 10 templates specified in PART 8 exist, in the given order", () => {
+test("exactly the 13 templates specified in PART 8 + the template gallery task exist, in the given order", () => {
   assert.deepEqual(IMAGE_AD_TEMPLATES.map((t) => t.id), EXPECTED_IDS);
 });
 

@@ -62,6 +62,15 @@ function createProject({ kind, anonymousSessionId = null, userId = null, product
     videoFields: {},
     preview: null, // { generatedAt, watermarked, ... }
     finalAsset: null,
+    // Structured creative-planning output (PART 12) for the CURRENT/latest
+    // revision — see revisions[] below for full history.
+    creativePlan: null,
+    // Append-only revision history (PART 16/17/19). Every generated preview
+    // (the first one AND every subsequent natural-language revision) is
+    // pushed here; nothing is ever overwritten, so the customer can always
+    // view/compare/restore an earlier version. `preview`/`creativePlan`
+    // above always mirror the LATEST entry in this array for convenience.
+    revisions: [],
     status: "draft", // draft -> previewed -> registered -> subscribed -> finalized
     createdAt: now,
     updatedAt: now
@@ -100,6 +109,58 @@ function listProjectsForUser(userId) {
   return Object.values(all).filter((p) => p.userId === userId);
 }
 
+// --- Revision history (PART 16/17/19) ----------------------------------
+
+/**
+ * Appends one revision entry (the first preview counts as revision 1) and
+ * updates the project's convenience `preview`/`creativePlan` mirror fields
+ * to match. Never mutates or removes a prior entry — PART 19's "the
+ * customer must be able to view/compare/restore an earlier revision"
+ * requires every past entry to stay exactly as it was generated.
+ */
+function addRevision(projectId, { instruction = null, plan = null, svg, width, height, watermarked, aiUsed = false }) {
+  const project = getProject(projectId);
+  if (!project) return null;
+  const revisionNumber = (project.revisions || []).length + 1;
+  const entry = {
+    revisionNumber,
+    instruction,
+    plan,
+    svg,
+    width,
+    height,
+    watermarked,
+    aiUsed,
+    createdAt: new Date().toISOString()
+  };
+  const revisions = [...(project.revisions || []), entry];
+  return updateProject(projectId, {
+    revisions,
+    creativePlan: plan,
+    preview: { generatedAt: entry.createdAt, watermarked, svg }
+  });
+}
+
+function listRevisions(projectId) {
+  const project = getProject(projectId);
+  return project ? (project.revisions || []) : [];
+}
+
+/**
+ * "Restore" never deletes newer revisions (PART 19) — it copies the chosen
+ * older revision's content back into the convenience mirror fields AND
+ * appends a NEW revision entry that is an exact copy of the restored one,
+ * so the append-only history and "what is currently shown" stay consistent
+ * without ever rewriting history.
+ */
+function restoreRevision(projectId, revisionNumber) {
+  const project = getProject(projectId);
+  if (!project) return null;
+  const target = (project.revisions || []).find((r) => r.revisionNumber === revisionNumber);
+  if (!target) return null;
+  return addRevision(projectId, { instruction: `Restored revision ${revisionNumber}`, plan: target.plan, svg: target.svg, width: target.width, height: target.height, watermarked: target.watermarked, aiUsed: target.aiUsed });
+}
+
 // --- Anonymous preview rate limiting (PART 13/20) ---------------------
 
 function canGenerateAnonymousPreview(anonymousSessionId, kind) {
@@ -117,6 +178,24 @@ function recordAnonymousPreview(anonymousSessionId, kind) {
   saveAnonLimits(limits);
 }
 
+// PART 18 — a separate, smaller counter for free revisions (distinct from
+// the initial-preview limit above), so "1 free preview + 1 free revision"
+// can both be enforced independently for an anonymous visitor.
+function canGenerateAnonymousRevision(anonymousSessionId, kind, { maxRevisions = 1 } = {}) {
+  if (!anonymousSessionId) return false;
+  const limits = loadAnonLimits();
+  const used = limits[anonymousSessionId]?.[`${kind}RevisionsUsed`] || 0;
+  return used < maxRevisions;
+}
+
+function recordAnonymousRevision(anonymousSessionId, kind) {
+  if (!anonymousSessionId) return;
+  const limits = loadAnonLimits();
+  const current = limits[anonymousSessionId] || {};
+  limits[anonymousSessionId] = { ...current, [`${kind}RevisionsUsed`]: (current[`${kind}RevisionsUsed`] || 0) + 1, lastUsedAt: new Date().toISOString() };
+  saveAnonLimits(limits);
+}
+
 module.exports = {
   createProject,
   getProject,
@@ -125,6 +204,11 @@ module.exports = {
   listProjectsForUser,
   canGenerateAnonymousPreview,
   recordAnonymousPreview,
+  canGenerateAnonymousRevision,
+  recordAnonymousRevision,
+  addRevision,
+  listRevisions,
+  restoreRevision,
   storePath,
   anonLimitsPath
 };

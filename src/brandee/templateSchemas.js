@@ -8,6 +8,7 @@ const { z } = require("zod");
 const TEMPLATE_STATUSES = ["DRAFT", "ACTIVE", "INACTIVE", "ARCHIVED"];
 const RENDER_MODES = ["COMPOSITE_TEMPLATE", "AI_GENERATED_LAYOUT"];
 const ASPECT_RATIOS = ["1:1", "4:5", "9:16", "16:9"];
+const AUDIENCE_TYPES = ["PRODUCT", "SERVICE", "UNIVERSAL"];
 
 // A single editable overlay region, in normalized (0-1) coordinates so it's
 // resolution-independent — PART 18's "at minimum, allow editable bounding
@@ -57,6 +58,18 @@ const StaticTemplateInput = z.object({
   description: z.string().min(1).max(500),
   category: z.string().min(1).max(80),
   frameworkKey: z.string().max(80).optional().nullable(),
+  // PART 9/30 — imported real-photo templates are classified as
+  // PRODUCT/SERVICE/UNIVERSAL so the public gallery's primary filter and the
+  // recommender can both use it; UNIVERSAL is the safe default for templates
+  // that work for either (matches the Prisma column's own default).
+  audienceType: z.enum(AUDIENCE_TYPES).default("UNIVERSAL"),
+  idealFor: z.string().max(300).optional().nullable(),
+  dominantColors: z.array(z.string().regex(/^#[0-9a-f]{6}$/i)).max(8).default([]),
+  // Set only by the importer script, never by an admin edit — but accepted
+  // here (optional) so round-tripping an imported row through
+  // updateTemplate() doesn't strip them.
+  sourceChecksum: z.string().max(128).optional().nullable(),
+  importedFromFilename: z.string().max(200).optional().nullable(),
   previewImageUrl: z.string().max(500).optional().nullable(),
   thumbnailUrl: z.string().max(500).optional().nullable(),
   sourceAssetUrl: z.string().max(500).optional().nullable(),
@@ -131,6 +144,7 @@ module.exports = {
   TEMPLATE_STATUSES,
   RENDER_MODES,
   ASPECT_RATIOS,
+  AUDIENCE_TYPES,
   OverlayRegion,
   OverlaySchema,
   TemplateFieldDef,

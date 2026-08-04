@@ -146,6 +146,57 @@ const IMAGE_AD_TEMPLATES = [
       { key: "evidenceSource", label: "Evidence source", type: "text", required: true, maxLength: 140 },
       { key: "cta", label: "Call to action", type: "text", required: true, maxLength: 40 }
     ]
+  },
+  {
+    id: "iphone_notes",
+    name: "iPhone Notes",
+    description: "A relatable 'note to self' headline next to a short list of real reasons why customers switched.",
+    bestUse: "Products or services with 3-5 concrete, specific reasons to choose you.",
+    thumbnail: "/agents/brandee/assets/templates/iphone-notes.svg",
+    proofRequirement: null,
+    fields: [
+      { key: "noteHeadline", label: "Note headline (as a relatable question or statement)", type: "text", required: true, maxLength: 100 },
+      { key: "reason1", label: "Reason 1", type: "text", required: true, maxLength: 80 },
+      { key: "reason2", label: "Reason 2", type: "text", required: true, maxLength: 80 },
+      { key: "reason3", label: "Reason 3", type: "text", required: true, maxLength: 80 },
+      { key: "reason4", label: "Reason 4 (optional)", type: "text", required: false, maxLength: 80 },
+      { key: "reason5", label: "Reason 5 (optional)", type: "text", required: false, maxLength: 80 },
+      { key: "cta", label: "Call to action", type: "text", required: true, maxLength: 40 }
+    ]
+  },
+  {
+    id: "reasons_why",
+    name: "Reasons Why",
+    description: "A numbered list of real reasons to choose your product or service, in a bold, scannable layout.",
+    bestUse: "Products or services with several distinct, supportable selling points.",
+    thumbnail: "/agents/brandee/assets/templates/reasons-why.svg",
+    proofRequirement: null,
+    fields: [
+      { key: "listHeadline", label: "List headline", type: "text", required: true, maxLength: 100 },
+      { key: "reason1", label: "Reason 1", type: "text", required: true, maxLength: 80 },
+      { key: "reason2", label: "Reason 2", type: "text", required: true, maxLength: 80 },
+      { key: "reason3", label: "Reason 3", type: "text", required: true, maxLength: 80 },
+      { key: "reason4", label: "Reason 4 (optional)", type: "text", required: false, maxLength: 80 },
+      { key: "reason5", label: "Reason 5 (optional)", type: "text", required: false, maxLength: 80 },
+      { key: "cta", label: "Call to action", type: "text", required: true, maxLength: 40 }
+    ]
+  },
+  {
+    id: "sticky_notes",
+    name: "Sticky Notes",
+    description: "Short, friendly sticky-note callouts scattered around a lifestyle shot of your product or service.",
+    bestUse: "Everyday products or services with a handful of short, likeable selling points.",
+    thumbnail: "/agents/brandee/assets/templates/sticky-notes.svg",
+    proofRequirement: null,
+    fields: [
+      { key: "headline", label: "Headline", type: "text", required: true, maxLength: 100 },
+      { key: "note1", label: "Sticky note 1", type: "text", required: true, maxLength: 40 },
+      { key: "note2", label: "Sticky note 2", type: "text", required: true, maxLength: 40 },
+      { key: "note3", label: "Sticky note 3", type: "text", required: true, maxLength: 40 },
+      { key: "note4", label: "Sticky note 4 (optional)", type: "text", required: false, maxLength: 40 },
+      { key: "note5", label: "Sticky note 5 (optional)", type: "text", required: false, maxLength: 40 },
+      { key: "cta", label: "Call to action", type: "text", required: true, maxLength: 40 }
+    ]
   }
 ];
 

@@ -26,19 +26,38 @@ const TEMPLATE_CONTENT_MAP = {
   minimal_ecommerce: (f, form) => ({ headline: form.productName, subcopy: null, price: f.price, cta: f.cta, badge: null }),
   testimonial_style: (f) => ({ headline: `"${f.testimonialQuote || ""}"`, subcopy: `— ${f.testimonialAttribution || ""}`, price: null, cta: f.cta, badge: null }),
   before_and_after: (f) => ({ headline: `Before: ${f.beforeState || ""}`, subcopy: `After: ${f.afterState || ""}`, price: null, cta: f.cta, badge: null }),
-  bold_claim: (f) => ({ headline: f.claim, subcopy: f.evidenceSource ? `Source: ${f.evidenceSource}` : null, price: null, cta: f.cta, badge: null })
+  bold_claim: (f) => ({ headline: f.claim, subcopy: f.evidenceSource ? `Source: ${f.evidenceSource}` : null, price: null, cta: f.cta, badge: null, list: null }),
+  iphone_notes: (f) => ({ headline: f.noteHeadline, subcopy: null, price: null, cta: f.cta, badge: null, list: [f.reason1, f.reason2, f.reason3, f.reason4, f.reason5].filter(Boolean) }),
+  reasons_why: (f) => ({ headline: f.listHeadline, subcopy: null, price: null, cta: f.cta, badge: null, list: [f.reason1, f.reason2, f.reason3, f.reason4, f.reason5].filter(Boolean) }),
+  sticky_notes: (f) => ({ headline: f.headline, subcopy: null, price: null, cta: f.cta, badge: null, list: [f.note1, f.note2, f.note3, f.note4, f.note5].filter(Boolean) })
 };
 
-function buildAdContent(templateId, templateFields = {}, form = {}) {
+/**
+ * Builds the final renderable ad content from the template's raw field
+ * values, with an optional `override` layered on top. `override` is where
+ * the creative-planning AI (creativePlanner.js) and the revision flow
+ * (Part 17 — "edit the current preview, preserve everything not asked to
+ * change") apply their decisions: only the keys actually present in
+ * `override` replace the template-field-derived value, so a revision that
+ * only asks to change the headline never touches subcopy/cta/list/price.
+ */
+function buildAdContent(templateId, templateFields = {}, form = {}, override = null) {
   const mapper = TEMPLATE_CONTENT_MAP[templateId];
-  const base = mapper ? mapper(templateFields, form) : { headline: form.productName, subcopy: form.mainBenefit, price: form.price, cta: "Learn More", badge: null };
-  return {
+  const base = mapper ? mapper(templateFields, form) : { headline: form.productName, subcopy: form.mainBenefit, price: form.price, cta: "Learn More", badge: null, list: null };
+  const merged = {
     headline: base.headline || form.productName || "Your product",
     subcopy: base.subcopy || form.mainBenefit || "",
     price: base.price || form.price || null,
     cta: base.cta || "Learn More",
-    badge: base.badge
+    badge: base.badge || null,
+    list: base.list || null
   };
+  if (override && typeof override === "object") {
+    for (const key of ["headline", "subcopy", "price", "cta", "badge", "list"]) {
+      if (override[key] !== undefined && override[key] !== null) merged[key] = override[key];
+    }
+  }
+  return merged;
 }
 
 function wrapText(text, maxCharsPerLine, maxLines) {
@@ -88,29 +107,64 @@ function watermarkOverlay(width, height) {
  * to false only after the subscription/export gate has been checked by the
  * caller.
  */
-function renderImageAdSvg({ templateId, templateFields = {}, form = {}, watermark = true }) {
-  const content = buildAdContent(templateId, templateFields, form);
+function listBlock(items, x, y, width, { accentColor, style = "check" }) {
+  if (!items || !items.length) return "";
+  const rowHeight = 34;
+  const rows = items.slice(0, 5).map((item, i) => {
+    const rowY = y + i * rowHeight;
+    const marker = style === "sticky"
+      ? `<rect x="${x}" y="${rowY - 16}" width="20" height="20" rx="4" fill="${accentColor}" fill-opacity="0.85" />`
+      : `<circle cx="${x + 10}" cy="${rowY - 6}" r="10" fill="${accentColor}" /><text x="${x + 10}" y="${rowY - 1}" font-family="Manrope, Arial, sans-serif" font-size="12" font-weight="700" fill="#ffffff" text-anchor="middle">${i + 1}</text>`;
+    const textX = x + 30;
+    return `${marker}${textLines(item, textX, rowY, { fontSize: 15, fontWeight: 600, fill: "#e6f2fa", maxCharsPerLine: 34, maxLines: 1 })}`;
+  });
+  return `<g>${rows.join("\n")}</g>`;
+}
+
+/**
+ * Renders a full SVG ad document. `productImageDataUrl` is embedded as-is —
+ * this function never alters, regenerates, or replaces the actual uploaded
+ * product photo. Set `watermark: true` for the free/anonymous preview
+ * (smaller canvas + visible repeated watermark, no clean download); set it
+ * to false only after the subscription/export gate has been checked by the
+ * caller. `override` layers creative-planning/revision decisions on top of
+ * the raw template fields (see buildAdContent's doc comment).
+ */
+function renderImageAdSvg({ templateId, templateFields = {}, form = {}, watermark = true, override = null }) {
+  const content = buildAdContent(templateId, templateFields, form, override);
   const width = watermark ? 720 : 1080;
   const height = watermark ? 900 : 1350;
   const brandColor = (form.brandColors && form.brandColors[0]) || "#0f172a";
   const accentColor = (form.brandColors && form.brandColors[1]) || "#3b82f6";
+  const hasList = Array.isArray(content.list) && content.list.length > 0;
 
+  // A soft rounded card + shadow behind the product photo reads as far more
+  // "premium creative tool" than a bare embedded image — cheap to render,
+  // real visual lift, and never touches the actual product pixels.
   const productImageBlock = form.productImage
-    ? `<image href="${form.productImage}" x="${width * 0.08}" y="${height * 0.1}" width="${width * 0.84}" height="${height * 0.46}" preserveAspectRatio="xMidYMid meet" />`
+    ? `<g>
+        <rect x="${width * 0.06}" y="${height * 0.08}" width="${width * 0.88}" height="${height * 0.48}" rx="18" fill="#ffffff" fill-opacity="0.04" />
+        <image href="${form.productImage}" x="${width * 0.08}" y="${height * 0.1}" width="${width * 0.84}" height="${height * 0.44}" preserveAspectRatio="xMidYMid meet" />
+      </g>`
     : "";
 
   const badge = content.badge
-    ? `<rect x="${width * 0.08}" y="${height * 0.62}" width="140" height="36" rx="18" fill="${accentColor}" /><text x="${width * 0.08 + 70}" y="${height * 0.62 + 24}" font-family="Manrope, Arial, sans-serif" font-size="16" font-weight="700" fill="#ffffff" text-anchor="middle">${escapeXml(content.badge)}</text>`
+    ? `<rect x="${width * 0.08}" y="${height * 0.58}" width="150" height="34" rx="17" fill="${accentColor}" /><text x="${width * 0.08 + 75}" y="${height * 0.58 + 23}" font-family="Manrope, Arial, sans-serif" font-size="15" font-weight="700" fill="#ffffff" text-anchor="middle">${escapeXml(content.badge)}</text>`
     : "";
 
   const priceBlock = content.price
-    ? `<text x="${width * 0.08}" y="${height * 0.94}" font-family="DM Mono, monospace" font-size="28" font-weight="600" fill="${accentColor}">${escapeXml(content.price)}</text>`
+    ? `<text x="${width * 0.08}" y="${height * 0.94}" font-family="DM Mono, monospace" font-size="26" font-weight="600" fill="${accentColor}">${escapeXml(content.price)}</text>`
     : "";
 
   const ctaBlock = `
-    <rect x="${width * 0.08}" y="${height * 0.97 - 46}" width="${width * 0.5}" height="46" rx="10" fill="${accentColor}" />
+    <rect x="${width * 0.08}" y="${height * 0.97 - 46}" width="${width * 0.5}" height="46" rx="23" fill="${accentColor}" />
     <text x="${width * 0.08 + (width * 0.25)}" y="${height * 0.97 - 17}" font-family="Manrope, Arial, sans-serif" font-size="18" font-weight="700" fill="#ffffff" text-anchor="middle">${escapeXml(content.cta)}</text>
   `;
+
+  const headlineY = hasList ? height * 0.635 : height * 0.7;
+  const bodyBlock = hasList
+    ? listBlock(content.list, width * 0.08, height * 0.72, width * 0.84, { accentColor, style: templateId === "sticky_notes" ? "sticky" : "check" })
+    : textLines(content.subcopy, width * 0.08, height * 0.79, { fontSize: 18, fontWeight: 500, fill: "#cbd5e1", maxCharsPerLine: 42, maxLines: 2 });
 
   const svg = `<svg viewBox="0 0 ${width} ${height}" width="${width}" height="${height}" xmlns="http://www.w3.org/2000/svg">
     <defs>
@@ -122,8 +176,8 @@ function renderImageAdSvg({ templateId, templateFields = {}, form = {}, watermar
     <rect x="0" y="0" width="${width}" height="${height}" fill="url(#bg)" />
     ${productImageBlock}
     ${badge}
-    ${textLines(content.headline, width * 0.08, height * 0.7, { fontSize: 34, maxCharsPerLine: 24, maxLines: 2 })}
-    ${textLines(content.subcopy, width * 0.08, height * 0.79, { fontSize: 18, fontWeight: 500, fill: "#cbd5e1", maxCharsPerLine: 42, maxLines: 2 })}
+    ${textLines(content.headline, width * 0.08, headlineY, { fontSize: 34, maxCharsPerLine: 24, maxLines: hasList ? 2 : 2 })}
+    ${bodyBlock}
     ${priceBlock}
     ${ctaBlock}
     ${watermark ? watermarkOverlay(width, height) : ""}

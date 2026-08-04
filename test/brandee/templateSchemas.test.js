@@ -8,7 +8,7 @@
 const test = require("node:test");
 const assert = require("node:assert/strict");
 
-const { StaticTemplateInput, UgcTemplateInput, OverlaySchema, ASPECT_RATIOS } = require("../../src/brandee/templateSchemas");
+const { StaticTemplateInput, UgcTemplateInput, OverlaySchema, ASPECT_RATIOS, AUDIENCE_TYPES } = require("../../src/brandee/templateSchemas");
 
 function baseStaticInput(overrides = {}) {
   return {
@@ -26,6 +26,45 @@ test("StaticTemplateInput accepts a minimal valid template and applies defaults"
   assert.equal(result.renderMode, "COMPOSITE_TEMPLATE");
   assert.deepEqual(result.supportedAspectRatios, ["4:5"]);
   assert.equal(result.defaultAspectRatio, "4:5");
+});
+
+test("StaticTemplateInput defaults audienceType to UNIVERSAL and dominantColors to an empty array", () => {
+  const result = StaticTemplateInput.parse(baseStaticInput());
+  assert.equal(result.audienceType, "UNIVERSAL");
+  assert.deepEqual(result.dominantColors, []);
+  assert.equal(result.idealFor, undefined);
+});
+
+test("StaticTemplateInput accepts PRODUCT/SERVICE/UNIVERSAL audienceType values (PART 9/30 classification)", () => {
+  for (const value of AUDIENCE_TYPES) {
+    const result = StaticTemplateInput.parse(baseStaticInput({ audienceType: value }));
+    assert.equal(result.audienceType, value);
+  }
+});
+
+test("StaticTemplateInput rejects an audienceType outside PRODUCT/SERVICE/UNIVERSAL", () => {
+  assert.throws(() => StaticTemplateInput.parse(baseStaticInput({ audienceType: "BOTH" })));
+});
+
+test("StaticTemplateInput accepts an idealFor description and importer-set fields (sourceChecksum, importedFromFilename)", () => {
+  const result = StaticTemplateInput.parse(baseStaticInput({
+    idealFor: "Products with a clear before/after transformation",
+    sourceChecksum: "abc123",
+    importedFromFilename: "before-and-after-1.jpg"
+  }));
+  assert.equal(result.idealFor, "Products with a clear before/after transformation");
+  assert.equal(result.sourceChecksum, "abc123");
+  assert.equal(result.importedFromFilename, "before-and-after-1.jpg");
+});
+
+test("StaticTemplateInput validates dominantColors as hex color strings", () => {
+  assert.throws(() => StaticTemplateInput.parse(baseStaticInput({ dominantColors: ["not-a-color"] })));
+  const result = StaticTemplateInput.parse(baseStaticInput({ dominantColors: ["#ff0033", "#000000"] }));
+  assert.deepEqual(result.dominantColors, ["#ff0033", "#000000"]);
+});
+
+test("AUDIENCE_TYPES covers exactly PRODUCT, SERVICE, UNIVERSAL", () => {
+  assert.deepEqual(AUDIENCE_TYPES, ["PRODUCT", "SERVICE", "UNIVERSAL"]);
 });
 
 test("StaticTemplateInput rejects a slug with uppercase letters or spaces", () => {

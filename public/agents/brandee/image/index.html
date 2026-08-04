@@ -45,15 +45,49 @@
   .url-extract-row { display: flex; gap: 10px; align-items: flex-end; flex-wrap: wrap; }
   .url-extract-row .field { flex: 1; min-width: 220px; }
   .extract-status { color: #9edfff; font: 13px "Manrope"; margin-top: 8px; min-height: 18px; }
-  .template-grid { display: grid; grid-template-columns: repeat(4,1fr); gap: 14px; }
-  .template-card { border: 1px solid rgba(117,161,188,.2); border-radius: 8px; background: rgba(11,25,36,.5); padding: 16px; cursor: pointer; text-align: left; color: inherit; font-family: inherit; transition: border-color .15s ease, background .15s ease; }
-  .template-card:hover { border-color: rgba(72,193,255,.5); }
-  .template-card.is-selected { border-color: var(--cyan); background: rgba(36,169,255,.1); box-shadow: 0 0 0 1px rgba(36,169,255,.35); }
-  .template-card[disabled], .template-card.is-unavailable { opacity: .45; cursor: not-allowed; }
-  .template-card h3 { margin: 0 0 6px; color: #f4f8ff; font: 600 15px "Manrope"; }
-  .template-card p { margin: 0 0 6px; color: #86a3b7; font: 13px/1.5 "Manrope"; }
-  .template-card .best-use { color: #587789; font: 12px "Manrope"; }
-  .template-card .unavailable-note { color: #d99a5f; font: 12px "Manrope"; margin-top: 6px; }
+  /* --- Premium template gallery (Step 2) --- */
+  .gallery-header { text-align: center; margin-bottom: 22px; }
+  .gallery-header h2 { color: #fff; font: 600 clamp(24px,3vw,32px)/1.2 "Space Grotesk"; margin: 0 0 8px; }
+  .gallery-header p { color: #9fc0d6; font: 15px/1.6 "Manrope"; max-width: 520px; margin: 0 auto; }
+  .gallery-filters { position: sticky; top: 8px; z-index: 5; display: flex; flex-direction: column; gap: 10px; margin-bottom: 20px; padding: 12px; border-radius: 10px; background: rgba(6,15,24,.85); backdrop-filter: blur(8px); border: 1px solid rgba(117,161,188,.18); }
+  .filter-row { display: flex; gap: 8px; flex-wrap: nowrap; overflow-x: auto; padding-bottom: 2px; scrollbar-width: thin; }
+  .filter-chip { flex: none; padding: 7px 14px; border-radius: 999px; border: 1px solid rgba(117,161,188,.28); background: rgba(11,25,36,.6); color: #9fc0d6; font: 600 12.5px "Manrope"; cursor: pointer; white-space: nowrap; transition: all .15s ease; }
+  .filter-chip:hover { border-color: rgba(72,193,255,.5); color: #d9f1ff; }
+  .filter-chip.is-active { background: linear-gradient(135deg,#24a9ff,#3ddc97); border-color: transparent; color: #04121c; }
+  .filter-reset { align-self: flex-end; color: #6f8a9c; font: 12px "Manrope"; background: none; border: none; cursor: pointer; text-decoration: underline; }
+  .recommended-section { margin-bottom: 28px; }
+  .recommended-section h3 { color: #d9f1ff; font: 600 16px "Space Grotesk"; margin: 0 0 4px; }
+  .recommended-section .sub { color: #6f8a9c; font: 13px "Manrope"; margin: 0 0 14px; }
+  .gallery-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 18px; }
+  .template-card { position: relative; border: 1px solid rgba(117,161,188,.2); border-radius: 12px; background: rgba(11,25,36,.5); overflow: hidden; cursor: pointer; text-align: left; color: inherit; font-family: inherit; transition: transform .18s ease, border-color .18s ease, box-shadow .18s ease; padding: 0; }
+  .template-card:hover, .template-card:focus-visible { border-color: rgba(72,193,255,.55); transform: translateY(-3px); box-shadow: 0 14px 30px -18px rgba(36,169,255,.5); }
+  .template-card.is-selected { border-color: var(--cyan); box-shadow: 0 0 0 2px rgba(36,169,255,.5); }
+  .template-card[disabled], .template-card.is-unavailable { opacity: .4; cursor: not-allowed; }
+  .template-card[disabled]:hover { transform: none; box-shadow: none; }
+  .card-thumb-wrap { position: relative; aspect-ratio: 4/5; background: #050c14; overflow: hidden; }
+  .card-thumb-wrap img { width: 100%; height: 100%; object-fit: cover; object-position: top center; display: block; transition: transform .3s ease; }
+  .template-card:hover .card-thumb-wrap img { transform: scale(1.04); }
+  .card-thumb-wrap .card-badges { position: absolute; top: 8px; left: 8px; display: flex; gap: 6px; }
+  .card-badge { font: 700 10px "Manrope"; padding: 3px 8px; border-radius: 999px; background: rgba(4,13,21,.75); color: #d9f1ff; border: 1px solid rgba(117,161,188,.3); letter-spacing: .03em; text-transform: uppercase; }
+  .card-badge.recommended { background: linear-gradient(135deg,#24a9ff,#3ddc97); color: #04121c; border-color: transparent; }
+  .card-overlay { position: absolute; inset: 0; background: linear-gradient(180deg, rgba(4,13,21,0) 40%, rgba(3,9,15,.92) 100%); display: flex; align-items: flex-end; opacity: 0; transition: opacity .18s ease; padding: 12px; gap: 8px; }
+  .template-card:hover .card-overlay, .template-card:focus-visible .card-overlay { opacity: 1; }
+  .card-overlay .button { flex: 1; font-size: 12px; padding: 8px 10px; }
+  .card-body { padding: 12px 14px 14px; }
+  .card-body h3 { margin: 0 0 4px; color: #f4f8ff; font: 600 14.5px "Manrope"; }
+  .card-body .best-use { color: #7ec69a; font: 12px "Manrope"; margin: 0; }
+  .card-body .unavailable-note { color: #d99a5f; font: 11.5px "Manrope"; margin-top: 6px; }
+  .gallery-layout { display: grid; grid-template-columns: 1fr; gap: 20px; }
+  .detail-drawer { position: fixed; inset: 0; background: rgba(2,6,10,.7); display: none; align-items: center; justify-content: center; z-index: 50; padding: 20px; }
+  .detail-drawer.is-open { display: flex; }
+  .detail-panel { background: #081420; border: 1px solid rgba(117,161,188,.25); border-radius: 14px; max-width: 720px; width: 100%; max-height: 88vh; overflow-y: auto; padding: 26px; position: relative; }
+  .detail-panel .close-btn { position: absolute; top: 14px; right: 14px; background: none; border: none; color: #9fc0d6; font-size: 20px; cursor: pointer; padding: 4px 8px; }
+  .detail-panel h3 { margin: 0 0 6px; color: #fff; font: 600 20px "Space Grotesk"; }
+  .detail-panel .detail-framework { color: #7ec69a; font: 600 13px "Manrope"; margin: 0 0 14px; }
+  .detail-meta-grid { display: grid; grid-template-columns: repeat(2,1fr); gap: 10px; margin: 14px 0; }
+  .detail-meta-grid .meta-item { background: rgba(11,25,36,.5); border-radius: 8px; padding: 10px 12px; }
+  .detail-meta-grid .meta-item b { display: block; color: #d9f1ff; font: 600 12px "Manrope"; margin-bottom: 2px; }
+  .detail-meta-grid .meta-item span { color: #86a3b7; font: 12px "Manrope"; }
   .template-fields { margin-top: 22px; }
   .flow-actions { display: flex; gap: 12px; justify-content: flex-end; margin-top: 22px; flex-wrap: wrap; }
   .status-line { min-height: 20px; color: #d9f1ff; font: 13px "Manrope"; margin-top: 10px; }
@@ -61,6 +95,34 @@
   .preview-wrap { text-align: center; }
   .preview-wrap svg { max-width: 100%; height: auto; border-radius: 10px; border: 1px solid rgba(117,161,188,.25); }
   .preview-note { color: #86a3b7; font: 13px/1.6 "Manrope"; margin-top: 12px; }
+
+  /* --- Preview step (Step 3): premium layout + revision composer --- */
+  .preview-layout { display: grid; grid-template-columns: 1.4fr 1fr; gap: 22px; align-items: start; }
+  .preview-sidebar { display: flex; flex-direction: column; gap: 14px; }
+  .sidebar-card { background: linear-gradient(145deg,rgba(19,39,54,.55),rgba(5,13,21,.85)); border: 1px solid rgba(117,161,188,.2); border-radius: 10px; padding: 16px; }
+  .sidebar-card h4 { margin: 0 0 10px; color: #d9f1ff; font: 600 13px "Manrope"; text-transform: uppercase; letter-spacing: .04em; }
+  .sidebar-row { display: flex; justify-content: space-between; gap: 10px; padding: 6px 0; border-bottom: 1px solid rgba(117,161,188,.12); font: 13px "Manrope"; }
+  .sidebar-row:last-child { border-bottom: none; }
+  .sidebar-row span:first-child { color: #6f8a9c; }
+  .sidebar-row span:last-child { color: #d9f1ff; text-align: right; max-width: 60%; }
+  .progress-phases { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 8px; }
+  .progress-phases li { color: #587789; font: 13px "Manrope"; opacity: .5; transition: opacity .2s ease, color .2s ease; }
+  .progress-phases li.is-current { color: #9edfff; opacity: 1; font-weight: 600; }
+  .progress-phases li.is-done { color: #7ec69a; opacity: .85; }
+  .revision-composer { margin-top: 18px; }
+  .revision-composer textarea { width: 100%; min-height: 70px; padding: 12px; border-radius: 8px; border: 1px solid rgba(117,161,188,.25); background: rgba(4,13,21,.8); color: #d9f1ff; font: 14px "Manrope"; resize: vertical; }
+  .revision-examples { display: flex; flex-wrap: wrap; gap: 6px; margin: 10px 0; }
+  .revision-example-chip { padding: 5px 10px; border-radius: 999px; border: 1px solid rgba(117,161,188,.25); background: rgba(11,25,36,.6); color: #86a3b7; font: 12px "Manrope"; cursor: pointer; }
+  .revision-example-chip:hover { border-color: rgba(72,193,255,.5); color: #d9f1ff; }
+  .revision-history { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 4px; margin-top: 10px; }
+  .revision-thumb { flex: none; width: 70px; text-align: center; cursor: pointer; border: 2px solid transparent; border-radius: 8px; padding: 3px; background: none; }
+  .revision-thumb.is-current { border-color: var(--cyan); }
+  .revision-thumb svg { width: 100%; height: auto; border-radius: 5px; display: block; }
+  .revision-thumb span { display: block; color: #6f8a9c; font: 11px "DM Mono"; margin-top: 4px; }
+  .preview-stage-actions { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 16px; }
+  @media (max-width: 900px) {
+    .preview-layout { grid-template-columns: 1fr; }
+  }
   .gate-actions { display: flex; gap: 12px; justify-content: center; margin-top: 20px; flex-wrap: wrap; }
   .auth-form { max-width: 380px; margin: 20px auto 0; display: grid; gap: 12px; }
   .plan-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 12px; margin-top: 18px; }
@@ -174,29 +236,105 @@
     </div>
   </section>
 
-  <!-- STEP 2: template picker -->
+  <!-- STEP 2: premium template gallery -->
   <section class="flow-panel" data-step="template" aria-labelledby="templateStepHeading">
-    <h2 id="templateStepHeading" class="sr-only">Choose a template</h2>
-    <div class="flow-card">
-      <div class="template-grid" id="templateGrid" role="group" aria-label="Image ad templates"></div>
-      <div class="template-fields" id="templateFields" hidden></div>
+    <div class="gallery-header">
+      <h2 id="templateStepHeading">Choose the look that fits your product.</h2>
+      <p>Brandee will personalize the layout, copy, colors, and product placement after you choose a starting style.</p>
     </div>
+
+    <div class="gallery-filters">
+      <div class="filter-row" id="primaryFilterRow" role="group" aria-label="Filter by product or service"></div>
+      <div class="filter-row" id="frameworkFilterRow" role="group" aria-label="Filter by ad style"></div>
+      <button type="button" class="filter-reset" id="resetFiltersBtn">Reset filters</button>
+    </div>
+
+    <div class="recommended-section" id="recommendedSection" hidden>
+      <h3>Recommended for your product</h3>
+      <p class="sub" id="recommendedSub">Brandee's picks based on what you told us.</p>
+      <div class="gallery-grid" id="recommendedGrid"></div>
+    </div>
+
+    <div class="gallery-grid" id="templateGrid" role="group" aria-label="Image ad templates"></div>
     <p class="status-line" id="templateStatus" role="status" aria-live="polite"></p>
+
+    <div class="detail-drawer" id="detailDrawer">
+      <div class="detail-panel" id="detailPanel" role="dialog" aria-modal="true" aria-labelledby="detailPanelTitle">
+        <button type="button" class="close-btn" id="closeDetailBtn" aria-label="Close">&times;</button>
+        <h3 id="detailPanelTitle"></h3>
+        <p class="detail-framework" id="detailFramework"></p>
+        <p id="detailWhyFits" style="color:#9fc0d6;font:14px/1.6 Manrope;margin:0 0 10px"></p>
+        <div class="detail-meta-grid" id="detailMetaGrid"></div>
+        <div class="template-fields" id="templateFields"></div>
+        <div class="flow-actions">
+          <button type="button" class="button button-soft" id="detailCancelBtn">Choose a different style</button>
+          <button type="button" class="button button-primary glow-button" id="generatePreviewBtn">Create My Preview <span>→</span></button>
+        </div>
+      </div>
+    </div>
+
     <div class="flow-actions">
       <button type="button" class="button button-soft" data-back="product">Back</button>
-      <button type="button" class="button button-primary glow-button" id="generatePreviewBtn">Generate Preview</button>
     </div>
   </section>
 
-  <!-- STEP 3: preview -->
+  <!-- STEP 3: preview + natural-language revision -->
   <section class="flow-panel" data-step="preview" aria-labelledby="previewStepHeading">
-    <h2 id="previewStepHeading" class="sr-only">Preview</h2>
-    <div class="flow-card preview-wrap" id="previewWrap">
-      <p class="status-line" id="previewStatus" role="status" aria-live="polite">Generating your preview…</p>
+    <div class="gallery-header">
+      <h2 id="previewStepHeading">Your first Brandee concept is ready.</h2>
     </div>
-    <p class="preview-note">This is a free, low-resolution, watermarked preview. Save and finish to unlock a clean, high-resolution export.</p>
+
+    <div class="flow-card" id="progressCard">
+      <ul class="progress-phases" id="progressPhases" aria-live="polite">
+        <li data-phase="0">Reading your product details</li>
+        <li data-phase="1">Studying your selected template</li>
+        <li data-phase="2">Writing the headline and CTA</li>
+        <li data-phase="3">Planning the composition</li>
+        <li data-phase="4">Creating your preview</li>
+      </ul>
+    </div>
+
+    <div class="preview-layout" id="previewLayout" hidden>
+      <div>
+        <div class="flow-card preview-wrap" id="previewWrap"></div>
+        <p class="preview-note" id="previewNote">This is a free, low-resolution, watermarked preview. Save and finish to unlock a clean, high-resolution export.</p>
+        <div class="revision-history" id="revisionHistory" aria-label="Revision history"></div>
+      </div>
+
+      <aside class="preview-sidebar">
+        <div class="sidebar-card">
+          <h4>This ad</h4>
+          <div class="sidebar-row"><span>Template</span><span id="sideTemplateName">—</span></div>
+          <div class="sidebar-row"><span>Framework</span><span id="sideFramework">—</span></div>
+          <div class="sidebar-row"><span>Headline</span><span id="sideHeadline">—</span></div>
+          <div class="sidebar-row"><span>CTA</span><span id="sideCta">—</span></div>
+          <div class="sidebar-row"><span>Aspect ratio</span><span>4:5</span></div>
+        </div>
+
+        <div class="sidebar-card revision-composer">
+          <h4>Describe what you want to change</h4>
+          <textarea id="revisionInput" placeholder="e.g. Make the headline shorter, or remove the price" maxlength="300"></textarea>
+          <div class="revision-examples">
+            <button type="button" class="revision-example-chip">Use less text</button>
+            <button type="button" class="revision-example-chip">Remove the price</button>
+            <button type="button" class="revision-example-chip">Make it feel more premium</button>
+            <button type="button" class="revision-example-chip">Change the CTA to Send a Message</button>
+          </div>
+          <button type="button" class="button button-primary glow-button" id="applyRevisionBtn" style="width:100%">Apply Revision</button>
+          <p class="status-line" id="revisionStatus" role="status" aria-live="polite"></p>
+        </div>
+
+        <div class="sidebar-card">
+          <h4>Not quite right?</h4>
+          <div class="preview-stage-actions">
+            <button type="button" class="button button-soft" data-back="template">Try another template</button>
+            <button type="button" class="button button-soft" data-back="product">Edit product details</button>
+          </div>
+        </div>
+      </aside>
+    </div>
+
     <div class="flow-actions">
-      <button type="button" class="button button-soft" data-back="template">Back</button>
       <button type="button" class="button button-primary glow-button" id="toAccountStep">Save and finish your image ad <span>↓</span></button>
     </div>
   </section>
@@ -332,18 +470,20 @@
     return null;
   }
 
-  $("#toTemplateStep").addEventListener("click", () => {
+  $("#toTemplateStep").addEventListener("click", async () => {
     const form = collectSharedForm();
     const error = validateSharedForm(form);
     const statusEl = $("#productFormStatus");
     if (error) { statusEl.textContent = error; statusEl.classList.add("is-error"); return; }
     statusEl.textContent = ""; statusEl.classList.remove("is-error");
     helpers.track("product_upload_completed", {});
-    renderTemplates();
+    helpers.track("template_gallery_opened", {});
     setStep("template");
+    await loadRecommendations();
+    renderGallery();
   });
 
-  // --- Templates ---
+  // --- Templates / premium gallery (Step 2) ---
   async function loadConfig() {
     const { body } = await helpers.fetchJson("/api/public/brandee/product-ads/config");
     state.config = body;
@@ -353,29 +493,114 @@
     return Boolean($("#testimonialQuote").value.trim() && $("#testimonialAttribution").value.trim());
   }
 
-  function renderTemplates() {
-    const grid = $("#templateGrid");
-    grid.innerHTML = "";
+  const galleryState = { primary: "all", framework: "all", recommendedIds: [] };
+
+  async function loadRecommendations() {
+    try {
+      const form = collectSharedForm();
+      const { body } = await helpers.fetchJson("/api/public/brandee/product-ads/image/recommend", {
+        method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(form)
+      });
+      galleryState.recommendedIds = (body && body.ok) ? body.recommendations.map((r) => r.templateId) : [];
+      state.recommendations = (body && body.ok) ? body.recommendations : [];
+    } catch { galleryState.recommendedIds = []; state.recommendations = []; }
+  }
+
+  function eligibleTemplates() {
     const testimonialOk = hasTestimonial();
-    (state.config.templates || []).forEach((t) => {
-      const available = t.proofRequirement === "testimonial" ? testimonialOk : true;
-      const card = document.createElement("button");
-      card.type = "button";
-      card.className = "template-card" + (available ? "" : " is-unavailable");
-      if (!available) card.disabled = true;
-      card.innerHTML = `<h3>${t.name}</h3><p>${t.description}</p><p class="best-use">${t.bestUse}</p>` + (available ? "" : `<p class="unavailable-note">Add a real testimonial above to unlock this template.</p>`);
-      card.addEventListener("click", () => selectTemplate(t));
-      grid.appendChild(card);
+    return (state.config.templates || []).filter((t) => t.proofRequirement !== "testimonial" || testimonialOk);
+  }
+
+  function visibleTemplates() {
+    return eligibleTemplates().filter((t) => {
+      if (galleryState.primary !== "all" && (t.audienceType || "UNIVERSAL") !== "UNIVERSAL" && t.audienceType !== galleryState.primary) return false;
+      if (galleryState.framework !== "all" && t.frameworkKey !== galleryState.framework) return false;
+      return true;
     });
   }
 
-  function selectTemplate(template) {
-    state.templateId = template.id;
-    $$(".template-card").forEach((c) => c.classList.toggle("is-selected", c.querySelector("h3").textContent === template.name));
+  function frameworkLabel(key) {
+    const labels = { bold_claim: "Bold Claim", iphone_notes: "iPhone Notes", features_and_benefits: "Features & Benefits", before_and_after: "Before & After", offer: "Offer", testimonial: "Testimonial", question: "Question", reasons_why: "Reasons Why", sticky_notes: "Sticky Notes", us_vs_them: "Us vs Them" };
+    return labels[key] || key;
+  }
+
+  function renderFilters() {
+    const primaryRow = $("#primaryFilterRow");
+    const options = [["all", "All Templates"], ["PRODUCT", "Product Ads"], ["SERVICE", "Service Ads"]];
+    primaryRow.innerHTML = options.map(([value, label]) => `<button type="button" class="filter-chip${galleryState.primary === value ? " is-active" : ""}" data-primary="${value}">${label}</button>`).join("");
+    $$("[data-primary]", primaryRow).forEach((btn) => btn.addEventListener("click", () => { galleryState.primary = btn.dataset.primary; helpers.track("template_filter_selected", { filterType: "primary", filterValue: btn.dataset.primary }); renderGallery(); }));
+
+    const frameworks = [...new Set(eligibleTemplates().map((t) => t.frameworkKey).filter(Boolean))];
+    const frameworkRow = $("#frameworkFilterRow");
+    frameworkRow.innerHTML = [`<button type="button" class="filter-chip${galleryState.framework === "all" ? " is-active" : ""}" data-framework="all">All Styles</button>`]
+      .concat(frameworks.map((fw) => `<button type="button" class="filter-chip${galleryState.framework === fw ? " is-active" : ""}" data-framework="${fw}">${frameworkLabel(fw)}</button>`)).join("");
+    $$("[data-framework]", frameworkRow).forEach((btn) => btn.addEventListener("click", () => { galleryState.framework = btn.dataset.framework; helpers.track("template_filter_selected", { filterType: "framework", filterValue: btn.dataset.framework }); renderGallery(); }));
+  }
+
+  function cardHtml(t, { recommended = false } = {}) {
+    const audienceBadge = t.audienceType && t.audienceType !== "UNIVERSAL" ? `<span class="card-badge">${t.audienceType === "PRODUCT" ? "Product" : "Service"}</span>` : "";
+    const recBadge = recommended ? `<span class="card-badge recommended">Recommended</span>` : "";
+    return `
+      <div class="card-thumb-wrap">
+        <img src="${t.thumbnail || ''}" alt="${t.name}" loading="lazy" width="480" height="600" />
+        <div class="card-badges">${recBadge}${audienceBadge}</div>
+        <div class="card-overlay">
+          <button type="button" class="button button-soft" data-preview-id="${t.id}">Preview</button>
+          <button type="button" class="button button-primary" data-select-id="${t.id}">Use this</button>
+        </div>
+      </div>
+      <div class="card-body">
+        <h3>${t.name}</h3>
+        <p class="best-use">${t.idealFor || t.bestUse || ""}</p>
+      </div>`;
+  }
+
+  function renderGallery() {
+    renderFilters();
+    const recommendedSection = $("#recommendedSection");
+    const recommendedGrid = $("#recommendedGrid");
+    const recTemplates = galleryState.recommendedIds.map((id) => eligibleTemplates().find((t) => t.id === id)).filter(Boolean);
+    if (recTemplates.length && galleryState.primary === "all" && galleryState.framework === "all") {
+      recommendedSection.hidden = false;
+      recommendedGrid.innerHTML = recTemplates.map((t) => `<button type="button" class="template-card" data-card-id="${t.id}">${cardHtml(t, { recommended: true })}</button>`).join("");
+      wireCardButtons(recommendedGrid);
+    } else {
+      recommendedSection.hidden = true;
+    }
+
+    const grid = $("#templateGrid");
+    const templates = visibleTemplates();
+    grid.innerHTML = templates.map((t) => `<button type="button" class="template-card" data-card-id="${t.id}">${cardHtml(t)}</button>`).join("");
+    wireCardButtons(grid);
+    $("#templateStatus").textContent = templates.length ? "" : "No templates match these filters yet.";
+  }
+
+  function wireCardButtons(root) {
+    $$("[data-select-id]", root).forEach((btn) => btn.addEventListener("click", (e) => { e.stopPropagation(); openDetail(btn.dataset.selectId); }));
+    $$("[data-preview-id]", root).forEach((btn) => btn.addEventListener("click", (e) => { e.stopPropagation(); helpers.track("template_preview_opened", { templateId: btn.dataset.previewId }); openDetail(btn.dataset.previewId); }));
+    $$(".template-card[data-card-id]", root).forEach((card) => card.addEventListener("click", () => openDetail(card.dataset.cardId)));
+  }
+
+  function findTemplate(id) {
+    return (state.config.templates || []).find((t) => t.id === id);
+  }
+
+  function openDetail(templateId) {
+    const template = findTemplate(templateId);
+    if (!template) return;
+    state.templateId = templateId;
+    $("#detailPanelTitle").textContent = template.name;
+    $("#detailFramework").textContent = frameworkLabel(template.frameworkKey) || "General layout";
+    $("#detailWhyFits").textContent = template.idealFor || template.description || "";
+    $("#detailMetaGrid").innerHTML = `
+      <div class="meta-item"><b>What Brandee will change</b><span>Headline, copy, colors, and product placement</span></div>
+      <div class="meta-item"><b>Output aspect ratio</b><span>${(template.supportedAspectRatios || ["4:5"])[0]}</span></div>
+      <div class="meta-item"><b>Proof needed</b><span>${template.proofRequirement ? template.proofRequirement.replace(/_/g, " ") : "None"}</span></div>
+      <div class="meta-item"><b>Required fields</b><span>${(template.fields || []).filter((f) => f.required).length}</span></div>
+    `;
     const fieldsWrap = $("#templateFields");
-    fieldsWrap.hidden = false;
     fieldsWrap.innerHTML = "<div class=\"field-grid\"></div>";
-    const grid = fieldsWrap.querySelector(".field-grid");
+    const fieldsGrid = fieldsWrap.querySelector(".field-grid");
     template.fields.forEach((f) => {
       const wrap = document.createElement("div");
       wrap.className = "field" + (f.type === "textarea" ? " full" : "");
@@ -389,50 +614,144 @@
         control = `<input type="${f.type === 'date' ? 'date' : 'text'}" id="${id}" maxlength="${f.maxLength || 100}" />`;
       }
       wrap.innerHTML = `<label for="${id}">${f.label}${f.required ? " *" : ""}</label>${control}`;
-      grid.appendChild(wrap);
+      fieldsGrid.appendChild(wrap);
     });
-    helpers.track("template_selected", { templateId: template.id });
+    $("#detailDrawer").classList.add("is-open");
+    helpers.track("template_selected", { templateId });
   }
 
+  $("#closeDetailBtn").addEventListener("click", () => $("#detailDrawer").classList.remove("is-open"));
+  $("#detailCancelBtn").addEventListener("click", () => $("#detailDrawer").classList.remove("is-open"));
+  $("#resetFiltersBtn").addEventListener("click", () => { galleryState.primary = "all"; galleryState.framework = "all"; renderGallery(); });
+
   function collectTemplateFields() {
-    const template = (state.config.templates || []).find((t) => t.id === state.templateId);
+    const template = findTemplate(state.templateId);
     if (!template) return {};
     const values = {};
     template.fields.forEach((f) => { const el = $(`#tf_${f.key}`); if (el) values[f.key] = el.value.trim(); });
     return values;
   }
 
+  // --- Preview generation with a real progress sequence (Step 3) ---
+  const PROGRESS_MESSAGE_MS = 650;
+  let progressTimer = null;
+  function runProgressPhases() {
+    const items = $$("#progressPhases li");
+    items.forEach((li) => li.classList.remove("is-current", "is-done"));
+    let i = 0;
+    clearInterval(progressTimer);
+    progressTimer = setInterval(() => {
+      if (i > 0) items[i - 1]?.classList.replace("is-current", "is-done");
+      if (i < items.length) { items[i].classList.add("is-current"); i += 1; }
+    }, PROGRESS_MESSAGE_MS);
+  }
+  function stopProgressPhases() {
+    clearInterval(progressTimer);
+    $$("#progressPhases li").forEach((li) => { li.classList.remove("is-current"); li.classList.add("is-done"); });
+  }
+
+  function renderPreviewSvg(svg) {
+    const wrap = $("#previewWrap");
+    wrap.querySelectorAll("svg").forEach((el) => el.remove());
+    wrap.insertAdjacentHTML("beforeend", svg);
+  }
+
+  function updateSidebar(plan, template) {
+    $("#sideTemplateName").textContent = template ? template.name : "—";
+    $("#sideFramework").textContent = template ? frameworkLabel(template.frameworkKey) : "—";
+    $("#sideHeadline").textContent = (plan && plan.headline) || "—";
+    $("#sideCta").textContent = (plan && plan.cta) || "—";
+  }
+
+  function renderRevisionHistory(revisions, currentNumber) {
+    const wrap = $("#revisionHistory");
+    wrap.innerHTML = (revisions || []).map((r) => `
+      <button type="button" class="revision-thumb${r.revisionNumber === currentNumber ? " is-current" : ""}" data-restore="${r.revisionNumber}" title="${r.instruction || 'Original'}">
+        ${r.svg}
+        <span>v${r.revisionNumber}</span>
+      </button>`).join("");
+    $$("[data-restore]", wrap).forEach((btn) => btn.addEventListener("click", () => restoreRevision(Number(btn.dataset.restore))));
+  }
+
+  async function loadRevisionHistory() {
+    const { body } = await helpers.fetchJson(`/api/public/brandee/product-ads/image/project/${state.projectId}/revisions`);
+    if (body && body.ok) renderRevisionHistory(body.revisions, state.revisionNumber);
+  }
+
+  async function restoreRevision(revisionNumber) {
+    const { body } = await helpers.fetchJson(`/api/public/brandee/product-ads/image/project/${state.projectId}/restore`, {
+      method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ revisionNumber })
+    });
+    if (!body || !body.ok) return;
+    state.revisionNumber = body.revisionNumber;
+    renderPreviewSvg(body.svg);
+    await loadRevisionHistory();
+  }
+
   $("#generatePreviewBtn").addEventListener("click", async () => {
-    const statusEl = $("#templateStatus");
-    if (!state.templateId) { statusEl.textContent = "Please choose a template."; statusEl.classList.add("is-error"); return; }
+    const template = findTemplate(state.templateId);
+    const statusEl = $("#detailWhyFits");
     const templateFields = collectTemplateFields();
-    const template = (state.config.templates || []).find((t) => t.id === state.templateId);
     const missing = template.fields.find((f) => f.required && !templateFields[f.key]);
-    if (missing) { statusEl.textContent = `"${missing.label}" is required for this template.`; statusEl.classList.add("is-error"); return; }
-    statusEl.textContent = ""; statusEl.classList.remove("is-error");
+    if (missing) { $("#templateStatus").textContent = `"${missing.label}" is required for this template.`; $("#templateStatus").classList.add("is-error"); return; }
+    $("#detailDrawer").classList.remove("is-open");
 
     setStep("preview");
-    $("#previewStatus").textContent = "Generating your preview…";
-    $("#previewWrap").querySelectorAll("svg").forEach((el) => el.remove());
-    helpers.track("image_preview_requested", { templateId: state.templateId });
+    $("#previewLayout").hidden = true;
+    $("#progressCard").hidden = false;
+    runProgressPhases();
+    helpers.track("preview_generation_started", { templateId: state.templateId, frameworkKey: template.frameworkKey });
 
     const form = { ...collectSharedForm(), templateId: state.templateId, templateFields };
     const { body } = await helpers.fetchJson("/api/public/brandee/product-ads/image/preview", {
       method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(form)
     });
+    stopProgressPhases();
+
     if (!body || !body.ok) {
-      $("#previewStatus").textContent = (body && body.error) || "Brandee could not generate a preview this time. Please try again.";
-      helpers.track("preview_failed", { templateId: state.templateId });
+      $("#progressCard").insertAdjacentHTML("beforeend", `<p class="status-line is-error">${(body && body.error) || "Brandee could not generate a preview this time. Please try again."}</p>`);
+      helpers.track("preview_generation_failed", { templateId: state.templateId, reason: (body && body.code) || "unknown" });
       return;
     }
     state.projectId = body.projectId;
-    state.previewSvg = body.svg;
-    $("#previewStatus").textContent = "";
-    $("#previewWrap").insertAdjacentHTML("beforeend", body.svg);
-    helpers.track("image_preview_completed", { templateId: state.templateId });
+    state.revisionNumber = body.revisionNumber;
+    $("#progressCard").hidden = true;
+    $("#previewLayout").hidden = false;
+    renderPreviewSvg(body.svg);
+    updateSidebar(body.plan, template);
+    await loadRevisionHistory();
+    helpers.track("preview_generation_completed", { templateId: state.templateId });
   });
 
-  $("#toAccountStep").addEventListener("click", () => { helpers.track("registration_prompt_shown", {}); setStep("account"); });
+  // --- Natural-language revisions (Step 3) ---
+  $$(".revision-example-chip").forEach((chip) => chip.addEventListener("click", () => { $("#revisionInput").value = chip.textContent; }));
+
+  $("#applyRevisionBtn").addEventListener("click", async () => {
+    const instruction = $("#revisionInput").value.trim();
+    const statusEl = $("#revisionStatus");
+    if (!instruction) { statusEl.textContent = "Describe what you'd like Brandee to change."; statusEl.classList.add("is-error"); return; }
+    statusEl.textContent = "Applying your revision…"; statusEl.classList.remove("is-error");
+    helpers.track("revision_started", { templateId: state.templateId });
+
+    const { body } = await helpers.fetchJson("/api/public/brandee/product-ads/image/revise", {
+      method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ projectId: state.projectId, instruction })
+    });
+    if (!body || !body.ok) {
+      statusEl.textContent = (body && body.error) || "Brandee couldn't apply that revision. Please try again.";
+      statusEl.classList.add("is-error");
+      helpers.track("revision_failed", { templateId: state.templateId, reason: (body && body.code) || "unknown" });
+      return;
+    }
+    statusEl.textContent = "";
+    state.revisionNumber = body.revisionNumber;
+    renderPreviewSvg(body.svg);
+    updateSidebar(body.plan, findTemplate(state.templateId));
+    await loadRevisionHistory();
+    $("#revisionInput").value = "";
+    helpers.track("revision_completed", { templateId: state.templateId });
+  });
+
+  $("#toAccountStep").addEventListener("click", () => { helpers.track("save_finish_clicked", {}); helpers.track("registration_gate_shown", {}); setStep("account"); });
 
   // --- Registration ---
   $("#registerForm").addEventListener("submit", async (e) => {
@@ -450,6 +769,7 @@
   });
 
   async function loadPlans() {
+    helpers.track("pricing_gate_shown", {});
     const grid = $("#planGrid");
     grid.innerHTML = "";
     (state.config.plans || []).forEach((plan, i) => {
@@ -462,6 +782,8 @@
   }
 
   async function subscribe(planSlug) {
+    helpers.track("plan_selected", { planSlug });
+    helpers.track("checkout_started", { planSlug });
     helpers.track("subscription_started", { planSlug });
     const { body, ok } = await helpers.fetchJson("/api/brandee/product-ads/subscribe", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ planSlug }) });
     const statusEl = $("#subscribeStatus");
@@ -482,7 +804,7 @@
     const wrap = $("#finalPreviewWrap");
     wrap.innerHTML = body.svg;
     $("#downloadPngBtn").hidden = false;
-    $("#downloadPngBtn").onclick = () => downloadSvgAsPng(body.svg, body.width, body.height);
+    $("#downloadPngBtn").onclick = () => { helpers.track("final_downloaded", { kind: "image" }); downloadSvgAsPng(body.svg, body.width, body.height); };
     helpers.track("final_generation_completed", { kind: "image" });
   });
 

@@ -218,7 +218,13 @@ const PRICING_NOTE = "Prices shown are the total monthly subscription prices. AI
 // 3-second video preview".
 const ANONYMOUS_LIMITS = {
   imagePreviewsPerSession: 1,
-  videoPreviewsPerSession: 1
+  videoPreviewsPerSession: 1,
+  // PART 18: one free revision for an anonymous visitor, on top of their one
+  // free initial preview — registering unlocks further revisions according
+  // to plan rules (registered-but-unsubscribed still gets a small allowance;
+  // see requireBrandeeSubscription()/entitlements.js for the paid tier).
+  imageRevisionsPerSession: 1,
+  videoRevisionsPerSession: 1
 };
 
 function getPlan(slug) {

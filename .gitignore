@@ -14,3 +14,12 @@ data/brandee-product-ad-anon-limits.json
 data/brandee-analytics-events.json
 data/.admin-storage-check
 data/.admin-write-probe
+
+# Raw local source images for the static-ad template importer (PART 3/4).
+# This is only ever an IMPORT SOURCE for
+# scripts/brandee-import-static-templates.js — never referenced by the
+# running app (the app serves optimized copies from
+# public/agents/brandee/assets/templates/imported/ instead, which IS
+# committed). Keeping the raw originals out of git avoids bloating the repo
+# with ~38MB of source photos that have no runtime purpose.
+/Assets/

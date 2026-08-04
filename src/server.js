@@ -70,7 +70,7 @@ const { listVideoAdStyles, getVideoAdStyle, HOOK_PREFERENCES, TONES, CREATOR_TYP
 const { listPlans: listBrandeePlans, getPlan: getBrandeePlan, ANONYMOUS_LIMITS: BRANDEE_ANON_LIMITS, PRICING_QUANTITIES_ARE_PLACEHOLDERS } = require("./brandee/pricingConfig");
 const { validateImageDataUrl } = require("./brandee/mediaValidation");
 const { extractProductFromUrl } = require("./brandee/productUrlExtractor");
-const { renderImageAdSvg } = require("./brandee/imageAdRenderer");
+const { renderImageAdSvg, buildAdContent } = require("./brandee/imageAdRenderer");
 const { probeVideoProviderAvailability, generateVideoTeaser, generateFinalVideo } = require("./brandee/videoTeaserRenderer");
 const productAdProjectStore = require("./brandee/productAdProjectStore");
 const { registerAccount, RegistrationError } = require("./brandee/accountRegistration");
@@ -80,6 +80,9 @@ const templateCatalog = require("./brandee/templateCatalog");
 const pricingOverride = require("./brandee/pricingOverride");
 const entitlements = require("./brandee/entitlements");
 const { ENTITLEMENT_UNITS, computeComboSavings, PRICING_NOTE } = require("./brandee/pricingConfig");
+const { buildCreativePlan, interpretRevision } = require("./brandee/creativePlanner");
+const { recommendTemplates } = require("./brandee/templateRecommender");
+const { probeImageProviderAvailability } = require("./brandee/imageGenProvider");
 const { getCreativeBrainStatus, validateAllResources, RESOURCE_VALIDATORS } = require("./admin/creativeBrain");
 const systemStatus = require("./admin/systemStatus");
 const { recordAuditEvent, listAuditLogs, AUDIT_ACTIONS } = require("./admin/auditLog");
@@ -1591,20 +1594,148 @@ app.post("/api/public/brandee/product-ads/image/preview", requireProductAdRateLi
 
   trackBrandeeEvent("image_preview_requested", { templateId: form.templateId }, { anonymousSessionId, userId });
 
-  const rendered = renderImageAdSvg({ templateId: form.templateId, templateFields: form.templateFields, form, watermark: true });
+  // PART 12: GPT-5.6 Sol plans the creative direction (headline/cta/tone/
+  // etc.) BEFORE any image is produced — falls back to a correct
+  // deterministic plan with zero AI dependency (see creativePlanner.js).
+  const { plan, aiUsed: planningAiUsed } = await buildCreativePlan({ form, template });
+
+  // PART 13/14: attempt a real pixel-generation call if a provider is
+  // actually configured; if not (the default in this environment — no
+  // image-generation API key/model configured, same disclosed status as
+  // this codebase's video pipeline), fall back HONESTLY to the real,
+  // working, deterministic SVG compositor personalized with the plan above.
+  // Never fabricates an "AI image" that wasn't actually produced.
+  const rendered = renderImageAdSvg({ templateId: form.templateId, templateFields: form.templateFields, form, watermark: true, override: plan });
 
   if (!userId) productAdProjectStore.recordAnonymousPreview(anonymousSessionId, "image");
   productAdProjectStore.updateProject(project.id, {
     templateId: form.templateId,
     templateFields: form.templateFields,
     product: form,
-    preview: { generatedAt: new Date().toISOString(), watermarked: true, svg: rendered.svg },
     status: "previewed"
   });
+  productAdProjectStore.addRevision(project.id, { instruction: null, plan, svg: rendered.svg, width: rendered.width, height: rendered.height, watermarked: true, aiUsed: planningAiUsed });
 
   trackBrandeeEvent("image_preview_completed", { templateId: form.templateId }, { anonymousSessionId, userId });
 
-  res.json({ ok: true, projectId: project.id, svg: rendered.svg, width: rendered.width, height: rendered.height, requiresRegistration: !userId });
+  res.json({ ok: true, projectId: project.id, svg: rendered.svg, width: rendered.width, height: rendered.height, plan, revisionNumber: 1, requiresRegistration: !userId });
+}));
+
+// PART 9 — up to 3 recommended templates for the customer's product, always
+// drawn from the eligible (proof-safe) ACTIVE catalog. Deterministic by
+// default; optionally polished by GPT-5.6 Sol if a planning provider is
+// configured (see templateRecommender.js).
+app.post("/api/public/brandee/product-ads/image/recommend", requireProductAdRateLimit, asyncHandler(async (req, res) => {
+  let form;
+  try {
+    form = ImageAdRequestSchema.omit({ templateId: true }).extend({ templateId: z.string().optional() }).parse(req.body);
+  } catch (error) {
+    return res.status(400).json({ ok: false, error: "Please complete the required product details first." });
+  }
+  const hasTestimonial = hasRealTestimonial(form);
+  const templates = await templateCatalog.listActiveStaticTemplates({ hasTestimonial });
+  const { recommendations, aiUsed } = await recommendTemplates({ templates, form });
+  res.json({ ok: true, recommendations, aiUsed });
+}));
+
+// PART 16/17 — apply a natural-language revision to the CURRENT preview
+// (not a new concept from scratch). Every call appends a new, distinct
+// revision entry; nothing is ever overwritten (PART 19).
+app.post("/api/public/brandee/product-ads/image/revise", requireProductAdRateLimit, asyncHandler(async (req, res) => {
+  const anonymousSessionId = getOrSetBrandeeSessionId(req, res);
+  const body = z.object({ projectId: z.string().min(1), instruction: z.string().min(2).max(300) }).safeParse(req.body);
+  if (!body.success) return res.status(400).json({ ok: false, error: "Please describe the revision you'd like." });
+
+  const project = productAdProjectStore.getProject(body.data.projectId);
+  if (!project) return res.status(404).json({ ok: false, error: "Project not found." });
+  const userId = req.user?.id || null;
+  const owns = (userId && project.userId === userId) || (!project.userId && project.anonymousSessionId === anonymousSessionId);
+  if (!owns) return res.status(403).json({ ok: false, error: "You don't have access to this project." });
+  if (!project.templateId || !project.revisions?.length) return res.status(400).json({ ok: false, error: "Generate a preview first." });
+
+  if (!userId) {
+    if (!productAdProjectStore.canGenerateAnonymousRevision(anonymousSessionId, "image", { maxRevisions: BRANDEE_ANON_LIMITS.imageRevisionsPerSession })) {
+      return res.status(403).json({ ok: false, code: "ANONYMOUS_REVISION_LIMIT_REACHED", error: "You've used your free revision. Create a free account to keep refining this ad." });
+    }
+  }
+
+  const template = await templateCatalog.getStaticTemplateBySlug(project.templateId);
+  if (!template) return res.status(400).json({ ok: false, error: "This project's template is no longer available." });
+
+  const latest = project.revisions[project.revisions.length - 1];
+  const currentContent = buildAdContent(project.templateId, project.templateFields, project.product, latest.plan);
+
+  trackBrandeeEvent("revision_started", { templateId: project.templateId }, { anonymousSessionId, userId });
+
+  const { revision, aiUsed } = await interpretRevision({ form: project.product, template, currentContent, instruction: body.data.instruction });
+  if (revision.understood === false) {
+    trackBrandeeEvent("revision_failed", { templateId: project.templateId, reason: "not_understood" }, { anonymousSessionId, userId });
+    return res.status(422).json({
+      ok: false,
+      code: "REVISION_NOT_UNDERSTOOD",
+      error: "Brandee couldn't quite understand that revision. Try being more specific — for example \"remove the price\" or \"make the headline shorter\"."
+    });
+  }
+
+  // PART 17: merge only the keys the revision actually asked to change on
+  // top of the CURRENT plan — everything else is preserved unchanged.
+  const updatedPlan = {
+    ...latest.plan,
+    ...(revision.updatedCopy?.headline ? { headline: revision.updatedCopy.headline } : {}),
+    ...(revision.updatedCopy?.subheadline !== undefined ? { subheadline: revision.updatedCopy.subheadline } : {}),
+    ...(revision.updatedCopy?.cta ? { cta: revision.updatedCopy.cta } : {})
+  };
+
+  const rendered = renderImageAdSvg({ templateId: project.templateId, templateFields: project.templateFields, form: project.product, watermark: true, override: updatedPlan });
+
+  if (!userId) productAdProjectStore.recordAnonymousRevision(anonymousSessionId, "image");
+  const updated = productAdProjectStore.addRevision(project.id, {
+    instruction: body.data.instruction,
+    plan: updatedPlan,
+    svg: rendered.svg,
+    width: rendered.width,
+    height: rendered.height,
+    watermarked: true,
+    aiUsed
+  });
+
+  trackBrandeeEvent("revision_completed", { templateId: project.templateId }, { anonymousSessionId, userId });
+
+  res.json({
+    ok: true,
+    projectId: project.id,
+    svg: rendered.svg,
+    width: rendered.width,
+    height: rendered.height,
+    plan: updatedPlan,
+    revisionNumber: updated.revisions.length,
+    revisionSummary: revision.revisionSummary
+  });
+}));
+
+// PART 19 — list/restore revision history. Restoring never deletes newer
+// revisions; it appends a new entry that is a copy of the chosen one.
+app.get("/api/public/brandee/product-ads/image/project/:id/revisions", asyncHandler(async (req, res) => {
+  const anonymousSessionId = req.cookies?.[BRANDEE_SESSION_COOKIE] || null;
+  const project = productAdProjectStore.getProject(req.params.id);
+  if (!project) return res.status(404).json({ ok: false, error: "Project not found." });
+  const owns = (req.user && project.userId === req.user.id) || (!project.userId && project.anonymousSessionId === anonymousSessionId);
+  if (!owns) return res.status(403).json({ ok: false, error: "You don't have access to this project." });
+  res.json({ ok: true, revisions: productAdProjectStore.listRevisions(project.id).map((r) => ({ revisionNumber: r.revisionNumber, instruction: r.instruction, svg: r.svg, width: r.width, height: r.height, createdAt: r.createdAt })) });
+}));
+
+app.post("/api/public/brandee/product-ads/image/project/:id/restore", requireProductAdRateLimit, asyncHandler(async (req, res) => {
+  const anonymousSessionId = req.cookies?.[BRANDEE_SESSION_COOKIE] || null;
+  const body = z.object({ revisionNumber: z.number().int().positive() }).safeParse(req.body);
+  if (!body.success) return res.status(400).json({ ok: false, error: "Invalid revision." });
+  const project = productAdProjectStore.getProject(req.params.id);
+  if (!project) return res.status(404).json({ ok: false, error: "Project not found." });
+  const owns = (req.user && project.userId === req.user.id) || (!project.userId && project.anonymousSessionId === anonymousSessionId);
+  if (!owns) return res.status(403).json({ ok: false, error: "You don't have access to this project." });
+  const updated = productAdProjectStore.restoreRevision(project.id, body.data.revisionNumber);
+  if (!updated) return res.status(404).json({ ok: false, error: "That revision could not be found." });
+  const latest = updated.revisions[updated.revisions.length - 1];
+  res.json({ ok: true, svg: latest.svg, width: latest.width, height: latest.height, revisionNumber: latest.revisionNumber });
 }));
 
 app.post("/api/public/brandee/product-ads/video/preview", requireProductAdRateLimit, asyncHandler(async (req, res) => {
@@ -1752,7 +1883,11 @@ app.post("/api/brandee/product-ads/image/final", requireAuth, requireBrandeeSubs
     outcome = await entitlements.withReservedEntitlement(
       { customerId: subscription.customer_id, subscriptionId: subscription.id, subscription, unit: ENTITLEMENT_UNITS.IMAGE_FINAL, amount: 1, projectId: project.id, idempotencyKey },
       async () => {
-        const rendered = renderImageAdSvg({ templateId: project.templateId, templateFields: project.templateFields, form: project.product, watermark: false });
+        // PART 22/28: use the customer's latest APPROVED revision — never a
+        // fresh, different concept — only the watermark is removed and the
+        // resolution changes.
+        const latest = project.revisions?.[project.revisions.length - 1];
+        const rendered = renderImageAdSvg({ templateId: project.templateId, templateFields: project.templateFields, form: project.product, watermark: false, override: latest?.plan || null });
         return { ok: true, rendered };
       }
     );

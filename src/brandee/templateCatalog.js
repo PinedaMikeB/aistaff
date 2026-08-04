@@ -19,6 +19,24 @@ const { prisma } = require("../db");
 const { IMAGE_AD_TEMPLATES, isTemplateAvailable: isStaticFallbackTemplateAvailable } = require("./imageAdTemplates");
 const { VIDEO_AD_STYLES } = require("./videoAdStyles");
 
+// Same framework mapping used to seed the database (templateSeedData.js) —
+// duplicated here (not required()'d, to avoid a circular require, since
+// templateSeedData.js pulls IMAGE_AD_TEMPLATES/VIDEO_AD_STYLES too) only for
+// the fallback path, so a gallery served without a reachable database still
+// has correct framework/audience metadata for filters to work.
+const FALLBACK_FRAMEWORK = {
+  feature_benefit: "features_and_benefits",
+  offer_promo: "offer",
+  question_ad: "question",
+  comparison: "us_vs_them",
+  testimonial_style: "testimonial",
+  before_and_after: "before_and_after",
+  bold_claim: "bold_claim",
+  iphone_notes: "iphone_notes",
+  reasons_why: "reasons_why",
+  sticky_notes: "sticky_notes"
+};
+
 let loggedDbFallbackOnce = false;
 function warnDbFallback(context, error) {
   if (loggedDbFallbackOnce) return;
@@ -37,9 +55,16 @@ function adaptStaticRow(row) {
     version: row.version,
     name: row.name,
     description: row.description,
-    bestUse: row.category,
+    bestUse: row.idealFor || row.category,
+    idealFor: row.idealFor || null,
     thumbnail: row.thumbnailUrl || row.previewImageUrl,
+    sourceAssetUrl: row.sourceAssetUrl || null,
     category: row.category,
+    frameworkKey: row.frameworkKey || null,
+    audienceType: row.audienceType || "UNIVERSAL",
+    dominantColors: row.dominantColors || [],
+    tags: row.tags || [],
+    isFeatured: Boolean(row.isFeatured),
     supportedAspectRatios: row.supportedAspectRatios,
     proofRequirement: (row.proofRequirements || [])[0] || null,
     fields: fieldDefsFromDbTemplate(row)
@@ -70,7 +95,7 @@ async function listActiveStaticTemplates({ hasTestimonial = false } = {}) {
   } catch (error) {
     warnDbFallback("listActiveStaticTemplates", error);
   }
-  return IMAGE_AD_TEMPLATES.map((t) => ({ ...t, available: isStaticFallbackTemplateAvailable(t.id, { hasTestimonial }) }));
+  return IMAGE_AD_TEMPLATES.map((t) => ({ ...t, frameworkKey: FALLBACK_FRAMEWORK[t.id] || null, audienceType: "UNIVERSAL", dominantColors: [], tags: [], isFeatured: false, available: isStaticFallbackTemplateAvailable(t.id, { hasTestimonial }) }));
 }
 
 async function getStaticTemplateBySlug(slug) {
