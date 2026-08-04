@@ -1,0 +1,327 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Analyze my business — Brandee | AIStaff</title>
+<meta name="description" content="Tell Brandee your business goal and website. Brandee analyzes what's publicly available and returns a Creative Plan — format, angle, hook, script, and call to action." />
+<meta name="robots" content="noindex, follow" />
+<link rel="icon" href="/aistaff-logo-square.png" type="image/png" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700;800&family=DM+Mono:wght@500&family=Manrope:wght@500;600;700;800&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="/style.css" />
+</head>
+<body class="modern-home closer-page brandee-page">
+<div id="toast" class="toast" hidden></div>
+<header class="site-header cinematic-header">
+  <a class="brand" href="/" aria-label="AIStaff home">
+    <img class="brand-logo" src="/aistaff-logo-square.png" alt="AIStaff" width="42" height="42" />
+  </a>
+  <nav class="site-nav" aria-label="Primary">
+    <a href="/agents/brandee/">Brandee</a>
+    <a href="/#services">All agents</a>
+  </nav>
+  <div class="header-actions">
+    <a class="ghost-link" href="/admin/login">Client login</a>
+  </div>
+</header>
+
+<main>
+<section class="closer-hero analyze-hero" id="top">
+  <p class="eyebrow bright"><span class="live-dot"></span> AISTAFF / BRANDEE · BUSINESS ANALYSIS</p>
+  <h1 id="analyzeHeadline">Tell Brandee about your business.</h1>
+  <p class="hero-sub">Brandee analyzes publicly available information from the website you provide, combines it with what you tell her here, and returns a complete creative plan — static ad, UGC video, or both.</p>
+  <p id="goalPill" class="goal-status" aria-live="polite">Loading your selected goal…</p>
+</section>
+
+<section class="closer-section closer-narrow analyze-form-section">
+  <form id="analyzeForm" novalidate>
+    <div class="field">
+      <label for="urlInput">Website, Facebook Page, or store link</label>
+      <input id="urlInput" name="url" type="text" placeholder="https://yourbusiness.com" required autocomplete="url" />
+      <p class="field-error" id="urlError" hidden></p>
+    </div>
+    <div class="field">
+      <label for="whatYouSellInput">What does your business offer?</label>
+      <input id="whatYouSellInput" name="whatYouSell" type="text" placeholder="e.g. Copier and printer rental for offices" required />
+      <p class="field-error" id="whatYouSellError" hidden></p>
+    </div>
+    <div class="field">
+      <label for="idealCustomerInput">Who is your ideal customer?</label>
+      <input id="idealCustomerInput" name="idealCustomer" type="text" placeholder="e.g. Office administrators and business owners" required />
+      <p class="field-error" id="idealCustomerError" hidden></p>
+    </div>
+    <div class="field-row">
+      <div class="field">
+        <label for="platformInput">Where will this be published?</label>
+        <select id="platformInput" name="platform" required>
+          <option value="facebook">Facebook</option>
+          <option value="instagram">Instagram</option>
+          <option value="tiktok">TikTok</option>
+          <option value="youtube">YouTube</option>
+          <option value="website">Website</option>
+          <option value="multiple">Multiple platforms</option>
+        </select>
+      </div>
+      <div class="field">
+        <label for="languageInput">Preferred language</label>
+        <select id="languageInput" name="language" required>
+          <option value="taglish">Taglish</option>
+          <option value="english">English</option>
+          <option value="filipino">Filipino</option>
+        </select>
+      </div>
+    </div>
+    <div class="field">
+      <label for="offerInput">What offer should this promote? <span class="optional-tag">Optional</span></label>
+      <input id="offerInput" name="offer" type="text" placeholder="e.g. Free maintenance this quarter" />
+    </div>
+    <div class="field">
+      <label for="differentiatorInput">What makes your business different? <span class="optional-tag">Optional</span></label>
+      <input id="differentiatorInput" name="differentiator" type="text" placeholder="e.g. Same-day service, no long-term contract" />
+    </div>
+    <div class="field">
+      <label for="additionalInfoInput">Anything else Brandee should know? <span class="optional-tag">Optional</span></label>
+      <textarea id="additionalInfoInput" name="additionalInfo" placeholder="Anything that helps Brandee understand your business better"></textarea>
+    </div>
+
+    <p class="privacy-note">Brandee analyzes publicly available information from the website you provide. She does not access private analytics, customer lists, or admin dashboards. No phone number or email is required to see your first plan.</p>
+
+    <div id="analyzeErrorBanner" class="form-error-banner" role="alert" hidden></div>
+
+    <button type="submit" id="analyzeSubmitBtn" class="button button-primary glow-button">Analyze my business</button>
+    <button type="button" id="loadMargaBtn" class="text-link dev-shortcut" hidden>Load Marga test website (dev only) <span>↗</span></button>
+  </form>
+</section>
+</main>
+
+<div id="loadingOverlay" class="brandee-loading-overlay" hidden aria-live="polite" aria-busy="true">
+  <div class="brandee-loading-panel">
+    <div class="brandee-loading-spinner" aria-hidden="true"></div>
+    <p id="loadingStageText">Brandee is studying your business and preparing a creative recommendation.</p>
+    <ul id="loadingStageList" class="loading-stage-list"></ul>
+  </div>
+</div>
+
+<footer class="site-footer">
+  <b>AIStaff.click</b>
+  <span>Brandee — AI UGC Brand Agent</span>
+  <span>support@aistaff.click</span>
+  <span>+63 900 000 0000</span>
+  <a href="/about/">About Us</a>
+  <a href="/contact/">Contact Us</a>
+  <a href="/pricing/">Pricing</a>
+  <a href="/privacy">Privacy Policy</a>
+  <a href="/terms">Terms</a>
+  <a href="/refund-policy/">Refund Policy</a>
+  <a href="/support/">Support</a>
+</footer>
+
+<style>
+  .closer-page { overflow: visible !important; }
+  .analyze-hero { padding: clamp(120px,14vh,160px) clamp(20px,8vw,130px) clamp(30px,5vh,50px); text-align: center; }
+  .analyze-hero h1 { margin: 18px auto; color: #fff; font: 600 clamp(32px,4.5vw,54px)/1.1 "Space Grotesk"; letter-spacing: -.03em; max-width: 780px; }
+  .analyze-hero .hero-sub { max-width: 620px; margin: 0 auto 20px; color: rgba(232,244,255,.72); font: 17px/1.6 "Manrope"; }
+  .goal-status { display: inline-flex; align-items: center; gap: 8px; margin: 0 auto; padding: 8px 16px; border-radius: 999px; border: 1px solid rgba(72,193,255,.35); background: rgba(11,25,36,.6); color: #9edfff; font: 600 13px "Manrope"; }
+  .closer-section { width: min(1180px, calc(100% - 40px)); margin: 0 auto; padding: 30px 0 90px; }
+  .closer-narrow { width: min(720px, calc(100% - 40px)); }
+  #analyzeForm { display: grid; gap: 18px; }
+  .field { display: grid; gap: 6px; }
+  .field-row { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; }
+  .field label { color: #d9f1ff; font: 600 13.5px "Manrope"; }
+  .optional-tag { color: #587789; font-weight: 500; font-size: 12px; text-transform: uppercase; letter-spacing: .04em; }
+  .field input, .field select, .field textarea { width: 100%; min-height: 46px; padding: 11px 14px; border-radius: 4px; border: 1px solid rgba(117,161,188,.25); background: rgba(4,13,21,.8); color: #d9f1ff; outline: none; font: 14.5px "Manrope"; }
+  .field select { appearance: none; background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="%239edfff"><path d="M2 4l5 6 5-6z"/></svg>'); background-repeat: no-repeat; background-position: right 14px center; }
+  .field textarea { min-height: 90px; resize: vertical; }
+  .field input::placeholder, .field textarea::placeholder { color: #587789; }
+  .field input:focus, .field select:focus, .field textarea:focus { border-color: #39baff; box-shadow: 0 0 0 2px rgba(36,169,255,.14); }
+  .field input:-webkit-autofill, .field input:-webkit-autofill:hover, .field input:-webkit-autofill:focus {
+    -webkit-text-fill-color: #d9f1ff; caret-color: #d9f1ff;
+    -webkit-box-shadow: 0 0 0 1000px rgba(4,13,21,.95) inset; box-shadow: 0 0 0 1000px rgba(4,13,21,.95) inset;
+    transition: background-color 9999s ease-in-out 0s;
+  }
+  .field-error { margin: 0; color: #ff9d9d; font: 600 12.5px "Manrope"; }
+  .privacy-note { margin: 4px 0 0; color: #587789; font: 13px/1.6 "Manrope"; }
+  .form-error-banner { padding: 14px 16px; border-radius: 4px; border: 1px solid rgba(255,120,120,.35); background: rgba(60,15,15,.4); color: #ffb4b4; font: 600 14px/1.5 "Manrope"; }
+  #analyzeSubmitBtn { justify-self: start; margin-top: 6px; }
+  .dev-shortcut { justify-self: start; }
+
+  .brandee-loading-overlay { position: fixed; inset: 0; z-index: 200; display: flex; align-items: center; justify-content: center; background: rgba(2,7,14,.88); backdrop-filter: blur(4px); }
+  .brandee-loading-panel { width: min(440px, calc(100% - 40px)); padding: 34px 30px; border: 1px solid rgba(117,161,188,.25); border-radius: 8px; background: linear-gradient(145deg,rgba(19,39,54,.9),rgba(5,13,21,.97)); text-align: center; }
+  .brandee-loading-spinner { width: 40px; height: 40px; margin: 0 auto 20px; border-radius: 50%; border: 3px solid rgba(117,161,188,.25); border-top-color: var(--cyan); animation: brandee-spin 0.9s linear infinite; }
+  @keyframes brandee-spin { to { transform: rotate(360deg); } }
+  #loadingStageText { margin: 0 0 16px; color: #f4f8ff; font: 600 15px/1.5 "Manrope"; }
+  .loading-stage-list { list-style: none; margin: 0; padding: 0; display: grid; gap: 8px; text-align: left; }
+  .loading-stage-list li { color: #587789; font: 13px "Manrope"; transition: color .3s ease; }
+  .loading-stage-list li.active { color: #9edfff; font-weight: 700; }
+  .loading-stage-list li.done { color: #6fbf8f; }
+  @media (prefers-reduced-motion: reduce) { .brandee-loading-spinner { animation: none; } }
+
+  @media (max-width: 700px) {
+    .field-row { grid-template-columns: 1fr; }
+    .site-nav { display: none; }
+  }
+</style>
+
+<script>
+(() => {
+  const GOAL_LABELS = {
+    purchase: "Buy a product", messages: "Send a message", booking: "Book an appointment",
+    signup: "Register or sign up", visit: "Visit your store", discover: "Discover a new product",
+    recover: "Return and complete a purchase"
+  };
+
+  const params = new URLSearchParams(location.search);
+  let goal = params.get("goal");
+  let goalLabel = goal ? GOAL_LABELS[goal] : null;
+  if (!goal) {
+    try {
+      goal = sessionStorage.getItem("brandeeGoal");
+      goalLabel = sessionStorage.getItem("brandeeGoalLabel");
+    } catch (e) { /* non-fatal */ }
+  }
+
+  const goalPill = document.getElementById("goalPill");
+  if (goal && GOAL_LABELS[goal]) {
+    goalPill.innerHTML = `Building a plan for: <strong>${goalLabel || GOAL_LABELS[goal]}</strong> — <a class="text-link" href="/agents/brandee/#goal-selector">change goal</a>`;
+  } else {
+    goalPill.innerHTML = `No goal selected yet — <a class="text-link" href="/agents/brandee/#goal-selector">choose your goal first</a>`;
+    goal = null;
+  }
+
+  // Prefill from "Edit business details" on the plan page, if present.
+  try {
+    const last = JSON.parse(sessionStorage.getItem("brandeeLastForm") || "null");
+    if (last) {
+      document.getElementById("whatYouSellInput").value = last.whatYouSell || "";
+      document.getElementById("idealCustomerInput").value = last.idealCustomer || "";
+      document.getElementById("platformInput").value = last.platform || "facebook";
+      document.getElementById("languageInput").value = last.language || "taglish";
+      document.getElementById("offerInput").value = last.offer || "";
+      document.getElementById("differentiatorInput").value = last.differentiator || "";
+      document.getElementById("additionalInfoInput").value = last.additionalInfo || "";
+      sessionStorage.removeItem("brandeeLastForm");
+    }
+  } catch (e) { /* non-fatal */ }
+
+  // Dev-only test shortcut — hidden on the live public domain.
+  const isLocalDev = ["localhost", "127.0.0.1"].includes(location.hostname);
+  const loadMargaBtn = document.getElementById("loadMargaBtn");
+  if (isLocalDev) {
+    loadMargaBtn.hidden = false;
+    loadMargaBtn.addEventListener("click", () => {
+      document.getElementById("urlInput").value = "https://marga.biz/";
+      document.getElementById("whatYouSellInput").value = "Copier and printer rental for offices";
+      document.getElementById("idealCustomerInput").value = "Office administrators and business owners";
+      document.getElementById("platformInput").value = "facebook";
+      document.getElementById("languageInput").value = "taglish";
+      document.getElementById("differentiatorInput").value = "";
+      document.getElementById("offerInput").value = "";
+    });
+  }
+
+  const STAGES = [
+    "Reading your website",
+    "Identifying your offer",
+    "Understanding your audience",
+    "Checking available proof",
+    "Selecting a creative framework",
+    "Evaluating hook options",
+    "Building your creative plan"
+  ];
+  const stageList = document.getElementById("loadingStageList");
+  stageList.innerHTML = STAGES.map((s, i) => `<li data-i="${i}">${s}</li>`).join("");
+  const stageItems = [...stageList.querySelectorAll("li")];
+  let stageTimer = null;
+
+  function startStageAnimation() {
+    let i = 0;
+    stageItems.forEach((el) => el.classList.remove("active", "done"));
+    stageItems[0].classList.add("active");
+    stageTimer = setInterval(() => {
+      stageItems[i].classList.remove("active");
+      stageItems[i].classList.add("done");
+      i = Math.min(i + 1, stageItems.length - 1);
+      if (i < stageItems.length) stageItems[i].classList.add("active");
+      if (i >= stageItems.length - 1) clearInterval(stageTimer);
+    }, 1500);
+  }
+  function stopStageAnimation() {
+    if (stageTimer) clearInterval(stageTimer);
+  }
+
+  const form = document.getElementById("analyzeForm");
+  const errorBanner = document.getElementById("analyzeErrorBanner");
+  const overlay = document.getElementById("loadingOverlay");
+  const submitBtn = document.getElementById("analyzeSubmitBtn");
+
+  function showFieldError(id, message) {
+    const el = document.getElementById(id);
+    if (!el) return;
+    el.textContent = message;
+    el.hidden = !message;
+  }
+
+  function clearFieldErrors() {
+    ["urlError", "whatYouSellError", "idealCustomerError"].forEach((id) => showFieldError(id, ""));
+  }
+
+  form.addEventListener("submit", async (event) => {
+    event.preventDefault();
+    errorBanner.hidden = true;
+    clearFieldErrors();
+
+    if (!goal) {
+      errorBanner.textContent = "Please choose a business goal first.";
+      errorBanner.hidden = false;
+      return;
+    }
+
+    const data = Object.fromEntries(new FormData(form));
+    let hasError = false;
+    if (!data.url || !data.url.trim()) { showFieldError("urlError", "A website, Facebook Page, or store link is required."); hasError = true; }
+    if (!data.whatYouSell || !data.whatYouSell.trim()) { showFieldError("whatYouSellError", "Tell Brandee what you offer."); hasError = true; }
+    if (!data.idealCustomer || !data.idealCustomer.trim()) { showFieldError("idealCustomerError", "Tell Brandee who your ideal customer is."); hasError = true; }
+    if (hasError) return;
+
+    submitBtn.disabled = true;
+    overlay.hidden = false;
+    startStageAnimation();
+
+    try {
+      const res = await fetch("/api/public/brandee/analyze", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          selectedGoal: goal,
+          url: data.url.trim(),
+          whatYouSell: data.whatYouSell.trim(),
+          idealCustomer: data.idealCustomer.trim(),
+          platform: data.platform,
+          language: data.language,
+          offer: data.offer ? data.offer.trim() : null,
+          differentiator: data.differentiator ? data.differentiator.trim() : null,
+          additionalInfo: data.additionalInfo ? data.additionalInfo.trim() : null
+        })
+      });
+
+      const json = await res.json().catch(() => ({}));
+      if (!res.ok || !json.ok) {
+        throw new Error(json.error || "Brandee could not build a plan. Please try again.");
+      }
+
+      try { sessionStorage.removeItem("brandeeGoal"); sessionStorage.removeItem("brandeeGoalLabel"); } catch (e) {}
+      window.location.href = `/agents/brandee/plan/${json.planId}`;
+    } catch (err) {
+      stopStageAnimation();
+      overlay.hidden = true;
+      submitBtn.disabled = false;
+      errorBanner.textContent = err.message || "Something went wrong. Please try again.";
+      errorBanner.hidden = false;
+    }
+  });
+})();
+</script>
+</body>
+</html>

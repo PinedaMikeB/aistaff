@@ -1,0 +1,534 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>AIStaff Super Admin</title>
+<meta name="robots" content="noindex, nofollow" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=DM+Mono:wght@500&family=Manrope:wght@500;600;700;800&display=swap" rel="stylesheet" />
+<style>
+  :root { --night:#030810; --panel:#0b1826; --cyan:#24a9ff; --ice:#c7ecff; --ok:#3ddc97; --warn:#ffcf5c; --bad:#ff8686; }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--night); color: var(--ice); font: 14.5px/1.55 "Manrope", sans-serif; }
+  a { color: var(--cyan); }
+  :focus-visible { outline: 2px solid var(--cyan); outline-offset: 2px; }
+  .layout { display: grid; grid-template-columns: 240px 1fr; min-height: 100vh; }
+  nav.sidebar { border-right: 1px solid rgba(117,161,188,.16); padding: 22px 14px; position: sticky; top: 0; height: 100vh; overflow-y: auto; }
+  .brand { display: block; color: #fff; font: 700 16px "Space Grotesk"; margin-bottom: 4px; text-decoration: none; }
+  .brand-sub { display: block; color: #587789; font: 600 11px "DM Mono"; letter-spacing: .08em; text-transform: uppercase; margin-bottom: 22px; }
+  .nav-link { display: block; padding: 9px 12px; margin-bottom: 2px; border-radius: 6px; color: #b7cbdb; text-decoration: none; font: 600 13.5px "Manrope"; }
+  .nav-link:hover { background: rgba(36,169,255,.08); }
+  .nav-link.active { background: rgba(36,169,255,.14); color: #fff; }
+  .nav-group-label { margin: 18px 0 6px; padding: 0 12px; color: #587789; font: 600 10.5px "DM Mono"; letter-spacing: .1em; text-transform: uppercase; }
+  main.content { padding: 30px clamp(20px, 4vw, 44px); max-width: 1180px; }
+  h1 { margin: 0 0 6px; color: #fff; font: 600 26px "Space Grotesk"; letter-spacing: -.01em; }
+  h2 { color: #fff; font: 600 18px "Space Grotesk"; margin: 30px 0 14px; }
+  .page-sub { margin: 0 0 24px; color: #86a3b7; }
+  .grid-cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 14px; margin-bottom: 8px; }
+  .card { padding: 18px; border-radius: 8px; border: 1px solid rgba(117,161,188,.18); background: var(--panel); }
+  .card .label { display: block; color: #7a94a8; font: 600 11px "DM Mono"; letter-spacing: .06em; text-transform: uppercase; margin-bottom: 8px; }
+  .card .value { display: block; color: #fff; font: 600 26px "Space Grotesk"; }
+  .card .sub { display: block; margin-top: 4px; color: #7a94a8; font-size: 12.5px; }
+  table { width: 100%; border-collapse: collapse; font-size: 13.5px; }
+  th, td { text-align: left; padding: 10px 12px; border-bottom: 1px solid rgba(117,161,188,.14); }
+  th { color: #7a94a8; font: 600 11px "DM Mono"; letter-spacing: .04em; text-transform: uppercase; }
+  .table-wrap { overflow-x: auto; border: 1px solid rgba(117,161,188,.16); border-radius: 8px; }
+  .badge { display: inline-flex; align-items: center; gap: 5px; padding: 3px 9px; border-radius: 100px; font: 600 11.5px "Manrope"; }
+  .badge::before { content: ""; width: 7px; height: 7px; border-radius: 50%; display: inline-block; }
+  .badge-active { background: rgba(61,220,151,.14); color: var(--ok); } .badge-active::before { background: var(--ok); }
+  .badge-missing, .badge-invalid, .badge-failed { background: rgba(255,134,134,.14); color: var(--bad); } .badge-missing::before, .badge-invalid::before, .badge-failed::before { background: var(--bad); }
+  .badge-inactive, .badge-notvalidated, .badge-nottested { background: rgba(255,207,92,.14); color: var(--warn); } .badge-inactive::before, .badge-notvalidated::before, .badge-nottested::before { background: var(--warn); }
+  button.action { padding: 8px 14px; border-radius: 6px; border: 1px solid rgba(36,169,255,.4); background: rgba(36,169,255,.12); color: #9edfff; font: 600 12.5px "Manrope"; cursor: pointer; }
+  button.action:hover { background: rgba(36,169,255,.22); }
+  button.action:disabled { opacity: .5; cursor: not-allowed; }
+  button.action.danger { border-color: rgba(255,134,134,.4); background: rgba(255,134,134,.1); color: #ffb0b0; }
+  .toolbar { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 16px; }
+  .empty-state { padding: 24px; text-align: center; color: #7a94a8; }
+  .drawer-backdrop { position: fixed; inset: 0; background: rgba(3,8,16,.7); display: none; align-items: flex-start; justify-content: flex-end; z-index: 20; }
+  .drawer-backdrop.open { display: flex; }
+  .drawer { width: min(480px, 100vw); height: 100vh; overflow-y: auto; background: #071018; border-left: 1px solid rgba(117,161,188,.2); padding: 24px; }
+  .drawer h3 { margin-top: 0; }
+  .kv { display: grid; grid-template-columns: 140px 1fr; gap: 6px 12px; margin: 14px 0; font-size: 13px; }
+  .kv dt { color: #7a94a8; } .kv dd { margin: 0; color: #eaf6ff; word-break: break-word; }
+  .banner { padding: 12px 16px; border-radius: 6px; margin-bottom: 18px; font-size: 13.5px; }
+  .banner-warn { background: rgba(255,207,92,.12); border: 1px solid rgba(255,207,92,.3); color: #ffe2a3; }
+  .banner-error { background: rgba(255,134,134,.12); border: 1px solid rgba(255,134,134,.3); color: #ffb0b0; }
+  .field { margin-bottom: 14px; }
+  .field label { display: block; margin-bottom: 6px; font-weight: 600; }
+  .field input, .field select { width: 100%; min-height: 42px; padding: 9px 12px; border-radius: 6px; border: 1px solid rgba(117,161,188,.28); background: rgba(4,13,21,.85); color: #eaf6ff; }
+  code.mono { font-family: "DM Mono", monospace; font-size: 12.5px; color: #9edfff; }
+  @media (prefers-reduced-motion: reduce) { * { transition: none !important; animation: none !important; } }
+  @media (max-width: 860px) {
+    .layout { grid-template-columns: 1fr; }
+    nav.sidebar { position: static; height: auto; border-right: none; border-bottom: 1px solid rgba(117,161,188,.16); display: flex; flex-wrap: wrap; gap: 4px; }
+    .nav-group-label { display: none; }
+  }
+</style>
+</head>
+<body>
+<div class="layout">
+  <nav class="sidebar" aria-label="Super Admin navigation">
+    <a class="brand" href="/superadmin">AIStaff</a>
+    <span class="brand-sub">Super Admin</span>
+    <a class="nav-link" data-path="/superadmin" href="/superadmin">Overview</a>
+    <a class="nav-link" data-path="/superadmin/tenants" href="/superadmin/tenants">Tenants</a>
+    <a class="nav-link" data-path="/superadmin/users" href="/superadmin/users">Users</a>
+    <p class="nav-group-label">Brandee</p>
+    <a class="nav-link" data-path="/superadmin/brandee/creative-brain" href="/superadmin/brandee/creative-brain">Creative Brain</a>
+    <a class="nav-link" data-path="/superadmin/brandee/runs" href="/superadmin/brandee/runs">Plan Runs</a>
+    <p class="nav-group-label">Platform</p>
+    <a class="nav-link" data-path="/superadmin/system" href="/superadmin/system">System</a>
+    <a class="nav-link" data-path="/superadmin/audit-logs" href="/superadmin/audit-logs">Audit Logs</a>
+    <a class="nav-link" data-path="/superadmin/security" href="/superadmin/security">Security (MFA)</a>
+  </nav>
+  <main class="content" id="content" tabindex="-1">
+    <p>Loading…</p>
+  </main>
+</div>
+
+<div class="drawer-backdrop" id="drawerBackdrop">
+  <div class="drawer" role="dialog" aria-modal="true" aria-labelledby="drawerTitle">
+    <button class="action" id="drawerClose" style="float:right">Close</button>
+    <h3 id="drawerTitle">Details</h3>
+    <div id="drawerBody"></div>
+  </div>
+</div>
+
+<script>
+(function () {
+  const content = document.getElementById("content");
+  const drawerBackdrop = document.getElementById("drawerBackdrop");
+  const drawerBody = document.getElementById("drawerBody");
+  const drawerTitle = document.getElementById("drawerTitle");
+  document.getElementById("drawerClose").addEventListener("click", closeDrawer);
+  drawerBackdrop.addEventListener("click", (e) => { if (e.target === drawerBackdrop) closeDrawer(); });
+  document.addEventListener("keydown", (e) => { if (e.key === "Escape") closeDrawer(); });
+
+  function openDrawer(title, html) {
+    drawerTitle.textContent = title;
+    drawerBody.innerHTML = html;
+    drawerBackdrop.classList.add("open");
+  }
+  function closeDrawer() { drawerBackdrop.classList.remove("open"); }
+
+  async function api(path, options = {}) {
+    const res = await fetch(`/api/superadmin${path}`, {
+      credentials: "include",
+      headers: { "Content-Type": "application/json" },
+      ...options
+    });
+    let body = null;
+    try { body = await res.json(); } catch { /* no body */ }
+    if (res.status === 401) {
+      window.location.href = "/superadmin/login?redirect=" + encodeURIComponent(window.location.pathname);
+      throw new Error("Unauthenticated");
+    }
+    if (!res.ok) {
+      const error = new Error(body?.error || `Request failed (${res.status})`);
+      error.body = body;
+      error.status = res.status;
+      throw error;
+    }
+    return body;
+  }
+
+  function badge(status) {
+    const key = String(status || "").toLowerCase().replace(/\s+/g, "");
+    return `<span class="badge badge-${key}">${escapeHtml(status)}</span>`;
+  }
+  function escapeHtml(str) {
+    return String(str ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+  }
+  function fmtDate(iso) { return iso ? new Date(iso).toLocaleString() : "—"; }
+
+  function setActiveNav(path) {
+    document.querySelectorAll(".nav-link").forEach((a) => a.classList.toggle("active", a.dataset.path === path));
+  }
+
+  // -------------------------------------------------------------
+  // Page renderers
+  // -------------------------------------------------------------
+  async function renderOverview() {
+    content.innerHTML = "<h1>Overview</h1><p class='page-sub'>Global AIStaff system health — not a customer view.</p><p>Loading…</p>";
+    let me;
+    try { me = await api("/me"); } catch { return; }
+    const status = await api("/system/status");
+
+    let banner = "";
+    if (me.mfaWarning) {
+      banner = `<div class="banner banner-warn">${escapeHtml(me.mfaWarning)} <a href="/superadmin/security">Enable it now →</a></div>`;
+    }
+
+    content.innerHTML = `
+      <h1>Overview</h1>
+      <p class="page-sub">Signed in as ${escapeHtml(me.user.name)} (${escapeHtml(me.adminRole)})</p>
+      ${banner}
+      <div class="grid-cards">
+        <div class="card"><span class="label">Active tenants</span><span class="value">${status.totalActiveTenants}</span></div>
+        <div class="card"><span class="label">Registered users</span><span class="value">${status.totalRegisteredUsers}</span></div>
+        <div class="card"><span class="label">Brandee attempts (recent)</span><span class="value">${status.brandee.recentAttempts}</span></div>
+        <div class="card"><span class="label">Plan success rate</span><span class="value">${status.brandee.successRate ?? "No data"}${status.brandee.successRate !== null ? "%" : ""}</span></div>
+        <div class="card"><span class="label">Failed plans</span><span class="value">${status.brandee.failedCount}</span></div>
+        <div class="card"><span class="label">Avg. processing time</span><span class="value">${status.brandee.avgDurationMs !== null ? status.brandee.avgDurationMs + "ms" : "No data"}</span></div>
+      </div>
+      <h2>Services</h2>
+      <div class="grid-cards">
+        <div class="card"><span class="label">Database</span><span class="value">${badge(status.services.database.status)}</span><span class="sub">${escapeHtml(status.services.database.message || "")}</span></div>
+        <div class="card"><span class="label">Storage</span><span class="value">${badge(status.services.storage.status)}</span><span class="sub">${escapeHtml(status.services.storage.message || "")}</span></div>
+        <div class="card"><span class="label">Queue / jobs</span><span class="value">${badge(status.services.queue.status)}</span><span class="sub">${escapeHtml(status.services.queue.message || "")}</span></div>
+      </div>
+      <h2>Last Brandee runs</h2>
+      <div class="grid-cards">
+        <div class="card"><span class="label">Last successful plan</span><span class="value" style="font-size:15px">${status.brandee.lastSuccessfulRun ? fmtDate(status.brandee.lastSuccessfulRun.timestamp) : "No data"}</span><span class="sub">${status.brandee.lastSuccessfulRun ? escapeHtml(status.brandee.lastSuccessfulRun.submittedDomain || "—") : ""}</span></div>
+        <div class="card"><span class="label">Last failed plan</span><span class="value" style="font-size:15px">${status.brandee.lastFailedRun ? fmtDate(status.brandee.lastFailedRun.timestamp) : "No data"}</span><span class="sub">${status.brandee.lastFailedRun ? escapeHtml(status.brandee.lastFailedRun.safeErrorCode || "—") : ""}</span></div>
+      </div>
+    `;
+  }
+
+  async function renderTenants() {
+    content.innerHTML = "<h1>Tenants</h1><p>Loading…</p>";
+    const { tenants } = await api("/tenants");
+    if (!tenants.length) { content.innerHTML = "<h1>Tenants</h1><div class='empty-state'>No tenants found.</div>"; return; }
+    content.innerHTML = `
+      <h1>Tenants</h1>
+      <p class="page-sub">${tenants.length} tenant(s)</p>
+      <div class="table-wrap"><table>
+        <thead><tr><th>Name</th><th>Status</th><th>Plan</th><th>Members</th><th>Recent activity</th><th>Created</th></tr></thead>
+        <tbody>${tenants.map((t) => `
+          <tr>
+            <td>${escapeHtml(t.tenantName)}<br /><code class="mono">${escapeHtml(t.tenantId)}</code></td>
+            <td>${badge(t.status)}</td>
+            <td>${escapeHtml(t.plan)}</td>
+            <td>${t.memberCount}</td>
+            <td>${fmtDate(t.recentActivityAt)}</td>
+            <td>${fmtDate(t.createdAt)}</td>
+          </tr>`).join("")}
+        </tbody>
+      </table></div>
+    `;
+  }
+
+  async function renderUsers() {
+    content.innerHTML = "<h1>Users</h1><p>Loading…</p>";
+    const { users } = await api("/users");
+    content.innerHTML = `
+      <h1>Users</h1>
+      <p class="page-sub">${users.length} user(s). Passwords, session tokens, and MFA secrets are never shown here.</p>
+      <div class="table-wrap"><table>
+        <thead><tr><th>Name</th><th>Email</th><th>Tenant</th><th>Role</th><th>Platform role</th><th>Status</th><th>MFA</th><th>Last login</th></tr></thead>
+        <tbody>${users.map((u) => `
+          <tr>
+            <td>${escapeHtml(u.name)}</td>
+            <td>${escapeHtml(u.email)}</td>
+            <td>${escapeHtml(u.company?.name || "—")}</td>
+            <td>${escapeHtml(u.role)}</td>
+            <td>${u.platform_role ? badge(u.platform_role) : "—"}</td>
+            <td>${badge(u.status)}</td>
+            <td>${u.mfa_enabled ? "Enabled" : "Disabled"}</td>
+            <td>${fmtDate(u.last_login_at)}</td>
+          </tr>`).join("")}
+        </tbody>
+      </table></div>
+      <p class="page-sub">Only SUPERADMIN accounts can assign internal (platform) roles, via a separate confirmed action — not shown in this read-only directory.</p>
+    `;
+  }
+
+  async function renderCreativeBrain() {
+    content.innerHTML = "<h1>Brandee Creative Brain</h1><p>Loading…</p>";
+    const { creativeBrain, resources } = await api("/brandee/resources");
+    const rows = Object.entries(resources).map(([key, r]) => `
+      <tr>
+        <td>${escapeHtml(r.name)}</td>
+        <td>${escapeHtml(r.type)}</td>
+        <td>${escapeHtml(r.version || "—")}</td>
+        <td><code class="mono">${escapeHtml(r.source || "—")}</code></td>
+        <td>${badge(r.status)}</td>
+        <td>${r.itemCount}${r.expectedItemCount != null ? ` / ${r.expectedItemCount}` : ""}</td>
+        <td>${escapeHtml(r.validationStatus)}</td>
+        <td>${fmtDate(r.lastUpdated)}</td>
+      </tr>`).join("");
+
+    const skill = resources.adCreativeSkill;
+
+    content.innerHTML = `
+      <h1>Brandee Creative Brain</h1>
+      <p class="page-sub">Version ${escapeHtml(creativeBrain.version)} · ${creativeBrain.active ? "Active" : "Issues detected"} · Environment: ${escapeHtml(creativeBrain.environment)}</p>
+      <div class="grid-cards">
+        <div class="card"><span class="label">Extraction prompt</span><span class="value" style="font-size:14px">${escapeHtml(creativeBrain.extractionPromptVersion)}</span></div>
+        <div class="card"><span class="label">Planner prompt version</span><span class="value" style="font-size:14px">${escapeHtml(creativeBrain.plannerPromptVersion)}</span></div>
+        <div class="card"><span class="label">Business profile schema</span><span class="value" style="font-size:14px">${escapeHtml(creativeBrain.businessProfileSchemaVersion)}</span></div>
+        <div class="card"><span class="label">Creative plan schema</span><span class="value" style="font-size:14px">${escapeHtml(creativeBrain.creativePlanSchemaVersion)}</span></div>
+      </div>
+
+      <h2>Ad Creative Skill (coreyhaines31/marketingskills)</h2>
+      <div class="grid-cards">
+        <div class="card"><span class="label">Status</span><span class="value">${badge(skill.status)}</span></div>
+        <div class="card"><span class="label">Present locally</span><span class="value" style="font-size:16px">${skill.presentLocally ? "Yes" : "No"}</span></div>
+        <div class="card"><span class="label">Runtime integration</span><span class="value" style="font-size:14px">${escapeHtml(skill.runtimeUsageStatus)}</span></div>
+        <div class="card"><span class="label">Content checksum</span><span class="value" style="font-size:14px">${escapeHtml(skill.contentChecksum || "n/a")}</span></div>
+      </div>
+
+      <h2>Installed resources</h2>
+      <div class="toolbar">
+        <button class="action" id="validateAllBtn">Validate Creative Brain (all)</button>
+      </div>
+      <div class="table-wrap"><table>
+        <thead><tr><th>Resource</th><th>Type</th><th>Version</th><th>Source</th><th>Status</th><th>Count</th><th>Validation</th><th>Last updated</th></tr></thead>
+        <tbody>${rows}</tbody>
+      </table></div>
+
+      <h2>Integrity actions</h2>
+      <div class="toolbar" id="integrityActions">
+        ${["hookFramework", "staticAdFrameworks", "goalMappings", "awarenessRules"].map((k) => `<button class="action" data-validate="${k}">Validate ${escapeHtml(resources[k].name)}</button>`).join("")}
+        ${["scraper", "extraction", "planner", "database"].map((s) => `<button class="action" data-test="${s}">Test ${s}</button>`).join("")}
+      </div>
+      <div id="actionResult"></div>
+    `;
+
+    document.getElementById("validateAllBtn").addEventListener("click", async (e) => {
+      await runValidation("all", e.target);
+      renderCreativeBrain();
+    });
+    document.querySelectorAll("[data-validate]").forEach((btn) => {
+      btn.addEventListener("click", () => runValidation(btn.dataset.validate, btn));
+    });
+    document.querySelectorAll("[data-test]").forEach((btn) => {
+      btn.addEventListener("click", () => runServiceTest(btn.dataset.test, btn));
+    });
+  }
+
+  async function runValidation(resource, btn) {
+    btn.disabled = true;
+    const resultEl = document.getElementById("actionResult");
+    resultEl.innerHTML = "<p>Running validation…</p>";
+    try {
+      const result = await api("/brandee/validate", { method: "POST", body: JSON.stringify({ resource }) });
+      resultEl.innerHTML = `<div class="banner ${result.pass ? "" : "banner-error"}">${result.pass ? "Passed" : "Failed"} — stage: ${escapeHtml(result.stage)} — ${result.durationMs}ms — ${fmtDate(result.timestamp)}</div>`;
+    } catch (error) {
+      resultEl.innerHTML = `<div class="banner banner-error">${escapeHtml(error.message)}</div>`;
+    } finally {
+      btn.disabled = false;
+    }
+  }
+
+  async function runServiceTest(service, btn) {
+    btn.disabled = true;
+    const resultEl = document.getElementById("actionResult");
+    resultEl.innerHTML = "<p>Testing…</p>";
+    try {
+      const result = await api("/system/test-service", { method: "POST", body: JSON.stringify({ service }) });
+      resultEl.innerHTML = `<div class="banner ${result.status === "Active" ? "" : "banner-warn"}">${escapeHtml(service)}: ${badge(result.status)} — ${escapeHtml(result.message || "")} (${result.durationMs}ms, ${fmtDate(result.timestamp)})</div>`;
+    } catch (error) {
+      resultEl.innerHTML = `<div class="banner banner-error">${escapeHtml(error.message)}</div>`;
+    } finally {
+      btn.disabled = false;
+    }
+  }
+
+  async function renderRuns() {
+    content.innerHTML = "<h1>Brandee Plan Runs</h1><p>Loading…</p>";
+    const { runs, stats } = await api("/brandee/runs");
+    if (!runs.length) {
+      content.innerHTML = "<h1>Brandee Plan Runs</h1><div class='empty-state'>No data yet — runs will appear here as customers use Brandee.</div>";
+      return;
+    }
+    content.innerHTML = `
+      <h1>Brandee Plan Runs</h1>
+      <p class="page-sub">${stats.totalAttempts} attempt(s) · ${stats.successRate ?? "No data"}${stats.successRate !== null ? "%" : ""} success rate · avg ${stats.avgDurationMs ?? "—"}ms</p>
+      <div class="table-wrap"><table>
+        <thead><tr><th>Timestamp</th><th>Domain</th><th>Mode</th><th>Selected goal</th><th>Recommended</th><th>Status</th><th>Duration</th><th></th></tr></thead>
+        <tbody>${runs.map((r) => `
+          <tr>
+            <td>${fmtDate(r.timestamp)}</td>
+            <td>${escapeHtml(r.submittedDomain || "—")}</td>
+            <td>${escapeHtml(r.sourceMode)}</td>
+            <td>${escapeHtml(r.selectedGoal || "—")}</td>
+            <td>${escapeHtml(r.recommendedGoal || "—")}</td>
+            <td>${badge(r.status === "success" ? "Active" : "Failed")}</td>
+            <td>${r.durationMs != null ? r.durationMs + "ms" : "—"}</td>
+            <td><button class="action" data-run="${r.requestId}">Details</button></td>
+          </tr>`).join("")}
+        </tbody>
+      </table></div>
+    `;
+    document.querySelectorAll("[data-run]").forEach((btn) => {
+      btn.addEventListener("click", () => {
+        const run = runs.find((r) => r.requestId === btn.dataset.run);
+        const retryBtn = run.status === "failed" ? `<button class="action" id="retryRunBtn">Retry (re-check domain)</button><div id="retryResult"></div>` : "";
+        openDrawer("Run details", `
+          <dl class="kv">
+            <dt>Request ID</dt><dd><code class="mono">${escapeHtml(run.requestId)}</code></dd>
+            <dt>Timestamp</dt><dd>${fmtDate(run.timestamp)}</dd>
+            <dt>Domain</dt><dd>${escapeHtml(run.submittedDomain || "—")}</dd>
+            <dt>Source mode</dt><dd>${escapeHtml(run.sourceMode)}</dd>
+            <dt>Selected goal</dt><dd>${escapeHtml(run.selectedGoal || "—")}</dd>
+            <dt>Recommended</dt><dd>${escapeHtml(run.recommendedGoal || "—")}</dd>
+            <dt>Status</dt><dd>${badge(run.status === "success" ? "Active" : "Failed")}</dd>
+            <dt>Failed stage</dt><dd>${escapeHtml(run.failedStage || "—")}</dd>
+            <dt>Error code</dt><dd>${escapeHtml(run.safeErrorCode || "—")}</dd>
+            <dt>Duration</dt><dd>${run.durationMs != null ? run.durationMs + "ms" : "—"}</dd>
+            <dt>Extraction model</dt><dd>${escapeHtml(run.extractionModel || "—")}</dd>
+            <dt>Planner model</dt><dd>${escapeHtml(run.plannerModel || "—")}</dd>
+            <dt>Creative Brain</dt><dd>${escapeHtml(run.creativeBrainVersion || "—")}</dd>
+            <dt>Retry count</dt><dd>${run.retryCount}</dd>
+          </dl>
+          ${retryBtn}
+        `);
+        if (run.status === "failed") {
+          document.getElementById("retryRunBtn").addEventListener("click", async (e) => {
+            e.target.disabled = true;
+            const out = document.getElementById("retryResult");
+            out.innerHTML = "<p>Re-checking…</p>";
+            try {
+              const result = await api("/brandee/retry-run", { method: "POST", body: JSON.stringify({ requestId: run.requestId }) });
+              out.innerHTML = `<div class="banner ${result.pass ? "" : "banner-warn"}">${escapeHtml(result.message)}</div>`;
+            } catch (error) {
+              out.innerHTML = `<div class="banner banner-error">${escapeHtml(error.message)}</div>`;
+            } finally {
+              e.target.disabled = false;
+            }
+          });
+        }
+      });
+    });
+  }
+
+  async function renderSystem() {
+    content.innerHTML = "<h1>System</h1><p>Loading…</p>";
+    const status = await api("/system/status");
+    const config = status.services.config;
+    content.innerHTML = `
+      <h1>System</h1>
+      <p class="page-sub">Safe status only — no secrets, keys, or full environment values are ever shown.</p>
+      <h2>Core services</h2>
+      <div class="grid-cards">
+        <div class="card"><span class="label">Database</span><span class="value">${badge(status.services.database.status)}</span><span class="sub">${escapeHtml(status.services.database.message || "")}</span></div>
+        <div class="card"><span class="label">Storage</span><span class="value">${badge(status.services.storage.status)}</span><span class="sub">${escapeHtml(status.services.storage.message || "")}</span></div>
+        <div class="card"><span class="label">Queue / jobs</span><span class="value">${badge(status.services.queue.status)}</span><span class="sub">${escapeHtml(status.services.queue.message || "")}</span></div>
+      </div>
+      ${config ? `
+        <h2>Configuration (SUPERADMIN only)</h2>
+        <div class="table-wrap"><table>
+          <thead><tr><th>Setting</th><th>Value</th></tr></thead>
+          <tbody>${Object.entries(config).map(([k, v]) => `<tr><td><code class="mono">${escapeHtml(k)}</code></td><td>${escapeHtml(String(v))}</td></tr>`).join("")}</tbody>
+        </table></div>
+      ` : ""}
+    `;
+  }
+
+  async function renderAuditLogs() {
+    content.innerHTML = "<h1>Audit Logs</h1><p>Loading…</p>";
+    try {
+      const { logs } = await api("/audit-logs");
+      if (!logs.length) { content.innerHTML = "<h1>Audit Logs</h1><div class='empty-state'>No audit events yet.</div>"; return; }
+      content.innerHTML = `
+        <h1>Audit Logs</h1>
+        <p class="page-sub">${logs.length} recent event(s). SUPERADMIN only.</p>
+        <div class="table-wrap"><table>
+          <thead><tr><th>Time</th><th>Actor</th><th>Action</th><th>Target</th><th>IP</th></tr></thead>
+          <tbody>${logs.map((l) => `
+            <tr>
+              <td>${fmtDate(l.created_at)}</td>
+              <td>${escapeHtml(l.actor?.name || l.actor_user_id)}</td>
+              <td>${escapeHtml(l.action)}</td>
+              <td>${escapeHtml(l.target_type)}${l.target_id ? ` / ${escapeHtml(l.target_id)}` : ""}</td>
+              <td>${escapeHtml(l.ip_address || "—")}</td>
+            </tr>`).join("")}
+          </tbody>
+        </table></div>
+      `;
+    } catch (error) {
+      if (error.status === 403) content.innerHTML = "<h1>Audit Logs</h1><div class='banner banner-warn'>Audit logs are visible to SUPERADMIN accounts only.</div>";
+      else throw error;
+    }
+  }
+
+  async function renderSecurity() {
+    const me = await api("/me");
+    content.innerHTML = `
+      <h1>Security</h1>
+      <p class="page-sub">Multi-factor authentication for your own Super Admin account.</p>
+      <div class="card" style="max-width:420px">
+        <span class="label">MFA status</span>
+        <span class="value" style="font-size:16px">${me.user.mfaEnabled ? "Enabled" : "Not enabled"}</span>
+      </div>
+      ${me.user.mfaEnabled ? "" : `
+        <h2>Enable MFA</h2>
+        <button class="action" id="startEnrollBtn">Start enrollment</button>
+        <div id="enrollArea"></div>
+      `}
+    `;
+    if (!me.user.mfaEnabled) {
+      document.getElementById("startEnrollBtn").addEventListener("click", async (e) => {
+        e.target.disabled = true;
+        const area = document.getElementById("enrollArea");
+        try {
+          const { otpauthUrl, secret } = await api("/mfa/enroll", { method: "POST" });
+          area.innerHTML = `
+            <p>Scan this into your authenticator app, or enter the secret manually:</p>
+            <p><code class="mono">${escapeHtml(secret)}</code></p>
+            <p style="word-break:break-all"><code class="mono">${escapeHtml(otpauthUrl)}</code></p>
+            <div class="field"><label for="confirmCode">Enter the 6-digit code to confirm</label><input id="confirmCode" maxlength="6" inputmode="numeric" /></div>
+            <button class="action" id="confirmEnrollBtn">Confirm</button>
+            <div id="confirmResult"></div>
+          `;
+          document.getElementById("confirmEnrollBtn").addEventListener("click", async (ev) => {
+            ev.target.disabled = true;
+            const result = document.getElementById("confirmResult");
+            try {
+              const res = await api("/mfa/confirm", { method: "POST", body: JSON.stringify({ token: document.getElementById("confirmCode").value.trim() }) });
+              result.innerHTML = `<div class="banner">MFA enabled. Save these one-time backup codes now — they will not be shown again:<br /><code class="mono">${res.backupCodes.join(", ")}</code></div>`;
+            } catch (error) {
+              result.innerHTML = `<div class="banner banner-error">${escapeHtml(error.message)}</div>`;
+            } finally {
+              ev.target.disabled = false;
+            }
+          });
+        } finally {
+          e.target.disabled = false;
+        }
+      });
+    }
+  }
+
+  // -------------------------------------------------------------
+  // Router
+  // -------------------------------------------------------------
+  const routes = {
+    "/superadmin": renderOverview,
+    "/superadmin/tenants": renderTenants,
+    "/superadmin/users": renderUsers,
+    "/superadmin/brandee/creative-brain": renderCreativeBrain,
+    "/superadmin/brandee/runs": renderRuns,
+    "/superadmin/system": renderSystem,
+    "/superadmin/audit-logs": renderAuditLogs,
+    "/superadmin/security": renderSecurity
+  };
+
+  async function route() {
+    const path = window.location.pathname.replace(/\/$/, "") || "/superadmin";
+    setActiveNav(path);
+    const renderer = routes[path] || renderOverview;
+    try {
+      await renderer();
+    } catch (error) {
+      content.innerHTML = `<h1>Something went wrong</h1><div class="banner banner-error">${escapeHtml(error.message)}</div>`;
+    }
+    content.focus();
+  }
+
+  document.querySelectorAll(".nav-link").forEach((a) => {
+    a.addEventListener("click", (e) => {
+      e.preventDefault();
+      window.history.pushState({}, "", a.getAttribute("href"));
+      route();
+    });
+  });
+  window.addEventListener("popstate", route);
+  route();
+})();
+</script>
+</body>
+</html>

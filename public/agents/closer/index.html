@@ -224,6 +224,21 @@
   .closer-audit-form input, .closer-audit-form textarea { width: 100%; min-height: 44px; padding: 10px 12px; border-radius: 0; border: 1px solid rgba(117,161,188,.25); background: rgba(4,13,21,.8); color: #d9f1ff; outline: none; font: 14px "Manrope"; }
   .closer-audit-form input::placeholder, .closer-audit-form textarea::placeholder { color: #587789; }
   .closer-audit-form input:focus, .closer-audit-form textarea:focus { border-color: #39baff; box-shadow: 0 0 0 2px rgba(36,169,255,.14); }
+  .closer-audit-form input:-webkit-autofill,
+  .closer-audit-form input:-webkit-autofill:hover,
+  .closer-audit-form input:-webkit-autofill:focus,
+  .closer-audit-form input:-webkit-autofill:active {
+    -webkit-text-fill-color: #d9f1ff;
+    caret-color: #d9f1ff;
+    -webkit-box-shadow: 0 0 0 1000px rgba(4,13,21,.95) inset;
+    box-shadow: 0 0 0 1000px rgba(4,13,21,.95) inset;
+    border-color: rgba(117,161,188,.25);
+    transition: background-color 9999s ease-in-out 0s, color 9999s ease-in-out 0s;
+  }
+  .closer-audit-form input:autofill {
+    -webkit-text-fill-color: #d9f1ff;
+    box-shadow: 0 0 0 1000px rgba(4,13,21,.95) inset;
+  }
   .closer-audit-form textarea { min-height: 90px; resize: vertical; }
   .closer-audit-form .success-message { background: rgba(41,145,184,.18); color: #9fe5ff; border: 1px solid rgba(75,193,244,.35); padding: 12px; border-radius: 4px; }
   .closer-faq-list { display: grid; gap: 10px; }

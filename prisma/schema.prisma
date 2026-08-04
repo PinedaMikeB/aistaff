@@ -42,6 +42,17 @@ model User {
   password_hash String
   role          String    @default("admin")
   status        String    @default("active")
+  // Global AIStaff platform role — independent of the tenant-scoped `role`
+  // field above. Null for ordinary tenant users. Only ever set server-side
+  // (CLI bootstrap script or an authenticated SUPERADMIN action); never
+  // accepted from public signup or client-supplied request bodies.
+  platform_role String?
+  mfa_enabled   Boolean   @default(false)
+  // Encrypted (not plaintext) TOTP secret — see src/crypto.js encryptSecret,
+  // the same helper already used for facebook_pages.page_access_token_encrypted.
+  mfa_secret_encrypted  String?
+  mfa_backup_codes_hash String[] @default([])
+  last_login_at DateTime?
   created_at    DateTime  @default(now())
   updated_at    DateTime  @updatedAt
   company       Company   @relation(fields: [company_id], references: [id], onDelete: Cascade)
@@ -52,8 +63,32 @@ model User {
   assigned_handoffs HumanHandoff[] @relation("HandoffAssignedTo")
   carts         Cart[]
   customers     Customer[]
+  admin_audit_logs AdminAuditLog[] @relation("AdminAuditActor")
 
+  @@index([platform_role])
   @@map("users")
+}
+
+// Append-only (by application convention — no update/delete API is ever
+// exposed for this model) audit trail for every AIStaff Super Admin action.
+model AdminAuditLog {
+  id             String   @id @default(uuid())
+  actor_user_id  String
+  actor_role     String
+  action         String
+  target_type    String
+  target_id      String?
+  ip_address     String?
+  user_agent     String?
+  metadata       Json?
+  created_at     DateTime @default(now())
+  actor          User     @relation("AdminAuditActor", fields: [actor_user_id], references: [id], onDelete: Restrict)
+
+  @@index([actor_user_id])
+  @@index([action])
+  @@index([target_type, target_id])
+  @@index([created_at])
+  @@map("admin_audit_logs")
 }
 
 model CompanySetting {

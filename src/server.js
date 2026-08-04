@@ -55,6 +55,29 @@ const {
   providerReady,
   verifyWebhookSignature
 } = require("./payments");
+const { AnalyzeRequestSchema, WebsiteBusinessAnalysisSchema } = require("./brandee/schemas");
+const { WebsiteAnalysisError, normalizeUrlInput } = require("./brandee/websiteAnalyzer");
+const { buildBusinessProfile } = require("./brandee/businessProfileBuilder");
+const { generateCreativePlan } = require("./brandee/planner");
+const { enrichBusinessAnalysisWithAi } = require("./brandee/extraction");
+const { getExtractionConfig, getPlannerConfig } = require("./brandee/modelConfig");
+const { BrandeeError, toBrandeeError } = require("./brandee/errors");
+const { savePlan, getPlan } = require("./brandee/store");
+const { recordRun: recordBrandeeRun, listRuns: listBrandeeRuns, getRunStats: getBrandeeRunStats } = require("./admin/brandeeRunLog");
+const { getCreativeBrainStatus, validateAllResources, RESOURCE_VALIDATORS } = require("./admin/creativeBrain");
+const systemStatus = require("./admin/systemStatus");
+const { recordAuditEvent, listAuditLogs, AUDIT_ACTIONS } = require("./admin/auditLog");
+const { createRateLimiter } = require("./admin/rateLimit");
+const {
+  PLATFORM_ROLES,
+  ALL_ADMIN_ROLES,
+  ADMIN_ERROR_CODES,
+  requireSuperAdminApi,
+  requireSuperAdminPage,
+  isLastActiveSuperadmin,
+  countActiveSuperadmins
+} = require("./adminAuth");
+const { mountSuperAdminPages } = require("./admin/pages");
 
 const app = express();
 const port = Number(process.env.APP_PORT || 3000);
@@ -1063,6 +1086,357 @@ app.post("/api/public/site-chat", asyncHandler(async (req, res) => {
   res.json({ ok: true, reply });
 }));
 
+// ---------------------------------------------------------------------------
+// Brandee — business-outcome-first Creative Plan generation.
+// See src/brandee/* for the SSRF-safe website analyzer, the approved
+// static-ad-framework + 100-hook playbook data, and the deterministic +
+// optional-AI planner. Public, unauthenticated, rate-limited like site-chat.
+// ---------------------------------------------------------------------------
+
+const BRANDEE_SESSION_COOKIE = "brandee_sid";
+
+function getOrSetBrandeeSessionId(req, res) {
+  let sid = req.cookies?.[BRANDEE_SESSION_COOKIE];
+  if (!sid) {
+    sid = crypto.randomUUID();
+    res.cookie(BRANDEE_SESSION_COOKIE, sid, {
+      httpOnly: true,
+      sameSite: "lax",
+      maxAge: 1000 * 60 * 60 * 24 * 30
+    });
+  }
+  return sid;
+}
+
+const brandeeRateLimitStore = new Map();
+function checkBrandeeRateLimit(ip) {
+  const now = Date.now();
+  const windowMs = 10 * 60 * 1000;
+  const maxRequests = 8; // website fetch + AI call is heavier than a chat message
+  const entry = brandeeRateLimitStore.get(ip) || [];
+  const recent = entry.filter((t) => now - t < windowMs);
+  if (recent.length >= maxRequests) return false;
+  recent.push(now);
+  brandeeRateLimitStore.set(ip, recent);
+  return true;
+}
+
+// Idempotency: a duplicate double-click on Submit within a short window
+// should not trigger a second full scrape+AI run. Keyed by session + a hash
+// of the submitted form (not by planId, since the client doesn't have one
+// yet). Entries expire quickly — this only guards against accidental
+// double-submits, not a general dedupe of legitimate re-analysis requests.
+const brandeeInFlightBySessionForm = new Map();
+function inFlightKey(sessionId, form) {
+  return `${sessionId}:${form.url}:${form.selectedGoal}:${form.regenerate ? "regen" : "initial"}`;
+}
+
+function buildManualOnlyAnalysis(form) {
+  // Graceful manual fallback (PART 5) — never block plan generation on a
+  // website-fetch/extraction failure. Every fact here comes straight from
+  // the submitted form (source: "user"), never invented. Matches the
+  // upgraded BusinessProfile shape (crawlSummary/blogState/confirmation
+  // fields) so downstream code never has to special-case "the crawl never
+  // ran at all" vs. "the crawl ran but found little."
+  const evidence = [];
+  if (form.whatYouSell) evidence.push({ statement: `What you sell: ${form.whatYouSell}`, sourceType: "user", confidence: 0.9, entityType: "product_or_service" });
+  if (form.idealCustomer) evidence.push({ statement: `Ideal customer: ${form.idealCustomer}`, sourceType: "user", confidence: 0.9, entityType: "audience" });
+  if (form.offer) evidence.push({ statement: `Offer: ${form.offer}`, sourceType: "user", confidence: 0.9, entityType: "offer" });
+  if (form.differentiator) evidence.push({ statement: `Differentiator: ${form.differentiator}`, sourceType: "user", confidence: 0.9, entityType: "differentiator" });
+
+  return {
+    sourceUrl: form.url,
+    crawlSummary: { pagesDiscovered: 0, pagesCrawled: 0, pagesRejected: 0, subdomainsCrawled: [], pageTypes: {}, warnings: ["Website could not be read automatically."] },
+    sourceMode: "manual_only",
+    businessName: null,
+    businessNameConfidence: 0,
+    businessType: "unknown",
+    industry: null,
+    summary: "Brandee could not read this website automatically. This plan is based on what you entered manually.",
+    productsOrServices: [],
+    targetAudienceSignals: [],
+    primaryProblemsSolved: [],
+    customerDesires: [],
+    features: [],
+    functionalBenefits: [],
+    businessOutcomes: [],
+    primaryBenefits: [],
+    differentiators: form.differentiator ? [form.differentiator] : [],
+    offers: form.offer ? [form.offer] : [],
+    callsToAction: [],
+    contactMethods: [],
+    locations: [],
+    blogState: "unknown",
+    proof: { testimonials: [], reviewCount: null, rating: null, customerCount: null, yearsInBusiness: null, awards: [], certifications: [], guarantees: [] },
+    brandTone: [],
+    claimsFound: evidence.map((e) => e.statement),
+    evidence,
+    inferences: [],
+    missingInformation: ["Everything from the website — Brandee could not read it automatically"],
+    contradictions: [],
+    confirmationRequired: true,
+    confirmationReasons: ["Brandee could not read this website automatically — please confirm the details below are accurate."],
+    confidence: 0.15,
+    fetchStatus: "manual_only"
+  };
+}
+
+function plannerModelLabel() {
+  const config = getPlannerConfig();
+  return `${config.provider}:${config.model || "unset"}`;
+}
+
+/** Maps a WebsiteAnalysisError (websiteAnalyzer.js) code to a BrandeeError code. */
+function scraperErrorCodeFor(error) {
+  if (!(error instanceof WebsiteAnalysisError)) return "BRANDEE_SCRAPER_FAILED";
+  if (error.code === "timeout") return "BRANDEE_SCRAPER_TIMEOUT";
+  if (error.code === "invalid_url") return "BRANDEE_INVALID_URL";
+  if (error.code === "blocked_host" || error.code === "unsupported_protocol") return "BRANDEE_URL_BLOCKED";
+  return "BRANDEE_SCRAPER_FAILED";
+}
+
+app.post("/api/public/brandee/analyze", asyncHandler(async (req, res) => {
+  const runStartedAt = Date.now();
+  const requestId = crypto.randomUUID();
+  const ip = req.ip || req.headers["x-forwarded-for"] || "unknown";
+
+  if (!checkBrandeeRateLimit(ip)) {
+    const err = new BrandeeError("BRANDEE_RATE_LIMITED", { requestId });
+    console.warn("[brandee]", err.toLogEntry());
+    return res.status(429).json(err.toSafeJson());
+  }
+
+  // Stage: input -------------------------------------------------------
+  let form;
+  try {
+    form = AnalyzeRequestSchema.parse(req.body);
+  } catch (error) {
+    const err = toBrandeeError(error, {
+      code: "BRANDEE_INVALID_INPUT",
+      stage: "input",
+      requestId,
+      metadata: { issues: error?.issues?.slice(0, 5) }
+    });
+    console.warn("[brandee]", err.toLogEntry());
+    return res.status(400).json(err.toSafeJson());
+  }
+
+  const sessionId = getOrSetBrandeeSessionId(req, res);
+
+  // Duplicate-click guard — same session+form combination already running.
+  const dedupeKey = inFlightKey(sessionId, form);
+  if (brandeeInFlightBySessionForm.has(dedupeKey)) {
+    const err = new BrandeeError("BRANDEE_RATE_LIMITED", {
+      requestId,
+      publicMessage: "Brandee is already building this plan. Please wait a moment.",
+      internalMessage: "Duplicate in-flight request for same session+form"
+    });
+    return res.status(429).json(err.toSafeJson());
+  }
+  brandeeInFlightBySessionForm.set(dedupeKey, true);
+
+  try {
+    // Stage: multi-page crawl + extraction ---------------------------------
+    // See businessProfileBuilder.js — discovers and reads pages beyond the
+    // homepage (nav/footer/sitemap), resolves the business name from a
+    // weighted evidence hierarchy, and extracts contacts/offers/products/
+    // proof/blog-state across every crawled page, not just one.
+    let websiteAnalysis;
+    let usedManualFallback = false;
+    let extractionModel = "deterministic";
+    try {
+      const normalizedUrl = normalizeUrlInput(form.url);
+      const heuristicAnalysis = await buildBusinessProfile({ rootUrl: normalizedUrl, form });
+
+      // Optional best-effort AI enrichment on top of the always-available
+      // deterministic extraction (see extraction.js) — never blocks, never
+      // invents proof, silently falls back on any failure. Uses the
+      // homepage's visible text as the enrichment sample (kept small and
+      // untrusted per extraction.js's prompt-injection defenses).
+      const homepageText = heuristicAnalysis.summary || "";
+      const enrichment = await enrichBusinessAnalysisWithAi(heuristicAnalysis, { visibleText: homepageText, form });
+      websiteAnalysis = enrichment.analysis;
+      if (enrichment.aiUsed) {
+        const extractionConfig = getExtractionConfig();
+        extractionModel = `${extractionConfig.provider}:${extractionConfig.model}`;
+      }
+
+      const validated = WebsiteBusinessAnalysisSchema.safeParse(websiteAnalysis);
+      if (!validated.success) {
+        throw new BrandeeError("BRANDEE_EXTRACTION_SCHEMA_FAILED", {
+          internalMessage: `Website analysis failed schema validation: ${validated.error.message}`,
+          metadata: { issues: validated.error.issues?.slice(0, 5) },
+          requestId
+        });
+      }
+      websiteAnalysis = validated.data;
+      if (websiteAnalysis.fetchStatus === "unreachable" || websiteAnalysis.crawlSummary.pagesCrawled === 0) {
+        usedManualFallback = true;
+      }
+    } catch (error) {
+      const brandeeError = error instanceof BrandeeError
+        ? error
+        : toBrandeeError(error, { code: scraperErrorCodeFor(error), stage: "scraping", requestId });
+      console.warn("[brandee] scraping/extraction failed, falling back to manual input:", brandeeError.toLogEntry());
+      websiteAnalysis = buildManualOnlyAnalysis(form);
+      usedManualFallback = true;
+    }
+
+    // Stage: rules ---------------------------------------------------------
+    const creativeBrainStatus = getCreativeBrainStatus();
+    if (!creativeBrainStatus.active) {
+      throw new BrandeeError("BRANDEE_RULES_NOT_LOADED", {
+        internalMessage: "Creative Brain resources failed validation — refusing to plan with an incomplete/invalid playbook.",
+        requestId,
+        metadata: { version: creativeBrainStatus.version }
+      });
+    }
+
+    // Stage: planning + validation ------------------------------------------
+    let generated;
+    try {
+      generated = await generateCreativePlan({ businessAnalysis: websiteAnalysis, form, requestId });
+    } catch (error) {
+      const brandeeError = error instanceof BrandeeError
+        ? error
+        : toBrandeeError(error, { code: "BRANDEE_PLANNER_MODEL_FAILED", stage: "planning", requestId });
+      console.error("[brandee] plan generation failed:", brandeeError.toLogEntry());
+      recordBrandeeRun({
+        status: "failed",
+        submittedUrl: form.url,
+        sessionId,
+        userId: req.user?.id || null,
+        selectedGoal: form.selectedGoal,
+        failedStage: brandeeError.stage,
+        safeErrorCode: brandeeError.code,
+        durationMs: Date.now() - runStartedAt,
+        extractionModel,
+        plannerModel: plannerModelLabel(),
+        creativeBrainVersion: creativeBrainStatus.version,
+        requestId
+      });
+      return res.status(brandeeError.retryable ? 503 : 500).json(brandeeError.toSafeJson());
+    }
+
+    // Stage: persistence -----------------------------------------------------
+    let record;
+    try {
+      record = savePlan({
+        plan: generated.plan,
+        websiteAnalysis,
+        decisionConstraints: generated.decisionConstraints || null,
+        form,
+        sessionId,
+        userId: req.session?.userId || null,
+        aiUsed: generated.aiUsed,
+        extractionModel,
+        plannerModel: generated.aiUsed ? plannerModelLabel() : "deterministic",
+        creativeBrainVersion: creativeBrainStatus.version,
+        requestId,
+        durationMs: Date.now() - runStartedAt
+      });
+    } catch (error) {
+      const brandeeError = toBrandeeError(error, { code: "BRANDEE_DATABASE_FAILED", stage: "persistence", requestId });
+      console.error("[brandee] plan persistence failed:", brandeeError.toLogEntry());
+      recordBrandeeRun({
+        status: "failed",
+        submittedUrl: form.url,
+        sessionId,
+        userId: req.user?.id || null,
+        selectedGoal: generated.plan.selectedGoal,
+        recommendedGoal: generated.plan.recommendedGoal,
+        failedStage: brandeeError.stage,
+        safeErrorCode: brandeeError.code,
+        durationMs: Date.now() - runStartedAt,
+        extractionModel,
+        plannerModel: generated.aiUsed ? plannerModelLabel() : "deterministic",
+        creativeBrainVersion: creativeBrainStatus.version,
+        requestId
+      });
+      return res.status(500).json(brandeeError.toSafeJson());
+    }
+
+    recordBrandeeRun({
+      status: "success",
+      submittedUrl: form.url,
+      sessionId,
+      userId: req.user?.id || null,
+      selectedGoal: generated.plan.selectedGoal,
+      recommendedGoal: generated.plan.recommendedGoal,
+      durationMs: Date.now() - runStartedAt,
+      extractionModel,
+      plannerModel: generated.aiUsed ? plannerModelLabel() : "deterministic",
+      creativeBrainVersion: creativeBrainStatus.version,
+      requestId,
+      crawlDiagnostics: {
+        pagesDiscovered: websiteAnalysis.crawlSummary?.pagesDiscovered ?? null,
+        pagesCrawled: websiteAnalysis.crawlSummary?.pagesCrawled ?? null,
+        pagesRejected: websiteAnalysis.crawlSummary?.pagesRejected ?? null,
+        pageTypes: websiteAnalysis.crawlSummary?.pageTypes ?? null,
+        subdomainsCrawled: websiteAnalysis.crawlSummary?.subdomainsCrawled ?? [],
+        businessNameConfidence: websiteAnalysis.businessNameConfidence ?? null,
+        productsOrServicesCount: (websiteAnalysis.productsOrServices || []).length,
+        contactMethodsFound: (websiteAnalysis.contactMethods || []).length,
+        blogState: websiteAnalysis.blogState ?? null,
+        confirmationRequired: Boolean(websiteAnalysis.confirmationRequired)
+      }
+    });
+
+    res.json({
+      ok: true,
+      requestId,
+      planId: record.planId,
+      websiteAnalysis,
+      plan: generated.plan,
+      aiUsed: generated.aiUsed,
+      aiNote: generated.aiUsed
+        ? null
+        : (generated.aiError ? "Brandee generated this plan using her core strategy engine (AI polish was unavailable)." : "Brandee generated this plan using her core strategy engine."),
+      notice: usedManualFallback
+        ? "Brandee could not read the website, so this plan was built from the details you entered."
+        : null,
+      // PART 15 — the plan itself is still fully generated even when
+      // confirmation is recommended (never blocks the customer from seeing
+      // a result), but the client can use this to show an inline "confirm
+      // these details" banner/step before treating the plan as final.
+      profileConfirmation: {
+        required: Boolean(websiteAnalysis.confirmationRequired),
+        reasons: websiteAnalysis.confirmationReasons || []
+      }
+    });
+  } catch (error) {
+    // Catch-all for anything thrown outside the per-stage try/catches above
+    // (e.g. BRANDEE_RULES_NOT_LOADED thrown between stages) — still typed,
+    // still stage-aware, never a bare stack trace to the client.
+    const brandeeError = toBrandeeError(error, { code: "BRANDEE_UNKNOWN_ERROR", stage: "planning", requestId });
+    console.error("[brandee] analyze request failed:", brandeeError.toLogEntry());
+    recordBrandeeRun({
+      status: "failed",
+      submittedUrl: form?.url,
+      sessionId,
+      userId: req.user?.id || null,
+      selectedGoal: form?.selectedGoal,
+      failedStage: brandeeError.stage,
+      safeErrorCode: brandeeError.code,
+      durationMs: Date.now() - runStartedAt,
+      requestId
+    });
+    return res.status(brandeeError.retryable ? 503 : 500).json(brandeeError.toSafeJson());
+  } finally {
+    brandeeInFlightBySessionForm.delete(dedupeKey);
+  }
+}));
+
+app.get("/api/public/brandee/plan/:planId", asyncHandler(async (req, res) => {
+  const record = getPlan(req.params.planId);
+  if (!record) return res.status(404).json({ ok: false, error: "Plan not found." });
+  res.json({ ok: true, ...record });
+}));
+
+app.get("/agents/brandee/plan/:planId", (req, res) => {
+  res.sendFile(path.join(__dirname, "..", "public", "agents", "brandee", "plan", "index.html"));
+});
+
 app.post("/api/page-intelligence/preview", requireAuth, asyncHandler(async (req, res) => {
   const body = z.object({
     facebookPage: z.string().optional().nullable(),
@@ -1795,6 +2169,14 @@ app.get("/admin", (req, res) => {
   res.redirect(302, "/admin/dashboard");
 });
 
+// ---------------------------------------------------------------------
+// AIStaff Super Admin (global platform console — NOT the customer/tenant
+// dashboard above). See src/admin/routes.js's header comment for why this
+// lives at /superadmin instead of /admin.
+// ---------------------------------------------------------------------
+app.use("/api/superadmin", require("./admin/routes"));
+mountSuperAdminPages(app);
+
 app.get("/privacy", (req, res) => {
   res.sendFile(path.join(__dirname, "..", "public", "privacy", "index.html"));
 });
@@ -1815,4 +2197,35 @@ app.use((error, req, res, next) => {
 
 app.listen(port, () => {
   console.log(`AI Inbox Sales Assistant running at http://localhost:${port}`);
+});
+
+// ---------------------------------------------------------------------
+// Process-level resilience.
+//
+// ROOT CAUSE FIX (see Brandee reliability task deliverables report): this
+// process previously had NO global unhandledRejection/uncaughtException
+// handler. `src/db.js` constructs `new PrismaClient()` at module load time;
+// whenever that client's compiled query-engine binary doesn't match the
+// runtime OS/architecture (for example: right after a `prisma/schema.prisma`
+// change, before `prisma generate` has been re-run for the deploy target —
+// exactly the situation this repo was left in after the previous session's
+// admin-system migration), Prisma's engine resolution fails asynchronously,
+// AFTER `app.listen` has already logged success, with no request involved
+// at all. Node's default behavior for an unhandled rejection is to crash
+// the entire process — which took the fully independent, JSON-file-backed
+// Brandee pipeline down as collateral damage, even though Brandee itself
+// never touches Prisma. That is what customers were experiencing as
+// "Brandee could not build a plan" — not a bug in the scraping, extraction,
+// or planning logic (verified: the deterministic planner was reproduced
+// successfully across every goal/platform/language combination and both
+// scraped and manual-fallback paths).
+//
+// This does not hide real bugs — it only prevents ONE unrelated subsystem's
+// async failure from being fatal to the whole application. Full technical
+// detail is still logged server-side (never surfaced to the browser).
+process.on("unhandledRejection", (reason) => {
+  console.error("[process] Unhandled promise rejection (process kept alive):", reason?.stack || reason);
+});
+process.on("uncaughtException", (error) => {
+  console.error("[process] Uncaught exception (process kept alive):", error?.stack || error);
 });

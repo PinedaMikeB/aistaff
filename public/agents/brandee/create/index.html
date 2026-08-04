@@ -1,0 +1,461 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Create with Brandee — Guided or Pro Mode | AIStaff</title>
+<meta name="description" content="Choose how you want to work with Brandee: Guided Mode for a recommended creative plan, or Pro Mode to bring your own brief and skip straight to production." />
+<meta name="robots" content="noindex, follow" />
+<link rel="icon" href="/aistaff-logo-square.png" type="image/png" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700;800&family=DM+Mono:wght@500&family=Manrope:wght@500;600;700;800&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="/style.css" />
+</head>
+<body class="modern-home closer-page brandee-page">
+<header class="site-header cinematic-header">
+  <a class="brand" href="/" aria-label="AIStaff home">
+    <img class="brand-logo" src="/aistaff-logo-square.png" alt="AIStaff" width="42" height="42" />
+  </a>
+  <nav class="site-nav" aria-label="Primary">
+    <a href="/agents/brandee/">Brandee</a>
+    <a href="/#services">All agents</a>
+  </nav>
+  <div class="header-actions">
+    <a class="ghost-link" href="/admin/login">Client login</a>
+  </div>
+</header>
+
+<main>
+
+<section class="closer-hero analyze-hero" id="top">
+  <p class="eyebrow bright"><span class="live-dot"></span> AISTAFF / BRANDEE · CREATE</p>
+  <h1 id="createHeadline">How would you like to work with Brandee?</h1>
+  <p class="hero-sub">Guided Mode recommends the creative strategy for you. Pro Mode lets you bring your own brief and go straight to production.</p>
+</section>
+
+<!-- Standalone Mode Selector — same 2-card pattern as the Brandee landing page -->
+<section id="modeSelectorSection" class="closer-section closer-narrow">
+  <div class="mode-selector-grid">
+    <div class="mode-card mode-card-guided">
+      <span class="mode-badge">Recommended for business owners</span>
+      <h3>Help me decide</h3>
+      <p>Tell Brandee what you sell and what you want customers to do. She will recommend the creative strategy, format, angle, hook, message, and variations.</p>
+      <ul class="mode-included-list">
+        <li>Business and website analysis</li>
+        <li>Goal recommendation</li>
+        <li>Audience-awareness assessment</li>
+        <li>Creative-angle selection</li>
+        <li>Static or video recommendation</li>
+        <li>Hook and copy creation</li>
+        <li>Campaign-ready variations</li>
+      </ul>
+      <button type="button" class="button button-primary glow-button" id="startGuidedBtn">Start Guided Mode <span>↓</span></button>
+    </div>
+    <div class="mode-card mode-card-pro">
+      <span class="mode-badge">For marketers and media buyers</span>
+      <h3>I know what I want</h3>
+      <p>Bring your own creative brief and move directly to creating static ads, UGC videos, carousels, or controlled variations.</p>
+      <ul class="mode-included-list">
+        <li>Use your own angle and hook</li>
+        <li>Enter or upload your own script</li>
+        <li>Choose your creative format</li>
+        <li>Select your framework and CTA</li>
+        <li>Control dimensions and variations</li>
+        <li>Ask Brandee to review or improve the brief</li>
+      </ul>
+      <button type="button" class="button button-soft" id="openProBtn">Open Pro Mode <span>↗</span></button>
+    </div>
+  </div>
+</section>
+
+<!-- Pro Mode wizard -->
+<section id="proWizard" class="closer-section closer-narrow" hidden>
+  <p class="section-kicker">Pro mode</p>
+  <h2>Bring your own creative brief.</h2>
+  <p class="closer-statement">Brandee will not decide your angle or hook for you here — she'll validate what you already have, flag anything missing or unsupported, and get it ready for production.</p>
+
+  <p class="wizard-back"><button type="button" class="text-link" id="backToSelectorBtn">&larr; Back to mode selection</button></p>
+
+  <div class="wizard-step" id="wizardStep1">
+    <p class="wizard-step-label">Step 1 of 3 — Choose your output type</p>
+    <div class="goal-grid output-type-grid" role="group" aria-label="Choose your output type">
+      <button type="button" class="goal-card output-type-card" data-output="static">
+        <span class="goal-card-check" aria-hidden="true">✓</span>
+        <h3>Static ad</h3>
+        <p>A layout-ready ad concept using a proven direct-response framework.</p>
+      </button>
+      <button type="button" class="goal-card output-type-card" data-output="ugc">
+        <span class="goal-card-check" aria-hidden="true">✓</span>
+        <h3>UGC video</h3>
+        <p>A scripted, creator-led vertical video with scenes and a call to action.</p>
+      </button>
+      <button type="button" class="goal-card output-type-card" data-output="carousel">
+        <span class="goal-card-check" aria-hidden="true">✓</span>
+        <h3>Carousel</h3>
+        <p>A multi-card sequence stepping through a story, product line, or proof points.</p>
+      </button>
+      <button type="button" class="goal-card output-type-card" data-output="variations">
+        <span class="goal-card-check" aria-hidden="true">✓</span>
+        <h3>Creative variations</h3>
+        <p>Multiple alternate hooks or angles for the same goal, ready to test.</p>
+      </button>
+      <button type="button" class="goal-card output-type-card" data-output="recommend">
+        <span class="goal-card-check" aria-hidden="true">✓</span>
+        <h3>Let Brandee recommend</h3>
+        <p>Not sure which format fits? This is the same as Guided Mode.</p>
+      </button>
+    </div>
+    <p id="recommendNote" class="field-error" hidden style="color:#9edfff">Let Brandee recommend uses the Guided Mode flow, since it's Brandee — not you — choosing the format. <button type="button" class="text-link" id="goToGuidedFromRecommend">Switch to Guided Mode <span>↗</span></button></p>
+  </div>
+
+  <div class="wizard-step" id="wizardStep2" hidden>
+    <p class="wizard-step-label">Step 2 of 3 — How much help do you want?</p>
+    <div class="goal-grid help-level-grid" role="group" aria-label="Choose how much help you want">
+      <button type="button" class="goal-card help-level-card" data-help="complete">
+        <span class="goal-card-check" aria-hidden="true">✓</span>
+        <h3>I have a complete brief</h3>
+        <p>Just check my brief for gaps or unsupported claims before production.</p>
+      </button>
+      <button type="button" class="goal-card help-level-card" data-help="partial">
+        <span class="goal-card-check" aria-hidden="true">✓</span>
+        <h3>I have a partial brief</h3>
+        <p>Help me fill in what's missing based on what I've provided.</p>
+      </button>
+      <button type="button" class="goal-card help-level-card" data-help="light">
+        <span class="goal-card-check" aria-hidden="true">✓</span>
+        <h3>Just review what I have</h3>
+        <p>I mostly know what I want — flag anything risky before I move on.</p>
+      </button>
+    </div>
+  </div>
+
+  <div class="wizard-step" id="wizardStep3" hidden>
+    <p class="wizard-step-label">Step 3 of 3 — Your brief</p>
+    <div id="dynamicFields" class="dynamic-fields"></div>
+  </div>
+
+  <div class="goal-cta-row" id="wizardCtaRow" hidden>
+    <p class="goal-status">Fill in your brief, then review it.</p>
+    <button type="button" id="reviewBriefBtn" class="button button-primary glow-button">Review my creative brief <span>↗</span></button>
+  </div>
+
+  <div id="briefReview" class="brief-review" hidden>
+    <h3>Brandee's review</h3>
+    <div class="review-columns">
+      <div>
+        <h4>Missing information</h4>
+        <ul id="reviewMissing"><li class="review-empty">Nothing missing.</li></ul>
+      </div>
+      <div>
+        <h4>Unsupported claims</h4>
+        <ul id="reviewClaims"><li class="review-empty">No unsupported claims found.</li></ul>
+      </div>
+      <div>
+        <h4>Suggested corrections</h4>
+        <ul id="reviewCorrections"><li class="review-empty">No corrections suggested.</li></ul>
+      </div>
+    </div>
+    <h4>Brief summary</h4>
+    <pre id="reviewSummary" class="review-summary"></pre>
+    <div class="goal-cta-row">
+      <p class="goal-status">Production is not connected yet.</p>
+      <button type="button" id="continueToProductionBtn" class="button button-primary glow-button" disabled title="Not connected yet — coming after MVP">Continue to production <span>↗</span></button>
+    </div>
+  </div>
+</section>
+
+</main>
+
+<footer class="site-footer">
+  <b>AIStaff.click</b>
+  <span>Brandee — AI Creative Marketing Agent</span>
+  <span>support@aistaff.click</span>
+  <span>+63 900 000 0000</span>
+  <a href="/about/">About Us</a>
+  <a href="/contact/">Contact Us</a>
+  <a href="/pricing/">Pricing</a>
+  <a href="/privacy">Privacy Policy</a>
+  <a href="/terms">Terms</a>
+  <a href="/refund-policy/">Refund Policy</a>
+  <a href="/support/">Support</a>
+</footer>
+
+<style>
+  .closer-page { overflow: visible !important; }
+  .closer-hero.analyze-hero { padding: clamp(120px,14vh,160px) clamp(20px,8vw,130px) clamp(30px,5vh,50px); text-align: center; }
+  .closer-hero h1 { margin: 18px auto; color: #fff; font: 600 clamp(32px,4.5vw,54px)/1.1 "Space Grotesk"; letter-spacing: -.03em; max-width: 780px; }
+  .closer-hero .hero-sub { max-width: 620px; margin: 0 auto 20px; color: rgba(232,244,255,.72); font: 17px/1.6 "Manrope"; }
+  .closer-section { width: min(1180px, calc(100% - 40px)); margin: 0 auto; padding: 40px 0; }
+  .closer-narrow { width: min(920px, calc(100% - 40px)); }
+  .closer-section h2 { color: #f4f8ff; font: 500 clamp(24px,3vw,38px)/1.15 "Space Grotesk"; letter-spacing: -.02em; margin: 12px 0 20px; }
+  .closer-statement { color: #d9f1ff; font: 600 16px/1.6 "Manrope"; max-width: 680px; }
+  .section-kicker { color: var(--cyan); font: 500 11px "DM Mono"; letter-spacing: .14em; text-transform: uppercase; }
+
+  .mode-selector-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-top: 10px; }
+  .mode-card { padding: 28px 26px; border-radius: 10px; border: 1px solid rgba(117,161,188,.22); background: linear-gradient(145deg,rgba(19,39,54,.6),rgba(5,13,21,.85)); }
+  .mode-card-guided { border-color: rgba(36,169,255,.35); }
+  .mode-badge { display: inline-block; margin-bottom: 14px; padding: 5px 12px; border-radius: 100px; background: rgba(36,169,255,.14); color: #9edfff; font: 600 11px "DM Mono"; letter-spacing: .06em; text-transform: uppercase; }
+  .mode-card h3 { margin: 0 0 10px; color: #f4f8ff; font: 600 24px "Space Grotesk"; letter-spacing: -.01em; }
+  .mode-card > p { margin: 0 0 18px; color: #b7cbdb; font: 15px/1.6 "Manrope"; }
+  .mode-included-list { list-style: none; margin: 0 0 24px; padding: 0; display: grid; gap: 8px; }
+  .mode-included-list li { position: relative; padding-left: 22px; color: #86a3b7; font: 14px/1.5 "Manrope"; }
+  .mode-included-list li::before { content: "✓"; position: absolute; left: 0; color: var(--cyan); font-weight: 700; }
+  .mode-card .button { width: 100%; text-align: center; justify-content: center; }
+  .closer-page .button-soft { color: #c7ecff; background: rgba(39,111,149,.18); border: 1px solid rgba(117,204,255,.28); }
+
+  .wizard-back { margin: 0 0 18px; }
+  .wizard-step-label { color: var(--cyan); font: 600 12px "DM Mono"; letter-spacing: .08em; text-transform: uppercase; margin: 0 0 14px; }
+  .wizard-step { margin-bottom: 30px; }
+  .goal-grid.output-type-grid { grid-template-columns: repeat(3,1fr); }
+  .goal-grid.help-level-grid { grid-template-columns: repeat(3,1fr); }
+  .goal-card { position: relative; text-align: left; padding: 20px 18px; min-height: 130px; border: 1px solid rgba(117,161,188,.22); border-radius: 6px; background: linear-gradient(145deg,rgba(19,39,54,.6),rgba(5,13,21,.85)); color: inherit; cursor: pointer; font-family: inherit; }
+  .goal-card:hover { border-color: rgba(72,193,255,.55); }
+  .goal-card[aria-pressed="true"] { border-color: var(--cyan); box-shadow: 0 0 0 1px rgba(36,169,255,.4); }
+  .goal-card h3 { margin: 0 0 6px; color: #f4f8ff; font: 600 16px "Space Grotesk"; }
+  .goal-card p { margin: 0; color: #86a3b7; font: 13.5px/1.5 "Manrope"; }
+  .goal-card-check { position: absolute; top: 14px; right: 14px; opacity: 0; color: var(--cyan); }
+  .goal-card[aria-pressed="true"] .goal-card-check { opacity: 1; }
+
+  .dynamic-fields { display: grid; gap: 16px; max-width: 640px; }
+  .dynamic-fields .field label { color: #d9f1ff; font: 600 13.5px "Manrope"; display: block; margin-bottom: 6px; }
+  .dynamic-fields .field input, .dynamic-fields .field select, .dynamic-fields .field textarea { width: 100%; min-height: 46px; padding: 11px 14px; border-radius: 4px; border: 1px solid rgba(117,161,188,.25); background: rgba(4,13,21,.8); color: #d9f1ff; outline: none; font: 14.5px "Manrope"; }
+  .dynamic-fields .field textarea { min-height: 90px; resize: vertical; }
+  .dynamic-fields .field { margin-bottom: 4px; }
+
+  .goal-cta-row { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 16px; margin-top: 10px; padding-top: 18px; border-top: 1px solid rgba(117,161,188,.15); }
+  .goal-status { margin: 0; color: #9edfff; font: 600 14px "Manrope"; }
+
+  .brief-review { margin-top: 30px; padding: 24px; border: 1px solid rgba(117,161,188,.2); border-radius: 8px; background: rgba(11,25,36,.5); }
+  .brief-review h3 { margin: 0 0 16px; color: #f4f8ff; font: 600 20px "Space Grotesk"; }
+  .brief-review h4 { margin: 0 0 8px; color: #9edfff; font: 600 12px "DM Mono"; text-transform: uppercase; letter-spacing: .06em; }
+  .review-columns { display: grid; grid-template-columns: repeat(3,1fr); gap: 20px; margin-bottom: 20px; }
+  .review-columns ul { margin: 0; padding: 0; list-style: none; display: grid; gap: 6px; }
+  .review-columns li { color: #d9f1ff; font: 13.5px/1.5 "Manrope"; padding-left: 16px; position: relative; }
+  .review-columns li::before { content: "•"; position: absolute; left: 0; color: #ff9d9d; }
+  .review-columns li.review-empty { color: #587789; }
+  .review-columns li.review-empty::before { color: #587789; }
+  .review-summary { white-space: pre-wrap; background: rgba(4,13,21,.8); border: 1px solid rgba(117,161,188,.2); border-radius: 6px; padding: 14px; color: #b7cbdb; font: 13px/1.6 "DM Mono"; margin: 0 0 6px; }
+
+  @media (max-width: 760px) {
+    .mode-selector-grid, .goal-grid.output-type-grid, .goal-grid.help-level-grid, .review-columns { grid-template-columns: 1fr; }
+  }
+</style>
+
+<script>
+(function () {
+  var params = new URLSearchParams(window.location.search);
+  var mode = params.get("mode");
+
+  var modeSelectorSection = document.getElementById("modeSelectorSection");
+  var proWizard = document.getElementById("proWizard");
+
+  function showWizard() {
+    modeSelectorSection.hidden = true;
+    proWizard.hidden = false;
+  }
+  function showSelector() {
+    modeSelectorSection.hidden = false;
+    proWizard.hidden = true;
+  }
+
+  if (mode === "guided") {
+    window.location.replace("/agents/brandee/#goal-selector");
+    return;
+  } else if (mode === "pro") {
+    showWizard();
+  } else {
+    showSelector();
+  }
+
+  document.getElementById("startGuidedBtn").addEventListener("click", function () {
+    window.location.href = "/agents/brandee/#goal-selector";
+  });
+  document.getElementById("openProBtn").addEventListener("click", function () {
+    window.history.replaceState({}, "", "/agents/brandee/create/?mode=pro");
+    showWizard();
+  });
+  document.getElementById("backToSelectorBtn").addEventListener("click", function () {
+    window.history.replaceState({}, "", "/agents/brandee/create/");
+    showSelector();
+  });
+
+  // ---- Step 1: output type ----
+  var outputCards = [].slice.call(document.querySelectorAll(".output-type-card"));
+  var selectedOutput = null;
+  var recommendNote = document.getElementById("recommendNote");
+  var step2 = document.getElementById("wizardStep2");
+  var step3 = document.getElementById("wizardStep3");
+  var ctaRow = document.getElementById("wizardCtaRow");
+
+  document.getElementById("goToGuidedFromRecommend").addEventListener("click", function () {
+    window.location.href = "/agents/brandee/#goal-selector";
+  });
+
+  outputCards.forEach(function (card) {
+    card.addEventListener("click", function () {
+      outputCards.forEach(function (c) { c.setAttribute("aria-pressed", "false"); });
+      card.setAttribute("aria-pressed", "true");
+      selectedOutput = card.dataset.output;
+
+      if (selectedOutput === "recommend") {
+        recommendNote.hidden = false;
+        step2.hidden = true;
+        step3.hidden = true;
+        ctaRow.hidden = true;
+      } else {
+        recommendNote.hidden = true;
+        step2.hidden = false;
+      }
+    });
+  });
+
+  // ---- Step 2: help level ----
+  var helpCards = [].slice.call(document.querySelectorAll(".help-level-card"));
+  var selectedHelp = null;
+  helpCards.forEach(function (card) {
+    card.addEventListener("click", function () {
+      helpCards.forEach(function (c) { c.setAttribute("aria-pressed", "false"); });
+      card.setAttribute("aria-pressed", "true");
+      selectedHelp = card.dataset.help;
+      step3.hidden = false;
+      renderDynamicFields(selectedOutput);
+      ctaRow.hidden = false;
+    });
+  });
+
+  // ---- Step 3: dynamic fields per output type ----
+  var FIELD_SETS = {
+    static: [
+      { id: "claim", label: "Main claim or headline", type: "text", required: true, placeholder: "e.g. Copier rentals with free maintenance" },
+      { id: "offer", label: "Offer (if any)", type: "text", required: false, placeholder: "e.g. 10% off your first 3 months" },
+      { id: "proof", label: "Proof you can back up (testimonials, years in business, numbers)", type: "textarea", required: false, placeholder: "e.g. Serving offices since 2015" },
+      { id: "cta", label: "Call to action", type: "text", required: true, placeholder: "e.g. Message us for a free quote" },
+      { id: "platform", label: "Platform", type: "select", required: true, options: ["Facebook feed", "Instagram feed", "Website", "Multiple"] }
+    ],
+    ugc: [
+      { id: "hookOrScript", label: "Hook or script you already have", type: "textarea", required: true, placeholder: "Paste your hook, script, or talking points" },
+      { id: "creatorDescription", label: "Creator description (if you have one in mind)", type: "text", required: false, placeholder: "e.g. Filipino male, 30s, office setting" },
+      { id: "cta", label: "Call to action", type: "text", required: true, placeholder: "e.g. Book a free consultation" },
+      { id: "platform", label: "Platform", type: "select", required: true, options: ["Facebook Reels", "Instagram Reels", "TikTok", "Multiple"] }
+    ],
+    carousel: [
+      { id: "storyAngle", label: "Story or sequence you want to tell", type: "textarea", required: true, placeholder: "e.g. Problem, product, proof, offer" },
+      { id: "cardCount", label: "Number of cards", type: "select", required: true, options: ["3", "4", "5"] },
+      { id: "cta", label: "Call to action", type: "text", required: true, placeholder: "e.g. Shop the collection" }
+    ],
+    variations: [
+      { id: "baseAngle", label: "Base angle or hook to build variations from", type: "textarea", required: true, placeholder: "e.g. Convenience-led angle for busy office admins" },
+      { id: "variationCount", label: "Number of variations", type: "select", required: true, options: ["2", "3", "4"] },
+      { id: "cta", label: "Call to action", type: "text", required: true, placeholder: "e.g. Message us to get started" }
+    ]
+  };
+
+  function renderDynamicFields(outputType) {
+    var container = document.getElementById("dynamicFields");
+    container.innerHTML = "";
+    var fields = FIELD_SETS[outputType] || [];
+    fields.forEach(function (f) {
+      var wrap = document.createElement("div");
+      wrap.className = "field";
+      var label = document.createElement("label");
+      label.setAttribute("for", "df_" + f.id);
+      label.textContent = f.label + (f.required ? "" : " (optional)");
+      wrap.appendChild(label);
+      var input;
+      if (f.type === "textarea") {
+        input = document.createElement("textarea");
+      } else if (f.type === "select") {
+        input = document.createElement("select");
+        (f.options || []).forEach(function (opt) {
+          var o = document.createElement("option");
+          o.value = opt; o.textContent = opt;
+          input.appendChild(o);
+        });
+      } else {
+        input = document.createElement("input");
+        input.type = "text";
+        if (f.placeholder) input.placeholder = f.placeholder;
+      }
+      input.id = "df_" + f.id;
+      input.dataset.fieldId = f.id;
+      input.dataset.required = f.required ? "true" : "false";
+      input.dataset.label = f.label;
+      wrap.appendChild(input);
+      container.appendChild(wrap);
+    });
+  }
+
+  // ---- Review my creative brief (client-side, deterministic — no fabricated backend) ----
+  var RESTRICTED_CLAIM_PATTERNS = [
+    { re: /\bguarantee(d)?\b/i, note: "\"Guaranteed\" implies a formal guarantee — remove unless you have a documented policy." },
+    { re: /\b100%\b/i, note: "\"100%\" is an absolute claim — soften it or provide the specific proof behind it." },
+    { re: /\b#1\b|\bnumber one\b|\bbest in\b/i, note: "Ranking or superiority claims (\"#1\", \"best in...\") need a verifiable source." },
+    { re: /\bclinically proven\b|\bscientifically proven\b/i, note: "\"Clinically/scientifically proven\" requires a citation or study reference." },
+    { re: /\bmoney[- ]back\b/i, note: "A money-back promise should match an actual refund policy you can honor." },
+    { re: /\bfree\b/i, note: "\"Free\" should point to a real, currently active offer — confirm it's not fabricated." },
+    { re: /\bas seen on\b/i, note: "\"As seen on...\" implies press or media coverage — confirm it's real before using it." }
+  ];
+
+  document.getElementById("reviewBriefBtn").addEventListener("click", function () {
+    var inputs = [].slice.call(document.querySelectorAll("#dynamicFields [data-field-id]"));
+    var missing = [];
+    var claims = [];
+    var corrections = [];
+    var summaryLines = ["Output type: " + selectedOutput, "Help level: " + selectedHelp, ""];
+
+    inputs.forEach(function (input) {
+      var value = (input.value || "").trim();
+      var label = input.dataset.label;
+      var required = input.dataset.required === "true";
+      summaryLines.push(label + ": " + (value || "(not provided)"));
+
+      if (required && !value) {
+        missing.push(label + " is required for this output type.");
+      }
+      if (value) {
+        RESTRICTED_CLAIM_PATTERNS.forEach(function (p) {
+          if (p.re.test(value)) claims.push("In \"" + label + "\": " + p.note);
+        });
+        if ((input.tagName === "TEXTAREA") && value.length > 400) {
+          corrections.push(label + " is quite long (" + value.length + " characters) — consider tightening it before production.");
+        }
+      }
+    });
+
+    if (selectedHelp === "light" && missing.length === 0 && claims.length === 0) {
+      corrections.push("Brief looks complete for a light review — no gaps or flagged claims found.");
+    }
+
+    renderReviewList("reviewMissing", missing, "Nothing missing.");
+    renderReviewList("reviewClaims", claims, "No unsupported claims found.");
+    renderReviewList("reviewCorrections", corrections, "No corrections suggested.");
+    document.getElementById("reviewSummary").textContent = summaryLines.join("\n");
+    document.getElementById("briefReview").hidden = false;
+    document.getElementById("briefReview").scrollIntoView({ behavior: "smooth", block: "start" });
+  });
+
+  function renderReviewList(elId, items, emptyText) {
+    var el = document.getElementById(elId);
+    el.innerHTML = "";
+    if (!items.length) {
+      var li = document.createElement("li");
+      li.className = "review-empty";
+      li.textContent = emptyText;
+      el.appendChild(li);
+      return;
+    }
+    items.forEach(function (text) {
+      var li = document.createElement("li");
+      li.textContent = text;
+      el.appendChild(li);
+    });
+  }
+
+  document.getElementById("continueToProductionBtn").addEventListener("click", function (e) {
+    e.preventDefault();
+  });
+})();
+</script>
+</body>
+</html>

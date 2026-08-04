@@ -1,0 +1,132 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Sign in — AIStaff Super Admin</title>
+<meta name="robots" content="noindex, nofollow" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=DM+Mono:wght@500&family=Manrope:wght@500;600;700&display=swap" rel="stylesheet" />
+<style>
+  :root { --night:#030810; --cyan:#24a9ff; --ice:#c7ecff; }
+  * { box-sizing: border-box; }
+  body { margin: 0; min-height: 100vh; display: grid; place-items: center; background: var(--night); color: var(--ice); font: 15px/1.6 "Manrope", sans-serif; }
+  .card { width: min(380px, calc(100vw - 40px)); padding: 34px 30px; border-radius: 12px; border: 1px solid rgba(117,161,188,.22); background: linear-gradient(160deg, rgba(19,39,54,.7), rgba(3,8,16,.9)); }
+  .kicker { color: var(--cyan); font: 600 11px "DM Mono"; letter-spacing: .14em; text-transform: uppercase; margin: 0 0 10px; }
+  h1 { margin: 0 0 22px; color: #fff; font: 600 22px "Space Grotesk"; letter-spacing: -.01em; }
+  label { display: block; margin: 0 0 6px; color: #d9f1ff; font: 600 13px "Manrope"; }
+  input { width: 100%; min-height: 44px; margin-bottom: 16px; padding: 10px 13px; border-radius: 6px; border: 1px solid rgba(117,161,188,.3); background: rgba(4,13,21,.85); color: #eaf6ff; font: 14.5px "Manrope"; outline: none; }
+  input:focus { border-color: var(--cyan); box-shadow: 0 0 0 2px rgba(36,169,255,.18); }
+  .totp-row { display: none; }
+  .totp-row.show { display: block; }
+  button { width: 100%; min-height: 46px; margin-top: 6px; border: none; border-radius: 6px; background: var(--cyan); color: #00131f; font: 700 14.5px "Manrope"; cursor: pointer; }
+  button:disabled { opacity: .55; cursor: not-allowed; }
+  .error { color: #ff9d9d; font: 600 13px "Manrope"; margin: -6px 0 14px; min-height: 1em; }
+  .footnote { margin-top: 18px; color: #587789; font: 13px "Manrope"; text-align: center; }
+  a { color: var(--cyan); }
+  :focus-visible { outline: 2px solid var(--cyan); outline-offset: 2px; }
+</style>
+</head>
+<body>
+<form class="card" id="loginForm" novalidate>
+  <p class="kicker">AIStaff · Internal</p>
+  <h1>Super Admin sign in</h1>
+
+  <div id="credentialsStep">
+    <label for="email">Email</label>
+    <input id="email" name="email" type="email" autocomplete="username" required />
+    <label for="password">Password</label>
+    <input id="password" name="password" type="password" autocomplete="current-password" required />
+  </div>
+
+  <div class="totp-row" id="totpRow">
+    <label for="totp">6-digit authentication code</label>
+    <input id="totp" name="totp" type="text" inputmode="numeric" autocomplete="one-time-code" maxlength="6" />
+  </div>
+
+  <p class="error" id="errorMessage" role="alert"></p>
+  <button type="submit" id="submitBtn">Sign in</button>
+  <p class="footnote">This area is restricted to authorized AIStaff personnel.<br /><a href="/">Return to AIStaff.click</a></p>
+</form>
+
+<script>
+  const form = document.getElementById("loginForm");
+  const errorEl = document.getElementById("errorMessage");
+  const submitBtn = document.getElementById("submitBtn");
+  const totpRow = document.getElementById("totpRow");
+  let mfaStage = false;
+
+  form.addEventListener("submit", async (event) => {
+    event.preventDefault();
+    errorEl.textContent = "";
+    submitBtn.disabled = true;
+    try {
+      if (!mfaStage) {
+        const res = await fetch("/api/auth/login", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          credentials: "include",
+          body: JSON.stringify({
+            email: document.getElementById("email").value.trim(),
+            password: document.getElementById("password").value
+          })
+        });
+        if (!res.ok) {
+          const body = await res.json().catch(() => ({}));
+          errorEl.textContent = body.error || "Invalid email or password.";
+          return;
+        }
+      }
+
+      // Whether or not this account requires MFA is only knowable once
+      // authenticated — check /api/superadmin/me now that the session
+      // cookie is set.
+      const meRes = await fetch("/api/superadmin/me", { credentials: "include" });
+      if (meRes.status === 403) {
+        errorEl.textContent = "Your account does not have Super Admin access.";
+        return;
+      }
+      if (!meRes.ok) {
+        errorEl.textContent = "Sign-in failed. Please try again.";
+        return;
+      }
+      const me = await meRes.json();
+
+      if (me.user.mfaEnabled && !mfaStage) {
+        mfaStage = true;
+        totpRow.classList.add("show");
+        document.getElementById("credentialsStep").style.display = "none";
+        submitBtn.textContent = "Verify code";
+        errorEl.textContent = "Enter the 6-digit code from your authenticator app.";
+        return;
+      }
+
+      if (mfaStage) {
+        const challengeRes = await fetch("/api/superadmin/mfa/challenge", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          credentials: "include",
+          body: JSON.stringify({ token: document.getElementById("totp").value.trim() })
+        });
+        if (!challengeRes.ok) {
+          const body = await challengeRes.json().catch(() => ({}));
+          errorEl.textContent = body.error || "Incorrect code.";
+          return;
+        }
+      }
+
+      const requested = new URLSearchParams(window.location.search).get("redirect");
+      // Only ever follow the redirect param back into /superadmin/* — never
+      // treat it as an arbitrary open-redirect target.
+      const destination = requested && requested.startsWith("/superadmin") ? requested : "/superadmin";
+      window.location.href = destination;
+    } catch (err) {
+      errorEl.textContent = "Something went wrong. Please try again.";
+    } finally {
+      submitBtn.disabled = false;
+    }
+  });
+</script>
+</body>
+</html>

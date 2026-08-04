@@ -32,7 +32,13 @@ async function requireAuth(req, res, next) {
     const payload = jwt.verify(token, jwtSecret());
     const user = await prisma.user.findFirst({
       where: { id: payload.sub, status: "active" },
-      select: { id: true, company_id: true, name: true, email: true, role: true, status: true }
+      select: {
+        id: true, company_id: true, name: true, email: true, role: true, status: true,
+        // Read fresh from the database on every request — never trust the JWT
+        // payload or any client-supplied value for these. Safe to select
+        // broadly here since none of these are secrets (no hashes/tokens).
+        platform_role: true, mfa_enabled: true, last_login_at: true
+      }
     });
     if (!user) return res.status(401).json({ error: "Invalid session" });
 
@@ -48,7 +54,12 @@ function setSessionCookie(res, token) {
   res.cookie(COOKIE_NAME, token, {
     httpOnly: true,
     sameSite: "lax",
-    secure: false,
+    // Was previously hardcoded to `false` in every environment. Made
+    // environment-aware so production deployments (NODE_ENV=production)
+    // require HTTPS-only transmission, while local dev over plain HTTP
+    // still works. Set NODE_ENV=production in the deployed environment for
+    // this to take effect.
+    secure: process.env.NODE_ENV === "production",
     maxAge: 8 * 60 * 60 * 1000
   });
 }
