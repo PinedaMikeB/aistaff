@@ -1,0 +1,446 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Create a Video Ad | Brandee | AIStaff</title>
+<meta name="description" content="Upload your product, choose a video style, and generate a free 3-second teaser preview with Brandee." />
+<link rel="canonical" href="https://aistaff.click/agents/brandee/video/" />
+<meta name="robots" content="index, follow" />
+<link rel="icon" href="/aistaff-logo-square.png" type="image/png" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700;800&family=DM+Mono:wght@500&family=Manrope:wght@500;600;700;800&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="/style.css" />
+<style>
+  .flow-page { overflow: visible !important; }
+  .flow-main { width: min(1080px, calc(100% - 32px)); margin: 0 auto; padding: clamp(90px,12vh,120px) 0 100px; }
+  .flow-header { text-align: center; margin-bottom: 34px; }
+  .flow-header h1 { color: #fff; font: 600 clamp(28px,4vw,42px)/1.15 "Space Grotesk"; letter-spacing: -.03em; margin: 10px 0 8px; }
+  .flow-header p { color: #9fc0d6; font: 15px/1.6 "Manrope"; max-width: 560px; margin: 0 auto; }
+  .flow-steps-nav { display: flex; justify-content: center; gap: 10px; margin: 20px 0 40px; flex-wrap: wrap; }
+  .flow-step-pill { padding: 7px 16px; border-radius: 999px; border: 1px solid rgba(117,161,188,.25); background: rgba(11,25,36,.5); color: #7791a3; font: 600 12px "DM Mono"; letter-spacing: .04em; }
+  .flow-step-pill.is-active { border-color: var(--cyan); color: #9edfff; background: rgba(36,169,255,.12); }
+  .flow-panel { display: none; }
+  .flow-panel.is-active { display: block; }
+  .flow-card { padding: 28px; border-radius: 10px; border: 1px solid rgba(117,161,188,.2); background: linear-gradient(145deg,rgba(19,39,54,.55),rgba(5,13,21,.85)); margin-bottom: 22px; }
+  .field-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  .field { display: flex; flex-direction: column; gap: 6px; }
+  .field.full { grid-column: 1 / -1; }
+  .field label { color: #d9f1ff; font: 600 13px "Manrope"; }
+  .field .hint { color: #6f8a9c; font: 12px "Manrope"; }
+  .field input[type="text"], .field input[type="url"], .field input[type="number"], .field select, .field textarea {
+    width: 100%; min-height: 44px; padding: 10px 12px; border-radius: 6px; border: 1px solid rgba(117,161,188,.25);
+    background: rgba(4,13,21,.8); color: #d9f1ff; outline: none; font: 14px "Manrope";
+  }
+  .field textarea { min-height: 80px; resize: vertical; }
+  .field input:focus, .field select:focus, .field textarea:focus { border-color: #39baff; box-shadow: 0 0 0 2px rgba(36,169,255,.14); }
+  .field input:focus-visible, .field select:focus-visible, .field textarea:focus-visible, button:focus-visible, a:focus-visible { outline: 2px solid var(--cyan); outline-offset: 2px; }
+  .upload-box { border: 1px dashed rgba(117,161,188,.35); border-radius: 8px; padding: 18px; text-align: center; cursor: pointer; background: rgba(4,13,21,.5); }
+  .upload-box:hover { border-color: rgba(72,193,255,.6); }
+  .upload-preview { max-width: 100%; max-height: 160px; border-radius: 6px; margin-top: 10px; display: none; }
+  .color-swatches { display: flex; gap: 8px; align-items: center; }
+  .color-swatches input[type="color"] { width: 40px; height: 40px; padding: 0; border: none; border-radius: 6px; background: none; cursor: pointer; }
+  .url-extract-row { display: flex; gap: 10px; align-items: flex-end; flex-wrap: wrap; }
+  .url-extract-row .field { flex: 1; min-width: 220px; }
+  .extract-status { color: #9edfff; font: 13px "Manrope"; margin-top: 8px; min-height: 18px; }
+  .style-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 14px; }
+  .style-card { border: 1px solid rgba(117,161,188,.2); border-radius: 8px; background: rgba(11,25,36,.5); padding: 16px; cursor: pointer; text-align: left; color: inherit; font-family: inherit; transition: border-color .15s ease, background .15s ease; }
+  .style-card:hover { border-color: rgba(72,193,255,.5); }
+  .style-card.is-selected { border-color: var(--cyan); background: rgba(36,169,255,.1); box-shadow: 0 0 0 1px rgba(36,169,255,.35); }
+  .style-card h3 { margin: 0 0 6px; color: #f4f8ff; font: 600 15px "Manrope"; }
+  .style-card p { margin: 0 0 6px; color: #86a3b7; font: 13px/1.5 "Manrope"; }
+  .style-card .best-use { color: #587789; font: 12px "Manrope"; }
+  .style-fields { margin-top: 22px; }
+  .flow-actions { display: flex; gap: 12px; justify-content: flex-end; margin-top: 22px; flex-wrap: wrap; }
+  .status-line { min-height: 20px; color: #d9f1ff; font: 13px "Manrope"; margin-top: 10px; }
+  .status-line.is-error { color: #e88; }
+  .preview-wrap { text-align: center; }
+  .preview-wrap video { max-width: 100%; border-radius: 10px; border: 1px solid rgba(117,161,188,.25); background: #000; }
+  .preview-note { color: #86a3b7; font: 13px/1.6 "Manrope"; margin-top: 12px; }
+  .concept-box { text-align: left; margin-top: 16px; padding: 16px; border-radius: 6px; background: rgba(4,13,21,.5); }
+  .concept-box dt { color: #587789; font: 600 11px "DM Mono"; text-transform: uppercase; letter-spacing: .06em; margin-top: 10px; }
+  .concept-box dd { margin: 2px 0 0; color: #d9f1ff; font: 14px/1.5 "Manrope"; }
+  .auth-form { max-width: 380px; margin: 20px auto 0; display: grid; gap: 12px; }
+  .plan-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 12px; margin-top: 18px; }
+  .plan-card { border: 1px solid rgba(117,161,188,.2); border-radius: 8px; padding: 18px; text-align: center; background: rgba(11,25,36,.5); }
+  .plan-card.featured { border-color: rgba(72,193,255,.6); }
+  .plan-card h4 { margin: 0 0 6px; color: #fff; font: 600 16px "Space Grotesk"; }
+  .plan-card b { display: block; color: var(--cyan); font: 700 18px "Space Grotesk"; margin-bottom: 10px; }
+  .provider-note { text-align: center; padding: 14px; border-radius: 6px; background: rgba(217,154,95,.12); border: 1px solid rgba(217,154,95,.3); color: #f0c99a; font: 13px/1.6 "Manrope"; }
+  @media (max-width: 760px) {
+    .field-grid, .style-grid, .plan-grid { grid-template-columns: 1fr; }
+  }
+  @media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
+</style>
+</head>
+<body class="modern-home closer-page brandee-page flow-page">
+<div id="toast" class="toast" hidden></div>
+<header class="site-header cinematic-header">
+  <a class="brand" href="/" aria-label="AIStaff home">
+    <img class="brand-logo" src="/aistaff-logo-square.png" alt="AIStaff" width="42" height="42" />
+  </a>
+  <nav class="site-nav" aria-label="Primary">
+    <a href="/agents/brandee/">Brandee</a>
+    <a href="/agents/brandee/image/">Image Ad</a>
+  </nav>
+  <div class="header-actions">
+    <a class="ghost-link" href="/admin/login">Client login</a>
+  </div>
+</header>
+
+<main class="flow-main">
+  <div class="flow-header">
+    <p class="section-kicker">Video Ad</p>
+    <h1>Create a Video Ad</h1>
+    <p>Upload your product, choose a video style, and generate a 3-second teaser before creating the full video.</p>
+  </div>
+
+  <nav class="flow-steps-nav" aria-label="Steps">
+    <span class="flow-step-pill is-active" data-step-pill="product">1. Product</span>
+    <span class="flow-step-pill" data-step-pill="style">2. Style</span>
+    <span class="flow-step-pill" data-step-pill="preview">3. Teaser</span>
+    <span class="flow-step-pill" data-step-pill="account">4. Save &amp; finish</span>
+  </nav>
+
+  <!-- STEP 1: shared product form -->
+  <section class="flow-panel is-active" data-step="product" aria-labelledby="productStepHeading">
+    <h2 id="productStepHeading" class="sr-only">Product details</h2>
+    <div class="flow-card">
+      <div class="url-extract-row">
+        <div class="field">
+          <label for="productUrl">Product listing URL (optional)</label>
+          <input type="url" id="productUrl" placeholder="https://your-store.com/products/example" />
+          <span class="hint">Ecommerce, Shopify, WooCommerce, Lazada, Shopee, or a Facebook/Instagram product post. Brandee reads only this one page.</span>
+        </div>
+        <button type="button" class="button button-soft" id="extractBtn">Fill from link</button>
+      </div>
+      <p class="extract-status" id="extractStatus" role="status" aria-live="polite"></p>
+    </div>
+
+    <div class="flow-card">
+      <div class="field-grid">
+        <div class="field full">
+          <label for="productImage">Product image *</label>
+          <div class="upload-box" id="uploadBox" tabindex="0" role="button" aria-describedby="uploadHint">
+            <span id="uploadLabel">Click or drag a product photo here</span>
+            <img id="uploadPreview" class="upload-preview" alt="Uploaded product preview" />
+          </div>
+          <input type="file" id="productImage" accept="image/png,image/jpeg,image/webp" style="display:none" />
+          <span class="hint" id="uploadHint">PNG, JPEG, or WebP. Up to 5MB.</span>
+        </div>
+        <div class="field"><label for="productName">Product name *</label><input type="text" id="productName" maxlength="150" required /></div>
+        <div class="field"><label for="targetCustomer">Target customer *</label><input type="text" id="targetCustomer" maxlength="300" required placeholder="e.g. small business owners" /></div>
+        <div class="field full"><label for="productDescription">Product description *</label><textarea id="productDescription" maxlength="1000" required></textarea></div>
+        <div class="field full"><label for="mainFeatures">Main features *</label><textarea id="mainFeatures" maxlength="600" required placeholder="List the main features, one idea per line"></textarea></div>
+        <div class="field">
+          <label for="desiredAction">Desired customer action *</label>
+          <select id="desiredAction" required>
+            <option value="buy_now">Buy now</option>
+            <option value="send_message">Send a message</option>
+            <option value="visit_product_page">Visit product page</option>
+            <option value="learn_more">Learn more</option>
+          </select>
+        </div>
+        <div class="field"><label for="preferredLanguage">Preferred language</label>
+          <select id="preferredLanguage"><option value="english">English</option><option value="filipino">Filipino</option><option value="taglish">Taglish</option></select>
+        </div>
+        <div class="field"><label for="mainBenefit">Main benefit (optional)</label><input type="text" id="mainBenefit" maxlength="200" /></div>
+        <div class="field"><label for="ctaText">Call to action text (optional)</label><input type="text" id="ctaText" maxlength="60" placeholder="e.g. Shop now" /></div>
+        <div class="field">
+          <label for="brandColor1">Brand color (optional)</label>
+          <div class="color-swatches"><input type="color" id="brandColor1" value="#0f172a" /></div>
+        </div>
+        <div class="field full"><label for="additionalNotes">Additional notes (optional)</label><textarea id="additionalNotes" maxlength="500"></textarea></div>
+      </div>
+    </div>
+    <p class="status-line" id="productFormStatus" role="status" aria-live="polite"></p>
+    <div class="flow-actions">
+      <button type="button" class="button button-primary glow-button" id="toStyleStep">Choose a video style <span>↓</span></button>
+    </div>
+  </section>
+
+  <!-- STEP 2: style picker -->
+  <section class="flow-panel" data-step="style" aria-labelledby="styleStepHeading">
+    <h2 id="styleStepHeading" class="sr-only">Choose a video style</h2>
+    <div class="flow-card">
+      <div class="style-grid" id="styleGrid" role="group" aria-label="Video ad styles"></div>
+      <div class="style-fields field-grid" id="styleFields" hidden>
+        <div class="field"><label for="hookPreference">Hook preference</label><select id="hookPreference"></select></div>
+        <div class="field"><label for="tone">Tone</label><select id="tone"></select></div>
+        <div class="field"><label for="creatorType">Creator type</label><select id="creatorType"></select></div>
+        <div class="field"><label for="settingSelect">Setting</label><select id="settingSelect"></select></div>
+      </div>
+    </div>
+    <p class="status-line" id="styleStatus" role="status" aria-live="polite"></p>
+    <div class="flow-actions">
+      <button type="button" class="button button-soft" data-back="product">Back</button>
+      <button type="button" class="button button-primary glow-button" id="generateTeaserBtn">Generate 3-Second Preview</button>
+    </div>
+  </section>
+
+  <!-- STEP 3: teaser preview -->
+  <section class="flow-panel" data-step="preview" aria-labelledby="previewStepHeading">
+    <h2 id="previewStepHeading" class="sr-only">Teaser preview</h2>
+    <div class="flow-card preview-wrap" id="previewWrap">
+      <p class="status-line" id="previewStatus" role="status" aria-live="polite">Generating your 3-second teaser…</p>
+    </div>
+    <p class="preview-note">This is a free, low-resolution, watermarked 3-second teaser — not the final video.</p>
+    <div class="flow-actions">
+      <button type="button" class="button button-soft" data-back="style">Back</button>
+      <button type="button" class="button button-primary glow-button" id="toAccountStep" hidden>Unlock the full video <span>↓</span></button>
+    </div>
+  </section>
+
+  <!-- STEP 4: registration + subscription + final generation -->
+  <section class="flow-panel" data-step="account" aria-labelledby="accountStepHeading">
+    <h2 id="accountStepHeading" class="sr-only">Save and finish</h2>
+
+    <div class="flow-card" id="registerCard">
+      <h3 style="color:#f4f8ff;font:600 18px 'Space Grotesk';margin:0 0 10px">Create a free account to save this ad</h3>
+      <p style="color:#86a3b7;font:14px/1.6 Manrope;margin:0 0 6px">Your teaser and product details are already saved to this project — creating an account just lets you come back to it and unlock the full video.</p>
+      <form class="auth-form" id="registerForm">
+        <div class="field"><label for="regName">Name</label><input type="text" id="regName" required /></div>
+        <div class="field"><label for="regEmail">Email</label><input type="text" id="regEmail" required /></div>
+        <div class="field"><label for="regPassword">Password (min 8 characters)</label><input type="password" id="regPassword" minlength="8" required /></div>
+        <button type="submit" class="button button-primary glow-button">Create account</button>
+        <p class="status-line" id="registerStatus" role="status" aria-live="polite"></p>
+      </form>
+      <p style="text-align:center;margin-top:10px"><a class="text-link" href="/admin/login">Already have an account? Sign in</a></p>
+    </div>
+
+    <div class="flow-card" id="subscribeCard" hidden>
+      <h3 style="color:#f4f8ff;font:600 18px 'Space Grotesk';margin:0 0 10px">Choose a plan to unlock your full video</h3>
+      <div class="plan-grid" id="planGrid"></div>
+      <p class="status-line" id="subscribeStatus" role="status" aria-live="polite"></p>
+    </div>
+
+    <div class="flow-card" id="finalCard" hidden>
+      <h3 style="color:#f4f8ff;font:600 18px 'Space Grotesk';margin:0 0 10px">Generate your full video</h3>
+      <button type="button" class="button button-primary glow-button" id="finalGenerateBtn">Generate full video</button>
+      <p class="status-line" id="finalStatus" role="status" aria-live="polite"></p>
+      <div class="preview-wrap" id="finalPreviewWrap"></div>
+    </div>
+  </section>
+</main>
+
+<script src="/agents/brandee/product-ad-common.js"></script>
+<script>
+(function () {
+  const $ = (sel, root) => (root || document).querySelector(sel);
+  const $$ = (sel, root) => [...(root || document).querySelectorAll(sel)];
+  const helpers = window.BrandeeProductAd;
+
+  const state = { config: null, projectId: null, styleId: null };
+
+  function setStep(step) {
+    $$(".flow-panel").forEach((p) => p.classList.toggle("is-active", p.dataset.step === step));
+    $$(".flow-step-pill").forEach((p) => p.classList.toggle("is-active", p.dataset.stepPill === step));
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  }
+  $$("[data-back]").forEach((btn) => btn.addEventListener("click", () => setStep(btn.dataset.back)));
+
+  let productImageDataUrl = null;
+  $("#uploadBox").addEventListener("click", () => $("#productImage").click());
+  $("#uploadBox").addEventListener("keydown", (e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); $("#productImage").click(); } });
+  $("#productImage").addEventListener("change", async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+    if (file.size > 5 * 1024 * 1024) { const s = $("#productFormStatus"); s.textContent = "That image is larger than 5MB. Please choose a smaller file."; s.classList.add("is-error"); return; }
+    productImageDataUrl = await helpers.fileToDataUrl(file);
+    const preview = $("#uploadPreview");
+    preview.src = productImageDataUrl;
+    preview.style.display = "block";
+    $("#uploadLabel").textContent = file.name;
+    helpers.track("product_upload_started", {});
+  });
+
+  $("#extractBtn").addEventListener("click", async () => {
+    const url = $("#productUrl").value.trim();
+    if (!url) return;
+    $("#extractStatus").textContent = "Reading this product page…";
+    const { body } = await helpers.fetchJson("/api/public/brandee/product-ads/url-extract", {
+      method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ url })
+    });
+    if (!body || !body.ok) {
+      $("#extractStatus").textContent = (body && body.message) || "Brandee could not read this product page, so she will use the information you entered.";
+      return;
+    }
+    const ex = body.extracted;
+    if (ex.productName && !$("#productName").value) $("#productName").value = ex.productName;
+    if (ex.description && !$("#productDescription").value) $("#productDescription").value = ex.description;
+    $("#extractStatus").textContent = "Found product details. Please review and edit the fields below.";
+  });
+
+  function collectSharedForm() {
+    return {
+      productImage: productImageDataUrl,
+      productName: $("#productName").value.trim(),
+      productDescription: $("#productDescription").value.trim(),
+      mainFeatures: $("#mainFeatures").value.trim(),
+      targetCustomer: $("#targetCustomer").value.trim(),
+      desiredAction: $("#desiredAction").value,
+      productListingUrl: $("#productUrl").value.trim() || null,
+      mainBenefit: $("#mainBenefit").value.trim() || null,
+      ctaText: $("#ctaText").value.trim() || null,
+      brandColors: [$("#brandColor1").value],
+      preferredLanguage: $("#preferredLanguage").value,
+      additionalNotes: $("#additionalNotes").value.trim() || null,
+      projectId: state.projectId
+    };
+  }
+
+  function validateSharedForm(form) {
+    if (!form.productImage) return "Please upload a product image.";
+    if (!form.productName) return "Please enter a product name.";
+    if (!form.productDescription) return "Please enter a product description.";
+    if (!form.mainFeatures) return "Please list the main features.";
+    if (!form.targetCustomer) return "Please enter the target customer.";
+    return null;
+  }
+
+  $("#toStyleStep").addEventListener("click", () => {
+    const form = collectSharedForm();
+    const error = validateSharedForm(form);
+    const statusEl = $("#productFormStatus");
+    if (error) { statusEl.textContent = error; statusEl.classList.add("is-error"); return; }
+    statusEl.textContent = ""; statusEl.classList.remove("is-error");
+    helpers.track("product_upload_completed", {});
+    renderStyles();
+    setStep("style");
+  });
+
+  async function loadConfig() {
+    const { body } = await helpers.fetchJson("/api/public/brandee/product-ads/config");
+    state.config = body;
+  }
+
+  function fillSelect(id, values) {
+    const el = $(`#${id}`);
+    el.innerHTML = values.map((v) => `<option value="${v}">${v.replace(/_/g, " ")}</option>`).join("");
+  }
+
+  function renderStyles() {
+    const grid = $("#styleGrid");
+    grid.innerHTML = "";
+    (state.config.videoStyles || []).forEach((s) => {
+      const card = document.createElement("button");
+      card.type = "button";
+      card.className = "style-card";
+      card.innerHTML = `<h3>${s.name}</h3><p>${s.description}</p><p class="best-use">${s.bestUse} · ~${s.suggestedLengthSeconds}s</p>`;
+      card.addEventListener("click", () => selectStyle(s));
+      grid.appendChild(card);
+    });
+    fillSelect("hookPreference", state.config.hookPreferences || []);
+    fillSelect("tone", state.config.tones || []);
+    fillSelect("creatorType", state.config.creatorTypes || []);
+    fillSelect("settingSelect", state.config.settings || []);
+  }
+
+  function selectStyle(style) {
+    state.styleId = style.id;
+    $$(".style-card").forEach((c) => c.classList.toggle("is-selected", c.querySelector("h3").textContent === style.name));
+    $("#styleFields").hidden = false;
+    helpers.track("video_style_selected", { styleId: style.id });
+  }
+
+  $("#generateTeaserBtn").addEventListener("click", async () => {
+    const statusEl = $("#styleStatus");
+    if (!state.styleId) { statusEl.textContent = "Please choose a video style."; statusEl.classList.add("is-error"); return; }
+    statusEl.textContent = ""; statusEl.classList.remove("is-error");
+
+    setStep("preview");
+    const previewWrap = $("#previewWrap");
+    previewWrap.innerHTML = '<p class="status-line" id="previewStatus" role="status" aria-live="polite">Generating your 3-second teaser…</p>';
+    helpers.track("video_preview_requested", { styleId: state.styleId });
+
+    const form = {
+      ...collectSharedForm(),
+      styleId: state.styleId,
+      hookPreference: $("#hookPreference").value,
+      tone: $("#tone").value,
+      creatorType: $("#creatorType").value,
+      setting: $("#settingSelect").value
+    };
+    const { body } = await helpers.fetchJson("/api/public/brandee/product-ads/video/preview", {
+      method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(form)
+    });
+    const statusLine = $("#previewStatus") || document.createElement("p");
+    if (!body || !body.ok) {
+      const message = (body && body.error) || "Brandee could not generate the video preview this time. Your project has been saved — try again shortly.";
+      previewWrap.innerHTML = `<p class="status-line is-error">${message}</p>`;
+      if (body && body.projectId) state.projectId = body.projectId;
+      helpers.track("preview_failed", { styleId: state.styleId });
+      return;
+    }
+    state.projectId = body.projectId;
+    previewWrap.innerHTML = `
+      <video src="${body.url}" controls autoplay loop muted playsinline></video>
+      <dl class="concept-box">
+        <dt>Selected hook</dt><dd>${body.hookText || "—"}</dd>
+        <dt>Concept</dt><dd>${body.concept || "—"}</dd>
+        <dt>Proposed final length</dt><dd>${(state.config.plans[0] && state.config.plans[0].videoMaxLengthSeconds) || 15} seconds (plan-dependent)</dd>
+      </dl>`;
+    $("#toAccountStep").hidden = false;
+    helpers.track("video_preview_completed", { styleId: state.styleId });
+  });
+
+  $("#toAccountStep").addEventListener("click", () => { helpers.track("registration_prompt_shown", {}); setStep("account"); });
+
+  $("#registerForm").addEventListener("submit", async (e) => {
+    e.preventDefault();
+    helpers.track("registration_started", {});
+    const payload = { name: $("#regName").value.trim(), email: $("#regEmail").value.trim(), password: $("#regPassword").value, projectId: state.projectId };
+    const { body, ok } = await helpers.fetchJson("/api/auth/register", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(payload) });
+    const statusEl = $("#registerStatus");
+    if (!ok || !body || !body.ok) { statusEl.textContent = (body && body.error) || "Could not create your account."; statusEl.classList.add("is-error"); return; }
+    statusEl.textContent = "Account created.";
+    helpers.track("registration_completed", {});
+    $("#registerCard").hidden = true;
+    await loadPlans();
+    $("#subscribeCard").hidden = false;
+  });
+
+  async function loadPlans() {
+    const grid = $("#planGrid");
+    grid.innerHTML = "";
+    (state.config.plans || []).forEach((plan, i) => {
+      const card = document.createElement("div");
+      card.className = "plan-card" + (i === 1 ? " featured" : "");
+      card.innerHTML = `<h4>${plan.name}</h4><b>₱${plan.monthlyPrice}/mo</b><p style="color:#86a3b7;font:13px Manrope;margin:0 0 12px">${plan.imageCreditsPerMonth} image ads · ${plan.videoCreditsPerMonth} full videos</p><button type="button" class="button button-primary glow-button" data-plan="${plan.slug}">Choose ${plan.name}</button>`;
+      grid.appendChild(card);
+    });
+    $$("[data-plan]", grid).forEach((btn) => btn.addEventListener("click", () => subscribe(btn.dataset.plan)));
+  }
+
+  async function subscribe(planSlug) {
+    helpers.track("subscription_started", { planSlug });
+    const { body, ok } = await helpers.fetchJson("/api/brandee/product-ads/subscribe", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ planSlug }) });
+    const statusEl = $("#subscribeStatus");
+    if (!ok || !body || !body.ok) { statusEl.textContent = (body && body.error) || "Could not start your subscription."; statusEl.classList.add("is-error"); return; }
+    statusEl.textContent = body.message || "Subscribed.";
+    helpers.track("subscription_completed", { planSlug });
+    $("#subscribeCard").hidden = true;
+    $("#finalCard").hidden = false;
+  }
+
+  $("#finalGenerateBtn").addEventListener("click", async () => {
+    helpers.track("final_generation_started", { kind: "video" });
+    const statusEl = $("#finalStatus");
+    statusEl.textContent = "Generating your full video…";
+    const { body, ok } = await helpers.fetchJson("/api/brandee/product-ads/video/final", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ projectId: state.projectId }) });
+    if (!ok || !body || !body.ok) { statusEl.textContent = (body && body.error) || "Brandee could not generate the video this time. Your project has been saved — try again shortly."; statusEl.classList.add("is-error"); return; }
+    statusEl.textContent = "";
+    $("#finalPreviewWrap").innerHTML = `<video src="${body.url}" controls playsinline></video>`;
+    helpers.track("final_generation_completed", { kind: "video" });
+  });
+
+  loadConfig().then(() => {
+    if (state.config && state.config.videoProvider && state.config.videoProvider.available === false) {
+      $("#generateTeaserBtn").insertAdjacentHTML("beforebegin", '<p class="provider-note">Brandee\'s video preview isn\'t available in this environment right now. You can still fill in your product and style — try generating again shortly.</p>');
+    }
+  });
+})();
+</script>
+</body>
+</html>

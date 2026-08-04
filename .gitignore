@@ -9,5 +9,8 @@ remotion/node_modules
 data/marketing-state.json
 data/brandee-plans.json
 data/brandee-run-log.json
+data/brandee-product-ad-projects.json
+data/brandee-product-ad-anon-limits.json
+data/brandee-analytics-events.json
 data/.admin-storage-check
 data/.admin-write-probe

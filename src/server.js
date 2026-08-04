@@ -64,6 +64,18 @@ const { getExtractionConfig, getPlannerConfig } = require("./brandee/modelConfig
 const { BrandeeError, toBrandeeError } = require("./brandee/errors");
 const { savePlan, getPlan } = require("./brandee/store");
 const { recordRun: recordBrandeeRun, listRuns: listBrandeeRuns, getRunStats: getBrandeeRunStats } = require("./admin/brandeeRunLog");
+const { ImageAdRequestSchema, VideoAdRequestSchema, ProductUrlExtractRequestSchema, hasRealTestimonial } = require("./brandee/productAdSchemas");
+const { listAvailableTemplates, getImageAdTemplate, isTemplateAvailable } = require("./brandee/imageAdTemplates");
+const { listVideoAdStyles, getVideoAdStyle, HOOK_PREFERENCES, TONES, CREATOR_TYPES, SETTINGS } = require("./brandee/videoAdStyles");
+const { listPlans: listBrandeePlans, getPlan: getBrandeePlan, ANONYMOUS_LIMITS: BRANDEE_ANON_LIMITS, PRICING_QUANTITIES_ARE_PLACEHOLDERS } = require("./brandee/pricingConfig");
+const { validateImageDataUrl } = require("./brandee/mediaValidation");
+const { extractProductFromUrl } = require("./brandee/productUrlExtractor");
+const { renderImageAdSvg } = require("./brandee/imageAdRenderer");
+const { probeVideoProviderAvailability, generateVideoTeaser, generateFinalVideo } = require("./brandee/videoTeaserRenderer");
+const productAdProjectStore = require("./brandee/productAdProjectStore");
+const { registerAccount, RegistrationError } = require("./brandee/accountRegistration");
+const { ensureBrandeeProductAdsCatalog, subscribeUserToPlan, getActiveBrandeeSubscriptionForUser, requireBrandeeSubscription } = require("./brandee/productAdBilling");
+const { track: trackBrandeeEvent } = require("./brandee/analyticsEvents");
 const { getCreativeBrainStatus, validateAllResources, RESOURCE_VALIDATORS } = require("./admin/creativeBrain");
 const systemStatus = require("./admin/systemStatus");
 const { recordAuditEvent, listAuditLogs, AUDIT_ACTIONS } = require("./admin/auditLog");
@@ -144,6 +156,13 @@ app.post("/api/webhooks/stripe", express.raw({ type: "application/json", limit: 
     res.status(500).json({ error: "Webhook processing failed" });
   });
 });
+
+// Brandee product-ad routes accept base64 product images in the JSON body,
+// larger than the app-wide 1MB limit below — this path-scoped parser must
+// be registered BEFORE the general one so it runs first for these two path
+// prefixes; body-parser skips re-parsing a request whose body it already
+// parsed, so the general 1MB limit never truncates/rejects these requests.
+app.use(["/api/public/brandee/product-ads", "/api/brandee/product-ads"], express.json({ limit: "24mb" }));
 
 app.use(express.json({ limit: "1mb" }));
 app.use(express.urlencoded({ extended: true }));
@@ -1435,6 +1454,341 @@ app.get("/api/public/brandee/plan/:planId", asyncHandler(async (req, res) => {
 
 app.get("/agents/brandee/plan/:planId", (req, res) => {
   res.sendFile(path.join(__dirname, "..", "public", "agents", "brandee", "plan", "index.html"));
+});
+
+// ===========================================================================
+// Brandee product-ad MVP (image + video ad creation from an uploaded
+// product) — "Upload your product. Brandee turns it into an ad."
+//
+// Reuses: the SSRF-safe fetch layer (websiteAnalyzer.js), the dependency-
+// free HTML parser (crawler.js parseHtmlDocument), the Brandee session
+// cookie helper (getOrSetBrandeeSessionId), the existing auth primitives
+// (hashPassword/signSession/setSessionCookie/requireAuth), and the existing
+// Product/PricingPlan/Customer/Order/Subscription billing tables. See
+// src/brandee/productAd*.js for the implementation modules.
+// ===========================================================================
+
+// Product images arrive as base64 data URLs in the JSON body — the larger
+// (24mb) body-size limit for these routes is registered globally, path-
+// scoped, near the top of the file (see the express.json call right before
+// the app-wide 1MB default), so it runs before the general limit would
+// reject the request.
+
+const productAdPreviewRateLimiter = createRateLimiter({ windowMs: 10 * 60 * 1000, max: 20 });
+
+function requireProductAdRateLimit(req, res, next) {
+  const ip = req.ip || req.headers["x-forwarded-for"] || "unknown";
+  const result = productAdPreviewRateLimiter.check(ip);
+  if (!result.allowed) {
+    return res.status(429).json({ error: "Too many requests. Please wait a moment and try again." });
+  }
+  next();
+}
+
+app.get("/api/public/brandee/product-ads/config", asyncHandler(async (req, res) => {
+  res.json({
+    templates: listAvailableTemplates({ hasTestimonial: false }),
+    videoStyles: listVideoAdStyles(),
+    plans: listBrandeePlans(),
+    pricingQuantitiesArePlaceholders: PRICING_QUANTITIES_ARE_PLACEHOLDERS,
+    hookPreferences: HOOK_PREFERENCES,
+    tones: TONES,
+    creatorTypes: CREATOR_TYPES,
+    settings: SETTINGS,
+    desiredActions: ["buy_now", "send_message", "visit_product_page", "learn_more"],
+    videoProvider: probeVideoProviderAvailability()
+  });
+}));
+
+// PART 21 — a handful of funnel events (landing viewed, image/video
+// selected, template/style selected, pricing viewed) happen client-side
+// before any form submission reaches a server route that could log them
+// itself, so the client posts them here. Only names in ALLOWED_EVENTS are
+// ever accepted; anything else is silently dropped by track() itself.
+app.post("/api/public/brandee/product-ads/track", requireProductAdRateLimit, (req, res) => {
+  const body = req.body || {};
+  const anonymousSessionId = getOrSetBrandeeSessionId(req, res);
+  trackBrandeeEvent(String(body.event || ""), body.properties || {}, { anonymousSessionId, userId: req.user?.id || null });
+  res.status(204).end();
+});
+
+app.post("/api/public/brandee/product-ads/url-extract", requireProductAdRateLimit, asyncHandler(async (req, res) => {
+  let body;
+  try {
+    body = ProductUrlExtractRequestSchema.parse(req.body);
+  } catch (error) {
+    return res.status(400).json({ ok: false, error: "Please enter a valid product page link." });
+  }
+  const result = await extractProductFromUrl(body.url);
+  if (!result.ok) {
+    return res.json({ ok: false, reason: result.reason, message: result.message });
+  }
+  res.json({ ok: true, extracted: result.extracted });
+}));
+
+function requireValidImages(form) {
+  const productImageCheck = validateImageDataUrl(form.productImage);
+  if (!productImageCheck.ok) return { field: "productImage", ...productImageCheck };
+  if (form.logo) {
+    const logoCheck = validateImageDataUrl(form.logo);
+    if (!logoCheck.ok) return { field: "logo", ...logoCheck };
+  }
+  for (const [i, img] of (form.additionalProductImages || []).entries()) {
+    const check = validateImageDataUrl(img);
+    if (!check.ok) return { field: `additionalProductImages[${i}]`, ...check };
+  }
+  return null;
+}
+
+app.post("/api/public/brandee/product-ads/image/preview", requireProductAdRateLimit, asyncHandler(async (req, res) => {
+  const anonymousSessionId = getOrSetBrandeeSessionId(req, res);
+  let form;
+  try {
+    form = ImageAdRequestSchema.parse(req.body);
+  } catch (error) {
+    return res.status(400).json({ ok: false, error: "Please complete the required product details.", issues: error?.issues?.slice(0, 8) });
+  }
+
+  const imageError = requireValidImages(form);
+  if (imageError) return res.status(400).json({ ok: false, error: "One of the uploaded images could not be used.", detail: imageError });
+
+  const hasTestimonial = hasRealTestimonial(form);
+  if (!isTemplateAvailable(form.templateId, { hasTestimonial })) {
+    return res.status(400).json({ ok: false, error: "That template isn't available yet — it requires a real testimonial." });
+  }
+  const template = getImageAdTemplate(form.templateId);
+  if (!template) return res.status(400).json({ ok: false, error: "Unknown template." });
+  for (const field of template.fields) {
+    if (field.required && !form.templateFields?.[field.key]) {
+      return res.status(400).json({ ok: false, error: `"${field.label}" is required for the ${template.name} template.` });
+    }
+  }
+
+  const userId = req.user?.id || null;
+  let project = form.projectId ? productAdProjectStore.getProject(form.projectId) : null;
+  if (!project) project = productAdProjectStore.createProject({ kind: "image", anonymousSessionId: userId ? null : anonymousSessionId, userId, product: form });
+
+  if (!userId) {
+    if (!productAdProjectStore.canGenerateAnonymousPreview(anonymousSessionId, "image")) {
+      return res.status(403).json({ ok: false, code: "ANONYMOUS_PREVIEW_LIMIT_REACHED", error: "You've used your free image preview. Create a free account to keep going." });
+    }
+  }
+
+  trackBrandeeEvent("image_preview_requested", { templateId: form.templateId }, { anonymousSessionId, userId });
+
+  const rendered = renderImageAdSvg({ templateId: form.templateId, templateFields: form.templateFields, form, watermark: true });
+
+  if (!userId) productAdProjectStore.recordAnonymousPreview(anonymousSessionId, "image");
+  productAdProjectStore.updateProject(project.id, {
+    templateId: form.templateId,
+    templateFields: form.templateFields,
+    product: form,
+    preview: { generatedAt: new Date().toISOString(), watermarked: true, svg: rendered.svg },
+    status: "previewed"
+  });
+
+  trackBrandeeEvent("image_preview_completed", { templateId: form.templateId }, { anonymousSessionId, userId });
+
+  res.json({ ok: true, projectId: project.id, svg: rendered.svg, width: rendered.width, height: rendered.height, requiresRegistration: !userId });
+}));
+
+app.post("/api/public/brandee/product-ads/video/preview", requireProductAdRateLimit, asyncHandler(async (req, res) => {
+  const anonymousSessionId = getOrSetBrandeeSessionId(req, res);
+  let form;
+  try {
+    form = VideoAdRequestSchema.parse(req.body);
+  } catch (error) {
+    return res.status(400).json({ ok: false, error: "Please complete the required product details.", issues: error?.issues?.slice(0, 8) });
+  }
+
+  const imageError = requireValidImages(form);
+  if (imageError) return res.status(400).json({ ok: false, error: "One of the uploaded images could not be used.", detail: imageError });
+
+  const style = getVideoAdStyle(form.styleId);
+  if (!style) return res.status(400).json({ ok: false, error: "Unknown video style." });
+
+  const userId = req.user?.id || null;
+  let project = form.projectId ? productAdProjectStore.getProject(form.projectId) : null;
+  if (!project) project = productAdProjectStore.createProject({ kind: "video", anonymousSessionId: userId ? null : anonymousSessionId, userId, product: form });
+
+  if (!userId) {
+    if (!productAdProjectStore.canGenerateAnonymousPreview(anonymousSessionId, "video")) {
+      return res.status(403).json({ ok: false, code: "ANONYMOUS_PREVIEW_LIMIT_REACHED", error: "You've used your free video preview. Create a free account to keep going." });
+    }
+  }
+
+  trackBrandeeEvent("video_preview_requested", { styleId: form.styleId }, { anonymousSessionId, userId });
+
+  const hookText = form.hookPreference ? `${form.mainBenefit || form.productName} — ${form.hookPreference}` : (form.mainBenefit || form.productName);
+  const result = await generateVideoTeaser({
+    projectId: project.id,
+    styleId: form.styleId,
+    hookText,
+    headline: form.productName,
+    ctaText: form.ctaText || "Learn more",
+    productImageDataUrl: form.productImage,
+    brandColor: (form.brandColors && form.brandColors[0]) || "#0f172a"
+  });
+
+  if (!result.ok) {
+    trackBrandeeEvent("preview_failed", { styleId: form.styleId, reason: result.reason }, { anonymousSessionId, userId });
+    productAdProjectStore.updateProject(project.id, { styleId: form.styleId, videoFields: form, product: form, status: "draft" });
+    return res.status(503).json({ ok: false, projectId: project.id, reason: result.reason, error: result.message });
+  }
+
+  if (!userId) productAdProjectStore.recordAnonymousPreview(anonymousSessionId, "video");
+  productAdProjectStore.updateProject(project.id, {
+    styleId: form.styleId,
+    videoFields: form,
+    product: form,
+    preview: { generatedAt: new Date().toISOString(), watermarked: true, url: result.relativeUrl, durationSeconds: result.durationSeconds },
+    status: "previewed"
+  });
+
+  trackBrandeeEvent("video_preview_completed", { styleId: form.styleId }, { anonymousSessionId, userId });
+
+  res.json({
+    ok: true,
+    projectId: project.id,
+    url: result.relativeUrl,
+    durationSeconds: result.durationSeconds,
+    hookText,
+    concept: style.description,
+    requiresRegistration: !userId
+  });
+}));
+
+app.get("/api/public/brandee/product-ads/project/:id", asyncHandler(async (req, res) => {
+  const anonymousSessionId = req.cookies?.[BRANDEE_SESSION_COOKIE] || null;
+  const project = productAdProjectStore.getProject(req.params.id);
+  if (!project) return res.status(404).json({ ok: false, error: "Project not found." });
+  const owns = (req.user && project.userId === req.user.id) || (!project.userId && project.anonymousSessionId === anonymousSessionId);
+  if (!owns) return res.status(403).json({ ok: false, error: "You don't have access to this project." });
+  res.json({ ok: true, project });
+}));
+
+app.post("/api/auth/register", asyncHandler(async (req, res) => {
+  const body = z.object({
+    name: z.string().min(1),
+    email: z.string().email(),
+    password: z.string().min(8),
+    companyName: z.string().optional().nullable(),
+    projectId: z.string().optional().nullable()
+  }).parse(req.body);
+
+  trackBrandeeEvent("registration_started", {}, {});
+
+  let user;
+  try {
+    user = await registerAccount(body);
+  } catch (error) {
+    if (error instanceof RegistrationError) {
+      return res.status(400).json({ ok: false, code: error.code, error: error.message });
+    }
+    throw error;
+  }
+
+  const token = signSession(user);
+  setSessionCookie(res, token);
+
+  if (body.projectId) {
+    const project = productAdProjectStore.getProject(body.projectId);
+    const anonymousSessionId = req.cookies?.[BRANDEE_SESSION_COOKIE] || null;
+    if (project && !project.userId && project.anonymousSessionId === anonymousSessionId) {
+      productAdProjectStore.claimProjectForUser(body.projectId, user.id);
+    }
+  }
+
+  trackBrandeeEvent("registration_completed", {}, { userId: user.id });
+
+  res.json({ ok: true, user: { id: user.id, company_id: user.company_id, name: user.name, email: user.email, role: user.role } });
+}));
+
+app.get("/api/brandee/product-ads/subscription-status", requireAuth, asyncHandler(async (req, res) => {
+  const subscription = await getActiveBrandeeSubscriptionForUser(req.user.id);
+  res.json({ ok: true, active: Boolean(subscription), subscription });
+}));
+
+app.post("/api/brandee/product-ads/subscribe", requireAuth, asyncHandler(async (req, res) => {
+  const body = z.object({ planSlug: z.string().min(1), billingFrequency: z.enum(["monthly", "annual"]).default("monthly") }).parse(req.body);
+  const plan = getBrandeePlan(body.planSlug);
+  if (!plan) return res.status(400).json({ ok: false, error: "Selected plan is not available." });
+
+  trackBrandeeEvent("subscription_started", { planSlug: body.planSlug }, { userId: req.user.id });
+  const { subscription, testMode } = await subscribeUserToPlan({ user: req.user, planSlug: body.planSlug, billingFrequency: body.billingFrequency });
+  trackBrandeeEvent("subscription_completed", { planSlug: body.planSlug }, { userId: req.user.id });
+
+  res.json({ ok: true, subscription, testMode, message: testMode ? "Test-mode subscription activated (no real payment was collected — PAYMENT_MODE is not \"live\")." : "Your order was created and is awaiting payment confirmation." });
+}));
+
+app.post("/api/brandee/product-ads/image/final", requireAuth, requireBrandeeSubscription(), asyncHandler(async (req, res) => {
+  const body = z.object({ projectId: z.string().min(1) }).parse(req.body);
+  const project = productAdProjectStore.getProject(body.projectId);
+  if (!project || project.userId !== req.user.id) return res.status(404).json({ ok: false, error: "Project not found." });
+  if (!project.templateId) return res.status(400).json({ ok: false, error: "Choose a template and generate a preview first." });
+
+  trackBrandeeEvent("final_generation_started", { kind: "image" }, { userId: req.user.id });
+  const rendered = renderImageAdSvg({ templateId: project.templateId, templateFields: project.templateFields, form: project.product, watermark: false });
+  productAdProjectStore.updateProject(project.id, {
+    finalAsset: { generatedAt: new Date().toISOString(), svg: rendered.svg, width: rendered.width, height: rendered.height },
+    status: "finalized"
+  });
+  trackBrandeeEvent("final_generation_completed", { kind: "image" }, { userId: req.user.id });
+
+  res.json({ ok: true, svg: rendered.svg, width: rendered.width, height: rendered.height });
+}));
+
+app.post("/api/brandee/product-ads/video/final", requireAuth, requireBrandeeSubscription(), asyncHandler(async (req, res) => {
+  const body = z.object({ projectId: z.string().min(1) }).parse(req.body);
+  const project = productAdProjectStore.getProject(body.projectId);
+  if (!project || project.userId !== req.user.id) return res.status(404).json({ ok: false, error: "Project not found." });
+  if (!project.styleId) return res.status(400).json({ ok: false, error: "Choose a video style and generate a preview first." });
+
+  const plan = req.brandeeSubscription?.pricing_plan?.features?.videoMaxLengthSeconds || 15;
+
+  trackBrandeeEvent("final_generation_started", { kind: "video" }, { userId: req.user.id });
+  const form = project.videoFields || project.product;
+  const hookText = form.hookPreference ? `${form.mainBenefit || form.productName} — ${form.hookPreference}` : (form.mainBenefit || form.productName);
+  const result = await generateFinalVideo({
+    projectId: project.id,
+    styleId: project.styleId,
+    hookText,
+    headline: form.productName,
+    ctaText: form.ctaText || "Learn more",
+    productImageDataUrl: form.productImage,
+    brandColor: (form.brandColors && form.brandColors[0]) || "#0f172a",
+    durationSeconds: Math.min(plan, form.preferredFinalLength || plan)
+  });
+
+  if (!result.ok) {
+    return res.status(503).json({ ok: false, reason: result.reason, error: result.message });
+  }
+
+  productAdProjectStore.updateProject(project.id, {
+    finalAsset: { generatedAt: new Date().toISOString(), url: result.relativeUrl, durationSeconds: result.durationSeconds },
+    status: "finalized"
+  });
+  trackBrandeeEvent("final_generation_completed", { kind: "video" }, { userId: req.user.id });
+
+  res.json({ ok: true, url: result.relativeUrl, durationSeconds: result.durationSeconds });
+}));
+
+// Deprecated old entry points (PART 24). The actual redirect customers hit
+// is served by express.static from the replaced HTML content at
+// public/agents/brandee/create/index.html and .../analyze/index.html
+// (client-side meta-refresh + JS redirect, since express.static is
+// registered earlier and serves those files before these routes could ever
+// be reached for an exact path match). These two routes are a defensive
+// fallback for any request path variant that isn't resolved by the static
+// file itself (e.g. no trailing slash on hosts where static redirect
+// behavior differs). The underlying business-analysis engine (crawler/
+// planner/etc.) and its API routes are NOT deleted. Existing saved plans at
+// /agents/brandee/plan/:planId are untouched and still work.
+app.get(["/agents/brandee/create", "/agents/brandee/create/"], (req, res) => {
+  res.redirect(302, "/agents/brandee/");
+});
+app.get(["/agents/brandee/analyze", "/agents/brandee/analyze/"], (req, res) => {
+  res.redirect(302, "/agents/brandee/");
 });
 
 app.post("/api/page-intelligence/preview", requireAuth, asyncHandler(async (req, res) => {

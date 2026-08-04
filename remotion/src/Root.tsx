@@ -2,6 +2,7 @@ import React from "react";
 import { Composition } from "remotion";
 import { AdLostSales } from "./compositions/AdLostSales";
 import { AdQuotationFlow } from "./compositions/AdQuotationFlow";
+import { ProductTeaser } from "./compositions/ProductTeaser";
 import { DURATION_SECONDS, FPS } from "./theme";
 
 export const RemotionRoot: React.FC = () => (
@@ -59,6 +60,33 @@ export const RemotionRoot: React.FC = () => (
       height={1920}
       fps={FPS}
       defaultProps={{ layout: "story" as const }}
+    />
+    {/* Brandee product-ad MVP — parameterized teaser rendered dynamically
+        via `remotion render ProductTeaser --props='{...}'` (see
+        src/brandee/videoTeaserRenderer.js). Duration is derived from the
+        submitted `durationInSeconds` prop (3s for the free preview, longer
+        for the paid full video) via calculateMetadata rather than a fixed
+        value, since the same composition serves both cases. */}
+    <Composition
+      id="ProductTeaser"
+      component={ProductTeaser}
+      durationInFrames={3 * FPS}
+      width={1080}
+      height={1350}
+      fps={FPS}
+      defaultProps={{
+        styleId: "product_showcase",
+        hookText: "",
+        headline: "",
+        ctaText: "Learn more",
+        productImagePath: "",
+        brandColor: "#0f172a",
+        watermark: true,
+        durationInSeconds: 3
+      }}
+      calculateMetadata={async ({ props }) => ({
+        durationInFrames: Math.max(1, Math.round((props.durationInSeconds || 3) * FPS))
+      })}
     />
   </>
 );

@@ -1,0 +1,500 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Create an Image Ad | Brandee | AIStaff</title>
+<meta name="description" content="Upload your product, choose a template, and generate a free low-resolution image ad preview with Brandee." />
+<link rel="canonical" href="https://aistaff.click/agents/brandee/image/" />
+<meta name="robots" content="index, follow" />
+<link rel="icon" href="/aistaff-logo-square.png" type="image/png" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700;800&family=DM+Mono:wght@500&family=Manrope:wght@500;600;700;800&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="/style.css" />
+<style>
+  .flow-page { overflow: visible !important; }
+  .flow-main { width: min(1080px, calc(100% - 32px)); margin: 0 auto; padding: clamp(90px,12vh,120px) 0 100px; }
+  .flow-header { text-align: center; margin-bottom: 34px; }
+  .flow-header h1 { color: #fff; font: 600 clamp(28px,4vw,42px)/1.15 "Space Grotesk"; letter-spacing: -.03em; margin: 10px 0 8px; }
+  .flow-header p { color: #9fc0d6; font: 15px/1.6 "Manrope"; max-width: 560px; margin: 0 auto; }
+  .flow-steps-nav { display: flex; justify-content: center; gap: 10px; margin: 20px 0 40px; flex-wrap: wrap; }
+  .flow-step-pill { padding: 7px 16px; border-radius: 999px; border: 1px solid rgba(117,161,188,.25); background: rgba(11,25,36,.5); color: #7791a3; font: 600 12px "DM Mono"; letter-spacing: .04em; }
+  .flow-step-pill.is-active { border-color: var(--cyan); color: #9edfff; background: rgba(36,169,255,.12); }
+  .flow-step-pill.is-done { color: #7ec69a; border-color: rgba(126,198,154,.4); }
+  .flow-panel { display: none; }
+  .flow-panel.is-active { display: block; }
+  .flow-card { padding: 28px; border-radius: 10px; border: 1px solid rgba(117,161,188,.2); background: linear-gradient(145deg,rgba(19,39,54,.55),rgba(5,13,21,.85)); margin-bottom: 22px; }
+  .field-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  .field { display: flex; flex-direction: column; gap: 6px; }
+  .field.full { grid-column: 1 / -1; }
+  .field label { color: #d9f1ff; font: 600 13px "Manrope"; }
+  .field .hint { color: #6f8a9c; font: 12px "Manrope"; }
+  .field input[type="text"], .field input[type="url"], .field input[type="number"], .field input[type="date"], .field select, .field textarea {
+    width: 100%; min-height: 44px; padding: 10px 12px; border-radius: 6px; border: 1px solid rgba(117,161,188,.25);
+    background: rgba(4,13,21,.8); color: #d9f1ff; outline: none; font: 14px "Manrope";
+  }
+  .field textarea { min-height: 80px; resize: vertical; }
+  .field input:focus, .field select:focus, .field textarea:focus { border-color: #39baff; box-shadow: 0 0 0 2px rgba(36,169,255,.14); }
+  .field input:focus-visible, .field select:focus-visible, .field textarea:focus-visible, button:focus-visible, a:focus-visible { outline: 2px solid var(--cyan); outline-offset: 2px; }
+  .upload-box { border: 1px dashed rgba(117,161,188,.35); border-radius: 8px; padding: 18px; text-align: center; cursor: pointer; background: rgba(4,13,21,.5); }
+  .upload-box:hover { border-color: rgba(72,193,255,.6); }
+  .upload-preview { max-width: 100%; max-height: 160px; border-radius: 6px; margin-top: 10px; display: none; }
+  .color-swatches { display: flex; gap: 8px; align-items: center; }
+  .color-swatches input[type="color"] { width: 40px; height: 40px; padding: 0; border: none; border-radius: 6px; background: none; cursor: pointer; }
+  .url-extract-row { display: flex; gap: 10px; align-items: flex-end; flex-wrap: wrap; }
+  .url-extract-row .field { flex: 1; min-width: 220px; }
+  .extract-status { color: #9edfff; font: 13px "Manrope"; margin-top: 8px; min-height: 18px; }
+  .template-grid { display: grid; grid-template-columns: repeat(4,1fr); gap: 14px; }
+  .template-card { border: 1px solid rgba(117,161,188,.2); border-radius: 8px; background: rgba(11,25,36,.5); padding: 16px; cursor: pointer; text-align: left; color: inherit; font-family: inherit; transition: border-color .15s ease, background .15s ease; }
+  .template-card:hover { border-color: rgba(72,193,255,.5); }
+  .template-card.is-selected { border-color: var(--cyan); background: rgba(36,169,255,.1); box-shadow: 0 0 0 1px rgba(36,169,255,.35); }
+  .template-card[disabled], .template-card.is-unavailable { opacity: .45; cursor: not-allowed; }
+  .template-card h3 { margin: 0 0 6px; color: #f4f8ff; font: 600 15px "Manrope"; }
+  .template-card p { margin: 0 0 6px; color: #86a3b7; font: 13px/1.5 "Manrope"; }
+  .template-card .best-use { color: #587789; font: 12px "Manrope"; }
+  .template-card .unavailable-note { color: #d99a5f; font: 12px "Manrope"; margin-top: 6px; }
+  .template-fields { margin-top: 22px; }
+  .flow-actions { display: flex; gap: 12px; justify-content: flex-end; margin-top: 22px; flex-wrap: wrap; }
+  .status-line { min-height: 20px; color: #d9f1ff; font: 13px "Manrope"; margin-top: 10px; }
+  .status-line.is-error { color: #e88; }
+  .preview-wrap { text-align: center; }
+  .preview-wrap svg { max-width: 100%; height: auto; border-radius: 10px; border: 1px solid rgba(117,161,188,.25); }
+  .preview-note { color: #86a3b7; font: 13px/1.6 "Manrope"; margin-top: 12px; }
+  .gate-actions { display: flex; gap: 12px; justify-content: center; margin-top: 20px; flex-wrap: wrap; }
+  .auth-form { max-width: 380px; margin: 20px auto 0; display: grid; gap: 12px; }
+  .plan-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 12px; margin-top: 18px; }
+  .plan-card { border: 1px solid rgba(117,161,188,.2); border-radius: 8px; padding: 18px; text-align: center; background: rgba(11,25,36,.5); }
+  .plan-card.featured { border-color: rgba(72,193,255,.6); }
+  .plan-card h4 { margin: 0 0 6px; color: #fff; font: 600 16px "Space Grotesk"; }
+  .plan-card b { display: block; color: var(--cyan); font: 700 18px "Space Grotesk"; margin-bottom: 10px; }
+  @media (max-width: 760px) {
+    .field-grid, .template-grid, .plan-grid { grid-template-columns: 1fr; }
+  }
+  @media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
+</style>
+</head>
+<body class="modern-home closer-page brandee-page flow-page">
+<div id="toast" class="toast" hidden></div>
+<header class="site-header cinematic-header">
+  <a class="brand" href="/" aria-label="AIStaff home">
+    <img class="brand-logo" src="/aistaff-logo-square.png" alt="AIStaff" width="42" height="42" />
+  </a>
+  <nav class="site-nav" aria-label="Primary">
+    <a href="/agents/brandee/">Brandee</a>
+    <a href="/agents/brandee/video/">Video Ad</a>
+  </nav>
+  <div class="header-actions">
+    <a class="ghost-link" href="/admin/login">Client login</a>
+  </div>
+</header>
+
+<main class="flow-main">
+  <div class="flow-header">
+    <p class="section-kicker">Image Ad</p>
+    <h1>Create an Image Ad</h1>
+    <p>Upload your product, choose a template, and generate a low-resolution mockup before you subscribe.</p>
+  </div>
+
+  <nav class="flow-steps-nav" aria-label="Steps">
+    <span class="flow-step-pill is-active" data-step-pill="product">1. Product</span>
+    <span class="flow-step-pill" data-step-pill="template">2. Template</span>
+    <span class="flow-step-pill" data-step-pill="preview">3. Preview</span>
+    <span class="flow-step-pill" data-step-pill="account">4. Save &amp; finish</span>
+  </nav>
+
+  <!-- STEP 1: shared product form -->
+  <section class="flow-panel is-active" data-step="product" aria-labelledby="productStepHeading">
+    <h2 id="productStepHeading" class="sr-only">Product details</h2>
+    <div class="flow-card">
+      <div class="url-extract-row">
+        <div class="field">
+          <label for="productUrl">Product listing URL (optional)</label>
+          <input type="url" id="productUrl" placeholder="https://your-store.com/products/example" />
+          <span class="hint">Ecommerce, Shopify, WooCommerce, Lazada, Shopee, or a Facebook/Instagram product post. Brandee reads only this one page.</span>
+        </div>
+        <button type="button" class="button button-soft" id="extractBtn">Fill from link</button>
+      </div>
+      <p class="extract-status" id="extractStatus" role="status" aria-live="polite"></p>
+    </div>
+
+    <div class="flow-card">
+      <div class="field-grid">
+        <div class="field full">
+          <label for="productImage">Product image *</label>
+          <div class="upload-box" id="uploadBox" tabindex="0" role="button" aria-describedby="uploadHint">
+            <span id="uploadLabel">Click or drag a product photo here</span>
+            <img id="uploadPreview" class="upload-preview" alt="Uploaded product preview" />
+          </div>
+          <input type="file" id="productImage" accept="image/png,image/jpeg,image/webp" style="display:none" />
+          <span class="hint" id="uploadHint">PNG, JPEG, or WebP. Up to 5MB.</span>
+        </div>
+        <div class="field"><label for="productName">Product name *</label><input type="text" id="productName" maxlength="150" required /></div>
+        <div class="field"><label for="targetCustomer">Target customer *</label><input type="text" id="targetCustomer" maxlength="300" required placeholder="e.g. small business owners" /></div>
+        <div class="field full"><label for="productDescription">Product description *</label><textarea id="productDescription" maxlength="1000" required></textarea></div>
+        <div class="field full"><label for="mainFeatures">Main features *</label><textarea id="mainFeatures" maxlength="600" required placeholder="List the main features, one idea per line"></textarea></div>
+        <div class="field">
+          <label for="desiredAction">Desired customer action *</label>
+          <select id="desiredAction" required>
+            <option value="buy_now">Buy now</option>
+            <option value="send_message">Send a message</option>
+            <option value="visit_product_page">Visit product page</option>
+            <option value="learn_more">Learn more</option>
+          </select>
+        </div>
+        <div class="field"><label for="preferredLanguage">Preferred language</label>
+          <select id="preferredLanguage"><option value="english">English</option><option value="filipino">Filipino</option><option value="taglish">Taglish</option></select>
+        </div>
+        <div class="field"><label for="price">Price (optional)</label><input type="text" id="price" maxlength="60" /></div>
+        <div class="field"><label for="offer">Offer or discount (optional)</label><input type="text" id="offer" maxlength="200" /></div>
+        <div class="field full"><label for="mainBenefit">Main benefit (optional)</label><input type="text" id="mainBenefit" maxlength="200" /></div>
+        <div class="field">
+          <label for="logo">Logo (optional)</label>
+          <input type="file" id="logo" accept="image/png,image/jpeg,image/webp" />
+        </div>
+        <div class="field">
+          <label for="brandColor1">Brand colors (optional)</label>
+          <div class="color-swatches">
+            <input type="color" id="brandColor1" value="#0f172a" />
+            <input type="color" id="brandColor2" value="#3b82f6" />
+          </div>
+        </div>
+        <div class="field full"><label for="testimonialQuote">Real customer testimonial (optional — unlocks the Testimonial template)</label><textarea id="testimonialQuote" maxlength="300" placeholder="Exact customer quote"></textarea></div>
+        <div class="field"><label for="testimonialAttribution">Testimonial attribution</label><input type="text" id="testimonialAttribution" maxlength="80" placeholder="Name or initials" /></div>
+        <div class="field full"><label for="additionalNotes">Additional notes (optional)</label><textarea id="additionalNotes" maxlength="500"></textarea></div>
+      </div>
+    </div>
+    <p class="status-line" id="productFormStatus" role="status" aria-live="polite"></p>
+    <div class="flow-actions">
+      <button type="button" class="button button-primary glow-button" id="toTemplateStep">Choose a template <span>↓</span></button>
+    </div>
+  </section>
+
+  <!-- STEP 2: template picker -->
+  <section class="flow-panel" data-step="template" aria-labelledby="templateStepHeading">
+    <h2 id="templateStepHeading" class="sr-only">Choose a template</h2>
+    <div class="flow-card">
+      <div class="template-grid" id="templateGrid" role="group" aria-label="Image ad templates"></div>
+      <div class="template-fields" id="templateFields" hidden></div>
+    </div>
+    <p class="status-line" id="templateStatus" role="status" aria-live="polite"></p>
+    <div class="flow-actions">
+      <button type="button" class="button button-soft" data-back="product">Back</button>
+      <button type="button" class="button button-primary glow-button" id="generatePreviewBtn">Generate Preview</button>
+    </div>
+  </section>
+
+  <!-- STEP 3: preview -->
+  <section class="flow-panel" data-step="preview" aria-labelledby="previewStepHeading">
+    <h2 id="previewStepHeading" class="sr-only">Preview</h2>
+    <div class="flow-card preview-wrap" id="previewWrap">
+      <p class="status-line" id="previewStatus" role="status" aria-live="polite">Generating your preview…</p>
+    </div>
+    <p class="preview-note">This is a free, low-resolution, watermarked preview. Save and finish to unlock a clean, high-resolution export.</p>
+    <div class="flow-actions">
+      <button type="button" class="button button-soft" data-back="template">Back</button>
+      <button type="button" class="button button-primary glow-button" id="toAccountStep">Save and finish your image ad <span>↓</span></button>
+    </div>
+  </section>
+
+  <!-- STEP 4: registration + subscription + final generation -->
+  <section class="flow-panel" data-step="account" aria-labelledby="accountStepHeading">
+    <h2 id="accountStepHeading" class="sr-only">Save and finish</h2>
+
+    <div class="flow-card" id="registerCard">
+      <h3 style="color:#f4f8ff;font:600 18px 'Space Grotesk';margin:0 0 10px">Create a free account to save this ad</h3>
+      <p style="color:#86a3b7;font:14px/1.6 Manrope;margin:0 0 6px">Your preview and product details are already saved to this project — creating an account just lets you come back to it and unlock the final export.</p>
+      <form class="auth-form" id="registerForm">
+        <div class="field"><label for="regName">Name</label><input type="text" id="regName" required /></div>
+        <div class="field"><label for="regEmail">Email</label><input type="text" id="regEmail" required /></div>
+        <div class="field"><label for="regPassword">Password (min 8 characters)</label><input type="password" id="regPassword" minlength="8" required /></div>
+        <button type="submit" class="button button-primary glow-button">Create account</button>
+        <p class="status-line" id="registerStatus" role="status" aria-live="polite"></p>
+      </form>
+      <p style="text-align:center;margin-top:10px"><a class="text-link" href="/admin/login">Already have an account? Sign in</a></p>
+    </div>
+
+    <div class="flow-card" id="subscribeCard" hidden>
+      <h3 style="color:#f4f8ff;font:600 18px 'Space Grotesk';margin:0 0 10px">Choose a plan to unlock your final export</h3>
+      <div class="plan-grid" id="planGrid"></div>
+      <p class="status-line" id="subscribeStatus" role="status" aria-live="polite"></p>
+    </div>
+
+    <div class="flow-card" id="finalCard" hidden>
+      <h3 style="color:#f4f8ff;font:600 18px 'Space Grotesk';margin:0 0 10px">Generate your final ad</h3>
+      <button type="button" class="button button-primary glow-button" id="finalGenerateBtn">Generate your final ad</button>
+      <p class="status-line" id="finalStatus" role="status" aria-live="polite"></p>
+      <div class="preview-wrap" id="finalPreviewWrap"></div>
+      <button type="button" class="button button-soft" id="downloadPngBtn" hidden>Download PNG</button>
+    </div>
+  </section>
+</main>
+
+<script src="/agents/brandee/product-ad-common.js"></script>
+<script>
+(function () {
+  const $ = (sel, root) => (root || document).querySelector(sel);
+  const $$ = (sel, root) => [...(root || document).querySelectorAll(sel)];
+  const helpers = window.BrandeeProductAd;
+
+  const state = { config: null, projectId: null, templateId: null, templateFields: {}, previewSvg: null };
+
+  function setStep(step) {
+    $$(".flow-panel").forEach((p) => p.classList.toggle("is-active", p.dataset.step === step));
+    $$(".flow-step-pill").forEach((p) => p.classList.toggle("is-active", p.dataset.stepPill === step));
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  }
+  $$("[data-back]").forEach((btn) => btn.addEventListener("click", () => setStep(btn.dataset.back)));
+
+  // --- Uploads ---
+  let productImageDataUrl = null;
+  let logoDataUrl = null;
+
+  $("#uploadBox").addEventListener("click", () => $("#productImage").click());
+  $("#uploadBox").addEventListener("keydown", (e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); $("#productImage").click(); } });
+  $("#productImage").addEventListener("change", async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+    if (file.size > 5 * 1024 * 1024) { helpers.showError($("#productFormStatus"), "That image is larger than 5MB. Please choose a smaller file."); $("#productFormStatus").classList.add("is-error"); return; }
+    productImageDataUrl = await helpers.fileToDataUrl(file);
+    const preview = $("#uploadPreview");
+    preview.src = productImageDataUrl;
+    preview.style.display = "block";
+    $("#uploadLabel").textContent = file.name;
+    helpers.track("product_upload_started", {});
+  });
+  $("#logo").addEventListener("change", async (e) => {
+    const file = e.target.files[0];
+    if (file) logoDataUrl = await helpers.fileToDataUrl(file);
+  });
+
+  // --- URL extraction ---
+  $("#extractBtn").addEventListener("click", async () => {
+    const url = $("#productUrl").value.trim();
+    if (!url) return;
+    $("#extractStatus").textContent = "Reading this product page…";
+    const { body } = await helpers.fetchJson("/api/public/brandee/product-ads/url-extract", {
+      method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ url })
+    });
+    if (!body || !body.ok) {
+      $("#extractStatus").textContent = (body && body.message) || "Brandee could not read this product page, so she will use the information you entered.";
+      return;
+    }
+    const ex = body.extracted;
+    if (ex.productName && !$("#productName").value) $("#productName").value = ex.productName;
+    if (ex.description && !$("#productDescription").value) $("#productDescription").value = ex.description;
+    if (ex.price && !$("#price").value) $("#price").value = ex.price;
+    if (ex.images && ex.images[0] && !productImageDataUrl) {
+      $("#extractStatus").textContent = "Found product details. Please confirm the fields below, and add a product photo (image links from other sites can't be uploaded automatically).";
+    } else {
+      $("#extractStatus").textContent = "Found product details. Please review and edit the fields below.";
+    }
+  });
+
+  function collectSharedForm() {
+    return {
+      productImage: productImageDataUrl,
+      productName: $("#productName").value.trim(),
+      productDescription: $("#productDescription").value.trim(),
+      mainFeatures: $("#mainFeatures").value.trim(),
+      targetCustomer: $("#targetCustomer").value.trim(),
+      desiredAction: $("#desiredAction").value,
+      productListingUrl: $("#productUrl").value.trim() || null,
+      price: $("#price").value.trim() || null,
+      offer: $("#offer").value.trim() || null,
+      mainBenefit: $("#mainBenefit").value.trim() || null,
+      logo: logoDataUrl,
+      brandColors: [$("#brandColor1").value, $("#brandColor2").value],
+      preferredLanguage: $("#preferredLanguage").value,
+      additionalNotes: $("#additionalNotes").value.trim() || null,
+      testimonialQuote: $("#testimonialQuote").value.trim() || null,
+      testimonialAttribution: $("#testimonialAttribution").value.trim() || null,
+      projectId: state.projectId
+    };
+  }
+
+  function validateSharedForm(form) {
+    if (!form.productImage) return "Please upload a product image.";
+    if (!form.productName) return "Please enter a product name.";
+    if (!form.productDescription) return "Please enter a product description.";
+    if (!form.mainFeatures) return "Please list the main features.";
+    if (!form.targetCustomer) return "Please enter the target customer.";
+    return null;
+  }
+
+  $("#toTemplateStep").addEventListener("click", () => {
+    const form = collectSharedForm();
+    const error = validateSharedForm(form);
+    const statusEl = $("#productFormStatus");
+    if (error) { statusEl.textContent = error; statusEl.classList.add("is-error"); return; }
+    statusEl.textContent = ""; statusEl.classList.remove("is-error");
+    helpers.track("product_upload_completed", {});
+    renderTemplates();
+    setStep("template");
+  });
+
+  // --- Templates ---
+  async function loadConfig() {
+    const { body } = await helpers.fetchJson("/api/public/brandee/product-ads/config");
+    state.config = body;
+  }
+
+  function hasTestimonial() {
+    return Boolean($("#testimonialQuote").value.trim() && $("#testimonialAttribution").value.trim());
+  }
+
+  function renderTemplates() {
+    const grid = $("#templateGrid");
+    grid.innerHTML = "";
+    const testimonialOk = hasTestimonial();
+    (state.config.templates || []).forEach((t) => {
+      const available = t.proofRequirement === "testimonial" ? testimonialOk : true;
+      const card = document.createElement("button");
+      card.type = "button";
+      card.className = "template-card" + (available ? "" : " is-unavailable");
+      if (!available) card.disabled = true;
+      card.innerHTML = `<h3>${t.name}</h3><p>${t.description}</p><p class="best-use">${t.bestUse}</p>` + (available ? "" : `<p class="unavailable-note">Add a real testimonial above to unlock this template.</p>`);
+      card.addEventListener("click", () => selectTemplate(t));
+      grid.appendChild(card);
+    });
+  }
+
+  function selectTemplate(template) {
+    state.templateId = template.id;
+    $$(".template-card").forEach((c) => c.classList.toggle("is-selected", c.querySelector("h3").textContent === template.name));
+    const fieldsWrap = $("#templateFields");
+    fieldsWrap.hidden = false;
+    fieldsWrap.innerHTML = "<div class=\"field-grid\"></div>";
+    const grid = fieldsWrap.querySelector(".field-grid");
+    template.fields.forEach((f) => {
+      const wrap = document.createElement("div");
+      wrap.className = "field" + (f.type === "textarea" ? " full" : "");
+      const id = `tf_${f.key}`;
+      let control;
+      if (f.type === "select") {
+        control = `<select id="${id}">${f.options.map((o) => `<option>${o}</option>`).join("")}</select>`;
+      } else if (f.type === "textarea") {
+        control = `<textarea id="${id}" maxlength="${f.maxLength || 300}"></textarea>`;
+      } else {
+        control = `<input type="${f.type === 'date' ? 'date' : 'text'}" id="${id}" maxlength="${f.maxLength || 100}" />`;
+      }
+      wrap.innerHTML = `<label for="${id}">${f.label}${f.required ? " *" : ""}</label>${control}`;
+      grid.appendChild(wrap);
+    });
+    helpers.track("template_selected", { templateId: template.id });
+  }
+
+  function collectTemplateFields() {
+    const template = (state.config.templates || []).find((t) => t.id === state.templateId);
+    if (!template) return {};
+    const values = {};
+    template.fields.forEach((f) => { const el = $(`#tf_${f.key}`); if (el) values[f.key] = el.value.trim(); });
+    return values;
+  }
+
+  $("#generatePreviewBtn").addEventListener("click", async () => {
+    const statusEl = $("#templateStatus");
+    if (!state.templateId) { statusEl.textContent = "Please choose a template."; statusEl.classList.add("is-error"); return; }
+    const templateFields = collectTemplateFields();
+    const template = (state.config.templates || []).find((t) => t.id === state.templateId);
+    const missing = template.fields.find((f) => f.required && !templateFields[f.key]);
+    if (missing) { statusEl.textContent = `"${missing.label}" is required for this template.`; statusEl.classList.add("is-error"); return; }
+    statusEl.textContent = ""; statusEl.classList.remove("is-error");
+
+    setStep("preview");
+    $("#previewStatus").textContent = "Generating your preview…";
+    $("#previewWrap").querySelectorAll("svg").forEach((el) => el.remove());
+    helpers.track("image_preview_requested", { templateId: state.templateId });
+
+    const form = { ...collectSharedForm(), templateId: state.templateId, templateFields };
+    const { body } = await helpers.fetchJson("/api/public/brandee/product-ads/image/preview", {
+      method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(form)
+    });
+    if (!body || !body.ok) {
+      $("#previewStatus").textContent = (body && body.error) || "Brandee could not generate a preview this time. Please try again.";
+      helpers.track("preview_failed", { templateId: state.templateId });
+      return;
+    }
+    state.projectId = body.projectId;
+    state.previewSvg = body.svg;
+    $("#previewStatus").textContent = "";
+    $("#previewWrap").insertAdjacentHTML("beforeend", body.svg);
+    helpers.track("image_preview_completed", { templateId: state.templateId });
+  });
+
+  $("#toAccountStep").addEventListener("click", () => { helpers.track("registration_prompt_shown", {}); setStep("account"); });
+
+  // --- Registration ---
+  $("#registerForm").addEventListener("submit", async (e) => {
+    e.preventDefault();
+    helpers.track("registration_started", {});
+    const payload = { name: $("#regName").value.trim(), email: $("#regEmail").value.trim(), password: $("#regPassword").value, projectId: state.projectId };
+    const { body, ok } = await helpers.fetchJson("/api/auth/register", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(payload) });
+    const statusEl = $("#registerStatus");
+    if (!ok || !body || !body.ok) { statusEl.textContent = (body && body.error) || "Could not create your account."; statusEl.classList.add("is-error"); return; }
+    statusEl.textContent = "Account created.";
+    helpers.track("registration_completed", {});
+    $("#registerCard").hidden = true;
+    await loadPlans();
+    $("#subscribeCard").hidden = false;
+  });
+
+  async function loadPlans() {
+    const grid = $("#planGrid");
+    grid.innerHTML = "";
+    (state.config.plans || []).forEach((plan, i) => {
+      const card = document.createElement("div");
+      card.className = "plan-card" + (i === 1 ? " featured" : "");
+      card.innerHTML = `<h4>${plan.name}</h4><b>₱${plan.monthlyPrice}/mo</b><p style="color:#86a3b7;font:13px Manrope;margin:0 0 12px">${plan.imageCreditsPerMonth} image ads · ${plan.videoCreditsPerMonth} full videos</p><button type="button" class="button button-primary glow-button" data-plan="${plan.slug}">Choose ${plan.name}</button>`;
+      grid.appendChild(card);
+    });
+    $$("[data-plan]", grid).forEach((btn) => btn.addEventListener("click", () => subscribe(btn.dataset.plan)));
+  }
+
+  async function subscribe(planSlug) {
+    helpers.track("subscription_started", { planSlug });
+    const { body, ok } = await helpers.fetchJson("/api/brandee/product-ads/subscribe", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ planSlug }) });
+    const statusEl = $("#subscribeStatus");
+    if (!ok || !body || !body.ok) { statusEl.textContent = (body && body.error) || "Could not start your subscription."; statusEl.classList.add("is-error"); return; }
+    statusEl.textContent = body.message || "Subscribed.";
+    helpers.track("subscription_completed", { planSlug });
+    $("#subscribeCard").hidden = true;
+    $("#finalCard").hidden = false;
+  }
+
+  $("#finalGenerateBtn").addEventListener("click", async () => {
+    helpers.track("final_generation_started", { kind: "image" });
+    const statusEl = $("#finalStatus");
+    statusEl.textContent = "Generating your final ad…";
+    const { body, ok } = await helpers.fetchJson("/api/brandee/product-ads/image/final", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ projectId: state.projectId }) });
+    if (!ok || !body || !body.ok) { statusEl.textContent = (body && body.error) || "Could not generate your final ad."; statusEl.classList.add("is-error"); return; }
+    statusEl.textContent = "";
+    const wrap = $("#finalPreviewWrap");
+    wrap.innerHTML = body.svg;
+    $("#downloadPngBtn").hidden = false;
+    $("#downloadPngBtn").onclick = () => downloadSvgAsPng(body.svg, body.width, body.height);
+    helpers.track("final_generation_completed", { kind: "image" });
+  });
+
+  function downloadSvgAsPng(svgString, width, height) {
+    const svgBlob = new Blob([svgString], { type: "image/svg+xml" });
+    const url = URL.createObjectURL(svgBlob);
+    const img = new Image();
+    img.onload = () => {
+      const canvas = document.createElement("canvas");
+      canvas.width = width; canvas.height = height;
+      canvas.getContext("2d").drawImage(img, 0, 0, width, height);
+      URL.revokeObjectURL(url);
+      const link = document.createElement("a");
+      link.download = "brandee-image-ad.png";
+      link.href = canvas.toDataURL("image/png");
+      link.click();
+    };
+    img.src = url;
+  }
+
+  loadConfig();
+})();
+</script>
+</body>
+</html>

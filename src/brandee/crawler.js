@@ -203,6 +203,12 @@ function parseHtmlDocument(html) {
   })();
   const metaDescription = extractMetaAny(withoutNoise, "description") || extractMetaAny(withoutNoise, "og:description");
   const openGraphSiteName = extractMetaAny(withoutNoise, "og:site_name");
+  // og:title/og:description/og:image — used by the narrow single-page
+  // product URL extractor (productUrlExtractor.js) in addition to the
+  // business crawler's own use of metaDescription/openGraphSiteName above.
+  const openGraphTitle = extractMetaAny(withoutNoise, "og:title");
+  const openGraphDescription = extractMetaAny(withoutNoise, "og:description");
+  const openGraphImage = extractMetaAny(withoutNoise, "og:image");
   const canonicalUrl = extractCanonical(withoutNoise);
   const headings = extractHeadingsWithLevel(mainHtml);
   const mainText = stripTags(mainHtml);
@@ -247,6 +253,9 @@ function parseHtmlDocument(html) {
     title,
     metaDescription,
     openGraphSiteName,
+    openGraphTitle,
+    openGraphDescription,
+    openGraphImage,
     canonicalUrl,
     headings,
     mainText,
