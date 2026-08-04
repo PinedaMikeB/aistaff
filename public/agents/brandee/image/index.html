@@ -64,15 +64,26 @@
   .template-card.is-selected { border-color: var(--cyan); box-shadow: 0 0 0 2px rgba(36,169,255,.5); }
   .template-card[disabled], .template-card.is-unavailable { opacity: .4; cursor: not-allowed; }
   .template-card[disabled]:hover { transform: none; box-shadow: none; }
-  .card-thumb-wrap { position: relative; aspect-ratio: 4/5; background: #050c14; overflow: hidden; }
+  .card-thumb-wrap { position: relative; aspect-ratio: 4/5; min-height: 200px; background: #050c14; overflow: hidden; }
   .card-thumb-wrap img { width: 100%; height: 100%; object-fit: cover; object-position: top center; display: block; transition: transform .3s ease; }
+  .card-thumb-wrap img.is-broken { opacity: 0; }
   .template-card:hover .card-thumb-wrap img { transform: scale(1.04); }
   .card-thumb-wrap .card-badges { position: absolute; top: 8px; left: 8px; display: flex; gap: 6px; }
   .card-badge { font: 700 10px "Manrope"; padding: 3px 8px; border-radius: 999px; background: rgba(4,13,21,.75); color: #d9f1ff; border: 1px solid rgba(117,161,188,.3); letter-spacing: .03em; text-transform: uppercase; }
   .card-badge.recommended { background: linear-gradient(135deg,#24a9ff,#3ddc97); color: #04121c; border-color: transparent; }
-  .card-overlay { position: absolute; inset: 0; background: linear-gradient(180deg, rgba(4,13,21,0) 40%, rgba(3,9,15,.92) 100%); display: flex; align-items: flex-end; opacity: 0; transition: opacity .18s ease; padding: 12px; gap: 8px; }
+  .card-overlay { position: absolute; inset: 0; background: linear-gradient(180deg, rgba(4,13,21,0) 40%, rgba(3,9,15,.92) 100%); display: flex; align-items: flex-end; opacity: 0; transition: opacity .18s ease; padding: 12px; gap: 8px; box-sizing: border-box; }
   .template-card:hover .card-overlay, .template-card:focus-visible .card-overlay { opacity: 1; }
-  .card-overlay .button { flex: 1; font-size: 12px; padding: 8px 10px; }
+  /* Touch/no-hover devices never trigger :hover, so always show a lighter
+     version of the action row rather than hiding it behind an interaction
+     that may never fire (PART 29 accessibility: never rely on hover alone). */
+  @media (hover: none) { .card-overlay { opacity: 1; background: linear-gradient(180deg, rgba(4,13,21,0) 55%, rgba(3,9,15,.88) 100%); } }
+  /* Explicit, self-contained button sizing so these overlay actions can
+     never inherit a pill/circular button treatment meant for other pages
+     that share this site's base .button class (e.g. the homepage's
+     `.modern-home .button { border-radius:999px; min-height:50px }` hero
+     CTA style) — every geometric property is fixed here regardless of
+     what any other stylesheet declares for `.button` elsewhere. */
+  .card-overlay button.button { flex: 1 1 0; width: auto; box-sizing: border-box; font-size: 12px; line-height: 1.1; padding: 8px 6px; min-height: 0; height: 34px; max-height: 34px; border-radius: 8px !important; align-self: flex-end; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
   .card-body { padding: 12px 14px 14px; }
   .card-body h3 { margin: 0 0 4px; color: #f4f8ff; font: 600 14.5px "Manrope"; }
   .card-body .best-use { color: #7ec69a; font: 12px "Manrope"; margin: 0; }
@@ -542,7 +553,7 @@
     const recBadge = recommended ? `<span class="card-badge recommended">Recommended</span>` : "";
     return `
       <div class="card-thumb-wrap">
-        <img src="${t.thumbnail || ''}" alt="${t.name}" loading="lazy" width="480" height="600" />
+        <img src="${t.thumbnail || ''}" alt="${t.name}" loading="lazy" width="480" height="600" onerror="this.classList.add('is-broken')" />
         <div class="card-badges">${recBadge}${audienceBadge}</div>
         <div class="card-overlay">
           <button type="button" class="button button-soft" data-preview-id="${t.id}">Preview</button>

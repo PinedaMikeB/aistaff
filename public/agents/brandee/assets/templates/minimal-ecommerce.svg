@@ -1,0 +1,22 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 480 600" width="480" height="600">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#0d2233" />
+      <stop offset="1" stop-color="#050d15" />
+    </linearGradient>
+    <linearGradient id="accent" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#24a9ff" />
+      <stop offset="1" stop-color="#3ddc97" />
+    </linearGradient>
+  </defs>
+  <rect width="480" height="600" fill="url(#bg)" />
+  
+    <rect x="90" y="60" width="300" height="340" rx="16" fill="#12293b" stroke="#1f3d52" stroke-width="1" />
+    <circle cx="174" cy="175.60000000000002" r="33" fill="#294a63" />
+    <path d="M120 338.8 L204 236.8 L264 298 L324 216.4 L366 338.8 Z" fill="#1c3a50" />
+    <rect x="120" y="424" width="240" height="20" rx="4" fill="#e9f6ff" />
+    <rect x="120" y="456" width="130" height="16" rx="4" fill="#7ec69a" />
+    <rect x="120" y="494" width="240" height="30" rx="15" fill="url(#accent)" />
+    <text x="24" y="578" font-family="Manrope, sans-serif" font-size="14" font-weight="700" fill="#6f8a9c" letter-spacing=".01em">Minimal E-commerce</text>
+  
+</svg>

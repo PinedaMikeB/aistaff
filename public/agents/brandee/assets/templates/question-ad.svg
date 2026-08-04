@@ -1,0 +1,23 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 480 600" width="480" height="600">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#0d2233" />
+      <stop offset="1" stop-color="#050d15" />
+    </linearGradient>
+    <linearGradient id="accent" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#24a9ff" />
+      <stop offset="1" stop-color="#3ddc97" />
+    </linearGradient>
+  </defs>
+  <rect width="480" height="600" fill="url(#bg)" />
+  
+    <text x="240" y="150" font-family="Space Grotesk, sans-serif" font-size="90" font-weight="700" fill="#1f3d52" text-anchor="middle">?</text>
+    <rect x="40" y="200" width="400" height="26" rx="4" fill="#e9f6ff" />
+    <rect x="40" y="238" width="260" height="16" rx="4" fill="#b9d7e8" />
+    <rect x="40" y="290" width="400" height="210" rx="10" fill="#12293b" stroke="#1f3d52" stroke-width="1" />
+    <circle cx="152" cy="361.4" r="23.1" fill="#294a63" />
+    <path d="M80 462.2 L192 399.2 L272 437 L352 386.6 L408 462.2 Z" fill="#1c3a50" />
+    <rect x="40" y="522" width="130" height="30" rx="15" fill="url(#accent)" />
+    <text x="24" y="578" font-family="Manrope, sans-serif" font-size="14" font-weight="700" fill="#6f8a9c" letter-spacing=".01em">Question</text>
+  
+</svg>

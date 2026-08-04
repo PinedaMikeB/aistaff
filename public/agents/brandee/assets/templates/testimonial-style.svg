@@ -1,0 +1,26 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 480 600" width="480" height="600">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#0d2233" />
+      <stop offset="1" stop-color="#050d15" />
+    </linearGradient>
+    <linearGradient id="accent" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#24a9ff" />
+      <stop offset="1" stop-color="#3ddc97" />
+    </linearGradient>
+  </defs>
+  <rect width="480" height="600" fill="url(#bg)" />
+  
+    <text x="40" y="120" font-family="Space Grotesk, sans-serif" font-size="70" font-weight="700" fill="#3ddc97" opacity=".5">&#8220;</text>
+    <rect x="40" y="140" width="400" height="16" rx="4" fill="#e9f6ff" />
+    <rect x="40" y="166" width="360" height="16" rx="4" fill="#e9f6ff" />
+    <rect x="40" y="192" width="220" height="16" rx="4" fill="#e9f6ff" />
+    <circle cx="66" cy="260" r="22" fill="#294a63" />
+    <rect x="98" y="250" width="160" height="12" rx="4" fill="#b9d7e8" />
+    <rect x="98" y="270" width="100" height="10" rx="4" fill="#6f8a9c" />
+    <rect x="40" y="320" width="400" height="170" rx="10" fill="#12293b" stroke="#1f3d52" stroke-width="1" />
+    <circle cx="152" cy="377.8" r="18.7" fill="#294a63" />
+    <path d="M80 459.4 L192 408.4 L272 439 L352 398.2 L408 459.4 Z" fill="#1c3a50" />
+    <text x="24" y="578" font-family="Manrope, sans-serif" font-size="14" font-weight="700" fill="#6f8a9c" letter-spacing=".01em">Testimonial</text>
+  
+</svg>
