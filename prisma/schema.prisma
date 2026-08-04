@@ -461,6 +461,7 @@ model Customer {
   orders                      Order[]
   subscriptions               Subscription[]
   invoices                    Invoice[]
+  brandee_entitlement_events  BrandeeEntitlementEvent[]
 
   @@index([user_id])
   @@index([email])
@@ -605,6 +606,168 @@ model Invoice {
   @@index([customer_id])
   @@index([status])
   @@map("invoices")
+}
+
+// ===========================================================================
+// Brandee — Super Admin-managed creative templates (PART 9/15 of the
+// template-admin task). Two parallel model families (static image templates
+// vs UGC/video templates) rather than one polymorphic table, since their
+// schemas genuinely diverge (overlaySchema vs storyboardSchema/sceneSchema).
+//
+// Versioning (PART 25): editing a PUBLISHED template does not mutate it.
+// `version` + `parentTemplateId` let a new row link back to the template it
+// supersedes; existing customer projects store the exact template `id` +
+// `version` they used (in the JSON project store — see productAdProjectStore.js)
+// so a later edit never silently changes an already-generated project. Only
+// the newest ACTIVE version of a given `slug` is offered to new projects.
+// ===========================================================================
+model StaticAdTemplate {
+  id                    String    @id @default(uuid())
+  slug                  String
+  name                  String
+  description           String    @db.Text
+  category              String
+  frameworkKey          String?
+  previewImageUrl       String?
+  thumbnailUrl          String?
+  sourceAssetUrl        String?
+  // Editable overlay areas (product image/logo/headline/price/CTA/etc.) as
+  // normalized-coordinate bounding boxes — see overlaySchema shape documented
+  // in src/brandee/templateSchemas.js. Validated with Zod before every write.
+  overlaySchema         Json      @default("{}")
+  requiredFieldsSchema  Json      @default("[]")
+  optionalFieldsSchema  Json      @default("[]")
+  proofRequirements     Json      @default("[]")
+  supportedAspectRatios Json      @default("[]")
+  defaultAspectRatio    String    @default("4:5")
+  defaultLanguage       String    @default("english")
+  renderMode            String    @default("COMPOSITE_TEMPLATE") // COMPOSITE_TEMPLATE | AI_GENERATED_LAYOUT
+  tags                  String[]  @default([])
+  sortOrder             Int       @default(0)
+  status                String    @default("DRAFT") // DRAFT | ACTIVE | INACTIVE | ARCHIVED
+  isFeatured            Boolean   @default(false)
+  isPremium             Boolean   @default(false)
+  version               Int       @default(1)
+  parentTemplateId      String?
+  publishedAt           DateTime?
+  retiredAt             DateTime?
+  createdByPlatformUserId String?
+  updatedByPlatformUserId String?
+  createdAt             DateTime  @default(now())
+  updatedAt             DateTime  @updatedAt
+  archivedAt             DateTime?
+
+  @@index([slug])
+  @@index([status])
+  @@index([category])
+  @@index([parentTemplateId])
+  @@map("static_ad_templates")
+}
+
+model UgcTemplate {
+  id                    String    @id @default(uuid())
+  slug                  String
+  name                  String
+  description           String    @db.Text
+  category              String
+  previewPosterUrl      String?
+  previewVideoUrl       String?
+  sourceAssetUrl        String?
+  storyboardSchema      Json      @default("{}")
+  sceneSchema           Json      @default("[]")
+  creatorRequirements   Json      @default("{}")
+  voiceRequirements     Json      @default("{}")
+  scriptSchema          Json      @default("{}")
+  requiredFieldsSchema  Json      @default("[]")
+  optionalFieldsSchema  Json      @default("[]")
+  proofRequirements     Json      @default("[]")
+  supportedDurations    Json      @default("[]")
+  supportedAspectRatios Json      @default("[]")
+  supportedLanguages    Json      @default("[]")
+  // Safe provider identifiers/config ONLY — never a secret/API key. Enforced
+  // by templateAdmin.js's scrubProviderConfiguration() before every write.
+  modelProvider         String?
+  providerConfiguration Json      @default("{}")
+  tags                  String[]  @default([])
+  sortOrder             Int       @default(0)
+  status                String    @default("DRAFT")
+  isFeatured            Boolean   @default(false)
+  isPremium             Boolean   @default(false)
+  version               Int       @default(1)
+  parentTemplateId      String?
+  publishedAt           DateTime?
+  retiredAt             DateTime?
+  createdByPlatformUserId String?
+  updatedByPlatformUserId String?
+  createdAt             DateTime  @default(now())
+  updatedAt             DateTime  @updatedAt
+  archivedAt             DateTime?
+
+  @@index([slug])
+  @@index([status])
+  @@index([category])
+  @@index([parentTemplateId])
+  @@map("ugc_templates")
+}
+
+// Draft/publish pricing + tax-mode configuration a SUPERADMIN can edit
+// through /superadmin/brandee/pricing (PART 4/20) WITHOUT a code deploy.
+// The runtime app reads the newest `status: "published"` row; if none
+// exists yet, it falls back to the code-level defaults in pricingConfig.js
+// (see pricingOverride.js). Editing never mutates a published row in place
+// — publishing a new draft archives the previous published row, so the
+// change is itself auditable/reversible via history, not just via the
+// separate AdminAuditLog entry already written on publish.
+model BrandeePricingConfig {
+  id                      String    @id @default(uuid())
+  status                  String    @default("draft") // draft | published | archived
+  taxMode                 String    @default("NON_VAT") // NON_VAT | VAT
+  pricesAreTaxInclusive   Boolean   @default(true)
+  vatRatePercent          Decimal   @default(12) @db.Decimal(5, 2)
+  // Array of plan objects — same shape as pricingConfig.js's PLANS constant.
+  plans                   Json
+  publishedAt             DateTime?
+  createdByPlatformUserId String?
+  updatedByPlatformUserId String?
+  createdAt               DateTime  @default(now())
+  updatedAt               DateTime  @updatedAt
+
+  @@index([status])
+  @@map("brandee_pricing_configs")
+}
+
+// Entitlement ledger (PART 27) — IMAGE_FINAL / VIDEO_SECONDS only, never a
+// generic "credits" number. Append-only event log (RESERVE/CONSUME/RELEASE/
+// REFUND); the remaining balance for a billing period is always DERIVED by
+// summing events, never stored as a single mutable counter, so a crashed
+// request can never silently double-spend or lose an entitlement.
+model BrandeeEntitlementEvent {
+  id              String   @id @default(uuid())
+  customer_id     String
+  subscription_id String?
+  unit            String   // IMAGE_FINAL | VIDEO_SECONDS
+  eventType       String   // RESERVE | CONSUME | RELEASE | REFUND
+  amount          Int
+  // References a project in the JSON-file product-ad project store
+  // (productAdProjectStore.js), not a Postgres FK — that store is
+  // intentionally outside Postgres for this MVP (see its own header comment).
+  projectId       String?
+  // Unique per (idempotencyKey, eventType) rather than idempotencyKey alone:
+  // a RESERVE and its later RELEASE/CONSUME settlement event intentionally
+  // share the SAME idempotencyKey (so computeRemaining() in entitlements.js
+  // can group them together and cancel a released reservation out of the
+  // balance) — only a duplicate RESERVE (or duplicate RELEASE/CONSUME) of
+  // the exact same event is actually meant to be rejected.
+  idempotencyKey  String
+  reason          String?
+  createdAt       DateTime @default(now())
+  customer        Customer @relation(fields: [customer_id], references: [id], onDelete: Cascade)
+
+  @@unique([idempotencyKey, eventType])
+  @@index([customer_id, unit])
+  @@index([subscription_id])
+  @@index([idempotencyKey])
+  @@map("brandee_entitlement_events")
 }
 
 model ManualPaymentProof {

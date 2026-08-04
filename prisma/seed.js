@@ -203,7 +203,49 @@ async function main() {
     });
   }
 
+  await seedBrandeeTemplatesAndPricing();
+
   console.log(`Seeded demo company and admin: ${email}`);
+}
+
+/**
+ * Seeds the initial 10 static-ad templates + 8 UGC/video templates (already
+ * ACTIVE, so the public site has real selectable templates immediately
+ * after a fresh `npx prisma migrate deploy` + `npm run seed`), plus the
+ * first PUBLISHED BrandeePricingConfig row mirroring pricingConfig.js's
+ * code defaults exactly, so /superadmin/brandee/pricing has something real
+ * to show and edit from day one instead of an empty "nothing published yet"
+ * state.
+ */
+async function seedBrandeeTemplatesAndPricing() {
+  const { buildStaticTemplateSeeds, buildUgcTemplateSeeds } = require("../src/brandee/templateSeedData");
+  const { listPlans, DEFAULT_TAX_CONFIG } = require("../src/brandee/pricingConfig");
+
+  for (const seed of buildStaticTemplateSeeds()) {
+    const existing = await prisma.staticAdTemplate.findFirst({ where: { slug: seed.slug } });
+    if (!existing) await prisma.staticAdTemplate.create({ data: seed });
+  }
+
+  for (const seed of buildUgcTemplateSeeds()) {
+    const existing = await prisma.ugcTemplate.findFirst({ where: { slug: seed.slug } });
+    if (!existing) await prisma.ugcTemplate.create({ data: seed });
+  }
+
+  const existingPublished = await prisma.brandeePricingConfig.findFirst({ where: { status: "published" } });
+  if (!existingPublished) {
+    await prisma.brandeePricingConfig.create({
+      data: {
+        status: "published",
+        taxMode: DEFAULT_TAX_CONFIG.taxMode,
+        pricesAreTaxInclusive: DEFAULT_TAX_CONFIG.pricesAreTaxInclusive,
+        vatRatePercent: DEFAULT_TAX_CONFIG.vatRatePercent,
+        plans: listPlans(),
+        publishedAt: new Date()
+      }
+    });
+  }
+
+  console.log("Seeded Brandee static/UGC templates and initial published pricing configuration.");
 }
 
 main()

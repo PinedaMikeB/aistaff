@@ -38,6 +38,9 @@ const totp = require("./totp");
 const { encryptSecret, decryptSecret } = require("../crypto");
 const { issueAdminMfaCookie, clearAdminMfaCookie } = require("./mfaSession");
 const { WebsiteAnalysisError, safeFetchHtml, normalizeUrlInput } = require("../brandee/websiteAnalyzer");
+const brandeeTemplates = require("./brandeeTemplates");
+const brandeePricingAdmin = require("./brandeePricingAdmin");
+const { probeVideoProviderAvailability } = require("../brandee/videoTeaserRenderer");
 
 const router = express.Router();
 
@@ -359,6 +362,166 @@ router.post("/mfa/challenge", requireSuperAdminApi(ALL_ADMIN_ROLES), rateLimited
 router.post("/mfa/logout", requireSuperAdminApi(ALL_ADMIN_ROLES), (req, res) => {
   clearAdminMfaCookie(res);
   res.json({ ok: true });
+});
+
+// ---------------------------------------------------------------------
+// BRANDEE — STATIC AD TEMPLATE MANAGEMENT (PART 17/18/25)
+//
+// View/list/test: any admin role. Create/edit/status-change/duplicate:
+// SUPERADMIN only (SUPPORT_ADMIN's permission set explicitly excludes
+// "destructive template actions" and pricing is separate; creating/editing
+// content is kept SUPERADMIN-only too, the more conservative reading, since
+// an activated template immediately becomes publicly selectable).
+// ---------------------------------------------------------------------
+const templateWriteLimiter = createRateLimiter({ windowMs: 10 * 60 * 1000, max: 40 });
+const templateTestLimiter = createRateLimiter({ windowMs: 10 * 60 * 1000, max: 20 });
+
+const TEMPLATE_ACTION_AUDIT = {
+  static: {
+    created: AUDIT_ACTIONS.STATIC_TEMPLATE_CREATED,
+    edited: AUDIT_ACTIONS.STATIC_TEMPLATE_EDITED,
+    activated: AUDIT_ACTIONS.STATIC_TEMPLATE_ACTIVATED,
+    deactivated: AUDIT_ACTIONS.STATIC_TEMPLATE_DEACTIVATED,
+    archived: AUDIT_ACTIONS.STATIC_TEMPLATE_ARCHIVED
+  },
+  ugc: {
+    created: AUDIT_ACTIONS.UGC_TEMPLATE_CREATED,
+    edited: AUDIT_ACTIONS.UGC_TEMPLATE_EDITED,
+    activated: AUDIT_ACTIONS.UGC_TEMPLATE_ACTIVATED,
+    deactivated: AUDIT_ACTIONS.UGC_TEMPLATE_DEACTIVATED,
+    archived: AUDIT_ACTIONS.UGC_TEMPLATE_ARCHIVED
+  }
+};
+
+function registerTemplateRoutes(kind) {
+  const base = `/brandee/templates/${kind}`;
+  const targetType = kind === "static" ? "static_ad_template" : "ugc_template";
+
+  router.get(base, requireSuperAdminApi(ALL_ADMIN_ROLES), handleAsync(async (req, res) => {
+    const templates = await brandeeTemplates.listTemplates(kind, {
+      category: req.query.category || null,
+      status: req.query.status || null,
+      search: req.query.search || null
+    });
+    res.json({ templates });
+  }));
+
+  router.get(`${base}/:id`, requireSuperAdminApi(ALL_ADMIN_ROLES), handleAsync(async (req, res) => {
+    const template = await brandeeTemplates.getTemplateById(kind, req.params.id);
+    if (!template) return res.status(404).json({ error: "Template not found.", code: ADMIN_ERROR_CODES.INVALID_INPUT });
+    res.json({ template });
+  }));
+
+  router.post(base, requireSuperAdminApi([PLATFORM_ROLES.SUPERADMIN]), rateLimited(templateWriteLimiter, byUserId), handleAsync(async (req, res) => {
+    const template = await brandeeTemplates.createTemplate(kind, req.body, req.user.id);
+    await recordAuditEvent({ req, actorUserId: req.user.id, actorRole: req.adminRole, action: TEMPLATE_ACTION_AUDIT[kind].created, targetType, targetId: template.id, metadata: { slug: template.slug, name: template.name } });
+    res.status(201).json({ ok: true, template });
+  }));
+
+  router.patch(`${base}/:id`, requireSuperAdminApi([PLATFORM_ROLES.SUPERADMIN]), rateLimited(templateWriteLimiter, byUserId), handleAsync(async (req, res) => {
+    const template = await brandeeTemplates.updateTemplate(kind, req.params.id, req.body, req.user.id);
+    if (!template) return res.status(404).json({ error: "Template not found.", code: ADMIN_ERROR_CODES.INVALID_INPUT });
+    await recordAuditEvent({ req, actorUserId: req.user.id, actorRole: req.adminRole, action: TEMPLATE_ACTION_AUDIT[kind].edited, targetType, targetId: template.id, metadata: { slug: template.slug, newVersion: template.version } });
+    res.json({ ok: true, template });
+  }));
+
+  router.post(`${base}/:id/status`, requireSuperAdminApi([PLATFORM_ROLES.SUPERADMIN]), requireMfaIfEnabled, rateLimited(templateWriteLimiter, byUserId), handleAsync(async (req, res) => {
+    const body = z.object({ status: z.enum(["DRAFT", "ACTIVE", "INACTIVE", "ARCHIVED"]) }).parse(req.body);
+    const template = await brandeeTemplates.setStatus(kind, req.params.id, body.status, req.user.id);
+    const auditKey = body.status === "ACTIVE" ? "activated" : body.status === "ARCHIVED" ? "archived" : "deactivated";
+    await recordAuditEvent({ req, actorUserId: req.user.id, actorRole: req.adminRole, action: TEMPLATE_ACTION_AUDIT[kind][auditKey], targetType, targetId: template.id, metadata: { slug: template.slug, newStatus: body.status, mfaWarning: req.mfaWarning || null } });
+    res.json({ ok: true, template });
+  }));
+
+  router.post(`${base}/:id/duplicate`, requireSuperAdminApi([PLATFORM_ROLES.SUPERADMIN]), rateLimited(templateWriteLimiter, byUserId), handleAsync(async (req, res) => {
+    const template = await brandeeTemplates.duplicateTemplate(kind, req.params.id, req.user.id);
+    if (!template) return res.status(404).json({ error: "Template not found.", code: ADMIN_ERROR_CODES.INVALID_INPUT });
+    await recordAuditEvent({ req, actorUserId: req.user.id, actorRole: req.adminRole, action: TEMPLATE_ACTION_AUDIT[kind].created, targetType, targetId: template.id, metadata: { duplicatedFrom: req.params.id } });
+    res.status(201).json({ ok: true, template });
+  }));
+
+  // Test generation with sample data — available to both admin roles (PART
+  // 19: SUPPORT_ADMIN "possibly test templates"). Reuses the SAME renderer
+  // the public flow uses (renderImageAdSvg) with a fixed generic sample
+  // product, never real customer data.
+  router.post(`${base}/:id/test`, requireSuperAdminApi(ALL_ADMIN_ROLES), rateLimited(templateTestLimiter, byUserId), handleAsync(async (req, res) => {
+    const template = await brandeeTemplates.getTemplateById(kind, req.params.id);
+    if (!template) return res.status(404).json({ error: "Template not found.", code: ADMIN_ERROR_CODES.INVALID_INPUT });
+
+    await recordAuditEvent({ req, actorUserId: req.user.id, actorRole: req.adminRole, action: AUDIT_ACTIONS.TEMPLATE_TEST_GENERATION_STARTED, targetType, targetId: template.id, metadata: {} });
+    try {
+      if (kind === "static") {
+        const { renderImageAdSvg } = require("../brandee/imageAdRenderer");
+        const sampleForm = { productName: "Sample Product", mainBenefit: "A genuinely useful sample benefit.", brandColors: ["#0f172a", "#3b82f6"] };
+        const sampleFields = {};
+        for (const field of [...(template.requiredFieldsSchema || []), ...(template.optionalFieldsSchema || [])]) {
+          sampleFields[field.key] = field.type === "text" || field.type === "textarea" ? `Sample ${field.label}` : field.key;
+        }
+        const rendered = renderImageAdSvg({ templateId: template.slug, templateFields: sampleFields, form: sampleForm, watermark: true });
+        await recordAuditEvent({ req, actorUserId: req.user.id, actorRole: req.adminRole, action: AUDIT_ACTIONS.TEMPLATE_TEST_GENERATION_COMPLETED, targetType, targetId: template.id, metadata: {} });
+        return res.json({ ok: true, svg: rendered.svg, width: rendered.width, height: rendered.height });
+      }
+      const capability = probeVideoProviderAvailability();
+      await recordAuditEvent({ req, actorUserId: req.user.id, actorRole: req.adminRole, action: AUDIT_ACTIONS.TEMPLATE_TEST_GENERATION_COMPLETED, targetType, targetId: template.id, metadata: { providerAvailable: capability.available } });
+      return res.json({ ok: true, providerAvailable: capability.available, reason: capability.reason, message: capability.available ? "Video provider is available. Test generation would run the real 3-second preview render." : "Video provider is not available in this environment — no fabricated test output was generated." });
+    } catch (error) {
+      await recordAuditEvent({ req, actorUserId: req.user.id, actorRole: req.adminRole, action: AUDIT_ACTIONS.TEMPLATE_TEST_GENERATION_FAILED, targetType, targetId: template.id, metadata: { message: error.message } });
+      throw error;
+    }
+  }));
+}
+
+registerTemplateRoutes("static");
+registerTemplateRoutes("ugc");
+
+// ---------------------------------------------------------------------
+// BRANDEE — PRICING AND ALLOWANCE ADMIN (PART 20)
+// SUPERADMIN only for every mutating action; viewing draft/published/
+// history is SUPERADMIN-only too (pricing strategy is more sensitive than
+// template content) per PART 20: "Do not let SUPPORT_ADMIN modify prices
+// unless explicitly authorized" — read here follows the same conservative
+// default.
+// ---------------------------------------------------------------------
+router.get("/brandee/pricing/draft", requireSuperAdminApi([PLATFORM_ROLES.SUPERADMIN]), handleAsync(async (req, res) => {
+  res.json({ draft: await brandeePricingAdmin.getLatestDraft() });
+}));
+
+router.get("/brandee/pricing/published", requireSuperAdminApi([PLATFORM_ROLES.SUPERADMIN]), handleAsync(async (req, res) => {
+  res.json({ published: await brandeePricingAdmin.getPublished() });
+}));
+
+router.get("/brandee/pricing/history", requireSuperAdminApi([PLATFORM_ROLES.SUPERADMIN]), handleAsync(async (req, res) => {
+  res.json({ history: await brandeePricingAdmin.listHistory({ limit: req.query.limit }) });
+}));
+
+router.post("/brandee/pricing/draft", requireSuperAdminApi([PLATFORM_ROLES.SUPERADMIN]), requireMfaIfEnabled, rateLimited(templateWriteLimiter, byUserId), handleAsync(async (req, res) => {
+  const draft = await brandeePricingAdmin.saveDraft(req.body, req.user.id);
+  await recordAuditEvent({ req, actorUserId: req.user.id, actorRole: req.adminRole, action: AUDIT_ACTIONS.ALLOWANCE_CHANGED, targetType: "brandee_pricing_config", targetId: draft.id, metadata: { status: "draft", mfaWarning: req.mfaWarning || null } });
+  res.json({ ok: true, draft });
+}));
+
+router.post("/brandee/pricing/:id/publish", requireSuperAdminApi([PLATFORM_ROLES.SUPERADMIN]), requireMfaIfEnabled, rateLimited(bulkActionLimiter, byUserId), handleAsync(async (req, res) => {
+  const published = await brandeePricingAdmin.publishDraft(req.params.id, req.user.id);
+  await recordAuditEvent({
+    req, actorUserId: req.user.id, actorRole: req.adminRole,
+    action: AUDIT_ACTIONS.PLAN_PUBLISHED, targetType: "brandee_pricing_config", targetId: published.id,
+    metadata: { taxMode: published.taxMode, mfaWarning: req.mfaWarning || null }
+  });
+  if (req.body?.taxModeChanged) {
+    await recordAuditEvent({ req, actorUserId: req.user.id, actorRole: req.adminRole, action: AUDIT_ACTIONS.TAX_MODE_CHANGED, targetType: "brandee_pricing_config", targetId: published.id, metadata: { newTaxMode: published.taxMode } });
+  }
+  res.json({ ok: true, published });
+}));
+
+// ---------------------------------------------------------------------
+// BRANDEE — PROVIDER STATUS (non-secret only; PART 17's nav group)
+// ---------------------------------------------------------------------
+router.get("/brandee/provider-status", requireSuperAdminApi(ALL_ADMIN_ROLES), (req, res) => {
+  const capability = probeVideoProviderAvailability();
+  res.json({
+    video: { available: capability.available, reason: capability.reason },
+    image: { available: true, mode: "COMPOSITE_TEMPLATE (dependency-free SVG compositor, always available)" }
+  });
 });
 
 module.exports = router;

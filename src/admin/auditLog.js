@@ -23,7 +23,28 @@ const AUDIT_ACTIONS = Object.freeze({
   TENANT_STATUS_CHANGED: "tenant.status_changed",
   USER_STATUS_CHANGED: "user.status_changed",
   DATA_EXPORTED: "admin.data_exported",
-  CONFIG_CHANGED: "admin.config_changed"
+  CONFIG_CHANGED: "admin.config_changed",
+
+  // Brandee template + pricing management (PART 23)
+  STATIC_TEMPLATE_CREATED: "brandee.static_template_created",
+  STATIC_TEMPLATE_EDITED: "brandee.static_template_edited",
+  STATIC_TEMPLATE_ACTIVATED: "brandee.static_template_activated",
+  STATIC_TEMPLATE_DEACTIVATED: "brandee.static_template_deactivated",
+  STATIC_TEMPLATE_ARCHIVED: "brandee.static_template_archived",
+  UGC_TEMPLATE_CREATED: "brandee.ugc_template_created",
+  UGC_TEMPLATE_EDITED: "brandee.ugc_template_edited",
+  UGC_TEMPLATE_ACTIVATED: "brandee.ugc_template_activated",
+  UGC_TEMPLATE_DEACTIVATED: "brandee.ugc_template_deactivated",
+  UGC_TEMPLATE_ARCHIVED: "brandee.ugc_template_archived",
+  PRICING_CHANGED: "brandee.pricing_changed",
+  ALLOWANCE_CHANGED: "brandee.allowance_changed",
+  TAX_MODE_CHANGED: "brandee.tax_mode_changed",
+  PLAN_PUBLISHED: "brandee.plan_published",
+  SUPERADMIN_ASSIGNED: "admin.superadmin_assigned",
+  SUPERADMIN_REVOKED: "admin.superadmin_revoked",
+  TEMPLATE_TEST_GENERATION_STARTED: "brandee.template_test_generation_started",
+  TEMPLATE_TEST_GENERATION_FAILED: "brandee.template_test_generation_failed",
+  TEMPLATE_TEST_GENERATION_COMPLETED: "brandee.template_test_generation_completed"
 });
 
 /**

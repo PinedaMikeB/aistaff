@@ -145,9 +145,13 @@
         <div class="field"><label for="preferredLanguage">Preferred language</label>
           <select id="preferredLanguage"><option value="english">English</option><option value="filipino">Filipino</option><option value="taglish">Taglish</option></select>
         </div>
-        <div class="field"><label for="price">Price (optional)</label><input type="text" id="price" maxlength="60" /></div>
-        <div class="field"><label for="offer">Offer or discount (optional)</label><input type="text" id="offer" maxlength="200" /></div>
+        <div class="field"><label for="regularPrice">Regular price (optional)</label><input type="text" id="regularPrice" maxlength="60" placeholder="e.g. ₱999" /></div>
+        <div class="field"><label for="promoPrice">Sale/promo price (optional)</label><input type="text" id="promoPrice" maxlength="60" placeholder="e.g. ₱799" /></div>
+        <div class="field"><label for="discountText">Discount amount or percentage (optional)</label><input type="text" id="discountText" maxlength="60" placeholder="e.g. 20% off, or ₱200 off" /></div>
+        <div class="field"><label for="offerExpirationDate">Real offer expiration date (optional)</label><input type="date" id="offerExpirationDate" /></div>
+        <div class="field full"><label for="offerDetails">Offer details (optional)</label><input type="text" id="offerDetails" maxlength="200" placeholder="e.g. Free shipping on orders over ₱1,500" /></div>
         <div class="field full"><label for="mainBenefit">Main benefit (optional)</label><input type="text" id="mainBenefit" maxlength="200" /></div>
+        <p class="hint full">Only enter a discount, promo price, or expiration date if it is real. Brandee never invents offers, deadlines, or discounts.</p>
         <div class="field">
           <label for="logo">Logo (optional)</label>
           <input type="file" id="logo" accept="image/png,image/jpeg,image/webp" />
@@ -283,7 +287,7 @@
     const ex = body.extracted;
     if (ex.productName && !$("#productName").value) $("#productName").value = ex.productName;
     if (ex.description && !$("#productDescription").value) $("#productDescription").value = ex.description;
-    if (ex.price && !$("#price").value) $("#price").value = ex.price;
+    if (ex.price && !$("#regularPrice").value) $("#regularPrice").value = ex.price;
     if (ex.images && ex.images[0] && !productImageDataUrl) {
       $("#extractStatus").textContent = "Found product details. Please confirm the fields below, and add a product photo (image links from other sites can't be uploaded automatically).";
     } else {
@@ -300,8 +304,14 @@
       targetCustomer: $("#targetCustomer").value.trim(),
       desiredAction: $("#desiredAction").value,
       productListingUrl: $("#productUrl").value.trim() || null,
-      price: $("#price").value.trim() || null,
-      offer: $("#offer").value.trim() || null,
+      regularPrice: $("#regularPrice").value.trim() || null,
+      promoPrice: $("#promoPrice").value.trim() || null,
+      discountText: $("#discountText").value.trim() || null,
+      offerExpirationDate: $("#offerExpirationDate").value || null,
+      offerDetails: $("#offerDetails").value.trim() || null,
+      // `price` stays populated (from regularPrice) for template renderers that
+      // read the shared, single "price" field (e.g. Minimal Ecommerce).
+      price: $("#regularPrice").value.trim() || null,
       mainBenefit: $("#mainBenefit").value.trim() || null,
       logo: logoDataUrl,
       brandColors: [$("#brandColor1").value, $("#brandColor2").value],
@@ -445,7 +455,7 @@
     (state.config.plans || []).forEach((plan, i) => {
       const card = document.createElement("div");
       card.className = "plan-card" + (i === 1 ? " featured" : "");
-      card.innerHTML = `<h4>${plan.name}</h4><b>₱${plan.monthlyPrice}/mo</b><p style="color:#86a3b7;font:13px Manrope;margin:0 0 12px">${plan.imageCreditsPerMonth} image ads · ${plan.videoCreditsPerMonth} full videos</p><button type="button" class="button button-primary glow-button" data-plan="${plan.slug}">Choose ${plan.name}</button>`;
+      card.innerHTML = `<h4>${plan.name}${plan.badge ? ` <span style="font-size:11px;color:#3ddc97">${plan.badge}</span>` : ""}</h4><b>₱${plan.monthlyPrice}/mo</b><p style="color:#86a3b7;font:13px Manrope;margin:0 0 12px">${plan.entitlements.IMAGE_FINAL} image ads · ${plan.entitlements.VIDEO_SECONDS} video seconds per month</p><button type="button" class="button button-primary glow-button" data-plan="${plan.slug}">Choose ${plan.name}</button>`;
       grid.appendChild(card);
     });
     $$("[data-plan]", grid).forEach((btn) => btn.addEventListener("click", () => subscribe(btn.dataset.plan)));

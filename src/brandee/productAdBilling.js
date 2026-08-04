@@ -15,6 +15,12 @@
 const { prisma } = require("../db");
 const { PLANS, BRANDEE_PRODUCT_SLUG, BRANDEE_PRODUCT_NAME, getPlan } = require("./pricingConfig");
 
+// Brandee plans are monthly-only (PART 2: "exactly three monthly plans") —
+// annual_price is a required column on the shared PricingPlan table (used by
+// the Closer product, which does offer annual billing), so we set it equal
+// to 12x the monthly price purely so the column is populated; Brandee never
+// actually offers or charges annual billing, and subscribeUserToPlan below
+// always uses billingFrequency "monthly".
 async function ensureBrandeeProductAdsCatalog() {
   const product = await prisma.product.upsert({
     where: { slug: BRANDEE_PRODUCT_SLUG },
@@ -28,24 +34,24 @@ async function ensureBrandeeProductAdsCatalog() {
       product_id: product.id,
       name: plan.name,
       monthly_price: plan.monthlyPrice,
-      annual_price: plan.annualPrice,
+      annual_price: plan.monthlyPrice * 12,
       currency: plan.currency,
       conversation_limit: 0,
       facebook_page_limit: 0,
-      features: { imageCreditsPerMonth: plan.imageCreditsPerMonth, videoCreditsPerMonth: plan.videoCreditsPerMonth, videoMaxLengthSeconds: plan.videoMaxLengthSeconds, list: plan.features, placeholder: plan.placeholder },
-      active: true
+      features: { entitlements: plan.entitlements, limits: plan.limits, list: plan.features, featured: plan.featured || false, sortOrder: plan.sortOrder },
+      active: plan.visible !== false
     },
     create: {
       product_id: product.id,
       name: plan.name,
       slug: `brandee-${plan.slug}`,
       monthly_price: plan.monthlyPrice,
-      annual_price: plan.annualPrice,
+      annual_price: plan.monthlyPrice * 12,
       currency: plan.currency,
       conversation_limit: 0,
       facebook_page_limit: 0,
-      features: { imageCreditsPerMonth: plan.imageCreditsPerMonth, videoCreditsPerMonth: plan.videoCreditsPerMonth, videoMaxLengthSeconds: plan.videoMaxLengthSeconds, list: plan.features, placeholder: plan.placeholder },
-      active: true
+      features: { entitlements: plan.entitlements, limits: plan.limits, list: plan.features, featured: plan.featured || false, sortOrder: plan.sortOrder },
+      active: plan.visible !== false
     }
   })));
 
@@ -96,12 +102,13 @@ function orderNumber() {
 async function subscribeUserToPlan({ user, planSlug, billingFrequency = "monthly" }) {
   const plan = getPlan(planSlug);
   if (!plan) throw new Error("Selected plan is not available");
+  if (billingFrequency !== "monthly") throw new Error("Brandee plans are monthly-only.");
   await ensureBrandeeProductAdsCatalog();
   const dbPlan = await prisma.pricingPlan.findUnique({ where: { slug: `brandee-${planSlug}` } });
   if (!dbPlan) throw new Error("Selected plan is not available");
 
   const customer = await ensureCustomerForUser(user);
-  const amount = billingFrequency === "annual" ? plan.annualPrice : plan.monthlyPrice;
+  const amount = plan.monthlyPrice;
   const isLive = process.env.PAYMENT_MODE === "live";
 
   const order = await prisma.order.create({

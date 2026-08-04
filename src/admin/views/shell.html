@@ -77,7 +77,10 @@
     <a class="nav-link" data-path="/superadmin/users" href="/superadmin/users">Users</a>
     <p class="nav-group-label">Brandee</p>
     <a class="nav-link" data-path="/superadmin/brandee/creative-brain" href="/superadmin/brandee/creative-brain">Creative Brain</a>
+    <a class="nav-link" data-path="/superadmin/brandee/templates/static" href="/superadmin/brandee/templates/static">Static Templates</a>
+    <a class="nav-link" data-path="/superadmin/brandee/templates/ugc" href="/superadmin/brandee/templates/ugc">UGC Templates</a>
     <a class="nav-link" data-path="/superadmin/brandee/runs" href="/superadmin/brandee/runs">Plan Runs</a>
+    <a class="nav-link" data-path="/superadmin/brandee/pricing" href="/superadmin/brandee/pricing">Pricing and Allowances</a>
     <p class="nav-group-label">Platform</p>
     <a class="nav-link" data-path="/superadmin/system" href="/superadmin/system">System</a>
     <a class="nav-link" data-path="/superadmin/audit-logs" href="/superadmin/audit-logs">Audit Logs</a>
@@ -445,6 +448,304 @@
     }
   }
 
+  // -------------------------------------------------------------
+  // Brandee template management (static ad templates + UGC/video templates)
+  // -------------------------------------------------------------
+  const TEMPLATE_LABELS = { static: "Static Ad Templates", ugc: "UGC/Video Templates" };
+
+  async function renderBrandeeTemplatesHub() {
+    content.innerHTML = `
+      <h1>Brandee Templates</h1>
+      <p class="page-sub">Manage the templates customers choose from in the Image Ad and Video Ad flows.</p>
+      <div class="grid-cards">
+        <div class="card"><span class="label">Image ads</span><span class="value" style="font-size:16px"><a href="/superadmin/brandee/templates/static">Static Ad Templates →</a></span></div>
+        <div class="card"><span class="label">Video ads</span><span class="value" style="font-size:16px"><a href="/superadmin/brandee/templates/ugc">UGC/Video Templates →</a></span></div>
+      </div>
+    `;
+    content.querySelectorAll("a").forEach((a) => a.addEventListener("click", (e) => { e.preventDefault(); window.history.pushState({}, "", a.getAttribute("href")); route(); }));
+  }
+
+  function templateStatusBadge(status) {
+    const map = { ACTIVE: "active", DRAFT: "notvalidated", INACTIVE: "inactive", ARCHIVED: "failed" };
+    return `<span class="badge badge-${map[status] || "inactive"}">${escapeHtml(status)}</span>`;
+  }
+
+  async function renderTemplateList(kind) {
+    const label = TEMPLATE_LABELS[kind];
+    content.innerHTML = `<h1>${label}</h1><p>Loading…</p>`;
+    const { templates } = await api(`/brandee/templates/${kind}`);
+    content.innerHTML = `
+      <h1>${label}</h1>
+      <p class="page-sub">${templates.length} template(s). Only ACTIVE templates are shown to customers.</p>
+      <div class="toolbar">
+        <a class="action" style="text-decoration:none;display:inline-block" href="/superadmin/brandee/templates/${kind}/new">New Template</a>
+      </div>
+      <div class="table-wrap"><table>
+        <thead><tr><th>Name</th><th>Category</th><th>Slug</th><th>Version</th><th>Status</th><th>Featured</th><th>Updated</th><th></th></tr></thead>
+        <tbody>${templates.map((t) => `
+          <tr>
+            <td>${escapeHtml(t.name)}</td>
+            <td>${escapeHtml(t.category)}</td>
+            <td><code class="mono">${escapeHtml(t.slug)}</code></td>
+            <td>v${t.version}${t.parentTemplateId ? ` <span class="sub">(supersedes a prior version)</span>` : ""}</td>
+            <td>${templateStatusBadge(t.status)}</td>
+            <td>${t.isFeatured ? "Yes" : "—"}</td>
+            <td>${fmtDate(t.updatedAt)}</td>
+            <td><button class="action" data-id="${t.id}">Manage</button></td>
+          </tr>`).join("")}
+        </tbody>
+      </table></div>
+    `;
+    content.querySelector('[href^="/superadmin/brandee/templates/"]').addEventListener("click", (e) => { e.preventDefault(); window.history.pushState({}, "", e.target.getAttribute("href")); route(); });
+    templates.forEach((t) => {
+      const btn = content.querySelector(`[data-id="${t.id}"]`);
+      btn.addEventListener("click", () => openTemplateManageDrawer(kind, t));
+    });
+  }
+
+  function openTemplateManageDrawer(kind, t) {
+    openDrawer(t.name, `
+      <dl class="kv">
+        <dt>Slug</dt><dd><code class="mono">${escapeHtml(t.slug)}</code></dd>
+        <dt>Category</dt><dd>${escapeHtml(t.category)}</dd>
+        <dt>Description</dt><dd>${escapeHtml(t.description)}</dd>
+        <dt>Status</dt><dd>${templateStatusBadge(t.status)}</dd>
+        <dt>Version</dt><dd>v${t.version}</dd>
+        <dt>Aspect ratios</dt><dd>${(t.supportedAspectRatios || []).join(", ") || "—"}</dd>
+      </dl>
+      <div class="toolbar">
+        ${t.status !== "ACTIVE" ? `<button class="action" data-status="ACTIVE">Activate</button>` : `<button class="action" data-status="INACTIVE">Deactivate</button>`}
+        ${t.status !== "ARCHIVED" ? `<button class="action danger" data-status="ARCHIVED">Archive</button>` : ""}
+        <button class="action" id="dupBtn">Duplicate</button>
+        <button class="action" id="testBtn">Test with sample data</button>
+      </div>
+      <div id="templateActionResult"></div>
+      ${kind === "static" ? `<img alt="" style="max-width:100%;border-radius:8px;margin-top:10px" id="testPreviewImg" />` : ""}
+    `);
+    const resultEl = document.getElementById("templateActionResult");
+    document.querySelectorAll("[data-status]").forEach((btn) => {
+      btn.addEventListener("click", async () => {
+        btn.disabled = true;
+        try {
+          await api(`/brandee/templates/${kind}/${t.id}/status`, { method: "POST", body: JSON.stringify({ status: btn.dataset.status }) });
+          closeDrawer();
+          renderTemplateList(kind);
+        } catch (error) {
+          resultEl.innerHTML = `<div class="banner banner-error">${escapeHtml(error.message)}</div>`;
+          btn.disabled = false;
+        }
+      });
+    });
+    document.getElementById("dupBtn").addEventListener("click", async (e) => {
+      e.target.disabled = true;
+      try {
+        await api(`/brandee/templates/${kind}/${t.id}/duplicate`, { method: "POST" });
+        closeDrawer();
+        renderTemplateList(kind);
+      } catch (error) {
+        resultEl.innerHTML = `<div class="banner banner-error">${escapeHtml(error.message)}</div>`;
+        e.target.disabled = false;
+      }
+    });
+    document.getElementById("testBtn").addEventListener("click", async (e) => {
+      e.target.disabled = true;
+      resultEl.innerHTML = "<p>Running test generation with sample data…</p>";
+      try {
+        const result = await api(`/brandee/templates/${kind}/${t.id}/test`, { method: "POST" });
+        if (kind === "static" && result.svg) {
+          const blob = new Blob([result.svg], { type: "image/svg+xml" });
+          document.getElementById("testPreviewImg").src = URL.createObjectURL(blob);
+          resultEl.innerHTML = `<div class="banner">Test render generated below (sample data, watermarked).</div>`;
+        } else {
+          resultEl.innerHTML = `<div class="banner ${result.providerAvailable ? "" : "banner-warn"}">${escapeHtml(result.message)}</div>`;
+        }
+      } catch (error) {
+        resultEl.innerHTML = `<div class="banner banner-error">${escapeHtml(error.message)}</div>`;
+      } finally {
+        e.target.disabled = false;
+      }
+    });
+  }
+
+  function overlayRegionFields(name, defaults) {
+    const d = defaults || {};
+    return `
+      <div class="field"><label>${name} region (x, y, width, height — normalized 0-1)</label>
+        <div style="display:flex;gap:6px">
+          <input data-region="${name}" data-key="x" type="number" step="0.01" min="0" max="1" value="${d.x ?? ""}" placeholder="x" />
+          <input data-region="${name}" data-key="y" type="number" step="0.01" min="0" max="1" value="${d.y ?? ""}" placeholder="y" />
+          <input data-region="${name}" data-key="width" type="number" step="0.01" min="0" max="1" value="${d.width ?? ""}" placeholder="w" />
+          <input data-region="${name}" data-key="height" type="number" step="0.01" min="0" max="1" value="${d.height ?? ""}" placeholder="h" />
+        </div>
+      </div>`;
+  }
+
+  function collectOverlaySchema(container) {
+    const regions = ["productImage", "logo", "headline", "subheadline", "price", "offerBadge", "cta"];
+    const schema = {};
+    regions.forEach((name) => {
+      const xEl = container.querySelector(`[data-region="${name}"][data-key="x"]`);
+      if (!xEl || xEl.value === "") return;
+      schema[name] = {
+        x: Number(xEl.value),
+        y: Number(container.querySelector(`[data-region="${name}"][data-key="y"]`).value || 0),
+        width: Number(container.querySelector(`[data-region="${name}"][data-key="width"]`).value || 0.1),
+        height: Number(container.querySelector(`[data-region="${name}"][data-key="height"]`).value || 0.1),
+        alignment: "left",
+        layerOrder: 1
+      };
+    });
+    return schema;
+  }
+
+  async function renderTemplateForm(kind) {
+    const label = TEMPLATE_LABELS[kind];
+    content.innerHTML = `
+      <h1>New ${kind === "static" ? "Static Ad Template" : "UGC Template"}</h1>
+      <p class="page-sub">New templates start as DRAFT — activate them from the ${label} list once ready.</p>
+      <form id="templateForm">
+        <div class="field"><label for="f_name">Name</label><input id="f_name" required /></div>
+        <div class="field"><label for="f_slug">Slug (lowercase, underscores)</label><input id="f_slug" required pattern="[a-z0-9_]+" /></div>
+        <div class="field"><label for="f_category">Category</label><input id="f_category" required /></div>
+        <div class="field"><label for="f_description">Description</label><input id="f_description" required /></div>
+        ${kind === "static" ? `
+          <div class="field"><label for="f_thumb">Thumbnail URL</label><input id="f_thumb" placeholder="/agents/brandee/assets/templates/example.svg" /></div>
+          <div class="field"><label for="f_aspect">Supported aspect ratios (comma-separated: 1:1, 4:5, 9:16, 16:9)</label><input id="f_aspect" value="4:5" /></div>
+          <h2>Overlay regions (normalized coordinates)</h2>
+          ${["productImage", "headline", "subheadline", "price", "cta"].map((n) => overlayRegionFields(n)).join("")}
+        ` : `
+          <div class="field"><label for="f_poster">Preview poster URL</label><input id="f_poster" placeholder="/agents/brandee/assets/styles/example.svg" /></div>
+          <div class="field"><label for="f_durations">Supported durations in seconds (comma-separated)</label><input id="f_durations" value="15,30" /></div>
+        `}
+        <div class="field"><label for="f_required">Required field keys (comma-separated)</label><input id="f_required" placeholder="headline,cta" /></div>
+        <button class="action" type="submit">Create Draft Template</button>
+      </form>
+      <div id="formResult"></div>
+    `;
+    document.getElementById("templateForm").addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const resultEl = document.getElementById("formResult");
+      const requiredKeys = document.getElementById("f_required").value.split(",").map((s) => s.trim()).filter(Boolean);
+      const requiredFieldsSchema = requiredKeys.map((key) => ({ key, label: key, type: "text", required: true }));
+      let payload;
+      if (kind === "static") {
+        const aspectRatios = document.getElementById("f_aspect").value.split(",").map((s) => s.trim()).filter(Boolean);
+        payload = {
+          name: document.getElementById("f_name").value,
+          slug: document.getElementById("f_slug").value,
+          category: document.getElementById("f_category").value,
+          description: document.getElementById("f_description").value,
+          thumbnailUrl: document.getElementById("f_thumb").value || null,
+          previewImageUrl: document.getElementById("f_thumb").value || null,
+          supportedAspectRatios: aspectRatios.length ? aspectRatios : ["4:5"],
+          defaultAspectRatio: aspectRatios[0] || "4:5",
+          overlaySchema: collectOverlaySchema(document),
+          requiredFieldsSchema
+        };
+      } else {
+        const durations = document.getElementById("f_durations").value.split(",").map((s) => Number(s.trim())).filter((n) => n > 0);
+        payload = {
+          name: document.getElementById("f_name").value,
+          slug: document.getElementById("f_slug").value,
+          category: document.getElementById("f_category").value,
+          description: document.getElementById("f_description").value,
+          previewPosterUrl: document.getElementById("f_poster").value || null,
+          supportedDurations: durations.length ? durations : [15, 30],
+          requiredFieldsSchema
+        };
+      }
+      try {
+        await api(`/brandee/templates/${kind}`, { method: "POST", body: JSON.stringify(payload) });
+        window.history.pushState({}, "", `/superadmin/brandee/templates/${kind}`);
+        route();
+      } catch (error) {
+        resultEl.innerHTML = `<div class="banner banner-error">${escapeHtml(error.body?.details ? JSON.stringify(error.body.details) : error.message)}</div>`;
+      }
+    });
+  }
+
+  // -------------------------------------------------------------
+  // Brandee pricing and allowances
+  // -------------------------------------------------------------
+  async function renderBrandeePricing() {
+    content.innerHTML = "<h1>Pricing and Allowances</h1><p>Loading…</p>";
+    const [{ published }, draftResp] = await Promise.all([api("/brandee/pricing/published"), api("/brandee/pricing/draft")]);
+    const working = draftResp.draft || published || { taxMode: "NON_VAT", pricesAreTaxInclusive: true, vatRatePercent: 12, plans: [] };
+
+    content.innerHTML = `
+      <h1>Pricing and Allowances</h1>
+      <p class="page-sub">${published ? `Published: ${published.taxMode} · updated ${fmtDate(published.publishedAt)}` : "Nothing published yet — the app is using the code-level default prices."} Changes require SUPERADMIN and are audited.</p>
+      <div class="banner banner-warn">AIStaff Solutions Corporation is currently non-VAT registered. Do not switch taxMode to VAT without confirming this has changed.</div>
+      <form id="pricingForm">
+        <div class="field"><label for="p_taxMode">Tax mode</label>
+          <select id="p_taxMode"><option value="NON_VAT" ${working.taxMode === "NON_VAT" ? "selected" : ""}>NON_VAT (no VAT charged)</option><option value="VAT" ${working.taxMode === "VAT" ? "selected" : ""}>VAT (published price becomes tax-inclusive)</option></select>
+        </div>
+        <div class="field"><label for="p_vatRate">VAT rate percent (used only if tax mode is VAT)</label><input id="p_vatRate" type="number" step="0.01" value="${working.vatRatePercent}" /></div>
+        <h2>Plans</h2>
+        <div class="table-wrap"><table>
+          <thead><tr><th>Plan</th><th>Monthly price (₱)</th><th>IMAGE_FINAL / mo</th><th>VIDEO_SECONDS / mo</th><th>Featured</th></tr></thead>
+          <tbody>${(working.plans || []).map((p, i) => `
+            <tr>
+              <td>${escapeHtml(p.name)}<br /><code class="mono">${escapeHtml(p.slug)}</code></td>
+              <td><input data-plan="${i}" data-field="monthlyPrice" type="number" value="${p.monthlyPrice}" /></td>
+              <td><input data-plan="${i}" data-field="imageFinal" type="number" value="${p.entitlements.IMAGE_FINAL}" /></td>
+              <td><input data-plan="${i}" data-field="videoSeconds" type="number" value="${p.entitlements.VIDEO_SECONDS}" /></td>
+              <td><input data-plan="${i}" data-field="featured" type="checkbox" ${p.featured ? "checked" : ""} /></td>
+            </tr>`).join("")}
+          </tbody>
+        </table></div>
+        <div class="toolbar" style="margin-top:16px">
+          <button class="action" type="submit">Save Draft</button>
+        </div>
+      </form>
+      ${draftResp.draft ? `<button class="action" id="publishBtn" style="margin-top:10px">Publish Draft</button>` : ""}
+      <div id="pricingResult"></div>
+    `;
+
+    const plansState = JSON.parse(JSON.stringify(working.plans || []));
+
+    document.getElementById("pricingForm").addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const resultEl = document.getElementById("pricingResult");
+      document.querySelectorAll("[data-plan]").forEach((el) => {
+        const i = Number(el.dataset.plan);
+        if (el.dataset.field === "monthlyPrice") plansState[i].monthlyPrice = Number(el.value);
+        if (el.dataset.field === "imageFinal") plansState[i].entitlements.IMAGE_FINAL = Number(el.value);
+        if (el.dataset.field === "videoSeconds") plansState[i].entitlements.VIDEO_SECONDS = Number(el.value);
+        if (el.dataset.field === "featured") plansState[i].featured = el.checked;
+      });
+      const payload = {
+        taxMode: document.getElementById("p_taxMode").value,
+        pricesAreTaxInclusive: true,
+        vatRatePercent: Number(document.getElementById("p_vatRate").value),
+        plans: plansState
+      };
+      try {
+        await api("/brandee/pricing/draft", { method: "POST", body: JSON.stringify(payload) });
+        resultEl.innerHTML = `<div class="banner">Draft saved. Publish it to make these prices live.</div>`;
+        renderBrandeePricing();
+      } catch (error) {
+        resultEl.innerHTML = `<div class="banner banner-error">${escapeHtml(error.message)}</div>`;
+      }
+    });
+
+    const publishBtn = document.getElementById("publishBtn");
+    if (publishBtn) {
+      publishBtn.addEventListener("click", async (e) => {
+        e.target.disabled = true;
+        const resultEl = document.getElementById("pricingResult");
+        try {
+          await api(`/brandee/pricing/${draftResp.draft.id}/publish`, { method: "POST", body: JSON.stringify({}) });
+          resultEl.innerHTML = `<div class="banner">Published. The landing page and checkout now use this configuration.</div>`;
+          renderBrandeePricing();
+        } catch (error) {
+          resultEl.innerHTML = `<div class="banner banner-error">${escapeHtml(error.message)}</div>`;
+          e.target.disabled = false;
+        }
+      });
+    }
+  }
+
   async function renderSecurity() {
     const me = await api("/me");
     content.innerHTML = `
@@ -502,6 +803,12 @@
     "/superadmin/users": renderUsers,
     "/superadmin/brandee/creative-brain": renderCreativeBrain,
     "/superadmin/brandee/runs": renderRuns,
+    "/superadmin/brandee/templates": renderBrandeeTemplatesHub,
+    "/superadmin/brandee/templates/static": () => renderTemplateList("static"),
+    "/superadmin/brandee/templates/ugc": () => renderTemplateList("ugc"),
+    "/superadmin/brandee/templates/static/new": () => renderTemplateForm("static"),
+    "/superadmin/brandee/templates/ugc/new": () => renderTemplateForm("ugc"),
+    "/superadmin/brandee/pricing": renderBrandeePricing,
     "/superadmin/system": renderSystem,
     "/superadmin/audit-logs": renderAuditLogs,
     "/superadmin/security": renderSecurity

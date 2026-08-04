@@ -67,6 +67,45 @@ test("landing page does not promise 'Generate and publish' (publishing is not im
   assert.doesNotMatch(landingHtml, /generate and publish/i);
 });
 
+test("pricing section shows exactly the three final plans at their exact published prices", () => {
+  assert.match(landingHtml, /Image Starter/);
+  assert.match(landingHtml, /₱599\/month/);
+  assert.match(landingHtml, /Video Starter/);
+  assert.match(landingHtml, /₱1,199\/month/);
+  assert.match(landingHtml, /Brandee Combo/);
+  assert.match(landingHtml, /₱2,999\/month/);
+});
+
+test("Brandee Combo is marked 'Best Value'", () => {
+  assert.match(landingHtml, /Best Value/);
+});
+
+test("pricing section shows the ₱597 combo savings explanation", () => {
+  assert.match(landingHtml, /Save ₱597/);
+});
+
+test("pricing section shows the non-VAT disclosure and never claims VAT is charged or included", () => {
+  assert.match(landingHtml, /non-VAT registered/i);
+  assert.doesNotMatch(landingHtml, /VAT included/i);
+  // The page legitimately says "no 12% VAT is added" (a disclosure that VAT
+  // is NOT charged) — what must never appear is the same figure presented
+  // as an actual charge, e.g. "plus 12% VAT" or "12% VAT is added" without
+  // the "no" that negates it.
+  assert.doesNotMatch(landingHtml, /plus 12% VAT/i);
+  assert.match(landingHtml, /no 12% VAT is added/i);
+});
+
+test("pricing section never uses the old 'X creatives' or combined 'static ads or videos' wording", () => {
+  assert.doesNotMatch(landingHtml, /\d+\s+creatives/i);
+  assert.doesNotMatch(landingHtml, /static ads or videos/i);
+});
+
+test("pricing section no longer shows the old Starter/Creator/Growth placeholder plan prices", () => {
+  assert.doesNotMatch(landingHtml, /₱999\/month/);
+  assert.doesNotMatch(landingHtml, /₱2,499\/month/);
+  assert.doesNotMatch(landingHtml, /₱5,999\/month/);
+});
+
 test("pricing section does not display 'unlimited'", () => {
   assert.doesNotMatch(landingHtml, /unlimited/i);
 });

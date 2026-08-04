@@ -54,6 +54,12 @@ function mountSuperAdminPages(app) {
     "/superadmin/brandee",
     "/superadmin/brandee/creative-brain",
     "/superadmin/brandee/runs",
+    "/superadmin/brandee/templates",
+    "/superadmin/brandee/templates/static",
+    "/superadmin/brandee/templates/ugc",
+    "/superadmin/brandee/templates/static/new",
+    "/superadmin/brandee/templates/ugc/new",
+    "/superadmin/brandee/pricing",
     "/superadmin/system",
     "/superadmin/audit-logs",
     "/superadmin/security"

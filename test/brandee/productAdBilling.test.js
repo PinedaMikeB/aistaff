@@ -96,13 +96,13 @@ test("subscribeUserToPlan in non-live (test) payment mode activates the order an
   installFakeDb();
   const { subscribeUserToPlan } = freshBilling();
 
-  const result = await subscribeUserToPlan({ user: { id: "user-1", name: "Jane", email: "jane@example.com" }, planSlug: "starter", billingFrequency: "monthly" });
+  const result = await subscribeUserToPlan({ user: { id: "user-1", name: "Jane", email: "jane@example.com" }, planSlug: "image_starter", billingFrequency: "monthly" });
 
   assert.equal(result.testMode, true);
   assert.equal(result.order.order_status, "active");
   assert.equal(result.order.payment_status, "paid");
   assert.equal(result.subscription.status, "active");
-  assert.equal(result.plan.slug, "starter");
+  assert.equal(result.plan.slug, "image_starter");
 
   if (previousMode !== undefined) process.env.PAYMENT_MODE = previousMode;
 });
@@ -135,7 +135,7 @@ test("requireBrandeeSubscription blocks (402) a user with no active subscription
 });
 
 test("requireBrandeeSubscription allows a user with an active subscription through to next()", async () => {
-  const activeSubscription = { id: "sub-existing", customer_id: "customer-user-with-sub", status: "active", pricing_plan: { slug: "brandee-starter" } };
+  const activeSubscription = { id: "sub-existing", customer_id: "customer-user-with-sub", status: "active", pricing_plan: { slug: "brandee-image_starter" } };
   installFakeDb({ existingSubscription: activeSubscription });
   const { requireBrandeeSubscription } = freshBilling();
 

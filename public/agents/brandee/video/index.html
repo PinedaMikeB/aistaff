@@ -379,7 +379,7 @@
       <dl class="concept-box">
         <dt>Selected hook</dt><dd>${body.hookText || "—"}</dd>
         <dt>Concept</dt><dd>${body.concept || "—"}</dd>
-        <dt>Proposed final length</dt><dd>${(state.config.plans[0] && state.config.plans[0].videoMaxLengthSeconds) || 15} seconds (plan-dependent)</dd>
+        <dt>Proposed final length</dt><dd>Up to 30 seconds (plan-dependent — see plans below)</dd>
       </dl>`;
     $("#toAccountStep").hidden = false;
     helpers.track("video_preview_completed", { styleId: state.styleId });
@@ -407,7 +407,7 @@
     (state.config.plans || []).forEach((plan, i) => {
       const card = document.createElement("div");
       card.className = "plan-card" + (i === 1 ? " featured" : "");
-      card.innerHTML = `<h4>${plan.name}</h4><b>₱${plan.monthlyPrice}/mo</b><p style="color:#86a3b7;font:13px Manrope;margin:0 0 12px">${plan.imageCreditsPerMonth} image ads · ${plan.videoCreditsPerMonth} full videos</p><button type="button" class="button button-primary glow-button" data-plan="${plan.slug}">Choose ${plan.name}</button>`;
+      card.innerHTML = `<h4>${plan.name}${plan.badge ? ` <span style="font-size:11px;color:#3ddc97">${plan.badge}</span>` : ""}</h4><b>₱${plan.monthlyPrice}/mo</b><p style="color:#86a3b7;font:13px Manrope;margin:0 0 12px">${plan.entitlements.IMAGE_FINAL} image ads · ${plan.entitlements.VIDEO_SECONDS} video seconds per month</p><button type="button" class="button button-primary glow-button" data-plan="${plan.slug}">Choose ${plan.name}</button>`;
       grid.appendChild(card);
     });
     $$("[data-plan]", grid).forEach((btn) => btn.addEventListener("click", () => subscribe(btn.dataset.plan)));

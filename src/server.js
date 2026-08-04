@@ -76,6 +76,10 @@ const productAdProjectStore = require("./brandee/productAdProjectStore");
 const { registerAccount, RegistrationError } = require("./brandee/accountRegistration");
 const { ensureBrandeeProductAdsCatalog, subscribeUserToPlan, getActiveBrandeeSubscriptionForUser, requireBrandeeSubscription } = require("./brandee/productAdBilling");
 const { track: trackBrandeeEvent } = require("./brandee/analyticsEvents");
+const templateCatalog = require("./brandee/templateCatalog");
+const pricingOverride = require("./brandee/pricingOverride");
+const entitlements = require("./brandee/entitlements");
+const { ENTITLEMENT_UNITS, computeComboSavings, PRICING_NOTE } = require("./brandee/pricingConfig");
 const { getCreativeBrainStatus, validateAllResources, RESOURCE_VALIDATORS } = require("./admin/creativeBrain");
 const systemStatus = require("./admin/systemStatus");
 const { recordAuditEvent, listAuditLogs, AUDIT_ACTIONS } = require("./admin/auditLog");
@@ -1486,11 +1490,22 @@ function requireProductAdRateLimit(req, res, next) {
 }
 
 app.get("/api/public/brandee/product-ads/config", asyncHandler(async (req, res) => {
+  const [templates, videoStyles, pricing] = await Promise.all([
+    templateCatalog.listActiveStaticTemplates({ hasTestimonial: false }),
+    templateCatalog.listActiveUgcTemplates(),
+    pricingOverride.getEffectivePricing()
+  ]);
   res.json({
-    templates: listAvailableTemplates({ hasTestimonial: false }),
-    videoStyles: listVideoAdStyles(),
-    plans: listBrandeePlans(),
-    pricingQuantitiesArePlaceholders: PRICING_QUANTITIES_ARE_PLACEHOLDERS,
+    templates,
+    videoStyles,
+    plans: pricing.plans,
+    pricingSource: pricing.source,
+    taxMode: pricing.taxMode,
+    pricesAreTaxInclusive: pricing.pricesAreTaxInclusive,
+    vatRatePercent: pricing.vatRatePercent,
+    pricingNote: PRICING_NOTE,
+    comboSavings: computeComboSavings(),
+    pricingQuantitiesArePlaceholders: false,
     hookPreferences: HOOK_PREFERENCES,
     tones: TONES,
     creatorTypes: CREATOR_TYPES,
@@ -1553,11 +1568,11 @@ app.post("/api/public/brandee/product-ads/image/preview", requireProductAdRateLi
   if (imageError) return res.status(400).json({ ok: false, error: "One of the uploaded images could not be used.", detail: imageError });
 
   const hasTestimonial = hasRealTestimonial(form);
-  if (!isTemplateAvailable(form.templateId, { hasTestimonial })) {
+  const template = await templateCatalog.getStaticTemplateBySlug(form.templateId);
+  if (!template) return res.status(400).json({ ok: false, error: "Unknown template." });
+  if (template.proofRequirement === "testimonial" && !hasTestimonial) {
     return res.status(400).json({ ok: false, error: "That template isn't available yet — it requires a real testimonial." });
   }
-  const template = getImageAdTemplate(form.templateId);
-  if (!template) return res.status(400).json({ ok: false, error: "Unknown template." });
   for (const field of template.fields) {
     if (field.required && !form.templateFields?.[field.key]) {
       return res.status(400).json({ ok: false, error: `"${field.label}" is required for the ${template.name} template.` });
@@ -1604,7 +1619,7 @@ app.post("/api/public/brandee/product-ads/video/preview", requireProductAdRateLi
   const imageError = requireValidImages(form);
   if (imageError) return res.status(400).json({ ok: false, error: "One of the uploaded images could not be used.", detail: imageError });
 
-  const style = getVideoAdStyle(form.styleId);
+  const style = await templateCatalog.getUgcTemplateBySlug(form.styleId);
   if (!style) return res.status(400).json({ ok: false, error: "Unknown video style." });
 
   const userId = req.user?.id || null;
@@ -1727,8 +1742,28 @@ app.post("/api/brandee/product-ads/image/final", requireAuth, requireBrandeeSubs
   if (!project || project.userId !== req.user.id) return res.status(404).json({ ok: false, error: "Project not found." });
   if (!project.templateId) return res.status(400).json({ ok: false, error: "Choose a template and generate a preview first." });
 
+  const subscription = req.brandeeSubscription;
+  const idempotencyKey = `image-final:${project.id}`;
+
   trackBrandeeEvent("final_generation_started", { kind: "image" }, { userId: req.user.id });
-  const rendered = renderImageAdSvg({ templateId: project.templateId, templateFields: project.templateFields, form: project.product, watermark: false });
+
+  let outcome;
+  try {
+    outcome = await entitlements.withReservedEntitlement(
+      { customerId: subscription.customer_id, subscriptionId: subscription.id, subscription, unit: ENTITLEMENT_UNITS.IMAGE_FINAL, amount: 1, projectId: project.id, idempotencyKey },
+      async () => {
+        const rendered = renderImageAdSvg({ templateId: project.templateId, templateFields: project.templateFields, form: project.product, watermark: false });
+        return { ok: true, rendered };
+      }
+    );
+  } catch (error) {
+    if (error.code === "INSUFFICIENT_ENTITLEMENT") {
+      return res.status(402).json({ ok: false, code: "ENTITLEMENT_EXHAUSTED", error: "You've used all of your image ads for this billing period.", remaining: error.remaining });
+    }
+    throw error;
+  }
+
+  const { rendered } = outcome;
   productAdProjectStore.updateProject(project.id, {
     finalAsset: { generatedAt: new Date().toISOString(), svg: rendered.svg, width: rendered.width, height: rendered.height },
     status: "finalized"
@@ -1744,33 +1779,64 @@ app.post("/api/brandee/product-ads/video/final", requireAuth, requireBrandeeSubs
   if (!project || project.userId !== req.user.id) return res.status(404).json({ ok: false, error: "Project not found." });
   if (!project.styleId) return res.status(400).json({ ok: false, error: "Choose a video style and generate a preview first." });
 
-  const plan = req.brandeeSubscription?.pricing_plan?.features?.videoMaxLengthSeconds || 15;
+  const subscription = req.brandeeSubscription;
+  const form = project.videoFields || project.product;
+  const requestedSeconds = Math.max(1, Math.min(60, form.preferredFinalLength || 30));
+  const idempotencyKey = `video-final:${project.id}`;
 
   trackBrandeeEvent("final_generation_started", { kind: "video" }, { userId: req.user.id });
-  const form = project.videoFields || project.product;
-  const hookText = form.hookPreference ? `${form.mainBenefit || form.productName} — ${form.hookPreference}` : (form.mainBenefit || form.productName);
-  const result = await generateFinalVideo({
-    projectId: project.id,
-    styleId: project.styleId,
-    hookText,
-    headline: form.productName,
-    ctaText: form.ctaText || "Learn more",
-    productImageDataUrl: form.productImage,
-    brandColor: (form.brandColors && form.brandColors[0]) || "#0f172a",
-    durationSeconds: Math.min(plan, form.preferredFinalLength || plan)
-  });
 
-  if (!result.ok) {
-    return res.status(503).json({ ok: false, reason: result.reason, error: result.message });
+  const hookText = form.hookPreference ? `${form.mainBenefit || form.productName} — ${form.hookPreference}` : (form.mainBenefit || form.productName);
+
+  let outcome;
+  try {
+    outcome = await entitlements.withReservedEntitlement(
+      { customerId: subscription.customer_id, subscriptionId: subscription.id, subscription, unit: ENTITLEMENT_UNITS.VIDEO_SECONDS, amount: requestedSeconds, projectId: project.id, idempotencyKey },
+      () => generateFinalVideo({
+        projectId: project.id,
+        styleId: project.styleId,
+        hookText,
+        headline: form.productName,
+        ctaText: form.ctaText || "Learn more",
+        productImageDataUrl: form.productImage,
+        brandColor: (form.brandColors && form.brandColors[0]) || "#0f172a",
+        durationSeconds: requestedSeconds
+      })
+    );
+  } catch (error) {
+    if (error.code === "INSUFFICIENT_ENTITLEMENT") {
+      return res.status(402).json({ ok: false, code: "ENTITLEMENT_EXHAUSTED", error: "You don't have enough video seconds remaining this billing period.", remaining: error.remaining });
+    }
+    throw error;
+  }
+
+  if (!outcome.ok) {
+    return res.status(503).json({ ok: false, reason: outcome.reason, error: outcome.message });
   }
 
   productAdProjectStore.updateProject(project.id, {
-    finalAsset: { generatedAt: new Date().toISOString(), url: result.relativeUrl, durationSeconds: result.durationSeconds },
+    finalAsset: { generatedAt: new Date().toISOString(), url: outcome.relativeUrl, durationSeconds: outcome.durationSeconds },
     status: "finalized"
   });
   trackBrandeeEvent("final_generation_completed", { kind: "video" }, { userId: req.user.id });
 
-  res.json({ ok: true, url: result.relativeUrl, durationSeconds: result.durationSeconds });
+  res.json({ ok: true, url: outcome.relativeUrl, durationSeconds: outcome.durationSeconds });
+}));
+
+app.get("/api/brandee/product-ads/entitlements", requireAuth, requireBrandeeSubscription(), asyncHandler(async (req, res) => {
+  const subscription = req.brandeeSubscription;
+  const [imageBalance, videoBalance] = await Promise.all([
+    entitlements.getBalance({ customerId: subscription.customer_id, subscription, unit: ENTITLEMENT_UNITS.IMAGE_FINAL }),
+    entitlements.getBalance({ customerId: subscription.customer_id, subscription, unit: ENTITLEMENT_UNITS.VIDEO_SECONDS })
+  ]);
+  res.json({
+    ok: true,
+    imageFinalRemaining: imageBalance.remaining,
+    imageFinalAllowance: imageBalance.monthlyAllowance,
+    videoSecondsRemaining: videoBalance.remaining,
+    videoSecondsAllowance: videoBalance.monthlyAllowance,
+    approxThirtySecondVideosRemaining: Math.floor(videoBalance.remaining / 30)
+  });
 }));
 
 // Deprecated old entry points (PART 24). The actual redirect customers hit

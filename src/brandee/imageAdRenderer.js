@@ -24,7 +24,9 @@ const TEMPLATE_CONTENT_MAP = {
   question_ad: (f) => ({ headline: f.customerQuestion, subcopy: f.supportingAnswer, price: null, cta: f.cta, badge: null }),
   comparison: (f) => ({ headline: `Vs. ${f.comparisonSubject || ""}`.trim(), subcopy: f.comparisonPoints, price: null, cta: f.cta, badge: null }),
   minimal_ecommerce: (f, form) => ({ headline: form.productName, subcopy: null, price: f.price, cta: f.cta, badge: null }),
-  testimonial_style: (f) => ({ headline: `"${f.testimonialQuote || ""}"`, subcopy: `— ${f.testimonialAttribution || ""}`, price: null, cta: f.cta, badge: null })
+  testimonial_style: (f) => ({ headline: `"${f.testimonialQuote || ""}"`, subcopy: `— ${f.testimonialAttribution || ""}`, price: null, cta: f.cta, badge: null }),
+  before_and_after: (f) => ({ headline: `Before: ${f.beforeState || ""}`, subcopy: `After: ${f.afterState || ""}`, price: null, cta: f.cta, badge: null }),
+  bold_claim: (f) => ({ headline: f.claim, subcopy: f.evidenceSource ? `Source: ${f.evidenceSource}` : null, price: null, cta: f.cta, badge: null })
 };
 
 function buildAdContent(templateId, templateFields = {}, form = {}) {

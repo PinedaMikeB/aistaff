@@ -1,5 +1,5 @@
-// Video-ad style library tests (PART 11).
-// Confirms all 6 specified styles exist with the required shape and a
+// Video-ad style library tests (PART 14).
+// Confirms all 8 specified styles exist with the required shape and a
 // sane suggested length, and that the shared preference vocab lists exist.
 
 const test = require("node:test");
@@ -21,10 +21,12 @@ const EXPECTED_IDS = [
   "problem_solution",
   "offer_promo",
   "unboxing",
-  "product_showcase"
+  "product_showcase",
+  "founder_expert_style",
+  "voiceover_product_ad"
 ];
 
-test("exactly the 6 video styles specified in PART 11 exist", () => {
+test("exactly the 8 video styles specified in PART 14 exist", () => {
   assert.deepEqual(VIDEO_AD_STYLES.map((s) => s.id), EXPECTED_IDS);
 });
 
@@ -49,8 +51,8 @@ test("getVideoAdStyle returns the matching style or null", () => {
   assert.equal(getVideoAdStyle("not_real"), null);
 });
 
-test("listVideoAdStyles returns all 6 styles", () => {
-  assert.equal(listVideoAdStyles().length, 6);
+test("listVideoAdStyles returns all 8 styles", () => {
+  assert.equal(listVideoAdStyles().length, 8);
 });
 
 test("shared preference vocabularies (hooks/tones/creator types/settings) are non-empty", () => {

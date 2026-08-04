@@ -54,6 +54,24 @@ const VIDEO_AD_STYLES = [
     poster: "/agents/brandee/assets/styles/product-showcase.svg",
     suggestedLengthSeconds: 15,
     requiredInputs: ["setting"]
+  },
+  {
+    id: "founder_expert_style",
+    name: "Founder or Expert Style",
+    description: "A founder- or expert-style spokesperson speaks directly to camera about the product.",
+    bestUse: "Brands that want a credible, personal voice behind the product.",
+    poster: "/agents/brandee/assets/styles/founder-expert-style.svg",
+    suggestedLengthSeconds: 30,
+    requiredInputs: ["hookPreference", "creatorType", "setting"]
+  },
+  {
+    id: "voiceover_product_ad",
+    name: "Voiceover Product Ad",
+    description: "A narrated voiceover plays over product visuals — no on-camera creator required.",
+    bestUse: "Products where a clean, narrated visual sequence works better than a talking-head creator.",
+    poster: "/agents/brandee/assets/styles/voiceover-product-ad.svg",
+    suggestedLengthSeconds: 20,
+    requiredInputs: ["hookPreference", "voicePreference"]
   }
 ];
 

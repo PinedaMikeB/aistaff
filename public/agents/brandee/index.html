@@ -163,47 +163,50 @@
 
 <section id="pricing" class="closer-section closer-narrow">
   <p class="section-kicker">Pricing</p>
-  <h2>Simple plans, image and video allowances kept separate.</h2>
-  <p class="closer-statement">Every plan includes Brandee's creative recommendations, copy and headline generation, and image/video previews.
-    <!-- PLACEHOLDER: monthly prices and image/video credit counts below are configuration
-         placeholders (see src/brandee/pricingConfig.js) — not finalized against real
-         generation-cost data. Do not treat these numbers as committed pricing. -->
-  </p>
+  <h2>Three plans. Image and video allowances always kept separate.</h2>
+  <p class="closer-statement">Prices shown are the total monthly subscription prices. AIStaff Solutions Corporation is currently non-VAT registered.</p>
   <div class="brandee-pricing-grid" id="pricingGrid">
     <article>
-      <h3>Starter</h3><b>₱999/month</b><strong>Image-focused plan</strong>
-      <p>For sellers who mainly need product image ads.</p>
+      <h3>Image Starter</h3><b>₱599/month</b><strong>Image-focused plan</strong>
+      <p>Everything you need to turn products into image ads.</p>
       <ul class="pricing-feature-list">
-        <li>15 image ads per month</li>
-        <li>2 full videos per month</li>
-        <li>3-second video previews included</li>
-        <li>1 brand kit</li>
-        <li>High-resolution image export</li>
+        <li>10 final image ads per billing cycle</li>
+        <li>0 video seconds included</li>
+        <li>Low-resolution image previews</li>
+        <li>1080p final image exports</li>
+        <li>1 saved brand kit · up to 5 saved products</li>
+        <li>English, Filipino, and Taglish support</li>
       </ul>
-    </article>
-    <article class="featured">
-      <h3>Creator</h3><b>₱2,499/month</b><strong>Most popular</strong>
-      <p>For creators and sellers posting image and video ads weekly.</p>
-      <ul class="pricing-feature-list">
-        <li>40 image ads per month</li>
-        <li>8 full videos per month</li>
-        <li>More templates and video styles</li>
-        <li>High-resolution image export</li>
-      </ul>
+      <a class="button button-soft" href="/agents/brandee/image/">Start with Image Ads</a>
     </article>
     <article>
-      <h3>Growth</h3><b>₱5,999/month</b><strong>Multiple products</strong>
-      <p>For small marketing teams managing several products.</p>
+      <h3>Video Starter</h3><b>₱1,199/month</b><strong>Video-focused plan</strong>
+      <p>Turn products into short-form video ads.</p>
       <ul class="pricing-feature-list">
-        <li>100 image ads per month</li>
-        <li>20 full videos per month</li>
-        <li>Multiple products and brand kits</li>
-        <li>Priority rendering</li>
+        <li>0 final image ads included</li>
+        <li>60 finished video seconds per billing cycle (e.g. 2×30s, 4×15s, or 1×60s)</li>
+        <li>3-second teaser previews</li>
+        <li>1080p final export when supported by the configured provider</li>
+        <li>1 saved brand kit · up to 5 saved products</li>
+        <li>English, Filipino, and Taglish support</li>
       </ul>
+      <a class="button button-soft" href="/agents/brandee/video/">Start with Video Ads</a>
+    </article>
+    <article class="featured">
+      <h3>Brandee Combo</h3><span class="pricing-badge">Best Value</span><b>₱2,999/month</b><strong>Image + video together</strong>
+      <p>Image and video ads together, at a lower combined price.</p>
+      <ul class="pricing-feature-list">
+        <li>20 final image ads per billing cycle</li>
+        <li>120 finished video seconds per billing cycle (4 full 30-second videos)</li>
+        <li>Low-resolution image previews and 3-second video teasers</li>
+        <li>Up to 3 saved brand kits · up to 20 saved products</li>
+        <li>Multiple aspect ratios · priority rendering</li>
+      </ul>
+      <p class="pricing-savings">Save ₱597 compared with equivalent Starter allowances (2× Image Starter + 2× Video Starter = ₱3,596 vs. ₱2,999 — about 16.6% less).</p>
+      <a class="button button-primary glow-button" href="/agents/brandee/image/">Get Image + Video</a>
     </article>
   </div>
-  <p class="note">Quantities above are configuration placeholders and may change before public launch. Need a custom plan? <a class="text-link" href="/contact/">Contact us <span>↗</span></a></p>
-  <a class="button button-primary glow-button" href="#choose">Create with Brandee <span>↗</span></a>
+  <p class="note">Non-VAT transaction — no 12% VAT is added to these prices. Need a custom plan? <a class="text-link" href="/contact/">Contact us <span>↗</span></a></p>
 </section>
 
 <section id="faq" class="closer-section closer-narrow">
@@ -349,6 +352,9 @@
   .pricing-feature-list { margin: 0; padding: 0; list-style: none; display: grid; gap: 8px; }
   .pricing-feature-list li { position: relative; padding-left: 16px; color: #9fc0d6; font: 13.5px/1.5 "Manrope"; }
   .pricing-feature-list li::before { content: ""; position: absolute; left: 0; top: 7px; width: 5px; height: 5px; border-radius: 50%; background: var(--cyan); }
+  .pricing-badge { display: inline-block; padding: 3px 10px; margin-bottom: 10px; border-radius: 100px; background: rgba(61,220,151,.16); color: #3ddc97; font: 700 11px "DM Mono"; text-transform: uppercase; letter-spacing: .06em; }
+  .pricing-savings { color: #3ddc97; font: 13px/1.5 "Manrope"; margin: 0 0 16px; }
+  .brandee-pricing-grid article .button { margin-top: 4px; width: 100%; text-align: center; }
   .note { color: #587789; font: 13px "Manrope"; margin-bottom: 26px; }
   .closer-faq-list { display: grid; gap: 10px; }
   .closer-faq-list details { padding: 18px 20px; border: 1px solid rgba(117,161,188,.18); border-radius: 4px; background: rgba(11,25,36,.5); }

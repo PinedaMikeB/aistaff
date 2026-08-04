@@ -119,6 +119,33 @@ const IMAGE_AD_TEMPLATES = [
       { key: "testimonialAttribution", label: "Attribution (name or initials)", type: "text", required: true, maxLength: 60 },
       { key: "cta", label: "Call to action", type: "text", required: true, maxLength: 40 }
     ]
+  },
+  {
+    id: "before_and_after",
+    name: "Before and After",
+    description: "Shows a verifiable before state next to the after result your product delivers.",
+    bestUse: "Products with a genuine, demonstrable before/after difference.",
+    thumbnail: "/agents/brandee/assets/templates/before-and-after.svg",
+    proofRequirement: "before_after_proof",
+    fields: [
+      { key: "beforeState", label: "Verifiable before state", type: "text", required: true, maxLength: 140 },
+      { key: "afterState", label: "Verifiable after state", type: "text", required: true, maxLength: 140 },
+      { key: "proofSource", label: "Proof source", type: "text", required: true, maxLength: 140 },
+      { key: "cta", label: "Call to action", type: "text", required: true, maxLength: 40 }
+    ]
+  },
+  {
+    id: "bold_claim",
+    name: "Bold Claim",
+    description: "Leads with a strong, attention-grabbing claim backed by real evidence.",
+    bestUse: "Products with a genuinely strong, defensible selling point.",
+    thumbnail: "/agents/brandee/assets/templates/bold-claim.svg",
+    proofRequirement: "claim_evidence",
+    fields: [
+      { key: "claim", label: "Proposed claim", type: "text", required: true, maxLength: 100 },
+      { key: "evidenceSource", label: "Evidence source", type: "text", required: true, maxLength: 140 },
+      { key: "cta", label: "Call to action", type: "text", required: true, maxLength: 40 }
+    ]
   }
 ];
 

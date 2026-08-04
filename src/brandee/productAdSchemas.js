@@ -26,7 +26,17 @@ const SharedProductFormSchema = z.object({
 
   // Optional (PART 7) — never required before the free preview.
   productListingUrl: z.string().url().max(500).optional().nullable(),
+  // Structured price/offer fields (PART 7 — replaces the old, confusing
+  // single "Offer or discount" free-text field). `price` is kept as a
+  // simple derived/legacy alias (set to regularPrice by the client) so
+  // templates that only care about "a" price (e.g. Minimal Ecommerce) don't
+  // need to know about the structured breakdown.
   price: z.string().max(60).optional().nullable(),
+  regularPrice: z.string().max(60).optional().nullable(),
+  promoPrice: z.string().max(60).optional().nullable(),
+  discountText: z.string().max(60).optional().nullable(),
+  offerExpirationDate: z.string().max(20).optional().nullable(),
+  offerDetails: z.string().max(200).optional().nullable(),
   offer: z.string().max(200).optional().nullable(),
   mainBenefit: z.string().max(200).optional().nullable(),
   logo: DataUrlImage.optional().nullable(),

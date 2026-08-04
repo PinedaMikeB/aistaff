@@ -1,5 +1,5 @@
-// Image-ad template library tests (PART 9).
-// Confirms all 8 specified templates exist with the required shape, and
+// Image-ad template library tests (PART 8/9).
+// Confirms all 10 specified templates exist with the required shape, and
 // that Testimonial Style stays gated behind a real testimonial.
 
 const test = require("node:test");
@@ -20,10 +20,12 @@ const EXPECTED_IDS = [
   "question_ad",
   "comparison",
   "minimal_ecommerce",
-  "testimonial_style"
+  "testimonial_style",
+  "before_and_after",
+  "bold_claim"
 ];
 
-test("exactly the 8 templates specified in PART 9 exist, in the given order", () => {
+test("exactly the 10 templates specified in PART 8 exist, in the given order", () => {
   assert.deepEqual(IMAGE_AD_TEMPLATES.map((t) => t.id), EXPECTED_IDS);
 });
 
@@ -61,6 +63,18 @@ test("comparison template requires defensible comparison points (no unsupported 
   const template = getImageAdTemplate("comparison");
   const points = template.fields.find((f) => f.key === "comparisonPoints");
   assert.ok(points.required, "comparisonPoints must be required so no comparison ad ships without stated points");
+});
+
+test("before_and_after requires a real proof source (hard-blocks unsupported before/after claims)", () => {
+  const template = getImageAdTemplate("before_and_after");
+  const proof = template.fields.find((f) => f.key === "proofSource");
+  assert.ok(proof.required, "proofSource must be required so no before/after ad ships without real proof");
+});
+
+test("bold_claim requires a real evidence source (hard-blocks unsupported claims)", () => {
+  const template = getImageAdTemplate("bold_claim");
+  const evidence = template.fields.find((f) => f.key === "evidenceSource");
+  assert.ok(evidence.required, "evidenceSource must be required so no bold claim ships without evidence");
 });
 
 test("isTemplateAvailable: every non-testimonial template is always available", () => {
