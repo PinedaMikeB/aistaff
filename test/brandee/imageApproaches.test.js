@@ -53,6 +53,7 @@ test("approaches page resolves public template URLs and provides loading/failure
   assert.match(approachesHtml, /template-image-skeleton/);
   assert.match(approachesHtml, /template-image-fallback/);
   assert.match(approachesHtml, /template_image_load_failed/);
+  assert.match(approachesHtml, /const imported=matches\.filter\(\(t\) => \/\\\/imported\\\//);
   assert.doesNotMatch(approachesHtml, /\/Volumes\//);
   assert.doesNotMatch(approachesHtml, /file:\/\//);
 });
@@ -71,6 +72,11 @@ test("approaches page presents portrait examples with accessible motion and acti
   assert.match(approachesHtml, /mouseenter/);
   assert.match(approachesHtml, /visibilitychange/);
   assert.match(approachesHtml, /matchMedia\?\.\("\(prefers-reduced-motion: reduce\)"\)/);
+  assert.match(approachesHtml, /data-carousel-toggle/);
+  assert.match(approachesHtml, /aria-pressed/);
+  assert.match(approachesHtml, /setImagePaused/);
+  assert.match(approachesHtml, /data-approach-use/);
+  assert.match(approachesHtml, /approach-use-button/);
   assert.doesNotMatch(approachesHtml, /<span class="framework">/);
 });
 
