@@ -77,6 +77,29 @@ const AiAnalysisResponseSchema = z.object({
   fields: z.record(z.array(SuggestionSchema).max(4)).optional().default({})
 });
 
+// The model reliably returns a few more items than asked for in a given
+// array field (confirmed directly against the live API: advertisingAngles
+// came back with 5-6 items against a requested/schema max of 4, on 2 of 3
+// consecutive runs) — a minor, harmless overage that Zod's .max() treats
+// as a hard rejection of the ENTIRE response object, discarding perfectly
+// good suggestions for every other field along with it. Trims each
+// known array field down to its schema limit BEFORE validation, so an
+// overage in one non-critical field (advertising angles) can never nuke
+// suggestions for productName/productDescription/mainFeatures/etc.
+function clampAiAnalysisArrays(raw) {
+  if (!raw || typeof raw !== "object") return raw;
+  const clamped = { ...raw };
+  if (Array.isArray(clamped.productCapabilities)) clamped.productCapabilities = clamped.productCapabilities.slice(0, 8);
+  if (Array.isArray(clamped.serviceBenefits)) clamped.serviceBenefits = clamped.serviceBenefits.slice(0, 8);
+  if (Array.isArray(clamped.advertisingAngles)) clamped.advertisingAngles = clamped.advertisingAngles.slice(0, 4);
+  if (clamped.fields && typeof clamped.fields === "object") {
+    const fields = {};
+    for (const [key, list] of Object.entries(clamped.fields)) fields[key] = Array.isArray(list) ? list.slice(0, 4) : list;
+    clamped.fields = fields;
+  }
+  return clamped;
+}
+
 // --- Shared AI-call helpers (same shape as creativePlanner.js's, kept
 // local rather than shared to avoid coupling two independently-evolving
 // AI-call sites — same convention already used across this subsystem's
@@ -280,7 +303,7 @@ async function analyzeProduct({ productUrl, businessWebsite, productName, produc
   if (config.apiKeyConfigured && config.provider !== "mock") {
     try {
       const raw = await callResearchModel(buildResearchPrompt({ template, extracted, businessProfile, productName, productDescription, existingFields }));
-      const validated = AiAnalysisResponseSchema.safeParse(raw);
+      const validated = AiAnalysisResponseSchema.safeParse(clampAiAnalysisArrays(raw));
       if (validated.success) {
         ai = validated.data;
         aiUsed = true;
@@ -416,7 +439,7 @@ async function generateFieldAssist({ fieldKey, fieldLabel, action, mode = "sugge
   }
   try {
     const raw = await callResearchModel(buildFieldAssistPrompt({ fieldLabel, action, mode, currentValue, template, context }));
-    const validated = FieldAssistResponseSchema.safeParse(raw);
+    const validated = FieldAssistResponseSchema.safeParse(raw && typeof raw === "object" && Array.isArray(raw.suggestions) ? { ...raw, suggestions: raw.suggestions.slice(0, 6) } : raw);
     if (!validated.success || !validated.data.suggestions.length) return { suggestions: [], aiUsed: false, mode };
     const suggestions = validated.data.suggestions.map((s, i) => ({
       id: `assist_${fieldKey}_${action}_${i}_${Math.random().toString(36).slice(2, 8)}`,
@@ -445,6 +468,7 @@ module.exports = {
   FIELD_ASSIST_ACTIONS,
   buildFieldAssistPrompt,
   generateFieldAssist,
-  describeResearchError
+  describeResearchError,
+  clampAiAnalysisArrays
 };
 

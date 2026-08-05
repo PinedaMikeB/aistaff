@@ -15,7 +15,9 @@ const {
   deterministicAnalysis,
   generateFieldAssist,
   FIELD_ASSIST_ACTIONS,
-  describeResearchError
+  describeResearchError,
+  clampAiAnalysisArrays,
+  AiAnalysisResponseSchema
 } = require("../../src/brandee/productAnalysisService");
 const { makeEvidence } = require("../../src/brandee/evidenceModel");
 
@@ -180,4 +182,35 @@ test("describeResearchError distinguishes credit exhaustion, auth, model-not-fou
   assert.match(describeResearchError({ status: 404, providerBody: JSON.stringify({ error: { code: "model_not_found" } }) }), /model name isn't available/);
   assert.match(describeResearchError({ message: "Research model timed out" }), /didn't respond in time/);
   assert.match(describeResearchError({ status: 500, providerBody: "" }), /returned an error/);
+});
+
+test("clampAiAnalysisArrays trims oversized arrays instead of letting them invalidate the whole response", () => {
+  const oversized = {
+    detectedCategory: "Backpack",
+    productCapabilities: Array.from({ length: 10 }, (_, i) => `cap ${i}`),
+    serviceBenefits: Array.from({ length: 9 }, (_, i) => `benefit ${i}`),
+    advertisingAngles: Array.from({ length: 6 }, (_, i) => `angle ${i}`),
+    fields: {
+      productName: Array.from({ length: 5 }, (_, i) => ({ text: `name ${i}` })),
+      productDescription: [{ text: "a normal one" }]
+    }
+  };
+  const clamped = clampAiAnalysisArrays(oversized);
+  assert.equal(clamped.productCapabilities.length, 8);
+  assert.equal(clamped.serviceBenefits.length, 8);
+  assert.equal(clamped.advertisingAngles.length, 4);
+  assert.equal(clamped.fields.productName.length, 4);
+  assert.equal(clamped.fields.productDescription.length, 1);
+  // Now the whole thing actually validates — this is the real bug: before
+  // clamping, one oversized array (confirmed live: advertisingAngles
+  // returning 5-6 items against schema max 4) rejected the ENTIRE response
+  // and discarded good suggestions for every other field.
+  assert.equal(AiAnalysisResponseSchema.safeParse(clamped).success, true);
+  assert.equal(AiAnalysisResponseSchema.safeParse(oversized).success, false);
+});
+
+test("clampAiAnalysisArrays never throws on null/non-object input", () => {
+  assert.equal(clampAiAnalysisArrays(null), null);
+  assert.equal(clampAiAnalysisArrays(undefined), undefined);
+  assert.deepEqual(clampAiAnalysisArrays({}), {});
 });
