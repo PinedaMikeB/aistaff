@@ -29,10 +29,12 @@
 //   marketing copy; that stays exclusively in planner.js.
 
 const { WebsiteBusinessAnalysisSchema } = require("./schemas");
-const { getExtractionConfig } = require("./modelConfig");
+const { getExtractionConfig, isReasoningModel } = require("./modelConfig");
 
 const fetchImpl = (...args) => import("node-fetch").then(({ default: f }) => f(...args));
-const AI_TIMEOUT_MS = 10000;
+// See productAnalysisService.js's identical comment — reasoning-family
+// models take real "thinking" time, measured well past the old ceiling.
+const AI_TIMEOUT_MS = 45000;
 
 // Only these fields may be changed by the AI enrichment pass — every other
 // field (including every proof/claims field) passes through unchanged.
@@ -87,6 +89,10 @@ function buildExtractionPrompt({ heuristicAnalysis, visibleText, form }) {
 
 async function callAiModel(prompt, { provider, model, apiKeyConfigured }) {
   if (provider === "openai" && apiKeyConfigured) {
+    // Reasoning-family models (gpt-5-mini among them, confirmed against the
+    // live API) reject a custom `temperature` outright and expect
+    // `reasoning_effort` instead; standard models need the opposite.
+    const reasoning = isReasoningModel(model);
     const response = await fetchImpl("https://api.openai.com/v1/chat/completions", {
       method: "POST",
       headers: { "Content-Type": "application/json", Authorization: `Bearer ${process.env.OPENAI_API_KEY}` },
@@ -94,7 +100,7 @@ async function callAiModel(prompt, { provider, model, apiKeyConfigured }) {
         model,
         messages: [{ role: "user", content: prompt }],
         response_format: { type: "json_object" },
-        temperature: 0.2
+        ...(reasoning ? { reasoning_effort: "medium" } : { temperature: 0.2 })
       })
     });
     if (!response.ok) throw new Error(`OpenAI error ${response.status} (model: ${model})`);

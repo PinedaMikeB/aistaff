@@ -36,7 +36,7 @@ const {
   validateFrameworkAlignment
 } = require("./decisionEngine");
 const { BrandeeError, toBrandeeError } = require("./errors");
-const { getPlannerConfig } = require("./modelConfig");
+const { getPlannerConfig, isReasoningModel } = require("./modelConfig");
 const { scoreHookIndependently } = require("./hookScoring");
 const { buildDistinctAngles } = require("./angleDiversity");
 const { normalizeRawPhrase, validatePlanCopyQuality } = require("./copyQuality");
@@ -455,7 +455,9 @@ function buildDeterministicPlan({ businessAnalysis: rawBusinessAnalysis, form, p
 // Optional AI enhancement pass — prose/dialogue polish only, never structure.
 // ---------------------------------------------------------------------------
 
-const AI_TIMEOUT_MS = 12000;
+// See productAnalysisService.js's identical comment — reasoning-family
+// models take real "thinking" time, measured well past the old ceiling.
+const AI_TIMEOUT_MS = 45000;
 
 function buildEnhancementPrompt({ plan, businessAnalysis, form }) {
   return [
@@ -500,6 +502,10 @@ function buildEnhancementPrompt({ plan, businessAnalysis, form }) {
 
 async function callAiModel(prompt, { provider, model, apiKeyConfigured }) {
   if (provider === "openai" && apiKeyConfigured) {
+    // Reasoning-family models (gpt-5.6-terra among them, confirmed against
+    // the live API) reject a custom `temperature` outright and expect
+    // `reasoning_effort` instead; standard models need the opposite.
+    const reasoning = isReasoningModel(model);
     const response = await fetchImpl("https://api.openai.com/v1/chat/completions", {
       method: "POST",
       headers: { "Content-Type": "application/json", Authorization: `Bearer ${process.env.OPENAI_API_KEY}` },
@@ -507,7 +513,7 @@ async function callAiModel(prompt, { provider, model, apiKeyConfigured }) {
         model,
         messages: [{ role: "user", content: prompt }],
         response_format: { type: "json_object" },
-        temperature: 0.4
+        ...(reasoning ? { reasoning_effort: "medium" } : { temperature: 0.4 })
       })
     });
     if (!response.ok) throw new Error(`OpenAI error ${response.status} (model: ${model})`);

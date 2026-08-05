@@ -15,10 +15,13 @@
 // anything proof-gated).
 
 const { z } = require("zod");
-const { getImageCreativePlanningConfig } = require("./modelConfig");
+const { getImageCreativePlanningConfig, isReasoningModel } = require("./modelConfig");
 
 const fetchImpl = (...args) => import("node-fetch").then(({ default: f }) => f(...args));
-const AI_TIMEOUT_MS = 12000;
+// See productAnalysisService.js's identical comment — GPT-5.6-family
+// reasoning models measured ~31s for a comparable prompt, well past the
+// old 12s ceiling.
+const AI_TIMEOUT_MS = 45000;
 
 const CreativeDirectionSchema = z.object({
   primaryMessage: z.string().max(200).optional().nullable(),
@@ -116,6 +119,12 @@ async function callPlanningModel(prompt, { timeoutMs = AI_TIMEOUT_MS } = {}) {
 
   async function call(p) {
     if (config.provider === "openai") {
+      // GPT-5.6-family/reasoning models reject a custom `temperature`
+      // outright (confirmed against the live API) and use
+      // `reasoning_effort` instead; standard models (e.g. this getter's
+      // own OPENAI_MODEL fallback) need the opposite. Branch on the actual
+      // configured model rather than assuming one family unconditionally.
+      const reasoning = isReasoningModel(config.model);
       const response = await fetchImpl("https://api.openai.com/v1/chat/completions", {
         method: "POST",
         headers: { "Content-Type": "application/json", Authorization: `Bearer ${process.env.OPENAI_API_KEY}` },
@@ -123,10 +132,13 @@ async function callPlanningModel(prompt, { timeoutMs = AI_TIMEOUT_MS } = {}) {
           model: config.model,
           messages: [{ role: "user", content: p }],
           response_format: { type: "json_object" },
-          temperature: 0.4
+          ...(reasoning ? { reasoning_effort: config.reasoningEffort || "medium" } : { temperature: 0.4 })
         })
       });
-      if (!response.ok) throw new Error(`Planning provider error ${response.status} (model: ${config.model})`);
+      if (!response.ok) {
+        const errorBody = await response.text().catch(() => "");
+        throw Object.assign(new Error(`Planning provider error ${response.status} (model: ${config.model}): ${errorBody.slice(0, 300)}`), { status: response.status, providerBody: errorBody });
+      }
       const json = await response.json();
       return json.choices?.[0]?.message?.content || "{}";
     }

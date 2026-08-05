@@ -13,6 +13,21 @@
 // model name could silently point production at a model the connected
 // account doesn't have access to.
 
+// Reasoning-family OpenAI models (o1/o3/o4/gpt-5*, confirmed directly
+// against the live API for gpt-5-mini and gpt-5.6-terra/sol) reject a
+// custom `temperature` outright — "Unsupported value: 'temperature' does
+// not support 0.4 with this model. Only the default (1) value is
+// supported." — and take `reasoning_effort` instead. Older/standard models
+// (gpt-4.1-mini, gpt-4o, etc., which every one of this file's getters can
+// still fall back to via OPENAI_MODEL) need the opposite: they don't
+// accept `reasoning_effort` and expect `temperature`. Every OpenAI call
+// site in this subsystem must branch on this before building its request
+// body — hard-coding either parameter unconditionally breaks whichever
+// model family it wasn't written for.
+function isReasoningModel(model) {
+  return /^(o1|o3|o4|gpt-5)/i.test(String(model || ""));
+}
+
 function getExtractionConfig() {
   const provider = process.env.BRANDEE_EXTRACTION_PROVIDER || process.env.AI_PROVIDER || "mock";
   const model = process.env.BRANDEE_EXTRACTION_MODEL
@@ -82,4 +97,4 @@ function getImageGenConfig() {
   };
 }
 
-module.exports = { getExtractionConfig, getPlannerConfig, getImageCreativePlanningConfig, getImageGenConfig };
+module.exports = { getExtractionConfig, getPlannerConfig, getImageCreativePlanningConfig, getImageGenConfig, isReasoningModel };

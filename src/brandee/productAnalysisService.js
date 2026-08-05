@@ -22,14 +22,23 @@
 //   it is shown back to the owner or substituted into a prompt
 
 const { z } = require("zod");
-const { getImageCreativePlanningConfig } = require("./modelConfig");
+const { getImageCreativePlanningConfig, isReasoningModel } = require("./modelConfig");
 const { extractProductFromUrl } = require("./productUrlExtractor");
 const { buildBusinessProfile } = require("./businessProfileBuilder");
 const { makeEvidence, isVerified, isUserSupplied, isInferred } = require("./evidenceModel");
 const { normalizeRawPhrase } = require("./copyQuality");
 
 const fetchImpl = (...args) => import("node-fetch").then(({ default: f }) => f(...args));
-const AI_TIMEOUT_MS = 15000;
+// GPT-5.6-family reasoning models take real "thinking" time before
+// responding — measured at ~31s for this module's actual research prompt
+// at reasoning_effort:"medium" against the live API, well past the old
+// 15s ceiling (which meant analyzeProduct was ALWAYS timing out and
+// silently falling back to deterministic mode the moment credits existed
+// to actually reach this code path). 45s comfortably covers normal
+// variance above that measured baseline without making a single retry
+// attempt (the JSON-repair retry below can still double this in the rare
+// worst case) balloon past what's reasonable for an interactive request.
+const AI_TIMEOUT_MS = 45000;
 
 // --- Claim status mapping (spec: Verified / Owner Confirmed / Needs Confirmation) ---
 // Reuses evidenceModel.js's existing three-way split rather than inventing
@@ -96,6 +105,12 @@ async function callResearchModel(prompt, { timeoutMs = AI_TIMEOUT_MS } = {}) {
 
   async function call(p) {
     if (config.provider === "openai") {
+      // GPT-5.6-family/reasoning models reject a custom `temperature`
+      // outright (confirmed against the live API) and use
+      // `reasoning_effort` instead; standard models (e.g. this getter's
+      // own OPENAI_MODEL fallback) need the opposite. Branch on the actual
+      // configured model rather than assuming one family unconditionally.
+      const reasoning = isReasoningModel(config.model);
       const response = await fetchImpl("https://api.openai.com/v1/chat/completions", {
         method: "POST",
         headers: { "Content-Type": "application/json", Authorization: `Bearer ${process.env.OPENAI_API_KEY}` },
@@ -103,7 +118,7 @@ async function callResearchModel(prompt, { timeoutMs = AI_TIMEOUT_MS } = {}) {
           model: config.model,
           messages: [{ role: "user", content: p }],
           response_format: { type: "json_object" },
-          temperature: 0.4
+          ...(reasoning ? { reasoning_effort: config.reasoningEffort || "medium" } : { temperature: 0.4 })
         })
       });
       if (!response.ok) {
