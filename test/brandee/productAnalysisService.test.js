@@ -14,7 +14,8 @@ const {
   claimFromEvidence,
   deterministicAnalysis,
   generateFieldAssist,
-  FIELD_ASSIST_ACTIONS
+  FIELD_ASSIST_ACTIONS,
+  describeResearchError
 } = require("../../src/brandee/productAnalysisService");
 const { makeEvidence } = require("../../src/brandee/evidenceModel");
 
@@ -171,4 +172,12 @@ test("every action in FIELD_ASSIST_ACTIONS has a real, non-empty instruction —
   for (const id of ["cta_message", "cta_quotation", "cta_booking", "cta_purchase", "cta_store_visit"]) {
     assert.ok(FIELD_ASSIST_ACTIONS[id], `missing CTA action: ${id}`);
   }
+});
+
+test("describeResearchError distinguishes credit exhaustion, auth, model-not-found, and true timeouts", () => {
+  assert.match(describeResearchError({ status: 429, providerBody: JSON.stringify({ error: { message: "You have no credits remaining.", code: "credit_balance_exhausted" } }) }), /no billing credits remaining/);
+  assert.match(describeResearchError({ status: 401, providerBody: JSON.stringify({ error: { code: "invalid_api_key" } }) }), /API key was rejected/);
+  assert.match(describeResearchError({ status: 404, providerBody: JSON.stringify({ error: { code: "model_not_found" } }) }), /model name isn't available/);
+  assert.match(describeResearchError({ message: "Research model timed out" }), /didn't respond in time/);
+  assert.match(describeResearchError({ status: 500, providerBody: "" }), /returned an error/);
 });

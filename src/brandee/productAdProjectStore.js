@@ -1,36 +1,25 @@
-// Product-ad project persistence (image/video flow). Follows the exact same
-// lightweight JSON-file pattern already used for Brandee creative plans
-// (store.js) and marketing app state (data/marketing-state.json) — no new
-// Prisma model/migration needed for MVP volumes. See store.js's header
-// comment for the documented limitation (single file, no concurrent-write
-// safety, migrate to a real table if volume grows).
+// Product-ad project persistence (image/video flow) — Postgres-backed via
+// Prisma (prisma/schema.prisma's ProductAdProject/ProductAdRevision/
+// ProductAdImageAsset models). Was a lightweight JSON-file store; migrated
+// because uploaded images now live as real files on disk referenced by URL
+// (imageAssetStore.js) instead of embedded base64 blobs, and growing
+// multi-customer volume made a single JSON file with no concurrent-write
+// safety a real risk. Every exported function keeps the exact same name
+// and argument shape as the old store — the difference callers must
+// account for is that every one of these now returns a Promise and must
+// be awaited (they touch a real database now, not an in-memory object).
 //
-// A project starts anonymous (keyed by an anonymous session id set in a
-// cookie) and is claimed by a user_id once they register — this is what
-// lets "generate preview -> register -> resume the same project" work
-// without losing the customer's work (PART 13).
+// Anonymous per-session rate-limit flags (canGenerateAnonymousPreview/
+// Revision) stay in the small JSON file they were already in — low
+// per-customer footprint (a couple of booleans), not the thing that was
+// actually growing unboundedly, so migrating them isn't warranted yet.
 
 const fs = require("fs");
 const path = require("path");
-const crypto = require("crypto");
+const { prisma } = require("../db");
 
 const rootDir = path.join(__dirname, "..", "..");
-const storePath = path.join(rootDir, "data", "brandee-product-ad-projects.json");
 const anonLimitsPath = path.join(rootDir, "data", "brandee-product-ad-anon-limits.json");
-
-function loadAll() {
-  if (!fs.existsSync(storePath)) return {};
-  try {
-    return JSON.parse(fs.readFileSync(storePath, "utf8"));
-  } catch {
-    return {};
-  }
-}
-
-function saveAll(all) {
-  fs.mkdirSync(path.dirname(storePath), { recursive: true });
-  fs.writeFileSync(storePath, JSON.stringify(all, null, 2));
-}
 
 function loadAnonLimits() {
   if (!fs.existsSync(anonLimitsPath)) return {};
@@ -46,145 +35,96 @@ function saveAnonLimits(all) {
   fs.writeFileSync(anonLimitsPath, JSON.stringify(all, null, 2));
 }
 
-function createProject({ kind, anonymousSessionId = null, userId = null, product = {} }) {
-  const all = loadAll();
-  const id = crypto.randomUUID();
-  const now = new Date().toISOString();
-  const project = {
-    id,
-    kind, // "image" | "video"
-    anonymousSessionId,
-    userId,
-    product,
-    templateId: null,
-    styleId: null,
-    templateFields: {},
-    videoFields: {},
-    preview: null, // { generatedAt, watermarked, ... }
-    finalAsset: null,
-    // Structured creative-planning output (PART 12) for the CURRENT/latest
-    // revision — see revisions[] below for full history.
-    creativePlan: null,
-    // "Analyze Product" — latest completed product-research + field-
-    // suggestion result (productAnalysisService.js), plus which suggestions
-    // the owner has accepted/rejected/edited so reopening the workspace
-    // doesn't lose that decision (see saveAnalysis()/recordSuggestionDecision()
-    // below). Never rerun automatically on reopen — only on explicit
-    // re-analyze or a changed product image/URL (enforced by the route).
-    analysis: null,
-    suggestionDecisions: {}, // { [suggestionId]: "accepted" | "rejected" | "edited" }
-    // Append-only revision history (PART 16/17/19). Every generated preview
-    // (the first one AND every subsequent natural-language revision) is
-    // pushed here; nothing is ever overwritten, so the customer can always
-    // view/compare/restore an earlier version. `preview`/`creativePlan`
-    // above always mirror the LATEST entry in this array for convenience.
-    revisions: [],
-    status: "draft", // draft -> previewed -> registered -> subscribed -> finalized
-    createdAt: now,
-    updatedAt: now
-  };
-  all[id] = project;
-  saveAll(all);
-  return project;
+function mapRevision(r) {
+  return { revisionNumber: r.revisionNumber, instruction: r.instruction, plan: r.plan, svg: r.svg, width: r.width, height: r.height, watermarked: r.watermarked, aiUsed: r.aiUsed, createdAt: r.createdAt.toISOString() };
 }
 
-function getProject(id) {
+function serializeProject(project, revisions) {
+  if (!project) return null;
+  return { ...project, createdAt: project.createdAt.toISOString(), updatedAt: project.updatedAt.toISOString(), revisions: (revisions || []).map(mapRevision) };
+}
+
+async function attachRevisions(project) {
+  if (!project) return null;
+  const revisions = await prisma.productAdRevision.findMany({ where: { projectId: project.id }, orderBy: { revisionNumber: "asc" } });
+  return serializeProject(project, revisions);
+}
+
+async function createProject({ kind, anonymousSessionId = null, userId = null, product = {} }) {
+  const project = await prisma.productAdProject.create({ data: { kind, anonymousSessionId, userId, product } });
+  return serializeProject(project, []);
+}
+
+async function getProject(id) {
   if (!id) return null;
-  const all = loadAll();
-  return all[id] || null;
+  try {
+    const project = await prisma.productAdProject.findUnique({ where: { id } });
+    return attachRevisions(project);
+  } catch {
+    return null;
+  }
 }
 
-function updateProject(id, patch) {
-  const all = loadAll();
-  if (!all[id]) return null;
-  all[id] = { ...all[id], ...patch, updatedAt: new Date().toISOString() };
-  saveAll(all);
-  return all[id];
+async function updateProject(id, patch) {
+  if (!id) return null;
+  try {
+    const project = await prisma.productAdProject.update({ where: { id }, data: patch });
+    return attachRevisions(project);
+  } catch {
+    return null;
+  }
 }
 
-/**
- * Claims an anonymous project for a newly registered/logged-in user,
- * preserving all product data and any preview already generated (PART 13:
- * registration happens AFTER the preview, and must not lose it).
- */
-function claimProjectForUser(id, userId) {
+async function claimProjectForUser(id, userId) {
   return updateProject(id, { userId, anonymousSessionId: null, status: "registered" });
 }
 
-function listProjectsForUser(userId) {
+async function listProjectsForUser(userId) {
   if (!userId) return [];
-  const all = loadAll();
-  return Object.values(all).filter((p) => p.userId === userId);
+  const projects = await prisma.productAdProject.findMany({ where: { userId }, orderBy: { createdAt: "desc" } });
+  return Promise.all(projects.map(attachRevisions));
 }
 
-// --- Revision history (PART 16/17/19) ----------------------------------
+// --- Revision history (append-only; nothing is ever overwritten/deleted, so
+// the customer can always view/compare/restore an earlier version) --------
 
-/**
- * Appends one revision entry (the first preview counts as revision 1) and
- * updates the project's convenience `preview`/`creativePlan` mirror fields
- * to match. Never mutates or removes a prior entry — PART 19's "the
- * customer must be able to view/compare/restore an earlier revision"
- * requires every past entry to stay exactly as it was generated.
- */
-function addRevision(projectId, { instruction = null, plan = null, svg, width, height, watermarked, aiUsed = false }) {
-  const project = getProject(projectId);
-  if (!project) return null;
-  const revisionNumber = (project.revisions || []).length + 1;
-  const entry = {
-    revisionNumber,
-    instruction,
-    plan,
-    svg,
-    width,
-    height,
-    watermarked,
-    aiUsed,
-    createdAt: new Date().toISOString()
-  };
-  const revisions = [...(project.revisions || []), entry];
+async function addRevision(projectId, { instruction = null, plan = null, svg, width, height, watermarked, aiUsed = false }) {
+  const count = await prisma.productAdRevision.count({ where: { projectId } });
+  const revisionNumber = count + 1;
+  await prisma.productAdRevision.create({
+    data: { projectId, revisionNumber, instruction, plan: plan ?? undefined, svg, width, height, watermarked, aiUsed }
+  });
   return updateProject(projectId, {
-    revisions,
-    creativePlan: plan,
-    preview: { generatedAt: entry.createdAt, watermarked, svg }
+    creativePlan: plan ?? undefined,
+    preview: { generatedAt: new Date().toISOString(), watermarked, svg }
   });
 }
 
-function listRevisions(projectId) {
-  const project = getProject(projectId);
-  return project ? (project.revisions || []) : [];
+async function listRevisions(projectId) {
+  const revisions = await prisma.productAdRevision.findMany({ where: { projectId }, orderBy: { revisionNumber: "asc" } });
+  return revisions.map(mapRevision);
+}
+
+async function restoreRevision(projectId, revisionNumber) {
+  const target = await prisma.productAdRevision.findUnique({ where: { projectId_revisionNumber: { projectId, revisionNumber } } });
+  if (!target) return null;
+  return addRevision(projectId, { instruction: `Restored revision ${revisionNumber}`, plan: target.plan, svg: target.svg, width: target.width, height: target.height, watermarked: target.watermarked, aiUsed: target.aiUsed });
 }
 
 // --- "Analyze Product" persistence --------------------------------------
 
-/** Saves the latest completed analysis result onto the project (overwrites — analysis itself is not revisioned like previews are). */
-function saveAnalysis(projectId, analysis) {
+async function saveAnalysis(projectId, analysis) {
   return updateProject(projectId, { analysis });
 }
 
-/** Records the owner's decision (accepted/rejected/edited) on one suggestion, keyed by its id, so it persists across reopens. */
-function recordSuggestionDecision(projectId, suggestionId, decision) {
-  const project = getProject(projectId);
+async function recordSuggestionDecision(projectId, suggestionId, decision) {
+  const project = await getProject(projectId);
   if (!project) return null;
   const suggestionDecisions = { ...(project.suggestionDecisions || {}), [suggestionId]: decision };
   return updateProject(projectId, { suggestionDecisions });
 }
 
-/**
- * "Restore" never deletes newer revisions (PART 19) — it copies the chosen
- * older revision's content back into the convenience mirror fields AND
- * appends a NEW revision entry that is an exact copy of the restored one,
- * so the append-only history and "what is currently shown" stay consistent
- * without ever rewriting history.
- */
-function restoreRevision(projectId, revisionNumber) {
-  const project = getProject(projectId);
-  if (!project) return null;
-  const target = (project.revisions || []).find((r) => r.revisionNumber === revisionNumber);
-  if (!target) return null;
-  return addRevision(projectId, { instruction: `Restored revision ${revisionNumber}`, plan: target.plan, svg: target.svg, width: target.width, height: target.height, watermarked: target.watermarked, aiUsed: target.aiUsed });
-}
-
-// --- Anonymous preview rate limiting (PART 13/20) ---------------------
+// --- Anonymous preview/revision rate limiting (unchanged JSON-file logic) --
 
 function canGenerateAnonymousPreview(anonymousSessionId, kind) {
   if (!anonymousSessionId) return false;
@@ -201,9 +141,6 @@ function recordAnonymousPreview(anonymousSessionId, kind) {
   saveAnonLimits(limits);
 }
 
-// PART 18 — a separate, smaller counter for free revisions (distinct from
-// the initial-preview limit above), so "1 free preview + 1 free revision"
-// can both be enforced independently for an anonymous visitor.
 function canGenerateAnonymousRevision(anonymousSessionId, kind, { maxRevisions = 1 } = {}) {
   if (!anonymousSessionId) return false;
   const limits = loadAnonLimits();
@@ -234,6 +171,5 @@ module.exports = {
   restoreRevision,
   saveAnalysis,
   recordSuggestionDecision,
-  storePath,
   anonLimitsPath
 };

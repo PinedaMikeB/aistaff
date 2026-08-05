@@ -106,7 +106,10 @@ async function callResearchModel(prompt, { timeoutMs = AI_TIMEOUT_MS } = {}) {
           temperature: 0.4
         })
       });
-      if (!response.ok) throw new Error(`Research provider error ${response.status} (model: ${config.model})`);
+      if (!response.ok) {
+        const errorBody = await response.text().catch(() => "");
+        throw Object.assign(new Error(`Research provider error ${response.status} (model: ${config.model}): ${errorBody.slice(0, 300)}`), { status: response.status, providerBody: errorBody });
+      }
       const json = await response.json();
       return json.choices?.[0]?.message?.content || "{}";
     }
@@ -116,7 +119,10 @@ async function callResearchModel(prompt, { timeoutMs = AI_TIMEOUT_MS } = {}) {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ contents: [{ parts: [{ text: `${p}\nReturn only valid JSON, no markdown fences.` }] }], generationConfig: { temperature: 0.4 } })
       });
-      if (!response.ok) throw new Error(`Research provider error ${response.status} (model: ${config.model})`);
+      if (!response.ok) {
+        const errorBody = await response.text().catch(() => "");
+        throw Object.assign(new Error(`Research provider error ${response.status} (model: ${config.model}): ${errorBody.slice(0, 300)}`), { status: response.status, providerBody: errorBody });
+      }
       const json = await response.json();
       return json.candidates?.[0]?.content?.parts?.[0]?.text || "{}";
     }
@@ -134,6 +140,29 @@ async function callResearchModel(prompt, { timeoutMs = AI_TIMEOUT_MS } = {}) {
       throw firstError.message?.includes("not valid JSON") ? secondError : firstError;
     }
   }
+}
+
+// Turns a raw callResearchModel() failure into an honest, specific warning
+// instead of a generic "didn't respond in time" that could just as easily
+// mask a wrong/unsupported model name, an auth failure, or (as actually
+// happened once in this environment) the connected OpenAI account being
+// out of billing credits — genuinely different problems needing genuinely
+// different fixes, so the warning should say which one it actually was.
+function describeResearchError(error) {
+  const body = String(error?.providerBody || "");
+  if (/insufficient_quota|credit_balance_exhausted|no credits remaining/i.test(body)) {
+    return "Brandee's AI research model is unavailable — the connected OpenAI account has no billing credits remaining. Add credits to resume AI suggestions; extracted-data suggestions still work.";
+  }
+  if (error?.status === 401 || /invalid_api_key/i.test(body)) {
+    return "Brandee's AI research model is unavailable — the configured API key was rejected. Showing suggestions from your extracted data only.";
+  }
+  if (error?.status === 404 || /model_not_found/i.test(body)) {
+    return "Brandee's AI research model is unavailable — the configured model name isn't available on this account. Showing suggestions from your extracted data only.";
+  }
+  if (error?.message === "Research model timed out") {
+    return "Brandee's AI research model didn't respond in time — showing suggestions from your extracted data only.";
+  }
+  return "Brandee's AI research model returned an error — showing suggestions from your extracted data only.";
 }
 
 // --- Prompt ------------------------------------------------------------
@@ -238,8 +267,8 @@ async function analyzeProduct({ productUrl, businessWebsite, productName, produc
       const raw = await callResearchModel(buildResearchPrompt({ template, extracted, businessProfile, productName, productDescription, existingFields }));
       const validated = AiAnalysisResponseSchema.safeParse(raw);
       if (validated.success) { ai = validated.data; aiUsed = true; }
-    } catch {
-      warnings.push("Brandee's AI research model didn't respond in time — showing suggestions from your extracted data only.");
+    } catch (error) {
+      warnings.push(describeResearchError(error));
     }
   }
 
@@ -374,8 +403,8 @@ async function generateFieldAssist({ fieldKey, fieldLabel, action, mode = "sugge
       confidence: "medium"
     }));
     return { suggestions, aiUsed: true, mode };
-  } catch {
-    return { suggestions: [], aiUsed: false, error: true, mode };
+  } catch (error) {
+    return { suggestions: [], aiUsed: false, error: true, errorMessage: describeResearchError(error), mode };
   }
 }
 
@@ -389,6 +418,7 @@ module.exports = {
   SuggestionSchema,
   FIELD_ASSIST_ACTIONS,
   buildFieldAssistPrompt,
-  generateFieldAssist
+  generateFieldAssist,
+  describeResearchError
 };
 

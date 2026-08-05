@@ -807,3 +807,93 @@ model ManualPaymentProof {
   @@index([status])
   @@map("manual_payment_proofs")
 }
+
+
+// Product-ad project (image/video flow) — was a lightweight JSON-file store
+// (productAdProjectStore.js), explicitly documented in its own header as an
+// MVP-only pattern ("no new Prisma model/migration needed for MVP volumes
+// ... migrate to a real table if volume grows"). Migrated now because: (1)
+// uploaded product images move to real files on disk (ProductAdImageAsset
+// below) referenced by URL instead of embedded as base64 blobs, which
+// needed real disk-backed rows anyway; (2) growing multi-customer volume
+// made per-write full-file read/write with zero concurrent-write safety a
+// real risk. BrandeeEntitlementEvent.projectId (above) is a loose string
+// reference by design, not a Postgres FK — this model keeps `id` as a UUID
+// string so those existing references keep resolving with no changes.
+model ProductAdProject {
+  id                  String   @id @default(uuid())
+  kind                String // "image" | "video"
+  anonymousSessionId  String?
+  userId              String?
+  product             Json     @default("{}")
+  templateId          String?
+  styleId             String?
+  templateFields      Json     @default("{}")
+  videoFields         Json     @default("{}")
+  preview             Json?
+  finalAsset          Json?
+  creativePlan        Json?
+  analysis            Json?
+  suggestionDecisions Json     @default("{}")
+  status              String   @default("draft")
+  createdAt           DateTime @default(now())
+  updatedAt           DateTime @updatedAt
+
+  revisions ProductAdRevision[]
+  images    ProductAdImageAsset[]
+
+  @@index([anonymousSessionId])
+  @@index([userId])
+  @@index([status])
+  @@map("product_ad_projects")
+}
+
+// Append-only revision history (unchanged semantics from the JSON store's
+// addRevision/listRevisions/restoreRevision — nothing is ever overwritten
+// or deleted, so the customer can always view/compare/restore an earlier
+// version).
+model ProductAdRevision {
+  id             String   @id @default(uuid())
+  projectId      String
+  revisionNumber Int
+  instruction    String?  @db.Text
+  plan           Json?
+  svg            String   @db.Text
+  width          Int
+  height         Int
+  watermarked    Boolean  @default(true)
+  aiUsed         Boolean  @default(false)
+  createdAt      DateTime @default(now())
+
+  project ProductAdProject @relation(fields: [projectId], references: [id], onDelete: Cascade)
+
+  @@unique([projectId, revisionNumber])
+  @@index([projectId])
+  @@map("product_ad_revisions")
+}
+
+// One uploaded customer image (product photo or logo) — a real file on
+// disk (data/brandee-uploads/<scopeId>/<uuid>.<ext>, served at
+// /uploads/brandee/<scopeId>/<uuid>.<ext>), never embedded as base64 here
+// or in any generated SVG. `scopeId` (anonymousSessionId or userId) keeps
+// each customer's uploads in their own directory.
+model ProductAdImageAsset {
+  id        String   @id @default(uuid())
+  projectId String?
+  scopeId   String
+  role      String   @default("product") // "product" | "logo"
+  url       String
+  filePath  String
+  mimeType  String
+  bytes     Int
+  width     Int?
+  height    Int?
+  isPrimary Boolean  @default(false)
+  createdAt DateTime @default(now())
+
+  project ProductAdProject? @relation(fields: [projectId], references: [id], onDelete: SetNull)
+
+  @@index([projectId])
+  @@index([scopeId])
+  @@map("product_ad_image_assets")
+}

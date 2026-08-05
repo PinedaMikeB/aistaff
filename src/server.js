@@ -1593,8 +1593,8 @@ app.post("/api/public/brandee/product-ads/image/analyze", requireProductAdRateLi
   if (!template) return res.status(400).json({ ok: false, error: "Unknown template." });
 
   const userId = req.user?.id || null;
-  let project = body.projectId ? productAdProjectStore.getProject(body.projectId) : null;
-  if (!project) project = productAdProjectStore.createProject({ kind: "image", anonymousSessionId: userId ? null : anonymousSessionId, userId, product: {} });
+  let project = body.projectId ? await productAdProjectStore.getProject(body.projectId) : null;
+  if (!project) project = await productAdProjectStore.createProject({ kind: "image", anonymousSessionId: userId ? null : anonymousSessionId, userId, product: {} });
 
   trackBrandeeEvent("image_analysis_requested", { templateId: body.templateId }, { anonymousSessionId, userId });
 
@@ -1607,7 +1607,7 @@ app.post("/api/public/brandee/product-ads/image/analyze", requireProductAdRateLi
     existingFields: body.existingFields || {}
   });
 
-  productAdProjectStore.saveAnalysis(project.id, analysis);
+  await productAdProjectStore.saveAnalysis(project.id, analysis);
   trackBrandeeEvent("image_analysis_completed", { templateId: body.templateId, suggestedFieldCount: analysis.suggestedFieldCount, aiUsed: analysis.aiUsed }, { anonymousSessionId, userId });
 
   res.json({ ok: true, projectId: project.id, analysis });
@@ -1621,7 +1621,7 @@ app.post("/api/public/brandee/product-ads/image/project/:id/suggestion-decision"
   if (!suggestionId || !["accepted", "rejected", "edited"].includes(decision)) {
     return res.status(400).json({ ok: false, error: "Invalid suggestion decision." });
   }
-  const project = productAdProjectStore.recordSuggestionDecision(req.params.id, suggestionId, decision);
+  const project = await productAdProjectStore.recordSuggestionDecision(req.params.id, suggestionId, decision);
   if (!project) return res.status(404).json({ ok: false, error: "Project not found." });
   res.json({ ok: true });
 }));
@@ -1642,7 +1642,7 @@ app.post("/api/public/brandee/product-ads/image/field-assist", requireProductAdR
   if (!template) return res.status(400).json({ ok: false, error: "Unknown template." });
 
   const userId = req.user?.id || null;
-  const project = body.projectId ? productAdProjectStore.getProject(body.projectId) : null;
+  const project = body.projectId ? await productAdProjectStore.getProject(body.projectId) : null;
   const existingAnalysisSuggestions = project?.analysis?.fieldSuggestions?.[body.fieldKey] || [];
 
   const result = await generateFieldAssist({
@@ -1699,8 +1699,8 @@ app.post("/api/public/brandee/product-ads/image/preview", requireProductAdRateLi
   }
 
   const userId = req.user?.id || null;
-  let project = form.projectId ? productAdProjectStore.getProject(form.projectId) : null;
-  if (!project) project = productAdProjectStore.createProject({ kind: "image", anonymousSessionId: userId ? null : anonymousSessionId, userId, product: form });
+  let project = form.projectId ? await productAdProjectStore.getProject(form.projectId) : null;
+  if (!project) project = await productAdProjectStore.createProject({ kind: "image", anonymousSessionId: userId ? null : anonymousSessionId, userId, product: form });
 
   if (!userId) {
     if (!productAdProjectStore.canGenerateAnonymousPreview(anonymousSessionId, "image")) {
@@ -1724,13 +1724,13 @@ app.post("/api/public/brandee/product-ads/image/preview", requireProductAdRateLi
   const rendered = renderImageAdSvg({ templateId: form.templateId, templateFields: form.templateFields, form, watermark: true, override: plan });
 
   if (!userId) productAdProjectStore.recordAnonymousPreview(anonymousSessionId, "image");
-  productAdProjectStore.updateProject(project.id, {
+  await productAdProjectStore.updateProject(project.id, {
     templateId: form.templateId,
     templateFields: form.templateFields,
     product: form,
     status: "previewed"
   });
-  productAdProjectStore.addRevision(project.id, { instruction: null, plan, svg: rendered.svg, width: rendered.width, height: rendered.height, watermarked: true, aiUsed: planningAiUsed });
+  await productAdProjectStore.addRevision(project.id, { instruction: null, plan, svg: rendered.svg, width: rendered.width, height: rendered.height, watermarked: true, aiUsed: planningAiUsed });
 
   trackBrandeeEvent("image_preview_completed", { templateId: form.templateId }, { anonymousSessionId, userId });
 
@@ -1762,7 +1762,7 @@ app.post("/api/public/brandee/product-ads/image/revise", requireProductAdRateLim
   const body = z.object({ projectId: z.string().min(1), instruction: z.string().min(2).max(300) }).safeParse(req.body);
   if (!body.success) return res.status(400).json({ ok: false, error: "Please describe the revision you'd like." });
 
-  const project = productAdProjectStore.getProject(body.data.projectId);
+  const project = await productAdProjectStore.getProject(body.data.projectId);
   if (!project) return res.status(404).json({ ok: false, error: "Project not found." });
   const userId = req.user?.id || null;
   const owns = (userId && project.userId === userId) || (!project.userId && project.anonymousSessionId === anonymousSessionId);
@@ -1806,7 +1806,7 @@ app.post("/api/public/brandee/product-ads/image/revise", requireProductAdRateLim
   const rendered = renderImageAdSvg({ templateId: project.templateId, templateFields: project.templateFields, form: project.product, watermark: true, override: safeUpdatedPlan });
 
   if (!userId) productAdProjectStore.recordAnonymousRevision(anonymousSessionId, "image");
-  const updated = productAdProjectStore.addRevision(project.id, {
+  const updated = await productAdProjectStore.addRevision(project.id, {
     instruction: body.data.instruction,
     plan: safeUpdatedPlan,
     svg: rendered.svg,
@@ -1834,22 +1834,23 @@ app.post("/api/public/brandee/product-ads/image/revise", requireProductAdRateLim
 // revisions; it appends a new entry that is a copy of the chosen one.
 app.get("/api/public/brandee/product-ads/image/project/:id/revisions", asyncHandler(async (req, res) => {
   const anonymousSessionId = req.cookies?.[BRANDEE_SESSION_COOKIE] || null;
-  const project = productAdProjectStore.getProject(req.params.id);
+  const project = await productAdProjectStore.getProject(req.params.id);
   if (!project) return res.status(404).json({ ok: false, error: "Project not found." });
   const owns = (req.user && project.userId === req.user.id) || (!project.userId && project.anonymousSessionId === anonymousSessionId);
   if (!owns) return res.status(403).json({ ok: false, error: "You don't have access to this project." });
-  res.json({ ok: true, revisions: productAdProjectStore.listRevisions(project.id).map((r) => ({ revisionNumber: r.revisionNumber, instruction: r.instruction, svg: r.svg, width: r.width, height: r.height, createdAt: r.createdAt })) });
+  const revisions = await productAdProjectStore.listRevisions(project.id);
+  res.json({ ok: true, revisions: revisions.map((r) => ({ revisionNumber: r.revisionNumber, instruction: r.instruction, svg: r.svg, width: r.width, height: r.height, createdAt: r.createdAt })) });
 }));
 
 app.post("/api/public/brandee/product-ads/image/project/:id/restore", requireProductAdRateLimit, asyncHandler(async (req, res) => {
   const anonymousSessionId = req.cookies?.[BRANDEE_SESSION_COOKIE] || null;
   const body = z.object({ revisionNumber: z.number().int().positive() }).safeParse(req.body);
   if (!body.success) return res.status(400).json({ ok: false, error: "Invalid revision." });
-  const project = productAdProjectStore.getProject(req.params.id);
+  const project = await productAdProjectStore.getProject(req.params.id);
   if (!project) return res.status(404).json({ ok: false, error: "Project not found." });
   const owns = (req.user && project.userId === req.user.id) || (!project.userId && project.anonymousSessionId === anonymousSessionId);
   if (!owns) return res.status(403).json({ ok: false, error: "You don't have access to this project." });
-  const updated = productAdProjectStore.restoreRevision(project.id, body.data.revisionNumber);
+  const updated = await productAdProjectStore.restoreRevision(project.id, body.data.revisionNumber);
   if (!updated) return res.status(404).json({ ok: false, error: "That revision could not be found." });
   const latest = updated.revisions[updated.revisions.length - 1];
   res.json({ ok: true, svg: latest.svg, width: latest.width, height: latest.height, revisionNumber: latest.revisionNumber });
@@ -1871,8 +1872,8 @@ app.post("/api/public/brandee/product-ads/video/preview", requireProductAdRateLi
   if (!style) return res.status(400).json({ ok: false, error: "Unknown video style." });
 
   const userId = req.user?.id || null;
-  let project = form.projectId ? productAdProjectStore.getProject(form.projectId) : null;
-  if (!project) project = productAdProjectStore.createProject({ kind: "video", anonymousSessionId: userId ? null : anonymousSessionId, userId, product: form });
+  let project = form.projectId ? await productAdProjectStore.getProject(form.projectId) : null;
+  if (!project) project = await productAdProjectStore.createProject({ kind: "video", anonymousSessionId: userId ? null : anonymousSessionId, userId, product: form });
 
   if (!userId) {
     if (!productAdProjectStore.canGenerateAnonymousPreview(anonymousSessionId, "video")) {
@@ -1895,12 +1896,12 @@ app.post("/api/public/brandee/product-ads/video/preview", requireProductAdRateLi
 
   if (!result.ok) {
     trackBrandeeEvent("preview_failed", { styleId: form.styleId, reason: result.reason }, { anonymousSessionId, userId });
-    productAdProjectStore.updateProject(project.id, { styleId: form.styleId, videoFields: form, product: form, status: "draft" });
+    await productAdProjectStore.updateProject(project.id, { styleId: form.styleId, videoFields: form, product: form, status: "draft" });
     return res.status(503).json({ ok: false, projectId: project.id, reason: result.reason, error: result.message });
   }
 
   if (!userId) productAdProjectStore.recordAnonymousPreview(anonymousSessionId, "video");
-  productAdProjectStore.updateProject(project.id, {
+  await productAdProjectStore.updateProject(project.id, {
     styleId: form.styleId,
     videoFields: form,
     product: form,
@@ -1923,7 +1924,7 @@ app.post("/api/public/brandee/product-ads/video/preview", requireProductAdRateLi
 
 app.get("/api/public/brandee/product-ads/project/:id", asyncHandler(async (req, res) => {
   const anonymousSessionId = req.cookies?.[BRANDEE_SESSION_COOKIE] || null;
-  const project = productAdProjectStore.getProject(req.params.id);
+  const project = await productAdProjectStore.getProject(req.params.id);
   if (!project) return res.status(404).json({ ok: false, error: "Project not found." });
   const owns = (req.user && project.userId === req.user.id) || (!project.userId && project.anonymousSessionId === anonymousSessionId);
   if (!owns) return res.status(403).json({ ok: false, error: "You don't have access to this project." });
@@ -1955,10 +1956,10 @@ app.post("/api/auth/register", asyncHandler(async (req, res) => {
   setSessionCookie(res, token);
 
   if (body.projectId) {
-    const project = productAdProjectStore.getProject(body.projectId);
+    const project = await productAdProjectStore.getProject(body.projectId);
     const anonymousSessionId = req.cookies?.[BRANDEE_SESSION_COOKIE] || null;
     if (project && !project.userId && project.anonymousSessionId === anonymousSessionId) {
-      productAdProjectStore.claimProjectForUser(body.projectId, user.id);
+      await productAdProjectStore.claimProjectForUser(body.projectId, user.id);
     }
   }
 
@@ -1986,7 +1987,7 @@ app.post("/api/brandee/product-ads/subscribe", requireAuth, asyncHandler(async (
 
 app.post("/api/brandee/product-ads/image/final", requireAuth, requireBrandeeSubscription(), asyncHandler(async (req, res) => {
   const body = z.object({ projectId: z.string().min(1) }).parse(req.body);
-  const project = productAdProjectStore.getProject(body.projectId);
+  const project = await productAdProjectStore.getProject(body.projectId);
   if (!project || project.userId !== req.user.id) return res.status(404).json({ ok: false, error: "Project not found." });
   if (!project.templateId) return res.status(400).json({ ok: false, error: "Choose a template and generate a preview first." });
 
@@ -2016,7 +2017,7 @@ app.post("/api/brandee/product-ads/image/final", requireAuth, requireBrandeeSubs
   }
 
   const { rendered } = outcome;
-  productAdProjectStore.updateProject(project.id, {
+  await productAdProjectStore.updateProject(project.id, {
     finalAsset: { generatedAt: new Date().toISOString(), svg: rendered.svg, width: rendered.width, height: rendered.height },
     status: "finalized"
   });
@@ -2027,7 +2028,7 @@ app.post("/api/brandee/product-ads/image/final", requireAuth, requireBrandeeSubs
 
 app.post("/api/brandee/product-ads/video/final", requireAuth, requireBrandeeSubscription(), asyncHandler(async (req, res) => {
   const body = z.object({ projectId: z.string().min(1) }).parse(req.body);
-  const project = productAdProjectStore.getProject(body.projectId);
+  const project = await productAdProjectStore.getProject(body.projectId);
   if (!project || project.userId !== req.user.id) return res.status(404).json({ ok: false, error: "Project not found." });
   if (!project.styleId) return res.status(400).json({ ok: false, error: "Choose a video style and generate a preview first." });
 
@@ -2066,7 +2067,7 @@ app.post("/api/brandee/product-ads/video/final", requireAuth, requireBrandeeSubs
     return res.status(503).json({ ok: false, reason: outcome.reason, error: outcome.message });
   }
 
-  productAdProjectStore.updateProject(project.id, {
+  await productAdProjectStore.updateProject(project.id, {
     finalAsset: { generatedAt: new Date().toISOString(), url: outcome.relativeUrl, durationSeconds: outcome.durationSeconds },
     status: "finalized"
   });
