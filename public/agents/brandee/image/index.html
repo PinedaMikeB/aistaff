@@ -59,7 +59,7 @@
   .recommended-section h3 { color: #d9f1ff; font: 600 16px "Space Grotesk"; margin: 0 0 4px; }
   .recommended-section .sub { color: #6f8a9c; font: 13px "Manrope"; margin: 0 0 14px; }
   .gallery-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 18px; }
-  .template-card { position: relative; border: 1px solid rgba(117,161,188,.2); border-radius: 12px; background: rgba(11,25,36,.5); overflow: hidden; cursor: pointer; text-align: left; color: inherit; font-family: inherit; transition: transform .18s ease, border-color .18s ease, box-shadow .18s ease; padding: 0; }
+  .template-card { position: relative; display: block; width: 100%; border: 1px solid rgba(117,161,188,.2); border-radius: 12px; background: rgba(11,25,36,.5); overflow: hidden; cursor: pointer; text-align: left; color: inherit; font-family: inherit; transition: transform .18s ease, border-color .18s ease, box-shadow .18s ease; padding: 0; }
   .template-card:hover, .template-card:focus-visible { border-color: rgba(72,193,255,.55); transform: translateY(-3px); box-shadow: 0 14px 30px -18px rgba(36,169,255,.5); }
   .template-card.is-selected { border-color: var(--cyan); box-shadow: 0 0 0 2px rgba(36,169,255,.5); }
   .template-card[disabled], .template-card.is-unavailable { opacity: .4; cursor: not-allowed; }
@@ -244,6 +244,7 @@
     <p class="status-line" id="productFormStatus" role="status" aria-live="polite"></p>
     <div class="flow-actions">
       <button type="button" class="button button-primary glow-button" id="toTemplateStep">Choose a template <span>↓</span></button>
+      <button type="button" class="button button-soft" id="browseTemplatesBtn">Browse templates first</button>
     </div>
   </section>
 
@@ -494,6 +495,15 @@
     renderGallery();
   });
 
+  $("#browseTemplatesBtn").addEventListener("click", async () => {
+    galleryState.recommendedIds = [];
+    state.recommendations = [];
+    helpers.track("template_gallery_browsed_without_product", {});
+    setStep("template");
+    if (!state.config) await loadConfig();
+    renderGallery();
+  });
+
   // --- Templates / premium gallery (Step 2) ---
   async function loadConfig() {
     const { body } = await helpers.fetchJson("/api/public/brandee/product-ads/config");
@@ -553,7 +563,7 @@
     const recBadge = recommended ? `<span class="card-badge recommended">Recommended</span>` : "";
     return `
       <div class="card-thumb-wrap">
-        <img src="${t.thumbnail || ''}" alt="${t.name}" loading="lazy" width="480" height="600" onerror="this.classList.add('is-broken')" />
+        <img src="${t.thumbnail || ''}" alt="${t.name}" loading="eager" decoding="async" width="480" height="600" onerror="this.classList.add('is-broken')" />
         <div class="card-badges">${recBadge}${audienceBadge}</div>
         <div class="card-overlay">
           <button type="button" class="button button-soft" data-preview-id="${t.id}">Preview</button>
@@ -573,7 +583,7 @@
     const recTemplates = galleryState.recommendedIds.map((id) => eligibleTemplates().find((t) => t.id === id)).filter(Boolean);
     if (recTemplates.length && galleryState.primary === "all" && galleryState.framework === "all") {
       recommendedSection.hidden = false;
-      recommendedGrid.innerHTML = recTemplates.map((t) => `<button type="button" class="template-card" data-card-id="${t.id}">${cardHtml(t, { recommended: true })}</button>`).join("");
+      recommendedGrid.innerHTML = recTemplates.map((t) => `<article class="template-card" data-card-id="${t.id}">${cardHtml(t, { recommended: true })}</article>`).join("");
       wireCardButtons(recommendedGrid);
     } else {
       recommendedSection.hidden = true;
@@ -581,7 +591,7 @@
 
     const grid = $("#templateGrid");
     const templates = visibleTemplates();
-    grid.innerHTML = templates.map((t) => `<button type="button" class="template-card" data-card-id="${t.id}">${cardHtml(t)}</button>`).join("");
+    grid.innerHTML = templates.map((t) => `<article class="template-card" data-card-id="${t.id}">${cardHtml(t)}</article>`).join("");
     wireCardButtons(grid);
     $("#templateStatus").textContent = templates.length ? "" : "No templates match these filters yet.";
   }
@@ -701,6 +711,13 @@
 
   $("#generatePreviewBtn").addEventListener("click", async () => {
     const template = findTemplate(state.templateId);
+    const productError = validateSharedForm(collectSharedForm());
+    if (productError) {
+      $("#templateStatus").textContent = `Complete your product details before creating a preview. ${productError}`;
+      $("#templateStatus").classList.add("is-error");
+      $("#detailDrawer").classList.remove("is-open");
+      return;
+    }
     const statusEl = $("#detailWhyFits");
     const templateFields = collectTemplateFields();
     const missing = template.fields.find((f) => f.required && !templateFields[f.key]);
