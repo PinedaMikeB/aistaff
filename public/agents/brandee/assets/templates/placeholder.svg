@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 480 600" role="img" aria-labelledby="title desc">
+  <title id="title">Template preview unavailable</title>
+  <desc id="desc">A neutral placeholder for a template preview that is temporarily unavailable.</desc>
+  <rect width="480" height="600" fill="#102638"/>
+  <rect x="38" y="42" width="404" height="516" rx="24" fill="#17364d" stroke="#5dd0ff" stroke-opacity=".35"/>
+  <circle cx="240" cy="238" r="52" fill="#2b5873"/>
+  <path d="M125 370l80-86 54 56 42-52 74 82H125z" fill="#2b5873"/>
+  <rect x="112" y="424" width="256" height="12" rx="6" fill="#c7ecff" fill-opacity=".85"/>
+  <rect x="154" y="450" width="172" height="10" rx="5" fill="#3ddc97" fill-opacity=".8"/>
+</svg>

@@ -75,6 +75,12 @@ const ALLOWED_EVENTS = new Set([
   ,"image_checkout_started"
   ,"image_subscription_completed"
   ,"template_gallery_browsed_without_product"
+  ,"approach_nav_clicked"
+  ,"creative_approach_entered_view"
+  ,"product_example_viewed"
+  ,"service_example_viewed"
+  ,"template_image_load_failed"
+  ,"create_with_template_clicked"
 ]);
 
 // Only these keys are ever allowed onto an event, and every value is

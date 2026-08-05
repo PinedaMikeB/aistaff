@@ -32,6 +32,39 @@ test("approaches page selects an exact template and persists it for the workspac
   assert.match(approachesHtml, /data-next/);
 });
 
+test("approaches page overrides shared modern-home carousel rules and keeps document scrolling", () => {
+  assert.match(approachesHtml, /body\.approaches-page[^}]*overflow-y:auto/);
+  assert.match(approachesHtml, /\.modern-home\.approaches-page \{ overflow:visible; \}/);
+  assert.match(approachesHtml, /\.modern-home\.approaches-page \.carousel-track[^}]*height:auto/);
+  assert.match(approachesHtml, /\.modern-home\.approaches-page \.template-image-shell img[^}]*object-fit:contain/);
+  assert.match(approachesHtml, /\.modern-home\.approaches-page \.template-image-shell img[^}]*opacity:1/);
+  assert.doesNotMatch(approachesHtml, /approaches-page[^}]*position:\s*(fixed|sticky)/);
+  assert.match(approachesHtml, /\.approach-jump-wrap \{ position:sticky/);
+});
+
+test("approaches page resolves public template URLs and provides loading/failure states", () => {
+  assert.match(approachesHtml, /function resolveTemplatePreviewUrl\(template\)/);
+  assert.match(approachesHtml, /thumbnailUrl, template\.thumbnail, template\.previewUrl, template\.previewImageUrl, template\.sourceAssetUrl/);
+  assert.match(approachesHtml, /FALLBACK_PREVIEW_URL/);
+  assert.match(approachesHtml, /template-image-skeleton/);
+  assert.match(approachesHtml, /template-image-fallback/);
+  assert.match(approachesHtml, /template_image_load_failed/);
+  assert.doesNotMatch(approachesHtml, /\/Volumes\//);
+  assert.doesNotMatch(approachesHtml, /file:\/\//);
+});
+
+test("approaches page presents portrait examples with accessible motion and active navigation", () => {
+  assert.match(approachesHtml, /aspect-ratio:4\/5/);
+  assert.match(approachesHtml, /loading="\$\{index === 0 \? "eager" : "lazy"\}"/);
+  assert.match(approachesHtml, /ArrowLeft/);
+  assert.match(approachesHtml, /ArrowRight/);
+  assert.match(approachesHtml, /aria-current/);
+  assert.match(approachesHtml, /IntersectionObserver/);
+  assert.match(approachesHtml, /prefers-reduced-motion:reduce/);
+  assert.match(approachesHtml, /Create With This Template/);
+  assert.match(approachesHtml, /create_with_template_clicked/);
+});
+
 test("workspace reuses image preview, revision, registration, and final routes", () => {
   for (const route of ["/api/public/brandee/product-ads/image/preview", "/api/public/brandee/product-ads/image/revise", "/api/auth/register", "/api/brandee/product-ads/subscribe", "/api/brandee/product-ads/image/final"]) {
     assert.match(workspaceHtml, new RegExp(route.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")));
