@@ -281,7 +281,18 @@ async function analyzeProduct({ productUrl, businessWebsite, productName, produc
     try {
       const raw = await callResearchModel(buildResearchPrompt({ template, extracted, businessProfile, productName, productDescription, existingFields }));
       const validated = AiAnalysisResponseSchema.safeParse(raw);
-      if (validated.success) { ai = validated.data; aiUsed = true; }
+      if (validated.success) {
+        ai = validated.data;
+        aiUsed = true;
+      } else {
+        // A schema mismatch is a real, occasionally-occurring outcome with
+        // this reasoning model (confirmed: the exact same prompt succeeds
+        // on one run and fails shape validation on another) — previously
+        // silent, indistinguishable from "nothing went wrong, there was
+        // just nothing to suggest." Surface it honestly like every other
+        // failure mode here, and get the client to encourage a retry.
+        warnings.push("Brandee's AI research model returned an unexpected response shape — try Analyze Product again, or continue with your extracted data.");
+      }
     } catch (error) {
       warnings.push(describeResearchError(error));
     }
