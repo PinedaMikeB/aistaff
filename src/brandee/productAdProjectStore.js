@@ -65,6 +65,14 @@ function createProject({ kind, anonymousSessionId = null, userId = null, product
     // Structured creative-planning output (PART 12) for the CURRENT/latest
     // revision — see revisions[] below for full history.
     creativePlan: null,
+    // "Analyze Product" — latest completed product-research + field-
+    // suggestion result (productAnalysisService.js), plus which suggestions
+    // the owner has accepted/rejected/edited so reopening the workspace
+    // doesn't lose that decision (see saveAnalysis()/recordSuggestionDecision()
+    // below). Never rerun automatically on reopen — only on explicit
+    // re-analyze or a changed product image/URL (enforced by the route).
+    analysis: null,
+    suggestionDecisions: {}, // { [suggestionId]: "accepted" | "rejected" | "edited" }
     // Append-only revision history (PART 16/17/19). Every generated preview
     // (the first one AND every subsequent natural-language revision) is
     // pushed here; nothing is ever overwritten, so the customer can always
@@ -146,6 +154,21 @@ function listRevisions(projectId) {
   return project ? (project.revisions || []) : [];
 }
 
+// --- "Analyze Product" persistence --------------------------------------
+
+/** Saves the latest completed analysis result onto the project (overwrites — analysis itself is not revisioned like previews are). */
+function saveAnalysis(projectId, analysis) {
+  return updateProject(projectId, { analysis });
+}
+
+/** Records the owner's decision (accepted/rejected/edited) on one suggestion, keyed by its id, so it persists across reopens. */
+function recordSuggestionDecision(projectId, suggestionId, decision) {
+  const project = getProject(projectId);
+  if (!project) return null;
+  const suggestionDecisions = { ...(project.suggestionDecisions || {}), [suggestionId]: decision };
+  return updateProject(projectId, { suggestionDecisions });
+}
+
 /**
  * "Restore" never deletes newer revisions (PART 19) — it copies the chosen
  * older revision's content back into the convenience mirror fields AND
@@ -209,6 +232,8 @@ module.exports = {
   addRevision,
   listRevisions,
   restoreRevision,
+  saveAnalysis,
+  recordSuggestionDecision,
   storePath,
   anonLimitsPath
 };

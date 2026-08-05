@@ -75,6 +75,22 @@ const ProductUrlExtractRequestSchema = z.object({
   url: z.string().url().max(500)
 });
 
+// "Analyze Product" — Brandee Image Ad Workspace AI-assisted analysis
+// (productAnalysisService.js). At least one of productUrl/businessWebsite/
+// productName/productDescription must be supplied — enforced by the route
+// handler (productAnalysisService itself returns an honest warning rather
+// than throwing if all four are absent, since this is also called
+// server-side in contexts where that's a soft, recoverable case).
+const AnalyzeProductRequestSchema = z.object({
+  projectId: z.string().uuid().optional().nullable(),
+  templateId: z.string().min(1).max(80),
+  productUrl: z.string().url().max(500).optional().nullable(),
+  businessWebsite: z.string().url().max(500).optional().nullable(),
+  productName: z.string().max(140).optional().nullable(),
+  productDescription: z.string().max(2000).optional().nullable(),
+  existingFields: z.record(z.any()).optional().default({})
+});
+
 function hasRealTestimonial(form) {
   return Boolean(form.testimonialQuote && form.testimonialQuote.trim().length > 0 && form.testimonialAttribution && form.testimonialAttribution.trim().length > 0);
 }
@@ -85,5 +101,6 @@ module.exports = {
   ImageAdRequestSchema,
   VideoAdRequestSchema,
   ProductUrlExtractRequestSchema,
+  AnalyzeProductRequestSchema,
   hasRealTestimonial
 };

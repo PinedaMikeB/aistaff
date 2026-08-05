@@ -64,12 +64,13 @@ const { getExtractionConfig, getPlannerConfig } = require("./brandee/modelConfig
 const { BrandeeError, toBrandeeError } = require("./brandee/errors");
 const { savePlan, getPlan } = require("./brandee/store");
 const { recordRun: recordBrandeeRun, listRuns: listBrandeeRuns, getRunStats: getBrandeeRunStats } = require("./admin/brandeeRunLog");
-const { ImageAdRequestSchema, VideoAdRequestSchema, ProductUrlExtractRequestSchema, hasRealTestimonial } = require("./brandee/productAdSchemas");
+const { ImageAdRequestSchema, VideoAdRequestSchema, ProductUrlExtractRequestSchema, AnalyzeProductRequestSchema, hasRealTestimonial } = require("./brandee/productAdSchemas");
 const { listAvailableTemplates, getImageAdTemplate, isTemplateAvailable } = require("./brandee/imageAdTemplates");
 const { listVideoAdStyles, getVideoAdStyle, HOOK_PREFERENCES, TONES, CREATOR_TYPES, SETTINGS } = require("./brandee/videoAdStyles");
 const { listPlans: listBrandeePlans, getPlan: getBrandeePlan, ANONYMOUS_LIMITS: BRANDEE_ANON_LIMITS, PRICING_QUANTITIES_ARE_PLACEHOLDERS } = require("./brandee/pricingConfig");
 const { validateImageDataUrl } = require("./brandee/mediaValidation");
 const { extractProductFromUrl } = require("./brandee/productUrlExtractor");
+const { analyzeProduct } = require("./brandee/productAnalysisService");
 const { renderImageAdSvg, buildAdContent } = require("./brandee/imageAdRenderer");
 const { probeVideoProviderAvailability, generateVideoTeaser, generateFinalVideo } = require("./brandee/videoTeaserRenderer");
 const productAdProjectStore = require("./brandee/productAdProjectStore");
@@ -1567,6 +1568,62 @@ app.post("/api/public/brandee/product-ads/url-extract", requireProductAdRateLimi
     return res.json({ ok: false, reason: result.reason, message: result.message });
   }
   res.json({ ok: true, extracted: result.extracted });
+}));
+
+// "Analyze Product" (Phase 1 of the AI-assisted Image Ad Workspace). Runs
+// product/business research + generates field suggestions the owner must
+// explicitly review and apply — never auto-fills the form. Synchronous
+// (like /image/preview and /image/revise above it), not a job queue —
+// this app has no queue infrastructure and the spec explicitly says not to
+// add one for this feature alone. Creates a draft project up front if the
+// client doesn't have one yet, so a suggestion the owner accepts here can
+// be persisted immediately and the same projectId flows into the existing
+// /image/preview call later, exactly like an already-generated preview's
+// projectId does today.
+app.post("/api/public/brandee/product-ads/image/analyze", requireProductAdRateLimit, asyncHandler(async (req, res) => {
+  const anonymousSessionId = getOrSetBrandeeSessionId(req, res);
+  let body;
+  try {
+    body = AnalyzeProductRequestSchema.parse(req.body);
+  } catch (error) {
+    return res.status(400).json({ ok: false, error: "Please provide a template and at least a product link, business website, name, or description.", issues: error?.issues?.slice(0, 8) });
+  }
+
+  const template = await templateCatalog.getStaticTemplateBySlug(body.templateId);
+  if (!template) return res.status(400).json({ ok: false, error: "Unknown template." });
+
+  const userId = req.user?.id || null;
+  let project = body.projectId ? productAdProjectStore.getProject(body.projectId) : null;
+  if (!project) project = productAdProjectStore.createProject({ kind: "image", anonymousSessionId: userId ? null : anonymousSessionId, userId, product: {} });
+
+  trackBrandeeEvent("image_analysis_requested", { templateId: body.templateId }, { anonymousSessionId, userId });
+
+  const analysis = await analyzeProduct({
+    productUrl: body.productUrl || null,
+    businessWebsite: body.businessWebsite || null,
+    productName: body.productName || null,
+    productDescription: body.productDescription || null,
+    template,
+    existingFields: body.existingFields || {}
+  });
+
+  productAdProjectStore.saveAnalysis(project.id, analysis);
+  trackBrandeeEvent("image_analysis_completed", { templateId: body.templateId, suggestedFieldCount: analysis.suggestedFieldCount, aiUsed: analysis.aiUsed }, { anonymousSessionId, userId });
+
+  res.json({ ok: true, projectId: project.id, analysis });
+}));
+
+// Owner's decision (accept/reject/edit) on one suggestion from the most
+// recent analysis — persisted so reopening the workspace doesn't lose it.
+// Does not itself change any form field; the client applies the value.
+app.post("/api/public/brandee/product-ads/image/project/:id/suggestion-decision", requireProductAdTrackRateLimit, asyncHandler(async (req, res) => {
+  const { suggestionId, decision } = req.body || {};
+  if (!suggestionId || !["accepted", "rejected", "edited"].includes(decision)) {
+    return res.status(400).json({ ok: false, error: "Invalid suggestion decision." });
+  }
+  const project = productAdProjectStore.recordSuggestionDecision(req.params.id, suggestionId, decision);
+  if (!project) return res.status(404).json({ ok: false, error: "Project not found." });
+  res.json({ ok: true });
 }));
 
 function requireValidImages(form) {
