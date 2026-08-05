@@ -95,7 +95,7 @@ test("analyzeProduct with a product URL (no AI configured) surfaces the extracte
   assert.equal(result.detectedProduct.confidence, "medium");
 
   assert.ok(result.fieldSuggestions.productName?.length, "should suggest the extracted name");
-  assert.equal(result.fieldSuggestions.productName[0].status, "owner_confirmed");
+  assert.equal(result.fieldSuggestions.productName[0].status, "verified");
   assert.deepEqual(result.fieldSuggestions.productName[0].sourceIds, ["https://sample-shop.example/products/bamboo-mug"]);
   assert.ok(result.fieldSuggestions.productDescription?.length, "should suggest the extracted description");
 

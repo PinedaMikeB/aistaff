@@ -23,6 +23,39 @@
   .form-card { padding:22px; } .form-card h2 { margin:0 0 6px; font-size:23px; } .form-card > p { margin:0 0 20px; color:#86a3b7; font-size:13px; line-height:1.55; }
   .form-section { padding:17px 0; border-top:1px solid rgba(117,161,188,.16); } .form-section:first-of-type { border-top:0; padding-top:0; } .form-section h3 { margin:0 0 12px; color:#d9f1ff; font-size:15px; } .form-grid { display:grid; grid-template-columns:1fr 1fr; gap:12px; } .field { display:grid; gap:6px; } .field.full { grid-column:1/-1; } label { color:#9fc0d6; font-size:12px; font-weight:700; } input,textarea,select { width:100%; border:1px solid rgba(117,161,188,.25); border-radius:8px; padding:10px 11px; background:#07131f; color:#f4f8ff; font:13px Manrope; } textarea { min-height:82px; resize:vertical; } input:focus,textarea:focus,select:focus { border-color:var(--cyan); outline:3px solid rgba(36,169,255,.15); } .hint { margin:5px 0 0; color:#6f8a9c; font-size:11px; line-height:1.4; }
   .upload { display:grid; gap:8px; padding:14px; border:1px dashed rgba(117,204,255,.32); border-radius:10px; background:rgba(8,20,32,.6); } .upload input { border:0; padding:0; background:none; }
+  .analysis-status { display:none; gap:10px; align-items:center; margin:0 0 16px; padding:10px 12px; border:1px solid rgba(117,204,255,.22); border-radius:10px; background:rgba(8,20,32,.55); font-size:12.5px; color:#9fc0d6; }
+  .analysis-status.is-visible { display:flex; }
+  .analysis-status .spinner { width:14px; height:14px; border-radius:50%; border:2px solid rgba(117,204,255,.25); border-top-color:var(--cyan); animation:brandee-spin .8s linear infinite; flex:none; }
+  @keyframes brandee-spin { to { transform:rotate(360deg); } }
+  .analysis-status.is-done .spinner { display:none; }
+  .analysis-status .analysis-text { flex:1; }
+  .analysis-status .button { flex:none; padding:5px 10px; font-size:11px; min-height:0; }
+  .suggestion-panel { display:none; margin:0 0 20px; padding:18px; border:1px solid rgba(117,204,255,.22); border-radius:14px; background:linear-gradient(145deg,rgba(19,39,54,.62),rgba(3,8,16,.9)); }
+  .suggestion-panel.is-visible { display:block; }
+  .suggestion-panel h3 { margin:0 0 4px; font-size:17px; }
+  .suggestion-panel > p.panel-sub { margin:0 0 14px; color:#86a3b7; font-size:12.5px; }
+  .suggestion-group { margin-bottom:16px; }
+  .suggestion-group h4 { margin:0 0 8px; color:#7ec69a; font-size:11px; letter-spacing:.06em; text-transform:uppercase; }
+  .suggestion-card { display:flex; flex-direction:column; gap:8px; padding:12px; margin-bottom:8px; border:1px solid rgba(117,161,188,.2); border-radius:10px; background:#07131f; }
+  .suggestion-card.is-dismissed { display:none; }
+  .suggestion-card .suggestion-text { color:#f4f8ff; font-size:13px; line-height:1.5; }
+  .suggestion-card .suggestion-reason { color:#6f8a9c; font-size:11.5px; }
+  .suggestion-card .suggestion-meta { display:flex; gap:6px; flex-wrap:wrap; align-items:center; }
+  .claim-badge { display:inline-flex; align-items:center; gap:4px; padding:2px 8px; border-radius:999px; font:700 10px "DM Mono"; letter-spacing:.04em; text-transform:uppercase; }
+  .claim-badge.verified { color:#3ddc97; background:rgba(61,220,151,.12); border:1px solid rgba(61,220,151,.3); }
+  .claim-badge.owner_confirmed { color:#5dd0ff; background:rgba(93,208,255,.12); border:1px solid rgba(93,208,255,.3); }
+  .claim-badge.needs_confirmation { color:#ffc35d; background:rgba(255,195,93,.12); border:1px solid rgba(255,195,93,.3); }
+  .suggestion-actions { display:flex; gap:8px; }
+  .suggestion-actions .button { flex:none; padding:5px 12px; font-size:11px; min-height:0; }
+  .suggestion-compare { display:none; margin-top:6px; padding:9px; border-radius:8px; background:rgba(255,195,93,.08); border:1px solid rgba(255,195,93,.25); font-size:12px; color:#d9f1ff; }
+  .suggestion-compare.is-visible { display:block; }
+  .suggestion-compare b { display:block; color:#ffd990; font-size:10.5px; letter-spacing:.04em; text-transform:uppercase; margin-bottom:3px; }
+  .claims-list,.sources-list { display:grid; gap:6px; }
+  .claims-list .claim-row,.sources-list .source-row { display:flex; justify-content:space-between; gap:10px; align-items:center; padding:8px 10px; border:1px solid rgba(117,161,188,.16); border-radius:8px; background:#07131f; font-size:12px; color:#9fc0d6; }
+  .analysis-banner { display:none; gap:10px; align-items:center; margin:0 0 16px; padding:10px 12px; border:1px solid rgba(61,220,151,.35); border-radius:10px; background:rgba(61,220,151,.08); font-size:12.5px; color:#d9f1ff; }
+  .analysis-banner.is-visible { display:flex; }
+  .analysis-banner .button { flex:none; padding:5px 10px; font-size:11px; min-height:0; }
+
   .template-fields { display:grid; gap:12px; } .required-note { color:#ffd990; font-size:11px; } .status { min-height:20px; margin:11px 0 0; color:#9fc0d6; font-size:12px; } .status.error { color:#ffaaa8; }
   .action-row { display:flex; gap:10px; flex-wrap:wrap; margin-top:16px; } .action-row .button-primary { flex:1; justify-content:center; } .button { cursor:pointer; }
   .revision-card,.gate-card { margin-top:18px; padding:20px; } .revision-card h3,.gate-card h3 { margin:0 0 8px; font-size:19px; } .revision-card p,.gate-card p { margin:0 0 12px; color:#9fc0d6; font-size:13px; line-height:1.5; } .revision-row { display:flex; gap:8px; } .revision-row input { flex:1; } .history { display:flex; gap:8px; overflow-x:auto; margin-top:14px; } .history button { width:76px; flex:none; padding:4px; border:1px solid rgba(117,161,188,.22); border-radius:7px; background:#07131f; color:#9fc0d6; cursor:pointer; } .history svg { display:block; width:100%; height:auto; } .gate-card { display:none; border-color:rgba(61,220,151,.32); } .gate-card.is-visible { display:block; } .gate-form { display:grid; gap:9px; } .plan-list { display:grid; gap:9px; margin-top:15px; } .plan-choice { display:flex; justify-content:space-between; gap:10px; align-items:center; padding:12px; border:1px solid rgba(117,161,188,.2); border-radius:9px; background:#07131f; } .plan-choice strong { display:block; color:#fff; font-size:13px; } .plan-choice small { color:#86a3b7; }
@@ -36,8 +69,12 @@
   <header class="workspace-header"><div><span class="kicker">Image Ad Workspace</span><h1 id="workspaceTitle">Your selected approach</h1><p id="workspaceSubtitle">Brandee will personalize this layout using your product, customer, benefits, colors, and call to action.</p></div><a class="button button-soft" href="/agents/brandee/image/approaches">Change Template <span>↗</span></a></header>
   <div class="workspace-layout">
     <section class="preview-column"><div class="stage-card"><div class="stage-top"><div><h2 id="stageTemplateName">Loading template…</h2><p id="stageFramework"></p></div><span class="stage-chip">4:5 / image ad</span></div><div class="stage-surface" id="stageSurface"></div><p class="stage-note" id="stageNote">This is the selected visual reference. Your personalized, watermarked preview will appear here after generation.</p><div class="stage-actions"><button class="button button-soft" id="saveFinishBtn" type="button" hidden>Save &amp; Finish</button><button class="button button-soft" id="downloadBtn" type="button" hidden>Download Final Image</button></div></div><div class="revision-card" id="revisionCard" hidden><h3>Revise This Design</h3><p>Describe what you want to change. Brandee preserves the current preview and applies only your requested edit.</p><div class="revision-row"><input id="revisionInput" maxlength="300" placeholder="Make the product larger, shorten the headline, or use warmer colors." /><button class="button button-primary" id="revisionBtn" type="button">Apply Revision</button></div><p class="status" id="revisionStatus" role="status" aria-live="polite"></p><div class="history" id="history"></div></div></section>
-    <section class="form-column"><div class="form-card"><h2>Add your product details</h2><p>Start with the essentials. The form adapts to the creative approach you selected.</p><form id="workspaceForm" novalidate>
-      <div class="form-section"><h3>1. Product</h3><div class="form-grid"><div class="field full"><label for="productUrl">Product listing URL (optional)</label><div style="display:flex;gap:8px"><input id="productUrl" type="url" placeholder="https://…" /><button class="button button-soft" id="extractBtn" type="button">Fill from link</button></div><p class="hint" id="extractStatus"></p></div><div class="field full upload"><label for="productImage">Product image *</label><input id="productImage" type="file" accept="image/png,image/jpeg,image/webp" required /><span class="hint">Use a clear photo where the product is visible.</span></div><div class="field"><label for="productName">Product name *</label><input id="productName" required placeholder="e.g. Portable Mini Fan" /></div><div class="field"><label for="targetCustomer">Who is it for? *</label><input id="targetCustomer" required placeholder="e.g. commuters and students" /></div><div class="field full"><label for="productDescription">Product description *</label><textarea id="productDescription" required placeholder="What is it and what does it help customers do?"></textarea></div></div></div>
+    <section class="form-column"><div class="form-card"><h2>Add your product details</h2><p>Start with the essentials. The form adapts to the creative approach you selected.</p>
+      <div class="analysis-status" id="analysisStatus" role="status" aria-live="polite"><span class="spinner" aria-hidden="true"></span><span class="analysis-text" id="analysisStatusText">Brandee is studying your product…</span></div>
+      <div class="analysis-banner" id="analysisBanner" role="status" aria-live="polite"><span class="analysis-text" id="analysisBannerText"></span><button class="button button-soft" id="reviewSuggestionsBtn" type="button">Review Suggestions</button><button class="button button-soft" id="dismissAnalysisBtn" type="button">Dismiss</button></div>
+      <div class="suggestion-panel" id="suggestionPanel"><h3>Brandee's suggestions</h3><p class="panel-sub">Nothing is applied until you choose "Use this." Your own answers are never overwritten automatically.</p><div id="suggestionGroups"></div><div id="claimsSection"></div><div id="sourcesSection"></div></div>
+      <form id="workspaceForm" novalidate>
+      <div class="form-section"><h3>1. Product</h3><div class="form-grid"><div class="field full"><label for="productUrl">Product listing URL (optional)</label><div style="display:flex;gap:8px"><input id="productUrl" type="url" placeholder="https://…" /><button class="button button-soft" id="extractBtn" type="button">Analyze Product</button></div><p class="hint">Brandee will study the page, identify the product, extract verifiable details, and prepare advertising recommendations.</p><p class="hint" id="extractStatus"></p></div><div class="field full upload"><label for="productImage">Product image *</label><input id="productImage" type="file" accept="image/png,image/jpeg,image/webp" required /><span class="hint">Use a clear photo where the product is visible.</span></div><div class="field"><label for="productName">Product name *</label><input id="productName" required placeholder="e.g. Portable Mini Fan" /></div><div class="field"><label for="targetCustomer">Who is it for? *</label><input id="targetCustomer" required placeholder="e.g. commuters and students" /></div><div class="field full"><label for="productDescription">Product description *</label><textarea id="productDescription" required placeholder="What is it and what does it help customers do?"></textarea></div></div></div>
       <div class="form-section"><h3>2. Message</h3><div class="form-grid"><div class="field full"><label for="mainFeatures">Main features *</label><textarea id="mainFeatures" required placeholder="List the useful features customers should know."></textarea></div><div class="field full"><label for="mainBenefit">Main benefit</label><input id="mainBenefit" placeholder="What practical result does it provide?" /></div><div class="field"><label for="desiredAction">Desired customer action *</label><select id="desiredAction"><option value="buy_now">Buy now</option><option value="send_message">Send a message</option><option value="visit_product_page">Visit product page</option><option value="learn_more">Learn more</option></select></div><div class="field"><label for="preferredLanguage">Preferred language</label><select id="preferredLanguage"><option value="english">English</option><option value="filipino">Filipino</option><option value="taglish">Taglish</option></select></div></div></div>
       <div class="form-section"><h3>3. Price and offer</h3><div class="form-grid"><div class="field"><label for="regularPrice">Regular price</label><input id="regularPrice" placeholder="e.g. ₱999" /></div><div class="field"><label for="promoPrice">Promo price</label><input id="promoPrice" placeholder="e.g. ₱799" /></div><div class="field"><label for="discountText">Offer or discount</label><input id="discountText" placeholder="e.g. ₱200 off or free delivery" /></div><div class="field"><label for="offerExpirationDate">Real deadline</label><input id="offerExpirationDate" type="date" /></div><div class="field full"><label for="offerDetails">Offer details</label><input id="offerDetails" placeholder="Only enter a real offer." /></div></div></div>
       <div class="form-section"><h3>4. Brand and proof</h3><div class="form-grid"><div class="field"><label for="brandColor1">Brand color 1</label><input id="brandColor1" type="color" value="#0f172a" /></div><div class="field"><label for="brandColor2">Brand color 2</label><input id="brandColor2" type="color" value="#3b82f6" /></div><div class="field full"><label for="additionalNotes">Additional notes</label><textarea id="additionalNotes" placeholder="Anything Brandee should preserve or emphasize?"></textarea></div><div class="field full"><label for="testimonialQuote">Real customer quote</label><textarea id="testimonialQuote" placeholder="Required for Customer Story."></textarea></div><div class="field"><label for="testimonialAttribution">Quote attribution</label><input id="testimonialAttribution" placeholder="Name or initials" /></div><div class="field full"><label for="logo">Logo (optional)</label><input id="logo" type="file" accept="image/png,image/jpeg,image/webp" /></div></div></div>
@@ -49,7 +86,7 @@
 <script src="/agents/brandee/product-ad-common.js"></script>
 <script>
 (function(){
-  const $=(s,r)=> (r||document).querySelector(s); const helpers=window.BrandeeProductAd; let state={config:null,template:null,templateFields:{},productImage:null,logo:null,projectId:null,svg:null};
+  const $=(s,r)=> (r||document).querySelector(s); const helpers=window.BrandeeProductAd; let state={config:null,template:null,templateFields:{},productImage:null,logo:null,projectId:null,svg:null,analysis:null};
   const params=new URLSearchParams(location.search); const saved=JSON.parse(sessionStorage.getItem("brandeeSelectedTemplate")||"null"); const selectedId=params.get("templateId") || saved?.id;
   const esc=v=>String(v||"").replace(/[&<>\"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
   const label={us_vs_them:"Compare the Difference",features_and_benefits:"Show Features & Benefits",reasons_why:"Give Them Reasons",before_and_after:"Show the Transformation",bold_claim:"Lead With a Strong Message",iphone_notes:"Personal Note Style",offer:"Promote an Offer",question:"Open With a Question",sticky_notes:"Sticky Note Style",testimonial:"Customer Story"};
@@ -68,7 +105,108 @@
   $("#registerForm").addEventListener("submit",async e=>{e.preventDefault();showStatus("#gateStatus","Creating your account…");const r=await helpers.fetchJson("/api/auth/register",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({name:$("#regName").value.trim(),email:$("#regEmail").value.trim(),password:$("#regPassword").value,projectId:state.projectId})});if(!r.body?.ok){showStatus("#gateStatus",r.body?.error||"Could not create your account.",true);return;}showStatus("#gateStatus","Account created. Choose a plan to unlock the clean export.");$("#registerForm").hidden=true;const c=state.config.plans||[];$("#planList").hidden=false;$("#planList").innerHTML=c.filter(p=>p.slug!=="video_starter").map(p=>`<div class="plan-choice"><span><strong>${esc(p.name)} · ₱${esc(p.monthlyPrice)}/mo</strong><small>${p.slug==="brandee_combo"?"Best Value — image + video":"Image-focused plan"}</small></span><button type="button" class="button button-primary" data-plan="${esc(p.slug)}">Choose</button></div>`).join("");$("#planList").querySelectorAll("[data-plan]").forEach(b=>b.addEventListener("click",()=>subscribe(b.dataset.plan)));});
   async function subscribe(planSlug){showStatus("#gateStatus","Starting your subscription…");const r=await helpers.fetchJson("/api/brandee/product-ads/subscribe",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({planSlug})});if(!r.body?.ok){showStatus("#gateStatus",r.body?.error||"Could not start subscription.",true);return;}showStatus("#gateStatus","Subscription active. Generating your clean final image…");const f=await helpers.fetchJson("/api/brandee/product-ads/image/final",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({projectId:state.projectId})});if(!f.body?.ok){showStatus("#gateStatus",f.body?.error||"Could not generate the final image.",true);return;}$("#stageSurface").innerHTML=f.body.svg;$("#stageNote").textContent="Your clean final image is ready.";showStatus("#gateStatus","Final image generated.");downloadPng(f.body.svg,f.body.width,f.body.height);}
   function downloadPng(svg,w,h){const url=URL.createObjectURL(new Blob([svg],{type:"image/svg+xml"})),img=new Image();img.onload=()=>{const c=document.createElement("canvas");c.width=w;c.height=h;c.getContext("2d").drawImage(img,0,0,w,h);URL.revokeObjectURL(url);const a=document.createElement("a");a.download="brandee-image-ad.png";a.href=c.toDataURL("image/png");a.click();};img.src=url;}
-  $("#extractBtn").addEventListener("click",async()=>{const url=$("#productUrl").value.trim();if(!url)return;showStatus("#extractStatus","Reading product page…");const r=await helpers.fetchJson("/api/public/brandee/product-ads/url-extract",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({url})});if(!r.body?.ok){showStatus("#extractStatus",r.body?.message||"Could not read that page.",true);return;}const x=r.body.extracted;if(x.productName&&!$("#productName").value)$("#productName").value=x.productName;if(x.description&&!$("#productDescription").value)$("#productDescription").value=x.description;if(x.price&&!$("#regularPrice").value)$("#regularPrice").value=x.price;showStatus("#extractStatus","Details found. Review them and add a product image.");});
+  // --- "Analyze Product" (AI-assisted analysis) --------------------------
+  const CORE_FIELD_LABELS = { productName: "Product name", targetCustomer: "Who is it for?", productDescription: "Product description", mainFeatures: "Main features", mainBenefit: "Main benefit" };
+  const CORE_FIELD_IDS = { productName: "#productName", targetCustomer: "#targetCustomer", productDescription: "#productDescription", mainFeatures: "#mainFeatures", mainBenefit: "#mainBenefit" };
+  const STATUS_LABEL = { verified: "Verified", owner_confirmed: "Owner confirmed", needs_confirmation: "Needs confirmation" };
+  let analysisInFlight = false;
+  function fieldLabel(key){ if (CORE_FIELD_LABELS[key]) return CORE_FIELD_LABELS[key]; const tf=(state.template.fields||[]).find(f=>f.key===key); return tf?tf.label:key; }
+  function fieldInputSelector(key){ if (CORE_FIELD_IDS[key]) return CORE_FIELD_IDS[key]; const tf=(state.template.fields||[]).find(f=>f.key===key); return tf?`#tf_${key}`:null; }
+  function collectExistingFields(){ const out={}; for (const key of Object.keys(CORE_FIELD_IDS)) { const el=$(CORE_FIELD_IDS[key]); if (el && el.value.trim()) out[key]=el.value.trim(); } for (const f of state.template.fields||[]) { const el=$(`#tf_${f.key}`); if (el && el.value && el.value.trim()) out[f.key]=el.value.trim(); } return out; }
+
+  const ANALYSIS_STEPS = ["Identifying the product…", "Checking official specifications…", "Understanding your offer…", "Preparing advertising suggestions…"];
+  function stepThroughAnalysisStatus(){ let i=0; $("#analysisStatusText").textContent=ANALYSIS_STEPS[0]; return setInterval(()=>{ i=(i+1)%ANALYSIS_STEPS.length; $("#analysisStatusText").textContent=ANALYSIS_STEPS[i]; }, 1400); }
+
+  async function runAnalysis(){
+    if (analysisInFlight) return;
+    const productUrl = $("#productUrl").value.trim() || null;
+    const productName = $("#productName").value.trim() || null;
+    const productDescription = $("#productDescription").value.trim() || null;
+    if (!productUrl && !productName && !productDescription) { showStatus("#extractStatus", "Add a product link, name, or description first.", true); return; }
+    analysisInFlight = true;
+    $("#analysisBanner").classList.remove("is-visible");
+    $("#suggestionPanel").classList.remove("is-visible");
+    $("#analysisStatus").classList.remove("is-done");
+    $("#analysisStatus").classList.add("is-visible");
+    const stepTimer = stepThroughAnalysisStatus();
+    const r = await helpers.fetchJson("/api/public/brandee/product-ads/image/analyze", { method:"POST", headers:{"Content-Type":"application/json"}, body: JSON.stringify({ projectId: state.projectId, templateId: state.template.id, productUrl, productName, productDescription, existingFields: collectExistingFields() }) });
+    clearInterval(stepTimer);
+    analysisInFlight = false;
+    if (!r.body?.ok) { $("#analysisStatus").classList.remove("is-visible"); showStatus("#extractStatus", r.body?.error || "Brandee could not analyze this product right now.", true); return; }
+    state.projectId = r.body.projectId;
+    state.analysis = r.body.analysis;
+    $("#analysisStatus").classList.add("is-done");
+    $("#analysisStatusText").textContent = state.analysis.suggestedFieldCount ? `Brandee prepared suggestions for ${state.analysis.suggestedFieldCount} field${state.analysis.suggestedFieldCount===1?"":"s"}.` : "Brandee finished, but did not have enough information for new suggestions.";
+    setTimeout(()=>$("#analysisStatus").classList.remove("is-visible"), 2600);
+    if (state.analysis.warnings?.length) showStatus("#extractStatus", state.analysis.warnings[0]);
+    if (state.analysis.suggestedFieldCount) {
+      $("#analysisBannerText").textContent = `Brandee prepared suggestions for ${state.analysis.suggestedFieldCount} field${state.analysis.suggestedFieldCount===1?"":"s"}.`;
+      $("#analysisBanner").classList.add("is-visible");
+      helpers.track("image_analysis_completed", { templateId: state.template.id, suggestedFieldCount: state.analysis.suggestedFieldCount });
+    }
+  }
+
+  function recordSuggestionDecision(id, decision){ if (!state.projectId) return; helpers.fetchJson(`/api/public/brandee/product-ads/image/project/${state.projectId}/suggestion-decision`, { method:"POST", headers:{"Content-Type":"application/json"}, body: JSON.stringify({ suggestionId:id, decision }) }).catch(()=>{}); }
+
+  function applySuggestion(card, suggestion){
+    const selector = fieldInputSelector(suggestion.fieldKey);
+    const input = selector ? $(selector) : null;
+    if (!input) return;
+    const compare = $(".suggestion-compare", card);
+    if (input.value.trim() && input.value.trim() !== suggestion.text) {
+      compare.innerHTML = `<b>Your current answer</b>${esc(input.value.trim())}<br/><br/><b>Suggested</b>${esc(suggestion.text)}`;
+      compare.classList.add("is-visible");
+      const replaceBtn = document.createElement("button");
+      replaceBtn.type = "button"; replaceBtn.className = "button button-soft"; replaceBtn.textContent = "Replace my answer";
+      replaceBtn.addEventListener("click", () => { input.value = suggestion.text; compare.classList.remove("is-visible"); recordSuggestionDecision(suggestion.id, "accepted"); helpers.track("suggestion_applied", { fieldKey: suggestion.fieldKey }); }, { once: true });
+      compare.appendChild(document.createElement("br"));
+      compare.appendChild(replaceBtn);
+      return;
+    }
+    input.value = suggestion.text;
+    recordSuggestionDecision(suggestion.id, "accepted");
+    helpers.track("suggestion_applied", { fieldKey: suggestion.fieldKey });
+  }
+
+  function renderSuggestionPanel(){
+    const a = state.analysis; if (!a) return;
+    const groups = Object.entries(a.fieldSuggestions || {});
+    $("#suggestionGroups").innerHTML = groups.map(([key, list]) => `
+      <div class="suggestion-group">
+        <h4>${esc(fieldLabel(key))} · ${list.length} suggestion${list.length===1?"":"s"}</h4>
+        ${list.map((s) => `
+          <div class="suggestion-card" data-suggestion-id="${esc(s.id)}">
+            <div class="suggestion-text">${esc(s.text)}</div>
+            ${s.reason ? `<div class="suggestion-reason">${esc(s.reason)}</div>` : ""}
+            <div class="suggestion-meta"><span class="claim-badge ${esc(s.status)}">${esc(STATUS_LABEL[s.status] || s.status)}</span>${s.angle ? `<span class="hint">${esc(s.angle)}</span>` : ""}</div>
+            <div class="suggestion-actions"><button type="button" class="button button-primary" data-use>Use This</button><button type="button" class="button button-soft" data-dismiss>Dismiss</button></div>
+            <div class="suggestion-compare"></div>
+          </div>`).join("")}
+      </div>`).join("") || "<p class=\"hint\">No suggestions yet.</p>";
+
+    $("#suggestionGroups").querySelectorAll("[data-use]").forEach((btn) => btn.addEventListener("click", () => {
+      const card = btn.closest(".suggestion-card");
+      const id = card.dataset.suggestionId;
+      const suggestion = groups.flatMap(([, list]) => list).find((s) => s.id === id);
+      if (suggestion) applySuggestion(card, suggestion);
+    }));
+    $("#suggestionGroups").querySelectorAll("[data-dismiss]").forEach((btn) => btn.addEventListener("click", () => {
+      const card = btn.closest(".suggestion-card");
+      card.classList.add("is-dismissed");
+      recordSuggestionDecision(card.dataset.suggestionId, "rejected");
+    }));
+
+    const claims = a.claims || [];
+    $("#claimsSection").innerHTML = claims.length ? `<div class="suggestion-group"><h4>Claims to confirm</h4><div class="claims-list">${claims.map((c) => `<div class="claim-row"><span>${esc(c.text)}</span><span class="claim-badge ${esc(c.status)}">${esc(STATUS_LABEL[c.status] || c.status)}</span></div>`).join("")}</div></div>` : "";
+
+    const sources = a.sources || [];
+    $("#sourcesSection").innerHTML = sources.length ? `<div class="suggestion-group"><h4>Sources</h4><div class="sources-list">${sources.map((s) => `<div class="source-row"><span>${esc(s.name)}${s.pageTitle ? ` — ${esc(s.pageTitle)}` : ""}</span></div>`).join("")}</div></div>` : "";
+  }
+
+  $("#extractBtn").addEventListener("click", runAnalysis);
+  $("#reviewSuggestionsBtn").addEventListener("click", () => { renderSuggestionPanel(); $("#suggestionPanel").classList.add("is-visible"); $("#suggestionPanel").scrollIntoView({ behavior: "smooth", block: "nearest" }); });
+  $("#dismissAnalysisBtn").addEventListener("click", () => { $("#analysisBanner").classList.remove("is-visible"); });
+
   function customerTemplateName(template){return String(template.name||"").replace(/\s+[—-]\s+[^—-]+$/u,"").trim() || "Selected template";}
   fetch("/api/public/brandee/product-ads/config",{credentials:"same-origin"}).then(r=>r.json()).then(c=>{state.config=c;state.template=(c.templates||[]).find(t=>t.id===selectedId);if(!state.template){location.href="/agents/brandee/image/approaches";return;}$("#workspaceTitle").textContent=label[framework(state.template)]||"Creative Approach";$("#stageTemplateName").textContent=customerTemplateName(state.template);$("#stageFramework").textContent=label[framework(state.template)]||"Creative layout";$("#stageSurface").innerHTML=`<img src="${esc(state.template.thumbnail)}" alt="${esc(customerTemplateName(state.template))} template" width="480" height="600" />`;renderTemplateFields();helpers.track("image_workspace_opened",{templateId:state.template.id,frameworkKey:framework(state.template)});}).catch(()=>showStatus("#formStatus","Could not load the selected template.",true));
 })();

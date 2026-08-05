@@ -257,7 +257,7 @@ async function analyzeProduct({ productUrl, businessWebsite, productName, produc
       text: normalizeRawPhrase(s.text),
       angle: s.angle || null,
       reason: s.reason || null,
-      status: aiUsed ? "needs_confirmation" : "owner_confirmed",
+      status: aiUsed ? "needs_confirmation" : (extracted || businessProfile) ? "verified" : "owner_confirmed",
       sourceIds: extracted ? [productUrl] : businessProfile ? [businessWebsite] : [],
       confidence: aiUsed ? "medium" : (extracted || businessProfile) ? "high" : "low"
     }));

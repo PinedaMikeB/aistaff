@@ -164,3 +164,51 @@ test("workspace keeps the template stage visible and adapts approach fields", ()
   assert.match(workspaceHtml, /state\.template\.fields/);
   assert.match(workspaceHtml, /Change Template/);
 });
+
+test("workspace replaces 'Fill from link' with 'Analyze Product' and the AI-assisted workflow never auto-applies suggestions", () => {
+  assert.doesNotMatch(workspaceHtml, /Fill from link/);
+  assert.match(workspaceHtml, />Analyze Product</);
+  assert.match(workspaceHtml, /Brandee will study the page, identify the product, extract verifiable details, and prepare advertising recommendations\./);
+  // The old blind url-extract autofill call must be gone from the button's
+  // own handler — analysis now goes through the new endpoint instead.
+  assert.match(workspaceHtml, /"#extractBtn"\)\.addEventListener\("click", runAnalysis\)/);
+  assert.match(workspaceHtml, /\/api\/public\/brandee\/product-ads\/image\/analyze/);
+  // Calm, non-blocking status component (spec: "not an oversized modal",
+  // "user should be able to continue editing while analysis is running") —
+  // this is a status element among the form fields, not a fixed/modal
+  // overlay that would block interaction with the rest of the page.
+  assert.match(workspaceHtml, /class="analysis-status"/);
+  assert.doesNotMatch(workspaceHtml, /analysis-status[^"]*"[^>]*position:\s*fixed/);
+  assert.match(workspaceHtml, /Identifying the product/);
+  assert.match(workspaceHtml, /Checking official specifications/);
+  assert.match(workspaceHtml, /Understanding your offer/);
+  assert.match(workspaceHtml, /Preparing advertising suggestions/);
+});
+
+test("workspace never overwrites an existing owner answer without an explicit compare-and-replace step", () => {
+  assert.match(workspaceHtml, /function applySuggestion\(card, suggestion\)/);
+  // A non-empty, different current value must trigger the compare UI
+  // (current vs suggested + explicit Replace action) rather than silently
+  // overwriting.
+  assert.match(workspaceHtml, /if \(input\.value\.trim\(\) && input\.value\.trim\(\) !== suggestion\.text\)/);
+  assert.match(workspaceHtml, /suggestion-compare/);
+  assert.match(workspaceHtml, /Replace my answer/);
+  assert.match(workspaceHtml, /Your current answer/);
+});
+
+test("workspace suggestion cards show claim-status badges and let the owner accept or dismiss each one individually", () => {
+  assert.match(workspaceHtml, /function renderSuggestionPanel\(\)/);
+  assert.match(workspaceHtml, /claim-badge \$\{esc\(s\.status\)\}/);
+  assert.match(workspaceHtml, />Use This</);
+  assert.match(workspaceHtml, />Dismiss</);
+  assert.match(workspaceHtml, /data-use/);
+  assert.match(workspaceHtml, /data-dismiss/);
+  // Dismissing/accepting persists the owner's decision server-side so it
+  // survives reopening the workspace, rather than only living in memory.
+  assert.match(workspaceHtml, /suggestion-decision/);
+  assert.match(workspaceHtml, /recordSuggestionDecision/);
+  // Sources and claims-to-confirm are surfaced in the same review panel.
+  assert.match(workspaceHtml, /Claims to confirm/);
+  assert.match(workspaceHtml, /id="sourcesSection"/);
+});
+
