@@ -276,3 +276,43 @@ test("Phase 3: suggestion-count indicator sits next to the field label without d
   // lives inside the same lightweight label row as the label itself.
   assert.match(workspaceHtml, /field-label-row \{ display:flex/);
 });
+
+test("Phase 4: analysis shows a real animated progress percentage, not a fake instant bar", () => {
+  assert.match(workspaceHtml, /id="analysisProgressBar"/);
+  assert.match(workspaceHtml, /id="analysisProgressPct"/);
+  assert.match(workspaceHtml, /function startProgressAnimation\(\)/);
+  assert.match(workspaceHtml, /function finishProgressAnimation\(\)/);
+  // Climbs toward 92% while running, eased over the measured real duration
+  // — never claims 100% until the actual response has arrived.
+  assert.match(workspaceHtml, /Math\.min\(92, Math\.round\(92 \* \(1 - Math\.exp/);
+  assert.match(workspaceHtml, /ANALYSIS_ESTIMATED_MS = 40000/);
+  assert.match(workspaceHtml, /startProgressAnimation\(\);/);
+  assert.match(workspaceHtml, /finishProgressAnimation\(\);/);
+  assert.match(workspaceHtml, /analysisProgressBar"\)\.style\.width = "100%"/);
+});
+
+test("Phase 4: analysis auto-fills only currently-blank fields, never overwrites an owner-typed answer", () => {
+  assert.match(workspaceHtml, /function autoPopulateFromAnalysis\(\)/);
+  assert.match(workspaceHtml, /if \(!input \|\| \(input\.value && input\.value\.trim\(\)\)\) continue;/);
+  assert.match(workspaceHtml, /const autoFilledCount = autoPopulateFromAnalysis\(\);/);
+  // Every auto-filled field still records a real acceptance decision, same
+  // as a manual "Use This" click — not a silent, untracked overwrite.
+  assert.match(workspaceHtml, /recordSuggestionDecision\(list\[0\]\.id, "accepted"\);/);
+});
+
+test("Phase 4: Create My Preview starts disabled and enables once required fields are actually complete", () => {
+  assert.match(workspaceHtml, /id="generateBtn" type="submit" disabled/);
+  assert.match(workspaceHtml, /id="generateHint"/);
+  assert.match(workspaceHtml, /function updateGenerateButtonState\(\)/);
+  // Reuses the exact same validate()/collect() the submit handler already
+  // uses — one single definition of "ready," not a second parallel check.
+  assert.match(workspaceHtml, /const err = validate\(collect\(\)\);/);
+  assert.match(workspaceHtml, /btn\.disabled = Boolean\(err\);/);
+  // Wired to fire on manual typing (delegated form input/change), on file
+  // upload, after analysis auto-fill, and after accepting any suggestion —
+  // not just once at page load.
+  assert.match(workspaceHtml, /\$\("#workspaceForm"\)\.addEventListener\("input",updateGenerateButtonState\);/);
+  assert.match(workspaceHtml, /\$\("#workspaceForm"\)\.addEventListener\("change",updateGenerateButtonState\);/);
+  assert.match(workspaceHtml, /state\.productImage=await fileData\("#productImage"\);updateGenerateButtonState\(\);/);
+  assert.match(workspaceHtml, /helpers\.track\("suggestion_applied", \{ fieldKey: suggestion\.fieldKey \}\); updateGenerateButtonState\(\); \}/);
+});
