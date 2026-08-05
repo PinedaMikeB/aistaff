@@ -68,7 +68,7 @@ test("approaches page presents portrait examples with accessible motion and acti
   assert.match(approachesHtml, /prefers-reduced-motion:reduce/);
   assert.match(approachesHtml, /Create With This Template/);
   assert.match(approachesHtml, /create_with_template_clicked/);
-  assert.match(approachesHtml, /const AUTOPLAY_MS = 4500/);
+  assert.match(approachesHtml, /const AUTOPLAY_MS = 3500/);
   assert.match(approachesHtml, /mouseenter/);
   assert.match(approachesHtml, /visibilitychange/);
   assert.match(approachesHtml, /matchMedia\?\.\("\(prefers-reduced-motion: reduce\)"\)/);
@@ -78,14 +78,19 @@ test("approaches page presents portrait examples with accessible motion and acti
   assert.doesNotMatch(approachesHtml, /<span class="framework">/);
 });
 
-test("approach carousel autoplay interval is within the agreed 4000-5000ms range", () => {
+test("approach carousel autoplay interval is fast but not jarring, and slide count no longer shows a redundant audience label", () => {
   const match = approachesHtml.match(/const AUTOPLAY_MS = (\d+)/);
   assert.ok(match, "AUTOPLAY_MS constant not found");
   const interval = Number(match[1]);
-  assert.ok(interval >= 4000 && interval <= 5000, `AUTOPLAY_MS (${interval}) is outside the 4000-5000ms range`);
+  assert.ok(interval >= 2500 && interval <= 4500, `AUTOPLAY_MS (${interval}) is outside the sane 2500-4500ms range`);
   // Slide transition itself stays a smooth 300-450ms range — only the wait
   // between slides should have changed.
   assert.match(approachesHtml, /transition:transform \.4s cubic-bezier/);
+  // "Service example" / "Product example" label removed from under the
+  // template name — only the name and the Use This Template button remain.
+  assert.doesNotMatch(approachesHtml, /Service example/);
+  assert.doesNotMatch(approachesHtml, /Product example/);
+  assert.doesNotMatch(approachesHtml, /\.slide-meta small/);
 });
 
 test("each slide renders exactly one interactive Use This Template CTA (duplicate removed)", () => {
