@@ -68,7 +68,7 @@ test("approaches page presents portrait examples with accessible motion and acti
   assert.match(approachesHtml, /prefers-reduced-motion:reduce/);
   assert.match(approachesHtml, /Create With This Template/);
   assert.match(approachesHtml, /create_with_template_clicked/);
-  assert.match(approachesHtml, /const AUTOPLAY_MS = 3500/);
+  assert.match(approachesHtml, /const AUTOPLAY_MS = 2500/);
   assert.match(approachesHtml, /mouseenter/);
   assert.match(approachesHtml, /visibilitychange/);
   assert.match(approachesHtml, /matchMedia\?\.\("\(prefers-reduced-motion: reduce\)"\)/);
@@ -109,6 +109,36 @@ test("each slide renders exactly one interactive Use This Template CTA (duplicat
   assert.match(approachesHtml, /template-select-button/);
   assert.match(approachesHtml, /data-template-id="\$\{esc\(t\.id\)\}"/);
   assert.match(approachesHtml, /selected = true; selectTemplate\(t\); clearTimer\(\); setTimeout\(\(\) => openWorkspace\(t\), 180\)/);
+});
+
+test("all template thumbnails preload into cache as soon as config loads, ahead of scroll", () => {
+  assert.match(approachesHtml, /function preloadAllTemplateImages\(\)/);
+  assert.match(approachesHtml, /new Image\(\)/);
+  // Called right alongside render(), not gated behind any scroll/visibility
+  // check — every carousel's images start warming immediately, not just the
+  // first one on screen.
+  assert.match(approachesHtml, /config=body;render\(\);preloadAllTemplateImages\(\);/);
+});
+
+test("approach heading uses the site's shared Motion.js letter-reveal, replaying on every scroll direction", () => {
+  assert.match(approachesHtml, /cdn\.jsdelivr\.net\/npm\/motion@11\/dist\/motion\.js/);
+  assert.match(approachesHtml, /function wireHeadingReveal\(h2\)/);
+  assert.match(approachesHtml, /window\.Motion/);
+  assert.match(approachesHtml, /inView\(h2, \(\) => \{/);
+  // The reveal callback returns a cleanup that re-hides the letters — this
+  // is what makes it replay every time the heading re-enters the viewport
+  // in either scroll direction, instead of a one-shot animation.
+  assert.match(approachesHtml, /return setHidden;/);
+  assert.match(approachesHtml, /rotateX/);
+  assert.match(approachesHtml, /stagger\(/);
+  // Falls back to a fully visible, static heading for reduced-motion users
+  // or if Motion failed to load — same safety net as the rest of the site.
+  assert.match(approachesHtml, /reduceMotion \|\| typeof window\.Motion === "undefined"/);
+  assert.match(approachesHtml, /\.approach-copy h2 \.letter \{ opacity:1; \}/);
+  // Matches the exact CSS class pattern already used site-wide (word-group
+  // wrapper prevents mid-word line breaks) rather than inventing a new one.
+  assert.match(approachesHtml, /\.approach-copy h2 \.word-group \{ display:inline-block; white-space:nowrap; \}/);
+  assert.match(approachesHtml, /wireHeadingReveal\(\$\("h2",section\)\)/);
 });
 
 test("workspace preserves normal document scrolling and customer-facing template labels", () => {
