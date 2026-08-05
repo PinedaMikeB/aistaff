@@ -1,0 +1,114 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Creative Approaches for Image Ads | Brandee</title>
+<meta name="description" content="Browse Brandee's proven creative approaches and choose the exact image-ad template you want to personalize." />
+<link rel="icon" href="/aistaff-logo-square.png" type="image/png" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700;800&family=DM+Mono:wght@500&family=Manrope:wght@500;600;700;800&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="/style.css" />
+<style>
+  :root { --approach-night:#030810; --approach-ice:#c7ecff; --approach-cyan:#24a9ff; --approach-green:#3ddc97; }
+  * { box-sizing:border-box; }
+  body.approaches-page { margin:0; background:var(--approach-night); color:#f4f8ff; font-family:Manrope,sans-serif; }
+  .approaches-shell { width:min(1280px,calc(100% - 48px)); margin:0 auto; }
+  .approaches-hero { padding:120px 0 54px; text-align:center; }
+  .approaches-kicker { color:var(--approach-cyan); font:500 11px/1 "DM Mono",monospace; letter-spacing:.16em; text-transform:uppercase; }
+  .approaches-hero h1 { max-width:850px; margin:22px auto 14px; color:#fff; font:600 clamp(44px,7vw,86px)/.95 "Space Grotesk",sans-serif; letter-spacing:-.065em; }
+  .approaches-hero p { max-width:650px; margin:0 auto; color:#9fc0d6; font-size:17px; line-height:1.65; }
+  .approach-jump-wrap { position:sticky; top:10px; z-index:10; padding:10px 0; background:linear-gradient(180deg,rgba(3,8,16,.98),rgba(3,8,16,.8),transparent); }
+  .approach-jump { display:flex; align-items:center; gap:8px; max-width:100%; overflow-x:auto; padding:4px; border:1px solid rgba(117,204,255,.16); border-radius:12px; background:rgba(8,20,32,.88); backdrop-filter:blur(14px); scrollbar-width:thin; }
+  .approach-jump-label { flex:none; padding:9px 10px; color:#6f8a9c; font:500 10px "DM Mono"; letter-spacing:.12em; text-transform:uppercase; }
+  .approach-jump a { flex:none; padding:9px 12px; border:1px solid transparent; border-radius:8px; color:#9fc0d6; font-size:12px; font-weight:700; text-decoration:none; white-space:nowrap; }
+  .approach-jump a:hover,.approach-jump a:focus-visible { border-color:rgba(36,169,255,.45); color:#fff; outline:none; }
+  .approach-list { display:grid; gap:38px; padding:38px 0 150px; }
+  .approach-section { display:grid; grid-template-columns:minmax(280px,.8fr) minmax(0,1.2fr); gap:44px; align-items:center; padding:34px; border:1px solid rgba(117,204,255,.16); border-radius:24px; background:linear-gradient(145deg,rgba(19,39,54,.62),rgba(3,8,16,.88)); box-shadow:0 24px 70px rgba(0,0,0,.18); scroll-margin-top:80px; }
+  .approach-section:nth-child(even) { grid-template-columns:minmax(0,1.2fr) minmax(280px,.8fr); }
+  .approach-section:nth-child(even) .approach-copy { order:2; }
+  .approach-section:nth-child(even) .approach-carousel { order:1; }
+  .approach-copy .framework { color:#7ec69a; font:600 11px "DM Mono"; letter-spacing:.13em; text-transform:uppercase; }
+  .approach-copy h2 { margin:12px 0 12px; color:#fff; font:600 clamp(30px,4vw,54px)/.98 "Space Grotesk"; letter-spacing:-.055em; }
+  .approach-copy p { max-width:440px; margin:0 0 18px; color:#9fc0d6; font-size:15px; line-height:1.65; }
+  .requirement { display:inline-flex; align-items:center; gap:7px; margin:0 0 22px; padding:7px 10px; border:1px solid rgba(255,202,113,.3); border-radius:999px; color:#ffd990; font-size:11px; font-weight:700; }
+  .requirement::before { content:""; width:6px; height:6px; border-radius:50%; background:#ffc35d; box-shadow:0 0 12px rgba(255,195,93,.65); }
+  .approach-copy .button { display:inline-flex; align-items:center; gap:9px; }
+  .approach-carousel { min-width:0; }
+  .carousel-frame { position:relative; overflow:hidden; border:1px solid rgba(117,204,255,.18); border-radius:18px; background:#07131f; }
+  .carousel-track { display:flex; transition:transform .35s ease; touch-action:pan-y; }
+  .example-slide { min-width:100%; padding:16px; }
+  .example-slide button { display:block; width:100%; padding:0; border:0; background:none; color:inherit; cursor:zoom-in; text-align:left; }
+  .example-slide button:focus-visible { outline:3px solid var(--approach-cyan); outline-offset:4px; border-radius:12px; }
+  .example-slide img { display:block; width:100%; aspect-ratio:4/5; object-fit:contain; border-radius:12px; background:#0b1b2a; }
+  .slide-meta { display:flex; justify-content:space-between; gap:12px; align-items:flex-start; padding:13px 2px 2px; }
+  .slide-meta strong { display:block; color:#fff; font:600 16px "Space Grotesk"; }
+  .slide-meta small { display:block; margin-top:3px; color:#7ec69a; font:600 10px "DM Mono"; letter-spacing:.1em; text-transform:uppercase; }
+  .slide-count { flex:none; color:#6f8a9c; font:11px "DM Mono"; }
+  .carousel-controls { display:flex; justify-content:space-between; align-items:center; padding:0 16px 16px; }
+  .carousel-buttons { display:flex; gap:8px; }
+  .carousel-button { width:38px; height:38px; display:grid; place-items:center; border:1px solid rgba(117,204,255,.28); border-radius:50%; background:rgba(8,20,32,.8); color:#c7ecff; cursor:pointer; }
+  .carousel-button:hover,.carousel-button:focus-visible { border-color:var(--approach-cyan); color:#fff; outline:none; }
+  .carousel-dots { display:flex; gap:5px; }
+  .carousel-dot { width:6px; height:6px; padding:0; border:0; border-radius:50%; background:#355269; cursor:pointer; }
+  .carousel-dot.is-active { width:20px; border-radius:99px; background:linear-gradient(90deg,var(--approach-cyan),var(--approach-green)); }
+  .selection-bar { position:fixed; right:24px; bottom:24px; left:24px; z-index:20; display:flex; align-items:center; justify-content:space-between; gap:18px; width:min(850px,calc(100% - 48px)); margin:auto; padding:12px 14px 12px 18px; border:1px solid rgba(72,193,255,.48); border-radius:16px; background:rgba(6,17,28,.94); box-shadow:0 18px 60px rgba(0,0,0,.45); backdrop-filter:blur(16px); transform:translateY(140%); transition:transform .25s ease; }
+  .selection-bar.is-visible { transform:translateY(0); }
+  .selection-bar span { min-width:0; color:#c7ecff; font-size:13px; font-weight:700; }
+  .selection-bar span b { color:#fff; }
+  .selection-bar .button { flex:none; }
+  .empty-state { padding:40px; text-align:center; color:#9fc0d6; }
+  @media (max-width:820px) { .approaches-shell { width:min(100% - 28px,620px); } .approaches-hero { padding-top:76px; } .approach-section,.approach-section:nth-child(even) { grid-template-columns:1fr; gap:24px; padding:20px; } .approach-section:nth-child(even) .approach-copy,.approach-section:nth-child(even) .approach-carousel { order:initial; } .approach-copy h2 { font-size:42px; } .selection-bar { right:14px; bottom:14px; left:14px; width:calc(100% - 28px); } }
+  @media (prefers-reduced-motion:reduce) { .carousel-track,.selection-bar { transition:none; } }
+</style>
+</head>
+<body class="modern-home approaches-page">
+<header class="site-header cinematic-header">
+  <a class="brand" href="/agents/brandee/" aria-label="Brandee home"><img class="brand-logo" src="/aistaff-logo-square.png" alt="AIStaff" width="42" height="42" /></a>
+  <nav class="site-nav" aria-label="Primary"><a href="/agents/brandee/">Brandee</a><a href="#approaches">Creative Approaches</a></nav>
+  <div class="header-actions"><a class="ghost-link" href="/admin/login">Client login</a><a class="button button-primary glow-button" href="#approaches">Explore approaches <span>↓</span></a></div>
+</header>
+<main>
+  <section class="approaches-hero approaches-shell" aria-labelledby="approachesTitle">
+    <p class="approaches-kicker">AISTAFF / BRANDEE / IMAGE AD CREATOR</p>
+    <h1 id="approachesTitle">Choose a proven creative approach.</h1>
+    <p>See how each approach communicates, compare real product and service examples, and choose the exact direction Brandee should personalize for your ad.</p>
+  </section>
+  <div class="approach-jump-wrap"><nav class="approach-jump approaches-shell" aria-label="Jump to an approach" id="approachJump"><span class="approach-jump-label">Jump to an approach</span></nav></div>
+  <section class="approach-list approaches-shell" id="approaches" aria-live="polite"><p class="empty-state">Loading creative approaches…</p></section>
+</main>
+<div class="selection-bar" id="selectionBar" aria-live="polite"><span>Selected: <b id="selectedName">—</b></span><button class="button button-primary glow-button" id="continueBtn" type="button">Create With This Template <span>→</span></button></div>
+<script src="/agents/brandee/product-ad-common.js"></script>
+<script>
+(function () {
+  const $ = (s, r) => (r || document).querySelector(s);
+  const helpers = window.BrandeeProductAd;
+  const approachMeta = [
+    { key:"us_vs_them", jump:"Compare", name:"Compare the Difference", description:"Show why your product or service stands out from common alternatives. Best when you have clear, supportable advantages customers can understand quickly.", badge:"Needs supportable comparison details" },
+    { key:"features_and_benefits", jump:"Benefits", name:"Show Features & Benefits", description:"Turn product features into practical customer benefits. Best when your offer has several useful details that need a clear explanation." },
+    { key:"reasons_why", jump:"Reasons", name:"Give Them Reasons", description:"Present several clear reasons to choose your product or book your service. Best for offers with multiple convenience, quality, or value benefits." },
+    { key:"before_and_after", jump:"Transformation", name:"Show the Transformation", description:"Show a genuine visible change. Best when you have real before-and-after images or a clear transformation such as cleaning, organization, renovation, or restoration.", badge:"Needs genuine before-and-after images" },
+    { key:"bold_claim", jump:"Strong Message", name:"Lead With a Strong Message", description:"Put one memorable benefit or value proposition at the center of the ad. Best when you have one clear message customers should remember.", badge:"Strong claims may require support" },
+    { key:"iphone_notes", jump:"Personal Note", name:"Personal Note Style", description:"Make the ad feel like a casual recommendation, saved note, or personal discovery. Best for approachable, native-looking social ads." },
+    { key:"offer", jump:"Offer", name:"Promote an Offer", description:"Make a real price, bundle, discount, freebie, or limited offer easy to understand. Brandee uses only real customer-supplied offer information.", badge:"Needs a real offer" },
+    { key:"question", jump:"Question", name:"Open With a Question", description:"Start with a relatable problem, concern, or desire. Best when customers can immediately recognize themselves in the question." },
+    { key:"sticky_notes", jump:"Sticky Notes", name:"Sticky Note Style", description:"Use short handwritten reminders placed naturally around the product or service scene. Best for casual, everyday benefits and native-looking ads." },
+    { key:"testimonial", jump:"Customer Story", name:"Customer Story", description:"Lead with an exact real customer quote. This approach is available only when the customer provides a genuine testimonial and attribution.", badge:"Needs a real customer quote" }
+  ];
+  const labels = { feature_benefit:"features_and_benefits", offer_promo:"offer", question_ad:"question", comparison:"us_vs_them", testimonial_style:"testimonial", before_and_after:"before_and_after", bold_claim:"bold_claim", iphone_notes:"iphone_notes", reasons_why:"reasons_why", sticky_notes:"sticky_notes" };
+  let config = null; let selected = null;
+  const esc = (v) => String(v || "").replace(/[&<>\"']/g, (c) => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+  function framework(t) { return t.frameworkKey || labels[t.id] || null; }
+  function templatesFor(key) { return (config.templates || []).filter((t) => framework(t) === key); }
+  function selectTemplate(t) { selected = t; $("#selectedName").textContent = t.name; $("#selectionBar").classList.add("is-visible"); document.querySelectorAll("[data-template-id]").forEach((el) => el.classList.toggle("is-selected", el.dataset.templateId === t.id)); helpers.track("template_selected", { templateId:t.id, frameworkKey:framework(t), audienceType:t.audienceType }); }
+  function slideHtml(t, index, total) { const unavailable = t.available === false; return `<article class="example-slide"><button type="button" data-template-id="${esc(t.id)}" aria-label="Select ${esc(t.name)}" ${unavailable ? "disabled" : ""}><img src="${esc(t.thumbnail)}" alt="${esc(t.name)} template example" loading="eager" decoding="async" width="480" height="600" /><span class="slide-meta"><span><strong>${esc(t.name.replace(/^.*—\s*/, ""))}</strong><small>${t.audienceType === "SERVICE" ? "Service example" : t.audienceType === "PRODUCT" ? "Product example" : "Template example"}</small></span><span class="slide-count">${index + 1} / ${total}</span></span></button></article>`; }
+  function renderCarousel(templates) { const id = `carousel-${Math.random().toString(36).slice(2,8)}`; return `<div class="carousel-frame" data-carousel="${id}"><div class="carousel-track">${templates.map((t,i)=>slideHtml(t,i,templates.length)).join("")}</div><div class="carousel-controls"><div class="carousel-dots">${templates.map((_,i)=>`<button class="carousel-dot${i===0?" is-active":""}" type="button" aria-label="Go to example ${i+1}" data-dot="${i}"></button>`).join("")}</div><div class="carousel-buttons"><button class="carousel-button" type="button" aria-label="Previous example" data-prev>‹</button><button class="carousel-button" type="button" aria-label="Next example" data-next>›</button></div></div></div>`; }
+  function wireCarousel(root) { let index=0; const track=$(".carousel-track",root); const slides=[...root.querySelectorAll(".example-slide")]; const dots=[...root.querySelectorAll(".carousel-dot")]; const move=(next)=>{ index=(next+slides.length)%slides.length; track.style.transform=`translateX(-${index*100}%)`; dots.forEach((d,i)=>d.classList.toggle("is-active",i===index)); }; $("[data-prev]",root).addEventListener("click",()=>move(index-1)); $("[data-next]",root).addEventListener("click",()=>move(index+1)); dots.forEach((d,i)=>d.addEventListener("click",()=>move(i))); root.querySelectorAll("[data-template-id]").forEach((button)=>button.addEventListener("click",()=>{ const t=config.templates.find((x)=>x.id===button.dataset.templateId); if(t && t.available !== false) selectTemplate(t); })); let startX=0; root.addEventListener("touchstart",e=>{startX=e.touches[0].clientX},{passive:true}); root.addEventListener("touchend",e=>{const dx=e.changedTouches[0].clientX-startX;if(Math.abs(dx)>42)move(index+(dx<0?1:-1));},{passive:true}); }
+  function render() { const list=$("#approaches"), jump=$("#approachJump"); jump.innerHTML='<span class="approach-jump-label">Jump to an approach</span>'; list.innerHTML=""; approachMeta.forEach((meta)=>{ const templates=templatesFor(meta.key); if(!templates.length) return; const id=`approach-${meta.key}`; const jumpLink=document.createElement("a"); jumpLink.href=`#${id}`; jumpLink.textContent=meta.jump; jump.appendChild(jumpLink); const section=document.createElement("article"); section.className="approach-section"; section.id=id; const badgeHtml=meta.badge ? `<span class="requirement">${esc(meta.badge)}</span>` : `<span class="requirement" style="border-color:rgba(72,193,255,.25);color:#9fc0d6">Easy to customize</span>`; section.innerHTML=`<div class="approach-copy"><span class="framework">${esc(templates[0].category || meta.key.replaceAll("_"," "))}</span><h2>${esc(meta.name)}</h2><p>${esc(meta.description)}</p>${badgeHtml}<br /><button class="button button-primary glow-button" type="button" data-approach-select="${esc(templates[0].id)}">Choose This Approach <span>→</span></button></div><div class="approach-carousel">${renderCarousel(templates)}</div>`; list.appendChild(section); wireCarousel($("[data-carousel]",section)); section.querySelector("[data-approach-select]").addEventListener("click",()=>selectTemplate(templates[0])); }); if(!list.children.length) list.innerHTML='<p class="empty-state">No active image-ad approaches are available yet.</p>'; list.addEventListener("click",e=>{const button=e.target.closest("[data-template-id]");if(button){const t=config.templates.find(x=>x.id===button.dataset.templateId);if(t)selectTemplate(t);}}); }
+  $("#continueBtn").addEventListener("click",()=>{ if(!selected)return; sessionStorage.setItem("brandeeSelectedTemplate",JSON.stringify({id:selected.id,version:selected.version||null,frameworkKey:framework(selected),name:selected.name})); helpers.track("image_workspace_opened",{templateId:selected.id,frameworkKey:framework(selected)}); window.location.href=`/agents/brandee/image/workspace/?templateId=${encodeURIComponent(selected.id)}`; });
+  helpers.track("image_approaches_viewed",{}); fetch("/api/public/brandee/product-ads/config",{credentials:"same-origin"}).then(r=>r.json()).then(body=>{config=body;render();}).catch(()=>{$("#approaches").innerHTML='<p class="empty-state">Brandee could not load the creative approaches. Please refresh and try again.</p>';});
+})();
+</script>
+</body>
+</html>

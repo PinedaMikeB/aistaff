@@ -55,6 +55,26 @@ const ALLOWED_EVENTS = new Set([
   "plan_selected",
   "checkout_started",
   "final_downloaded"
+  ,"image_ad_cta_clicked"
+  ,"video_ad_cta_clicked"
+  ,"image_approaches_viewed"
+  ,"creative_approach_viewed"
+  ,"creative_approach_selected"
+  ,"template_example_viewed"
+  ,"image_workspace_opened"
+  ,"image_product_details_saved"
+  ,"image_preview_started"
+  ,"image_preview_failed"
+  ,"image_revision_started"
+  ,"image_revision_completed"
+  ,"image_revision_failed"
+  ,"image_save_finish_clicked"
+  ,"image_registration_gate_shown"
+  ,"image_registration_completed"
+  ,"image_pricing_gate_shown"
+  ,"image_checkout_started"
+  ,"image_subscription_completed"
+  ,"template_gallery_browsed_without_product"
 ]);
 
 // Only these keys are ever allowed onto an event, and every value is

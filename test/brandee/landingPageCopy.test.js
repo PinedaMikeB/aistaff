@@ -36,8 +36,13 @@ test("primary CTAs are 'Create an Image Ad' and 'Create a Video Ad'", () => {
 });
 
 test("Image/Video Ad CTAs link to the new flow routes", () => {
-  assert.match(landingHtml, /href="\/agents\/brandee\/image\/"/);
+  assert.match(landingHtml, /href="\/agents\/brandee\/image\/approaches"/);
   assert.match(landingHtml, /href="\/agents\/brandee\/video\/"/);
+});
+
+test("landing page positions Creative Approaches before product details", () => {
+  assert.match(landingHtml, /Choose a proven creative approach\./);
+  assert.match(landingHtml, /Explore Image Ad Approaches/);
 });
 
 test("landing page never mentions Guided Mode or Pro Mode as a first choice", () => {
