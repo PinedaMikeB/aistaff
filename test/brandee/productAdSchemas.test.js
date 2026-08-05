@@ -12,7 +12,9 @@ const {
   ImageAdRequestSchema,
   VideoAdRequestSchema,
   ProductUrlExtractRequestSchema,
-  hasRealTestimonial
+  AnalyzeProductRequestSchema,
+  hasRealTestimonial,
+  describeZodError
 } = require("../../src/brandee/productAdSchemas");
 
 // A tiny 1x1 PNG data URL, just enough to satisfy the wrapper-shape regex.
@@ -124,4 +126,41 @@ test("hasRealTestimonial is false when quote/attribution are absent, true only w
   assert.equal(hasRealTestimonial({ testimonialQuote: "Great product!" }), false);
   assert.equal(hasRealTestimonial({ testimonialQuote: "  ", testimonialAttribution: "  " }), false);
   assert.equal(hasRealTestimonial({ testimonialQuote: "Great product!", testimonialAttribution: "J.D." }), true);
+});
+
+test("product/business URL fields accept real-world e-commerce tracking URLs up to 2048 chars, not the old 500 cap", () => {
+  // A real Lazada product URL with tracking params, confirmed to be 1088
+  // characters — the exact URL that triggered the original bug report,
+  // rejected by the old max(500) with a misleading generic error message.
+  const realLazadaUrl = "https://www.lazada.com.ph/products/pdp-i3550633701-s18290895426.html?c=&channelLpJumpArgs=&clickTrackInfo=" + "a".repeat(950);
+  assert.ok(realLazadaUrl.length > 500 && realLazadaUrl.length < 2048);
+  assert.equal(AnalyzeProductRequestSchema.safeParse({ templateId: "x", productUrl: realLazadaUrl }).success, true);
+  assert.equal(ProductUrlExtractRequestSchema.safeParse({ url: realLazadaUrl }).success, true);
+  const tooLong = "https://example.com/" + "a".repeat(2100);
+  assert.equal(AnalyzeProductRequestSchema.safeParse({ templateId: "x", productUrl: tooLong }).success, false);
+});
+
+test("describeZodError builds a specific, actionable message instead of a generic catch-all", () => {
+  const tooLong = "https://example.com/" + "a".repeat(2100);
+  const lengthResult = AnalyzeProductRequestSchema.safeParse({ templateId: "x", productUrl: tooLong });
+  const lengthMessage = describeZodError(lengthResult.error, "fallback");
+  // Must name the actual field and the actual problem — not the generic
+  // "please provide a product link" message that misled the original bug
+  // report (the customer HAD provided a link; it was just too long).
+  assert.match(lengthMessage, /Product URL/);
+  assert.match(lengthMessage, /too long/);
+  assert.match(lengthMessage, /2048/);
+  assert.doesNotMatch(lengthMessage, /fallback/);
+
+  const missingResult = AnalyzeProductRequestSchema.safeParse({ productName: "Fan" });
+  const missingMessage = describeZodError(missingResult.error, "fallback");
+  assert.match(missingMessage, /Template/);
+
+  const badUrlResult = ProductUrlExtractRequestSchema.safeParse({ url: "not-a-url" });
+  const badUrlMessage = describeZodError(badUrlResult.error, "fallback");
+  assert.match(badUrlMessage, /valid web address/);
+
+  // Falls back gracefully when there's truly nothing to describe.
+  assert.equal(describeZodError(null, "fallback"), "fallback");
+  assert.equal(describeZodError({ issues: [] }, "fallback"), "fallback");
 });

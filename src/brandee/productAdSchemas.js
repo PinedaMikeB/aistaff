@@ -24,8 +24,11 @@ const SharedProductFormSchema = z.object({
   targetCustomer: z.string().min(1).max(300),
   desiredAction: z.enum(DESIRED_ACTIONS),
 
-  // Optional (PART 7) — never required before the free preview.
-  productListingUrl: z.string().url().max(500).optional().nullable(),
+  // Optional (PART 7) — never required before the free preview. 2048, not
+  // 500: real e-commerce listing URLs (Lazada/Shopee tracking params in
+  // particular) routinely run 1000+ characters — confirmed with a real
+  // Lazada URL that hit 500 and got rejected with a 400 before this fix.
+  productListingUrl: z.string().url().max(2048).optional().nullable(),
   // Structured price/offer fields (PART 7 — replaces the old, confusing
   // single "Offer or discount" free-text field). `price` is kept as a
   // simple derived/legacy alias (set to regularPrice by the client) so
@@ -72,7 +75,7 @@ const VideoAdRequestSchema = SharedProductFormSchema.extend({
 });
 
 const ProductUrlExtractRequestSchema = z.object({
-  url: z.string().url().max(500)
+  url: z.string().url().max(2048)
 });
 
 // "Analyze Product" — Brandee Image Ad Workspace AI-assisted analysis
@@ -84,8 +87,8 @@ const ProductUrlExtractRequestSchema = z.object({
 const AnalyzeProductRequestSchema = z.object({
   projectId: z.string().uuid().optional().nullable(),
   templateId: z.string().min(1).max(80),
-  productUrl: z.string().url().max(500).optional().nullable(),
-  businessWebsite: z.string().url().max(500).optional().nullable(),
+  productUrl: z.string().url().max(2048).optional().nullable(),
+  businessWebsite: z.string().url().max(2048).optional().nullable(),
   productName: z.string().max(140).optional().nullable(),
   productDescription: z.string().max(2000).optional().nullable(),
   existingFields: z.record(z.any()).optional().default({})
@@ -108,6 +111,40 @@ function hasRealTestimonial(form) {
   return Boolean(form.testimonialQuote && form.testimonialQuote.trim().length > 0 && form.testimonialAttribution && form.testimonialAttribution.trim().length > 0);
 }
 
+// Turns a Zod parse failure into a specific, actionable message instead of
+// a generic catch-all. Found via a real bug report: a schema rejection was
+// shown to the customer as "Please provide a template and at least a
+// product link..." even when they HAD provided a product link — it was
+// just longer than the old max() limit — so the message told them to do
+// the exact thing they'd already done, with no way to know the real
+// problem was length. Every route below now builds its user-facing error
+// from the actual first Zod issue, falling back to the generic message
+// only when there's truly no issue to describe.
+const FIELD_LABELS = {
+  productUrl: "Product URL",
+  businessWebsite: "Business website URL",
+  productListingUrl: "Product URL",
+  url: "URL",
+  templateId: "Template",
+  productName: "Product name",
+  productDescription: "Product description",
+  fieldKey: "Field",
+  fieldLabel: "Field label",
+  action: "Action",
+  projectId: "Project"
+};
+
+function describeZodError(error, fallback) {
+  const issue = error?.issues?.[0];
+  if (!issue) return fallback;
+  const label = FIELD_LABELS[issue.path?.[0]] || (issue.path?.length ? String(issue.path[issue.path.length - 1]) : "This field");
+  if (issue.code === "too_big") return `${label} is too long (max ${issue.maximum} characters) — please shorten it or remove tracking parameters from the URL.`;
+  if (issue.code === "too_small") return `${label} is required.`;
+  if (issue.code === "invalid_string" && issue.validation === "url") return `${label} doesn't look like a valid web address. Please check it and try again.`;
+  if (issue.code === "invalid_type") return `${label} is missing or in the wrong format.`;
+  return issue.message ? `${label}: ${issue.message}` : fallback;
+}
+
 module.exports = {
   DESIRED_ACTIONS,
   SharedProductFormSchema,
@@ -116,5 +153,6 @@ module.exports = {
   ProductUrlExtractRequestSchema,
   AnalyzeProductRequestSchema,
   FieldAssistRequestSchema,
-  hasRealTestimonial
+  hasRealTestimonial,
+  describeZodError
 };

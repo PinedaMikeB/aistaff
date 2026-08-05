@@ -64,7 +64,7 @@ const { getExtractionConfig, getPlannerConfig } = require("./brandee/modelConfig
 const { BrandeeError, toBrandeeError } = require("./brandee/errors");
 const { savePlan, getPlan } = require("./brandee/store");
 const { recordRun: recordBrandeeRun, listRuns: listBrandeeRuns, getRunStats: getBrandeeRunStats } = require("./admin/brandeeRunLog");
-const { ImageAdRequestSchema, VideoAdRequestSchema, ProductUrlExtractRequestSchema, AnalyzeProductRequestSchema, FieldAssistRequestSchema, hasRealTestimonial } = require("./brandee/productAdSchemas");
+const { ImageAdRequestSchema, VideoAdRequestSchema, ProductUrlExtractRequestSchema, AnalyzeProductRequestSchema, FieldAssistRequestSchema, hasRealTestimonial, describeZodError } = require("./brandee/productAdSchemas");
 const { listAvailableTemplates, getImageAdTemplate, isTemplateAvailable } = require("./brandee/imageAdTemplates");
 const { listVideoAdStyles, getVideoAdStyle, HOOK_PREFERENCES, TONES, CREATOR_TYPES, SETTINGS } = require("./brandee/videoAdStyles");
 const { listPlans: listBrandeePlans, getPlan: getBrandeePlan, ANONYMOUS_LIMITS: BRANDEE_ANON_LIMITS, PRICING_QUANTITIES_ARE_PLACEHOLDERS } = require("./brandee/pricingConfig");
@@ -1561,7 +1561,7 @@ app.post("/api/public/brandee/product-ads/url-extract", requireProductAdRateLimi
   try {
     body = ProductUrlExtractRequestSchema.parse(req.body);
   } catch (error) {
-    return res.status(400).json({ ok: false, error: "Please enter a valid product page link." });
+    return res.status(400).json({ ok: false, error: describeZodError(error, "Please enter a valid product page link.") });
   }
   const result = await extractProductFromUrl(body.url);
   if (!result.ok) {
@@ -1586,7 +1586,7 @@ app.post("/api/public/brandee/product-ads/image/analyze", requireProductAdRateLi
   try {
     body = AnalyzeProductRequestSchema.parse(req.body);
   } catch (error) {
-    return res.status(400).json({ ok: false, error: "Please provide a template and at least a product link, business website, name, or description.", issues: error?.issues?.slice(0, 8) });
+    return res.status(400).json({ ok: false, error: describeZodError(error, "Please provide a template and at least a product link, business website, name, or description."), issues: error?.issues?.slice(0, 8) });
   }
 
   const template = await templateCatalog.getStaticTemplateBySlug(body.templateId);
@@ -1636,7 +1636,7 @@ app.post("/api/public/brandee/product-ads/image/field-assist", requireProductAdR
   try {
     body = FieldAssistRequestSchema.parse(req.body);
   } catch (error) {
-    return res.status(400).json({ ok: false, error: "Please provide a valid field and action.", issues: error?.issues?.slice(0, 8) });
+    return res.status(400).json({ ok: false, error: describeZodError(error, "Please provide a valid field and action."), issues: error?.issues?.slice(0, 8) });
   }
   const template = await templateCatalog.getStaticTemplateBySlug(body.templateId);
   if (!template) return res.status(400).json({ ok: false, error: "Unknown template." });
@@ -1680,7 +1680,7 @@ app.post("/api/public/brandee/product-ads/image/preview", requireProductAdRateLi
   try {
     form = ImageAdRequestSchema.parse(req.body);
   } catch (error) {
-    return res.status(400).json({ ok: false, error: "Please complete the required product details.", issues: error?.issues?.slice(0, 8) });
+    return res.status(400).json({ ok: false, error: describeZodError(error, "Please complete the required product details."), issues: error?.issues?.slice(0, 8) });
   }
 
   const imageError = requireValidImages(form);
@@ -1862,7 +1862,7 @@ app.post("/api/public/brandee/product-ads/video/preview", requireProductAdRateLi
   try {
     form = VideoAdRequestSchema.parse(req.body);
   } catch (error) {
-    return res.status(400).json({ ok: false, error: "Please complete the required product details.", issues: error?.issues?.slice(0, 8) });
+    return res.status(400).json({ ok: false, error: describeZodError(error, "Please complete the required product details."), issues: error?.issues?.slice(0, 8) });
   }
 
   const imageError = requireValidImages(form);
