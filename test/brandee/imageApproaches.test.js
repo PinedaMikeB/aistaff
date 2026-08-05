@@ -68,16 +68,42 @@ test("approaches page presents portrait examples with accessible motion and acti
   assert.match(approachesHtml, /prefers-reduced-motion:reduce/);
   assert.match(approachesHtml, /Create With This Template/);
   assert.match(approachesHtml, /create_with_template_clicked/);
-  assert.match(approachesHtml, /const AUTOPLAY_MS = 7000/);
+  assert.match(approachesHtml, /const AUTOPLAY_MS = 4500/);
   assert.match(approachesHtml, /mouseenter/);
   assert.match(approachesHtml, /visibilitychange/);
   assert.match(approachesHtml, /matchMedia\?\.\("\(prefers-reduced-motion: reduce\)"\)/);
   assert.match(approachesHtml, /data-carousel-toggle/);
   assert.match(approachesHtml, /aria-pressed/);
   assert.match(approachesHtml, /setImagePaused/);
-  assert.match(approachesHtml, /data-approach-use/);
-  assert.match(approachesHtml, /approach-use-button/);
   assert.doesNotMatch(approachesHtml, /<span class="framework">/);
+});
+
+test("approach carousel autoplay interval is within the agreed 4000-5000ms range", () => {
+  const match = approachesHtml.match(/const AUTOPLAY_MS = (\d+)/);
+  assert.ok(match, "AUTOPLAY_MS constant not found");
+  const interval = Number(match[1]);
+  assert.ok(interval >= 4000 && interval <= 5000, `AUTOPLAY_MS (${interval}) is outside the 4000-5000ms range`);
+  // Slide transition itself stays a smooth 300-450ms range — only the wait
+  // between slides should have changed.
+  assert.match(approachesHtml, /transition:transform \.4s cubic-bezier/);
+});
+
+test("each slide renders exactly one interactive Use This Template CTA (duplicate removed)", () => {
+  // The old dead decorative text link (a non-interactive <em>, never wired
+  // to a click handler) must be gone, along with its now-unused CSS.
+  assert.doesNotMatch(approachesHtml, /template-select-action/);
+  assert.doesNotMatch(approachesHtml, /USE THIS TEMPLATE →/i);
+  // The section-level button duplicated the per-slide button's exact
+  // behavior (both resolved to the currently visible slide's template and
+  // called selectTemplate()+openWorkspace() on it) — confirmed by reading
+  // wireCarousel's onSlideChange wiring before removal. It must be gone.
+  assert.doesNotMatch(approachesHtml, /data-approach-use/);
+  assert.doesNotMatch(approachesHtml, /approach-use-button/);
+  // The retained per-slide button keeps its original handler, wired via
+  // event delegation on [data-template-id] inside wireCarousel — untouched.
+  assert.match(approachesHtml, /template-select-button/);
+  assert.match(approachesHtml, /data-template-id="\$\{esc\(t\.id\)\}"/);
+  assert.match(approachesHtml, /selected = true; selectTemplate\(t\); clearTimer\(\); setTimeout\(\(\) => openWorkspace\(t\), 180\)/);
 });
 
 test("workspace preserves normal document scrolling and customer-facing template labels", () => {
