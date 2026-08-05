@@ -64,13 +64,13 @@ const { getExtractionConfig, getPlannerConfig } = require("./brandee/modelConfig
 const { BrandeeError, toBrandeeError } = require("./brandee/errors");
 const { savePlan, getPlan } = require("./brandee/store");
 const { recordRun: recordBrandeeRun, listRuns: listBrandeeRuns, getRunStats: getBrandeeRunStats } = require("./admin/brandeeRunLog");
-const { ImageAdRequestSchema, VideoAdRequestSchema, ProductUrlExtractRequestSchema, AnalyzeProductRequestSchema, hasRealTestimonial } = require("./brandee/productAdSchemas");
+const { ImageAdRequestSchema, VideoAdRequestSchema, ProductUrlExtractRequestSchema, AnalyzeProductRequestSchema, FieldAssistRequestSchema, hasRealTestimonial } = require("./brandee/productAdSchemas");
 const { listAvailableTemplates, getImageAdTemplate, isTemplateAvailable } = require("./brandee/imageAdTemplates");
 const { listVideoAdStyles, getVideoAdStyle, HOOK_PREFERENCES, TONES, CREATOR_TYPES, SETTINGS } = require("./brandee/videoAdStyles");
 const { listPlans: listBrandeePlans, getPlan: getBrandeePlan, ANONYMOUS_LIMITS: BRANDEE_ANON_LIMITS, PRICING_QUANTITIES_ARE_PLACEHOLDERS } = require("./brandee/pricingConfig");
 const { validateImageDataUrl } = require("./brandee/mediaValidation");
 const { extractProductFromUrl } = require("./brandee/productUrlExtractor");
-const { analyzeProduct } = require("./brandee/productAnalysisService");
+const { analyzeProduct, generateFieldAssist } = require("./brandee/productAnalysisService");
 const { renderImageAdSvg, buildAdContent } = require("./brandee/imageAdRenderer");
 const { probeVideoProviderAvailability, generateVideoTeaser, generateFinalVideo } = require("./brandee/videoTeaserRenderer");
 const productAdProjectStore = require("./brandee/productAdProjectStore");
@@ -1624,6 +1624,40 @@ app.post("/api/public/brandee/product-ads/image/project/:id/suggestion-decision"
   const project = productAdProjectStore.recordSuggestionDecision(req.params.id, suggestionId, decision);
   if (!project) return res.status(404).json({ ok: false, error: "Project not found." });
   res.json({ ok: true });
+}));
+
+// Per-field AI assist (the sparkle-icon popover). "suggest_from_research"
+// reuses the project's existing analysis for this field when available —
+// no extra AI call. Every other action makes one fresh, narrow AI call
+// through the same model/timeout/fallback machinery as /image/analyze.
+app.post("/api/public/brandee/product-ads/image/field-assist", requireProductAdRateLimit, asyncHandler(async (req, res) => {
+  const anonymousSessionId = getOrSetBrandeeSessionId(req, res);
+  let body;
+  try {
+    body = FieldAssistRequestSchema.parse(req.body);
+  } catch (error) {
+    return res.status(400).json({ ok: false, error: "Please provide a valid field and action.", issues: error?.issues?.slice(0, 8) });
+  }
+  const template = await templateCatalog.getStaticTemplateBySlug(body.templateId);
+  if (!template) return res.status(400).json({ ok: false, error: "Unknown template." });
+
+  const userId = req.user?.id || null;
+  const project = body.projectId ? productAdProjectStore.getProject(body.projectId) : null;
+  const existingAnalysisSuggestions = project?.analysis?.fieldSuggestions?.[body.fieldKey] || [];
+
+  const result = await generateFieldAssist({
+    fieldKey: body.fieldKey,
+    fieldLabel: body.fieldLabel,
+    action: body.action,
+    mode: body.mode,
+    currentValue: body.currentValue || null,
+    template,
+    context: body.context || {},
+    existingAnalysisSuggestions
+  });
+
+  trackBrandeeEvent("field_assist_requested", { templateId: body.templateId, fieldKey: body.fieldKey, action: body.action, aiUsed: result.aiUsed }, { anonymousSessionId, userId });
+  res.json({ ok: true, ...result });
 }));
 
 function requireValidImages(form) {

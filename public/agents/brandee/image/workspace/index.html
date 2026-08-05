@@ -56,11 +56,31 @@
   .analysis-banner.is-visible { display:flex; }
   .analysis-banner .button { flex:none; padding:5px 10px; font-size:11px; min-height:0; }
 
-  .template-fields { display:grid; gap:12px; } .required-note { color:#ffd990; font-size:11px; } .status { min-height:20px; margin:11px 0 0; color:#9fc0d6; font-size:12px; } .status.error { color:#ffaaa8; }
+  .field.has-assist { position:relative; }
+  .field.has-assist textarea,.field.has-assist input[type="text"],.field.has-assist input:not([type]) { padding-right:38px; }
+  .assist-icon { position:absolute; right:8px; bottom:8px; width:26px; height:26px; display:grid; place-items:center; border:1px solid rgba(93,208,255,.35); border-radius:7px; background:rgba(8,20,32,.85); color:#5dd0ff; cursor:pointer; z-index:2; }
+  .assist-icon:hover,.assist-icon:focus-visible { border-color:var(--cyan); color:#fff; outline:2px solid rgba(36,169,255,.3); }
+  .assist-icon svg { width:14px; height:14px; }
+  .assist-icon.is-loading svg { animation:brandee-spin 1s linear infinite; }
+  .field-label-row { display:flex; justify-content:space-between; align-items:baseline; gap:8px; }
+  .field-suggestion-count { color:#5dd0ff; font-size:10.5px; font-weight:600; }
+  .assist-popover { display:none; position:fixed; z-index:60; width:min(340px,calc(100vw - 32px)); max-height:min(480px,calc(100vh - 32px)); overflow-y:auto; padding:14px; border-radius:12px; border:1px solid rgba(117,204,255,.28); background:linear-gradient(160deg,#132736,#030810); box-shadow:0 24px 60px rgba(0,0,0,.45); }
+  .assist-popover.is-visible { display:block; }
+  .assist-popover-head { display:flex; justify-content:space-between; align-items:center; margin-bottom:10px; }
+  .assist-popover-head strong { font-size:12.5px; color:#d9f1ff; }
+  .assist-popover-head button { background:none; border:0; color:#6f8a9c; cursor:pointer; font-size:16px; line-height:1; padding:2px; }
+  .assist-mode-label { color:#7ec69a; font-size:10.5px; letter-spacing:.05em; text-transform:uppercase; margin:0 0 8px; }
+  .assist-actions { display:grid; gap:5px; }
+  .assist-actions button { text-align:left; padding:7px 9px; border-radius:7px; border:1px solid rgba(117,161,188,.18); background:#07131f; color:#d9f1ff; font-size:12px; cursor:pointer; }
+  .assist-actions button:hover,.assist-actions button:focus-visible { border-color:var(--cyan); }
+  .assist-results .suggestion-card { margin-bottom:8px; }
+  .assist-back { margin-bottom:8px; }
+  .assist-back button { background:none; border:0; color:#5dd0ff; font-size:11.5px; cursor:pointer; padding:0; }
+
   .action-row { display:flex; gap:10px; flex-wrap:wrap; margin-top:16px; } .action-row .button-primary { flex:1; justify-content:center; } .button { cursor:pointer; }
   .revision-card,.gate-card { margin-top:18px; padding:20px; } .revision-card h3,.gate-card h3 { margin:0 0 8px; font-size:19px; } .revision-card p,.gate-card p { margin:0 0 12px; color:#9fc0d6; font-size:13px; line-height:1.5; } .revision-row { display:flex; gap:8px; } .revision-row input { flex:1; } .history { display:flex; gap:8px; overflow-x:auto; margin-top:14px; } .history button { width:76px; flex:none; padding:4px; border:1px solid rgba(117,161,188,.22); border-radius:7px; background:#07131f; color:#9fc0d6; cursor:pointer; } .history svg { display:block; width:100%; height:auto; } .gate-card { display:none; border-color:rgba(61,220,151,.32); } .gate-card.is-visible { display:block; } .gate-form { display:grid; gap:9px; } .plan-list { display:grid; gap:9px; margin-top:15px; } .plan-choice { display:flex; justify-content:space-between; gap:10px; align-items:center; padding:12px; border:1px solid rgba(117,161,188,.2); border-radius:9px; background:#07131f; } .plan-choice strong { display:block; color:#fff; font-size:13px; } .plan-choice small { color:#86a3b7; }
   @media (max-width:900px) { .workspace-shell { width:min(100% - 24px,680px); } .workspace-header { padding-top:48px; display:block; } .workspace-header .button { margin-top:18px; } .workspace-layout { grid-template-columns:1fr; } .preview-column { position:static; } .stage-surface { min-height:0; } }
-  @media (max-width:560px) { .form-grid { grid-template-columns:1fr; } .field.full { grid-column:auto; } .revision-row { display:grid; } }
+  @media (max-width:560px) { .form-grid { grid-template-columns:1fr; } .field.full { grid-column:auto; } .revision-row { display:grid; } .assist-popover { left:12px !important; right:12px; bottom:12px !important; top:auto !important; width:auto; max-height:70vh; } }
 </style>
 </head>
 <body class="modern-home workspace-page">
@@ -83,6 +103,7 @@
     </form></div><div class="gate-card" id="gateCard"><h3>Your design is ready.</h3><p>Create an account to save this project and unlock the clean high-resolution version. Your preview stays visible.</p><form class="gate-form" id="registerForm"><input id="regName" required placeholder="Full name" /><input id="regEmail" type="email" required placeholder="Email" /><input id="regPassword" type="password" minlength="8" required placeholder="Password (8+ characters)" /><button class="button button-primary" type="submit">Create Account</button></form><p class="status" id="gateStatus" role="status" aria-live="polite"></p><div class="plan-list" id="planList" hidden></div></div></section>
   </div>
 </main>
+<div class="assist-popover" id="assistPopover" role="dialog" aria-label="Ask Brandee"></div>
 <script src="/agents/brandee/product-ad-common.js"></script>
 <script>
 (function(){
@@ -92,7 +113,7 @@
   const label={us_vs_them:"Compare the Difference",features_and_benefits:"Show Features & Benefits",reasons_why:"Give Them Reasons",before_and_after:"Show the Transformation",bold_claim:"Lead With a Strong Message",iphone_notes:"Personal Note Style",offer:"Promote an Offer",question:"Open With a Question",sticky_notes:"Sticky Note Style",testimonial:"Customer Story"};
   function framework(t){return t.frameworkKey || ({feature_benefit:"features_and_benefits",offer_promo:"offer",question_ad:"question",comparison:"us_vs_them",testimonial_style:"testimonial",before_and_after:"before_and_after",bold_claim:"bold_claim",iphone_notes:"iphone_notes",reasons_why:"reasons_why",sticky_notes:"sticky_notes"}[t.id]) || "";}
   async function fileData(id){const f=$(id).files[0];return f?helpers.fileToDataUrl(f):null;}
-  function renderTemplateFields(){const wrap=$("#templateFields");wrap.innerHTML="";(state.template.fields||[]).forEach(f=>{const id=`tf_${f.key}`, el=document.createElement("div");el.className="field"+(f.type==="textarea"?" full":"");let input=f.type==="textarea"?`<textarea id="${id}" maxlength="${f.maxLength||300}"></textarea>`:f.type==="select"?`<select id="${id}">${(f.options||[]).map(o=>`<option>${esc(o)}</option>`).join("")}</select>`:`<input id="${id}" type="${f.type==='date'?'date':'text'}" maxlength="${f.maxLength||140}" />`;el.innerHTML=`<label for="${id}">${esc(f.label)}${f.required?" *":""}</label>${input}`;wrap.appendChild(el);});}
+  function renderTemplateFields(){const wrap=$("#templateFields");wrap.innerHTML="";(state.template.fields||[]).forEach(f=>{const id=`tf_${f.key}`, el=document.createElement("div");el.className="field"+(f.type==="textarea"?" full":"");let input=f.type==="textarea"?`<textarea id="${id}" maxlength="${f.maxLength||300}"></textarea>`:f.type==="select"?`<select id="${id}">${(f.options||[]).map(o=>`<option>${esc(o)}</option>`).join("")}</select>`:`<input id="${id}" type="${f.type==='date'?'date':'text'}" maxlength="${f.maxLength||140}" />`;el.innerHTML=`<label for="${id}">${esc(f.label)}${f.required?" *":""}</label>${input}`;wrap.appendChild(el);if(f.type==="text"||f.type==="textarea")wireAssistIcon(f.key,$(`#${id}`));});}
   function collect(){const v=id=>$(id)?.value.trim()||null;const colors=[$("#brandColor1").value,$("#brandColor2").value];const tf={};(state.template.fields||[]).forEach(f=>tf[f.key]=v(`#tf_${f.key}`));return {productImage:state.productImage,productName:v("#productName"),productDescription:v("#productDescription"),mainFeatures:v("#mainFeatures"),targetCustomer:v("#targetCustomer"),desiredAction:$("#desiredAction").value,productListingUrl:v("#productUrl"),regularPrice:v("#regularPrice"),promoPrice:v("#promoPrice"),discountText:v("#discountText"),offerExpirationDate:v("#offerExpirationDate"),offerDetails:v("#offerDetails"),price:v("#regularPrice"),mainBenefit:v("#mainBenefit"),logo:state.logo,brandColors:colors,preferredLanguage:$("#preferredLanguage").value,additionalNotes:v("#additionalNotes"),testimonialQuote:v("#testimonialQuote"),testimonialAttribution:v("#testimonialAttribution"),projectId:state.projectId,templateId:state.template.id,templateFields:tf};}
   function validate(form){const required=[["#productImage","Upload a product image."],["#productName","Enter a product name."],["#productDescription","Add a product description."],["#mainFeatures","List the main features."],["#targetCustomer","Enter the target customer."]];for(const [id,msg] of required)if(!form[id.slice(1)])return msg;for(const f of state.template.fields||[])if(f.required&&!form.templateFields[f.key])return `Complete “${f.label}”.`;return null;}
   function showStatus(id,msg,error=false){const el=$(id);el.textContent=msg||"";el.classList.toggle("error",Boolean(error));}
@@ -113,6 +134,100 @@
   function fieldLabel(key){ if (CORE_FIELD_LABELS[key]) return CORE_FIELD_LABELS[key]; const tf=(state.template.fields||[]).find(f=>f.key===key); return tf?tf.label:key; }
   function fieldInputSelector(key){ if (CORE_FIELD_IDS[key]) return CORE_FIELD_IDS[key]; const tf=(state.template.fields||[]).find(f=>f.key===key); return tf?`#tf_${key}`:null; }
   function collectExistingFields(){ const out={}; for (const key of Object.keys(CORE_FIELD_IDS)) { const el=$(CORE_FIELD_IDS[key]); if (el && el.value.trim()) out[key]=el.value.trim(); } for (const f of state.template.fields||[]) { const el=$(`#tf_${f.key}`); if (el && el.value && el.value.trim()) out[f.key]=el.value.trim(); } return out; }
+
+  // --- Per-field AI assist icon + popover ---------------------------------
+  const SPARKLE_SVG = '<svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 3l1.8 5.2L19 10l-5.2 1.8L12 17l-1.8-5.2L5 10l5.2-1.8L12 3z" fill="currentColor"/></svg>';
+  const GENERAL_ACTIONS = [
+    ["suggest_from_research","Suggest from product research"], ["improve","Improve my answer"], ["benefit_focused","Make it benefit-focused"],
+    ["more_persuasive","Make it more persuasive"], ["shorter","Make it shorter"], ["clearer","Make it clearer"],
+    ["for_target_customer","Write for my target customer"], ["alternatives","Generate alternatives"],
+    ["translate_en","Translate to English"], ["translate_fil","Translate to Filipino"],
+    ["tone_professional","Use a professional tone"], ["tone_conversational","Use a conversational tone"]
+  ];
+  const COMPARISON_ACTIONS = [["compare_product","Compare product capabilities"], ["compare_service","Compare service models"], ["defensible_points","Create defensible comparison points"], ["remove_risky","Remove risky claims"], ["verified_only","Show only verified claims"]];
+  const CTA_ACTIONS = [["cta_message","Generate message-based CTA"], ["cta_quotation","Generate quotation CTA"], ["cta_booking","Generate booking CTA"], ["cta_purchase","Generate purchase CTA"], ["cta_store_visit","Generate store-visit CTA"]];
+  const IMPROVE_MODE_ACTIONS = new Set(["improve","benefit_focused","more_persuasive","shorter","clearer","for_target_customer","translate_en","translate_fil","tone_professional","tone_conversational","compare_product","compare_service","defensible_points","remove_risky","verified_only","cta_message","cta_quotation","cta_booking","cta_purchase","cta_store_visit"]);
+  function actionsForField(key){ let list=[...GENERAL_ACTIONS]; if (key==="comparisonSubject"||key==="comparisonPoints") list=[...list,...COMPARISON_ACTIONS]; if (key==="cta") list=[...list,...CTA_ACTIONS]; return list; }
+  function actionMode(action, hasValue){ if (action==="suggest_from_research") return "suggest"; if (action==="alternatives") return "generate_again"; if (IMPROVE_MODE_ACTIONS.has(action)) return hasValue ? "improve" : "suggest"; return "suggest"; }
+
+  let assistFocusReturn = null;
+  function closeAssistPopover(){ $("#assistPopover").classList.remove("is-visible"); $("#assistPopover").innerHTML=""; if (assistFocusReturn) { assistFocusReturn.focus(); assistFocusReturn=null; } }
+  function positionAssistPopover(anchorEl){ const pop=$("#assistPopover"); if (window.innerWidth<=560) return; const r=anchorEl.getBoundingClientRect(); let top=r.bottom+8, left=Math.min(r.left, window.innerWidth-356); if (top+420>window.innerHeight) top=Math.max(12, r.top-8-420); pop.style.top=`${Math.max(12,top)}px`; pop.style.left=`${Math.max(12,left)}px`; }
+
+  function renderAssistActionList(fieldKey, fieldLabel, anchorEl){
+    const pop = $("#assistPopover");
+    pop.innerHTML = `<div class="assist-popover-head"><strong>Ask Brandee — ${esc(fieldLabel)}</strong><button type="button" aria-label="Close" id="assistCloseBtn">×</button></div><div class="assist-actions">${actionsForField(fieldKey).map(([id,lbl])=>`<button type="button" data-action="${esc(id)}">${esc(lbl)}</button>`).join("")}</div>`;
+    $("#assistCloseBtn", pop).addEventListener("click", closeAssistPopover);
+    pop.querySelectorAll("[data-action]").forEach((btn)=>btn.addEventListener("click", ()=>runFieldAssist(fieldKey, fieldLabel, btn.dataset.action, anchorEl)));
+  }
+
+  async function runFieldAssist(fieldKey, fieldLabel, action, anchorEl){
+    const pop = $("#assistPopover");
+    const input = $(fieldInputSelector(fieldKey));
+    const currentValue = input ? input.value.trim() : "";
+    const mode = actionMode(action, Boolean(currentValue));
+    const icon = anchorEl; icon.classList.add("is-loading");
+    pop.innerHTML = `<div class="assist-back"><button type="button" id="assistBackBtn">← Back</button></div><p class="assist-mode-label">Mode: ${mode==="improve"?"Improve":mode==="generate_again"?"Generate Again":"Suggest"}</p><p class="hint">Brandee is thinking…</p>`;
+    $("#assistBackBtn", pop).addEventListener("click", ()=>renderAssistActionList(fieldKey, fieldLabel, anchorEl));
+    const r = await helpers.fetchJson("/api/public/brandee/product-ads/image/field-assist", { method:"POST", headers:{"Content-Type":"application/json"}, body: JSON.stringify({ projectId: state.projectId, templateId: state.template.id, fieldKey, fieldLabel, action, mode, currentValue, context: { productName: $("#productName").value.trim()||null, targetCustomer: $("#targetCustomer").value.trim()||null } }) });
+    icon.classList.remove("is-loading");
+    if (!r.body?.ok) { pop.innerHTML = `<div class="assist-back"><button type="button" id="assistBackBtn2">← Back</button></div><p class="hint">Brandee could not generate suggestions right now.</p>`; $("#assistBackBtn2", pop).addEventListener("click", ()=>renderAssistActionList(fieldKey, fieldLabel, anchorEl)); return; }
+    const modeLabel = mode==="improve"?"Improve":mode==="generate_again"?"Generate Again":"Suggest";
+    if (r.body.unavailable) { pop.innerHTML = `<div class="assist-back"><button type="button" id="assistBackBtn3">← Back</button></div><p class="hint">Brandee's AI assistant isn't configured yet, so this action isn't available right now.</p>`; $("#assistBackBtn3", pop).addEventListener("click", ()=>renderAssistActionList(fieldKey, fieldLabel, anchorEl)); return; }
+    if (!r.body.suggestions?.length) { pop.innerHTML = `<div class="assist-back"><button type="button" id="assistBackBtn4">← Back</button></div><p class="hint">Brandee didn't have enough information for this yet.</p>`; $("#assistBackBtn4", pop).addEventListener("click", ()=>renderAssistActionList(fieldKey, fieldLabel, anchorEl)); return; }
+    pop.innerHTML = `<div class="assist-back"><button type="button" id="assistBackBtn5">← Back</button></div><p class="assist-mode-label">Mode: ${modeLabel}</p><div class="assist-results">${r.body.suggestions.map((s)=>`
+      <div class="suggestion-card" data-suggestion-id="${esc(s.id)}">
+        <div class="suggestion-text">${esc(s.text)}</div>
+        ${s.reason?`<div class="suggestion-reason">${esc(s.reason)}</div>`:""}
+        <div class="suggestion-meta"><span class="claim-badge ${esc(s.status)}">${esc(STATUS_LABEL[s.status]||s.status)}</span>${s.angle?`<span class="hint">${esc(s.angle)}</span>`:""}</div>
+        <div class="suggestion-actions"><button type="button" class="button button-primary" data-use>Use Suggestion</button><button type="button" class="button button-soft" data-edit>Edit Before Applying</button></div>
+        <div class="suggestion-compare"></div>
+      </div>`).join("")}</div>`;
+    $("#assistBackBtn5", pop).addEventListener("click", ()=>renderAssistActionList(fieldKey, fieldLabel, anchorEl));
+    pop.querySelectorAll("[data-use],[data-edit]").forEach((btn)=>btn.addEventListener("click", ()=>{
+      const card = btn.closest(".suggestion-card");
+      const suggestion = r.body.suggestions.find((s)=>s.id===card.dataset.suggestionId);
+      if (!suggestion) return;
+      applySuggestion(card, suggestion);
+      if (btn.dataset.edit !== undefined) { const targetInput = $(fieldInputSelector(fieldKey)); if (targetInput) { targetInput.focus(); const len=targetInput.value.length; targetInput.setSelectionRange?.(len,len); } }
+      closeAssistPopover();
+    }));
+  }
+
+  function openAssistPopover(fieldKey, fieldLabel, anchorEl){
+    assistFocusReturn = anchorEl;
+    renderAssistActionList(fieldKey, fieldLabel, anchorEl);
+    $("#assistPopover").classList.add("is-visible");
+    positionAssistPopover(anchorEl);
+  }
+  document.addEventListener("click", (e)=>{ const pop=$("#assistPopover"); if (!pop.classList.contains("is-visible")) return; if (pop.contains(e.target) || e.target.closest(".assist-icon")) return; closeAssistPopover(); });
+  document.addEventListener("keydown", (e)=>{ if (e.key==="Escape") closeAssistPopover(); });
+
+  function wireAssistIcon(fieldKey, input){
+    if (!input) return;
+    const fieldDiv = input.closest(".field");
+    if (!fieldDiv || fieldDiv.querySelector(".assist-icon")) return;
+    fieldDiv.classList.add("has-assist");
+    const lbl = fieldDiv.querySelector("label");
+    if (lbl && !lbl.closest(".field-label-row")) {
+      const row = document.createElement("div"); row.className = "field-label-row";
+      lbl.replaceWith(row); row.appendChild(lbl);
+      const count = document.createElement("span"); count.className = "field-suggestion-count"; count.id = `count_${fieldKey}`;
+      row.appendChild(count);
+    }
+    const icon = document.createElement("button");
+    icon.type = "button"; icon.className = "assist-icon"; icon.setAttribute("aria-label","Ask Brandee"); icon.title = "Ask Brandee"; icon.setAttribute("aria-haspopup","true"); icon.innerHTML = SPARKLE_SVG;
+    icon.addEventListener("click", (e)=>{ e.preventDefault(); openAssistPopover(fieldKey, fieldLabel(fieldKey), icon); });
+    fieldDiv.appendChild(icon);
+  }
+
+  function refreshSuggestionCounts(){
+    if (!state.analysis) return;
+    for (const [key, list] of Object.entries(state.analysis.fieldSuggestions || {})) {
+      const el = $(`#count_${key}`);
+      if (el) el.textContent = list.length ? `${list.length} suggestion${list.length===1?"":"s"}` : "";
+    }
+  }
 
   const ANALYSIS_STEPS = ["Identifying the product…", "Checking official specifications…", "Understanding your offer…", "Preparing advertising suggestions…"];
   function stepThroughAnalysisStatus(){ let i=0; $("#analysisStatusText").textContent=ANALYSIS_STEPS[0]; return setInterval(()=>{ i=(i+1)%ANALYSIS_STEPS.length; $("#analysisStatusText").textContent=ANALYSIS_STEPS[i]; }, 1400); }
@@ -135,6 +250,7 @@
     if (!r.body?.ok) { $("#analysisStatus").classList.remove("is-visible"); showStatus("#extractStatus", r.body?.error || "Brandee could not analyze this product right now.", true); return; }
     state.projectId = r.body.projectId;
     state.analysis = r.body.analysis;
+    refreshSuggestionCounts();
     $("#analysisStatus").classList.add("is-done");
     $("#analysisStatusText").textContent = state.analysis.suggestedFieldCount ? `Brandee prepared suggestions for ${state.analysis.suggestedFieldCount} field${state.analysis.suggestedFieldCount===1?"":"s"}.` : "Brandee finished, but did not have enough information for new suggestions.";
     setTimeout(()=>$("#analysisStatus").classList.remove("is-visible"), 2600);
@@ -208,7 +324,7 @@
   $("#dismissAnalysisBtn").addEventListener("click", () => { $("#analysisBanner").classList.remove("is-visible"); });
 
   function customerTemplateName(template){return String(template.name||"").replace(/\s+[—-]\s+[^—-]+$/u,"").trim() || "Selected template";}
-  fetch("/api/public/brandee/product-ads/config",{credentials:"same-origin"}).then(r=>r.json()).then(c=>{state.config=c;state.template=(c.templates||[]).find(t=>t.id===selectedId);if(!state.template){location.href="/agents/brandee/image/approaches";return;}$("#workspaceTitle").textContent=label[framework(state.template)]||"Creative Approach";$("#stageTemplateName").textContent=customerTemplateName(state.template);$("#stageFramework").textContent=label[framework(state.template)]||"Creative layout";$("#stageSurface").innerHTML=`<img src="${esc(state.template.thumbnail)}" alt="${esc(customerTemplateName(state.template))} template" width="480" height="600" />`;renderTemplateFields();helpers.track("image_workspace_opened",{templateId:state.template.id,frameworkKey:framework(state.template)});}).catch(()=>showStatus("#formStatus","Could not load the selected template.",true));
+  fetch("/api/public/brandee/product-ads/config",{credentials:"same-origin"}).then(r=>r.json()).then(c=>{state.config=c;state.template=(c.templates||[]).find(t=>t.id===selectedId);if(!state.template){location.href="/agents/brandee/image/approaches";return;}$("#workspaceTitle").textContent=label[framework(state.template)]||"Creative Approach";$("#stageTemplateName").textContent=customerTemplateName(state.template);$("#stageFramework").textContent=label[framework(state.template)]||"Creative layout";$("#stageSurface").innerHTML=`<img src="${esc(state.template.thumbnail)}" alt="${esc(customerTemplateName(state.template))} template" width="480" height="600" />`;renderTemplateFields();for(const key of Object.keys(CORE_FIELD_IDS))wireAssistIcon(key,$(CORE_FIELD_IDS[key]));helpers.track("image_workspace_opened",{templateId:state.template.id,frameworkKey:framework(state.template)});}).catch(()=>showStatus("#formStatus","Could not load the selected template.",true));
 })();
 </script>
 </body>

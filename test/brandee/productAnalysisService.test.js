@@ -12,7 +12,9 @@ const {
   analyzeProduct,
   claimStatusFromEvidence,
   claimFromEvidence,
-  deterministicAnalysis
+  deterministicAnalysis,
+  generateFieldAssist,
+  FIELD_ASSIST_ACTIONS
 } = require("../../src/brandee/productAnalysisService");
 const { makeEvidence } = require("../../src/brandee/evidenceModel");
 
@@ -79,7 +81,7 @@ test("analyzeProduct with a typed name/description but no URL/AI configured retu
   assert.equal(result.detectedProduct.confidence, "low");
 });
 
-test("analyzeProduct with a product URL (no AI configured) surfaces the extracted data as owner_confirmed suggestions with real source attribution", async () => {
+test("analyzeProduct with a product URL (no AI configured) surfaces the extracted data as verified suggestions with real source attribution", async () => {
   let fetchCount = 0;
   const fetchHtmlPage = async (url) => { fetchCount += 1; return { html: PRODUCT_PAGE_HTML, finalUrl: url }; };
 
@@ -134,4 +136,39 @@ test("deterministicAnalysis only ever echoes real extracted text, never invents 
   assert.deepEqual(withNothing.fields, {});
   assert.deepEqual(withNothing.productCapabilities, []);
   assert.deepEqual(withNothing.serviceBenefits, []);
+});
+
+test("generateFieldAssist('suggest_from_research') reuses the existing analysis suggestions with zero extra AI calls", async () => {
+  const existing = [{ id: "sugg_1", fieldKey: "productDescription", text: "Existing suggestion", status: "verified" }];
+  const result = await generateFieldAssist({
+    fieldKey: "productDescription", fieldLabel: "Product description", action: "suggest_from_research",
+    template: COMPARISON_TEMPLATE, existingAnalysisSuggestions: existing
+  });
+  assert.equal(result.aiUsed, false);
+  assert.deepEqual(result.suggestions, existing);
+});
+
+test("generateFieldAssist returns unavailable:true (not a crash, not fabricated copy) when no AI provider is configured", async () => {
+  const result = await generateFieldAssist({
+    fieldKey: "mainBenefit", fieldLabel: "Main benefit", action: "more_persuasive", mode: "improve",
+    currentValue: "It is fast.", template: COMPARISON_TEMPLATE
+  });
+  assert.equal(result.unavailable, true);
+  assert.deepEqual(result.suggestions, []);
+});
+
+test("every action in FIELD_ASSIST_ACTIONS has a real, non-empty instruction — none are stubs", () => {
+  for (const [action, instruction] of Object.entries(FIELD_ASSIST_ACTIONS)) {
+    assert.ok(instruction && instruction.length > 10, `action "${action}" has a missing/too-short instruction`);
+  }
+  // Spot-check the spec's exact required action sets are all present.
+  for (const id of ["improve", "benefit_focused", "more_persuasive", "shorter", "clearer", "for_target_customer", "alternatives", "translate_en", "translate_fil", "tone_professional", "tone_conversational"]) {
+    assert.ok(FIELD_ASSIST_ACTIONS[id], `missing general action: ${id}`);
+  }
+  for (const id of ["compare_product", "compare_service", "defensible_points", "remove_risky", "verified_only"]) {
+    assert.ok(FIELD_ASSIST_ACTIONS[id], `missing comparison action: ${id}`);
+  }
+  for (const id of ["cta_message", "cta_quotation", "cta_booking", "cta_purchase", "cta_store_visit"]) {
+    assert.ok(FIELD_ASSIST_ACTIONS[id], `missing CTA action: ${id}`);
+  }
 });

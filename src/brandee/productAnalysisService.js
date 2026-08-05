@@ -293,6 +293,92 @@ async function analyzeProduct({ productUrl, businessWebsite, productName, produc
   };
 }
 
+// --- Per-field AI assistance (Phase 3: the sparkle-icon popover menu) -----
+// One parameterized prompt template driven by an action->instruction map,
+// rather than 20 bespoke prompts — same model, same call/validate/fallback
+// pattern as analyzeProduct above, so every action gets the same honesty
+// guarantees for free.
+
+const FIELD_ASSIST_ACTIONS = {
+  suggest_from_research: "Suggest strong options grounded in the product research already gathered.",
+  improve: "Rewrite the owner's current answer to be clearer and more persuasive while preserving its exact meaning and every fact already in it. Do not add any new claim.",
+  benefit_focused: "Rewrite to foreground the practical benefit to the customer, not just the feature.",
+  more_persuasive: "Rewrite to be more persuasive while staying strictly truthful and adding no new claim.",
+  shorter: "Rewrite to be noticeably shorter while keeping the essential meaning.",
+  clearer: "Rewrite to be simpler and easier to understand at a glance.",
+  for_target_customer: "Rewrite so the language speaks directly to the stated target customer.",
+  alternatives: "Generate genuinely different alternative phrasings — not minor rewordings of each other.",
+  translate_en: "Translate the current answer to natural English, preserving its exact meaning.",
+  translate_fil: "Translate the current answer to natural Filipino, preserving its exact meaning.",
+  tone_professional: "Rewrite in a professional, business tone.",
+  tone_conversational: "Rewrite in a warm, conversational tone.",
+  compare_product: "Write a comparison of verifiable product capabilities against a clearly named product category — never an unnamed competitor.",
+  compare_service: "Write a comparison of this business's service model against an alternative buying/service model (e.g. renting vs. buying and maintaining one's own equipment) — never attack a competitor by name.",
+  defensible_points: "List only comparison points that are specific and defensible if challenged, never vague superiority claims.",
+  remove_risky: "Rewrite, removing any claim that could not be defended if challenged (e.g. 'always', 'guaranteed', 'zero downtime', 'cheapest', 'best').",
+  verified_only: "Keep only claims directly supported by the product/business research already gathered; remove anything else.",
+  cta_message: "Write a call to action that asks the customer to send a message.",
+  cta_quotation: "Write a call to action that asks the customer to request a quotation.",
+  cta_booking: "Write a call to action that asks the customer to book or schedule.",
+  cta_purchase: "Write a call to action that asks the customer to buy now.",
+  cta_store_visit: "Write a call to action that invites the customer to visit the store."
+};
+
+function buildFieldAssistPrompt({ fieldLabel, action, mode, currentValue, template, context }) {
+  const instruction = FIELD_ASSIST_ACTIONS[action] || FIELD_ASSIST_ACTIONS.suggest_from_research;
+  const lines = [
+    "You are Brandee, an AI creative strategist helping a small/medium Filipino business owner prepare a truthful image advertisement.",
+    "Never invent specifications, prices, guarantees, customer results, or competitor weaknesses beyond what is given below.",
+    `The owner selected the "${template.name}" creative approach.`,
+    `You are assisting with the field: "${fieldLabel}".`,
+    instruction,
+    mode === "improve" && currentValue ? `The owner's current answer to rewrite: "${currentValue}"` : null,
+    mode === "generate_again" ? "Use a genuinely different angle from the obvious/typical phrasing." : null,
+    context && Object.keys(context).length ? `Known context: ${JSON.stringify(context)}` : null,
+    'Return a single JSON object: { "suggestions": [ {"text": string, "angle": string or null, "reason": string or null}, ... up to 4 items ] }'
+  ].filter(Boolean);
+  return lines.join("\n\n");
+}
+
+const FieldAssistResponseSchema = z.object({ suggestions: z.array(SuggestionSchema).max(6).optional().default([]) });
+
+/**
+ * Per-field AI assistance (the sparkle-icon popover). "suggest_from_research"
+ * is special-cased to reuse whatever the last full analyzeProduct() call
+ * already produced for this exact field — no extra AI call needed, and it
+ * stays consistent with what "Review Suggestions" already showed. Every
+ * other action makes one fresh, narrowly-scoped call through the same
+ * callResearchModel used by analyzeProduct, so it inherits the same
+ * timeout/retry/honest-failure behavior.
+ */
+async function generateFieldAssist({ fieldKey, fieldLabel, action, mode = "suggest", currentValue = null, template, context = {}, existingAnalysisSuggestions = [] }) {
+  if (action === "suggest_from_research" && existingAnalysisSuggestions.length) {
+    return { suggestions: existingAnalysisSuggestions, aiUsed: false, mode: "suggest" };
+  }
+  const config = getImageCreativePlanningConfig();
+  if (!config.apiKeyConfigured || config.provider === "mock") {
+    return { suggestions: [], aiUsed: false, unavailable: true, mode };
+  }
+  try {
+    const raw = await callResearchModel(buildFieldAssistPrompt({ fieldLabel, action, mode, currentValue, template, context }));
+    const validated = FieldAssistResponseSchema.safeParse(raw);
+    if (!validated.success || !validated.data.suggestions.length) return { suggestions: [], aiUsed: false, mode };
+    const suggestions = validated.data.suggestions.map((s, i) => ({
+      id: `assist_${fieldKey}_${action}_${i}_${Math.random().toString(36).slice(2, 8)}`,
+      fieldKey,
+      text: normalizeRawPhrase(s.text),
+      angle: s.angle || null,
+      reason: s.reason || null,
+      status: "needs_confirmation",
+      sourceIds: [],
+      confidence: "medium"
+    }));
+    return { suggestions, aiUsed: true, mode };
+  } catch {
+    return { suggestions: [], aiUsed: false, error: true, mode };
+  }
+}
+
 module.exports = {
   analyzeProduct,
   claimStatusFromEvidence,
@@ -300,5 +386,9 @@ module.exports = {
   deterministicAnalysis,
   buildResearchPrompt,
   AiAnalysisResponseSchema,
-  SuggestionSchema
+  SuggestionSchema,
+  FIELD_ASSIST_ACTIONS,
+  buildFieldAssistPrompt,
+  generateFieldAssist
 };
+

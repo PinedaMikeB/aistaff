@@ -91,6 +91,19 @@ const AnalyzeProductRequestSchema = z.object({
   existingFields: z.record(z.any()).optional().default({})
 });
 
+// Per-field AI assistance (the sparkle-icon popover, productAnalysisService's
+// generateFieldAssist).
+const FieldAssistRequestSchema = z.object({
+  projectId: z.string().uuid().optional().nullable(),
+  templateId: z.string().min(1).max(80),
+  fieldKey: z.string().min(1).max(60),
+  fieldLabel: z.string().min(1).max(140),
+  action: z.string().min(1).max(60),
+  mode: z.enum(["suggest", "improve", "generate_again"]).optional().default("suggest"),
+  currentValue: z.string().max(2000).optional().nullable(),
+  context: z.record(z.any()).optional().default({})
+});
+
 function hasRealTestimonial(form) {
   return Boolean(form.testimonialQuote && form.testimonialQuote.trim().length > 0 && form.testimonialAttribution && form.testimonialAttribution.trim().length > 0);
 }
@@ -102,5 +115,6 @@ module.exports = {
   VideoAdRequestSchema,
   ProductUrlExtractRequestSchema,
   AnalyzeProductRequestSchema,
+  FieldAssistRequestSchema,
   hasRealTestimonial
 };

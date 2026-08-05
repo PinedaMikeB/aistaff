@@ -178,7 +178,8 @@ test("workspace replaces 'Fill from link' with 'Analyze Product' and the AI-assi
   // this is a status element among the form fields, not a fixed/modal
   // overlay that would block interaction with the rest of the page.
   assert.match(workspaceHtml, /class="analysis-status"/);
-  assert.doesNotMatch(workspaceHtml, /analysis-status[^"]*"[^>]*position:\s*fixed/);
+  const analysisStatusRule = workspaceHtml.match(/\.analysis-status\s*\{[^}]*\}/)?.[0] || "";
+  assert.doesNotMatch(analysisStatusRule, /position:\s*fixed/);
   assert.match(workspaceHtml, /Identifying the product/);
   assert.match(workspaceHtml, /Checking official specifications/);
   assert.match(workspaceHtml, /Understanding your offer/);
@@ -212,3 +213,66 @@ test("workspace suggestion cards show claim-status badges and let the owner acce
   assert.match(workspaceHtml, /id="sourcesSection"/);
 });
 
+
+test("Phase 3: every writing field gets a keyboard-accessible sparkle 'Ask Brandee' icon; technical inputs never do", () => {
+  assert.match(workspaceHtml, /function wireAssistIcon\(fieldKey, input\)/);
+  assert.match(workspaceHtml, /aria-label","Ask Brandee"/);
+  assert.match(workspaceHtml, /title = "Ask Brandee"/);
+  assert.match(workspaceHtml, /aria-haspopup","true"/);
+  // Wired onto the 5 free-text core fields...
+  assert.match(workspaceHtml, /for\(const key of Object\.keys\(CORE_FIELD_IDS\)\)wireAssistIcon\(key,\$\(CORE_FIELD_IDS\[key\]\)\)/);
+  assert.match(workspaceHtml, /CORE_FIELD_IDS = \{ productName:.*targetCustomer:.*productDescription:.*mainFeatures:.*mainBenefit:/);
+  // ...and dynamically onto per-template text/textarea fields only — never
+  // onto select/date/file/color/template-selector inputs.
+  assert.match(workspaceHtml, /if\(f\.type==="text"\|\|f\.type==="textarea"\)wireAssistIcon\(f\.key,\$\(`#\$\{id\}`\)\)/);
+  assert.doesNotMatch(workspaceHtml, /productImage.*wireAssistIcon/);
+  assert.doesNotMatch(workspaceHtml, /"#logo"\).*wireAssistIcon/);
+});
+
+test("Phase 3: the assist popover shows only the actions relevant to the field, not every option at once", () => {
+  assert.match(workspaceHtml, /function actionsForField\(key\)/);
+  assert.match(workspaceHtml, /key==="comparisonSubject"\|\|key==="comparisonPoints"/);
+  assert.match(workspaceHtml, /key==="cta"/);
+  // General actions present.
+  for (const label of ["Suggest from product research", "Improve my answer", "Make it benefit-focused", "Make it more persuasive", "Make it shorter", "Make it clearer", "Write for my target customer", "Generate alternatives", "Translate to English", "Translate to Filipino", "Use a professional tone", "Use a conversational tone"]) {
+    assert.ok(workspaceHtml.includes(label), `missing general action label: ${label}`);
+  }
+  // Comparison-only actions present, gated to comparison fields by actionsForField.
+  for (const label of ["Compare product capabilities", "Compare service models", "Create defensible comparison points", "Remove risky claims", "Show only verified claims"]) {
+    assert.ok(workspaceHtml.includes(label), `missing comparison action label: ${label}`);
+  }
+  // CTA-only actions present.
+  for (const label of ["Generate message-based CTA", "Generate quotation CTA", "Generate booking CTA", "Generate purchase CTA", "Generate store-visit CTA"]) {
+    assert.ok(workspaceHtml.includes(label), `missing CTA action label: ${label}`);
+  }
+});
+
+test("Phase 3: popover clearly shows which suggestion mode is active", () => {
+  assert.match(workspaceHtml, /function actionMode\(action, hasValue\)/);
+  assert.match(workspaceHtml, /assist-mode-label/);
+  assert.match(workspaceHtml, /Mode: \$\{mode==="improve"\?"Improve":mode==="generate_again"\?"Generate Again":"Suggest"\}/);
+});
+
+test("Phase 3: popover suggestions reuse the same never-overwrite Use/Edit flow and claim badges as the review panel", () => {
+  assert.match(workspaceHtml, /function runFieldAssist\(fieldKey, fieldLabel, action, anchorEl\)/);
+  assert.match(workspaceHtml, />Use Suggestion</);
+  assert.match(workspaceHtml, />Edit Before Applying</);
+  assert.match(workspaceHtml, /applySuggestion\(card, suggestion\)/);
+  assert.match(workspaceHtml, /\/api\/public\/brandee\/product-ads\/image\/field-assist/);
+});
+
+test("Phase 3: popover is keyboard/focus accessible — closes on Escape, outside click, and returns focus to the trigger", () => {
+  assert.match(workspaceHtml, /e\.key==="Escape"/);
+  assert.match(workspaceHtml, /assistFocusReturn = anchorEl/);
+  assert.match(workspaceHtml, /assistFocusReturn\.focus\(\)/);
+  assert.match(workspaceHtml, /role="dialog"/);
+});
+
+test("Phase 3: suggestion-count indicator sits next to the field label without dominating it", () => {
+  assert.match(workspaceHtml, /field-suggestion-count/);
+  assert.match(workspaceHtml, /function refreshSuggestionCounts\(\)/);
+  assert.match(workspaceHtml, /refreshSuggestionCounts\(\);/);
+  // Small text sitting beside the label, not a loud badge — count span
+  // lives inside the same lightweight label row as the label itself.
+  assert.match(workspaceHtml, /field-label-row \{ display:flex/);
+});
