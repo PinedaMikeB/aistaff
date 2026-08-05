@@ -80,7 +80,7 @@ const templateCatalog = require("./brandee/templateCatalog");
 const pricingOverride = require("./brandee/pricingOverride");
 const entitlements = require("./brandee/entitlements");
 const { ENTITLEMENT_UNITS, computeComboSavings, PRICING_NOTE } = require("./brandee/pricingConfig");
-const { buildCreativePlan, interpretRevision } = require("./brandee/creativePlanner");
+const { buildCreativePlan, interpretRevision, sanitizeCustomerFacingPlan } = require("./brandee/creativePlanner");
 const { recommendTemplates } = require("./brandee/templateRecommender");
 const { probeImageProviderAvailability } = require("./brandee/imageGenProvider");
 const { getCreativeBrainStatus, validateAllResources, RESOURCE_VALIDATORS } = require("./admin/creativeBrain");
@@ -1685,13 +1685,14 @@ app.post("/api/public/brandee/product-ads/image/revise", requireProductAdRateLim
     ...(revision.updatedCopy?.subheadline !== undefined ? { subheadline: revision.updatedCopy.subheadline } : {}),
     ...(revision.updatedCopy?.cta ? { cta: revision.updatedCopy.cta } : {})
   };
+  const safeUpdatedPlan = sanitizeCustomerFacingPlan(updatedPlan, project.product);
 
-  const rendered = renderImageAdSvg({ templateId: project.templateId, templateFields: project.templateFields, form: project.product, watermark: true, override: updatedPlan });
+  const rendered = renderImageAdSvg({ templateId: project.templateId, templateFields: project.templateFields, form: project.product, watermark: true, override: safeUpdatedPlan });
 
   if (!userId) productAdProjectStore.recordAnonymousRevision(anonymousSessionId, "image");
   const updated = productAdProjectStore.addRevision(project.id, {
     instruction: body.data.instruction,
-    plan: updatedPlan,
+    plan: safeUpdatedPlan,
     svg: rendered.svg,
     width: rendered.width,
     height: rendered.height,
@@ -1707,7 +1708,7 @@ app.post("/api/public/brandee/product-ads/image/revise", requireProductAdRateLim
     svg: rendered.svg,
     width: rendered.width,
     height: rendered.height,
-    plan: updatedPlan,
+    plan: safeUpdatedPlan,
     revisionNumber: updated.revisions.length,
     revisionSummary: revision.revisionSummary
   });

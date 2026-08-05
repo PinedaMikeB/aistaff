@@ -30,6 +30,10 @@ test("approaches page selects an exact template and persists it for the workspac
   assert.match(approachesHtml, /touchstart/);
   assert.match(approachesHtml, /data-prev/);
   assert.match(approachesHtml, /data-next/);
+  assert.match(approachesHtml, /Use This Template/);
+  assert.match(approachesHtml, /use_this_template_clicked/);
+  assert.doesNotMatch(approachesHtml, /data-approach-focus/);
+  assert.doesNotMatch(approachesHtml, />View Templates</);
 });
 
 test("approaches page overrides shared modern-home carousel rules and keeps document scrolling", () => {
@@ -63,6 +67,20 @@ test("approaches page presents portrait examples with accessible motion and acti
   assert.match(approachesHtml, /prefers-reduced-motion:reduce/);
   assert.match(approachesHtml, /Create With This Template/);
   assert.match(approachesHtml, /create_with_template_clicked/);
+  assert.match(approachesHtml, /const AUTOPLAY_MS = 7000/);
+  assert.match(approachesHtml, /mouseenter/);
+  assert.match(approachesHtml, /visibilitychange/);
+  assert.match(approachesHtml, /matchMedia\?\.\("\(prefers-reduced-motion: reduce\)"\)/);
+  assert.doesNotMatch(approachesHtml, /<span class="framework">/);
+});
+
+test("workspace preserves normal document scrolling and customer-facing template labels", () => {
+  assert.match(workspaceHtml, /body\.workspace-page[^}]*overflow-y:auto/);
+  assert.match(workspaceHtml, /\.modern-home\.workspace-page \{ overflow:visible; \}/);
+  assert.match(workspaceHtml, /\.workspace-layout[^}]*height:auto[^}]*overflow:visible/);
+  assert.match(workspaceHtml, /function customerTemplateName\(template\)/);
+  assert.match(workspaceHtml, /Creative layout/);
+  assert.match(workspaceHtml, /\$\("#stageFramework"\)\.textContent=label\[framework\(state\.template\)\]\|\|"Creative layout"/);
 });
 
 test("workspace reuses image preview, revision, registration, and final routes", () => {

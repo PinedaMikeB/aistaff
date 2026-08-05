@@ -81,6 +81,7 @@ const ALLOWED_EVENTS = new Set([
   ,"service_example_viewed"
   ,"template_image_load_failed"
   ,"create_with_template_clicked"
+  ,"use_this_template_clicked"
 ]);
 
 // Only these keys are ever allowed onto an event, and every value is

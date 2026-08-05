@@ -44,6 +44,48 @@ const RevisionInstructionSchema = z.object({
   understood: z.boolean().optional().default(true)
 });
 
+const FRAMEWORK_COPY_GUARDRAIL = [
+  "Use the selected framework only as a compositional and persuasive structure.",
+  "Do not render the framework name, internal classification, template-family label, or developer terminology inside the customer's ad unless the customer explicitly supplied or requested that exact text.",
+  "Do not print phrases such as 'Us vs Them', 'Features & Benefits', 'Bold Claim', 'Question', 'Reasons Why', 'Before & After', 'Offer', 'Testimonial', 'Sticky Notes', or 'iPhone Notes' as decorative labels by default."
+].join(" ");
+
+const INTERNAL_FRAMEWORK_LABELS = new Set([
+  "US VS THEM", "FEATURES & BENEFITS", "REASONS WHY", "BEFORE & AFTER", "BOLD CLAIM",
+  "QUESTION", "OFFER", "TESTIMONIAL", "STICKY NOTES", "IPHONE NOTES"
+]);
+
+function explicitlySupplied(value, form = {}) {
+  const needle = String(value || "").trim().toLowerCase();
+  if (!needle) return false;
+  return [form.productName, form.productDescription, form.mainFeatures, form.mainBenefit, form.additionalNotes, form.offerDetails, form.testimonialQuote, form.testimonialAttribution]
+    .some((source) => String(source || "").toLowerCase().includes(needle));
+}
+
+function sanitizeCustomerFacingPlan(plan = {}, form = {}) {
+  const next = { ...plan };
+  const fallbackHeadline = form.productName || "Your product";
+  const fallbackCta = form.desiredAction === "send_message" ? "Send a message" : form.desiredAction === "visit_product_page" ? "Visit product page" : "Learn more";
+  const clean = (value, fallback = null) => INTERNAL_FRAMEWORK_LABELS.has(String(value || "").trim().toUpperCase()) && !explicitlySupplied(value, form) ? fallback : value;
+  next.primaryMessage = clean(next.primaryMessage, form.mainBenefit || form.productDescription?.slice(0, 120) || null);
+  next.headline = clean(next.headline, fallbackHeadline);
+  next.subheadline = clean(next.subheadline, form.mainBenefit || null);
+  next.cta = clean(next.cta, fallbackCta);
+  next.supportingPoints = (next.supportingPoints || []).filter((point) => !INTERNAL_FRAMEWORK_LABELS.has(String(point || "").trim().toUpperCase()) || explicitlySupplied(point, form));
+  return next;
+}
+
+function buildImageGenerationPrompt({ template, plan = {}, templateFields = {} }) {
+  return [
+    "Create a polished 4:5 product advertisement using the selected template as a visual reference.",
+    "Preserve the reference layout balance, visual hierarchy, spacing, image placement, typography style, color relationships, and CTA placement.",
+    "Replace sample product names, logos, headlines, prices, features, testimonials, proof, and sample framework labels with the supplied customer information.",
+    FRAMEWORK_COPY_GUARDRAIL,
+    `Customer-visible copy: ${JSON.stringify({ headline:plan.headline || templateFields.headline || null, subheadline:plan.subheadline || plan.subcopy || null, cta:plan.cta || templateFields.cta || null, supportingPoints:plan.supportingPoints || [] })}`,
+    `Selected layout reference: ${template?.description || "customer-selected image-ad layout"}`
+  ].join("\n");
+}
+
 function parseJsonLoose(text) {
   const cleaned = String(text || "").replace(/^```json\s*|```\s*$/g, "").trim();
   return JSON.parse(cleaned);
@@ -149,7 +191,8 @@ function buildPlanningPrompt({ form, template, priorPlan }) {
     form.regularPrice ? `Regular price: ${form.regularPrice}` : "",
     form.promoPrice ? `Promo price: ${form.promoPrice}` : "",
     form.testimonialQuote ? `Real testimonial: "${form.testimonialQuote}" — ${form.testimonialAttribution}` : "",
-    `Selected template/framework: ${template.name} (${template.frameworkKey || "general"})`,
+    `Selected template/framework for internal planning only: ${template.name} (${template.frameworkKey || "general"})`,
+    FRAMEWORK_COPY_GUARDRAIL,
     `Template description: ${template.description}`,
     priorPlan ? `Previous creative plan (for context, you may keep or improve it): ${JSON.stringify(priorPlan)}` : "",
     "",
@@ -177,15 +220,15 @@ function buildPlanningPrompt({ form, template, priorPlan }) {
 async function buildCreativePlan({ form, template, priorPlan = null }) {
   const config = getImageCreativePlanningConfig();
   if (!config.apiKeyConfigured || config.provider === "mock") {
-    return { plan: deterministicCreativeDirection({ form, template }), aiUsed: false, model: null };
+    return { plan: sanitizeCustomerFacingPlan(deterministicCreativeDirection({ form, template }), form), aiUsed: false, model: null };
   }
   try {
     const raw = await callPlanningModel(buildPlanningPrompt({ form, template, priorPlan }));
     const validated = CreativeDirectionSchema.safeParse(raw);
-    if (!validated.success) return { plan: deterministicCreativeDirection({ form, template }), aiUsed: false, model: config.model };
-    return { plan: validated.data, aiUsed: true, model: config.model, reasoningEffort: config.reasoningEffort };
+    if (!validated.success) return { plan: sanitizeCustomerFacingPlan(deterministicCreativeDirection({ form, template }), form), aiUsed: false, model: config.model };
+    return { plan: sanitizeCustomerFacingPlan(validated.data, form), aiUsed: true, model: config.model, reasoningEffort: config.reasoningEffort };
   } catch {
-    return { plan: deterministicCreativeDirection({ form, template }), aiUsed: false, model: config.model };
+    return { plan: sanitizeCustomerFacingPlan(deterministicCreativeDirection({ form, template }), form), aiUsed: false, model: config.model };
   }
 }
 
@@ -211,7 +254,8 @@ function buildRevisionPrompt({ form, template, currentContent, instruction }) {
     "You are Brandee, editing an EXISTING ad preview based on the customer's instruction.",
     "Edit the provided current preview. Preserve its composition, product identity, logo, typography hierarchy, and all unchanged elements. Apply only the requested revision unless a small supporting change is necessary for visual coherence.",
     "Never invent new claims, discounts, testimonials, or facts not already present.",
-    `Template/framework: ${template.name} (${template.frameworkKey || "general"})`,
+    `Template/framework for internal planning only: ${template.name} (${template.frameworkKey || "general"})`,
+    FRAMEWORK_COPY_GUARDRAIL,
     `Current headline: ${currentContent.headline}`,
     `Current subheadline/body: ${currentContent.subcopy || "(none)"}`,
     `Current CTA: ${currentContent.cta}`,
@@ -246,7 +290,10 @@ async function interpretRevision({ form, template, currentContent, instruction }
     const raw = await callPlanningModel(buildRevisionPrompt({ form, template, currentContent, instruction }));
     const validated = RevisionInstructionSchema.safeParse(raw);
     if (!validated.success) return { revision: deterministicRevision(instruction, currentContent), aiUsed: false };
-    return { revision: validated.data, aiUsed: true };
+    const safeRevision = { ...validated.data, updatedCopy: { ...validated.data.updatedCopy } };
+    const safeCopy = sanitizeCustomerFacingPlan({ ...currentContent, ...safeRevision.updatedCopy }, form);
+    for (const key of ["headline", "subheadline", "cta"]) if (safeRevision.updatedCopy[key] !== undefined) safeRevision.updatedCopy[key] = safeCopy[key];
+    return { revision: safeRevision, aiUsed: true };
   } catch {
     return { revision: deterministicRevision(instruction, currentContent), aiUsed: false };
   }
@@ -256,6 +303,8 @@ module.exports = {
   CreativeDirectionSchema,
   RevisionInstructionSchema,
   callPlanningModel,
+  buildImageGenerationPrompt,
+  sanitizeCustomerFacingPlan,
   buildCreativePlan,
   interpretRevision,
   deterministicCreativeDirection

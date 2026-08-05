@@ -12,6 +12,8 @@ const assert = require("node:assert/strict");
 const {
   CreativeDirectionSchema,
   RevisionInstructionSchema,
+  buildImageGenerationPrompt,
+  sanitizeCustomerFacingPlan,
   buildCreativePlan,
   interpretRevision,
   deterministicCreativeDirection
@@ -94,4 +96,26 @@ test("interpretRevision always preserves everything not mentioned in the determi
 test("CreativeDirectionSchema rejects a headline over 100 characters (keeps ad copy readable)", () => {
   const tooLong = "x".repeat(101);
   assert.throws(() => CreativeDirectionSchema.parse({ headline: tooLong, cta: "Shop now" }));
+});
+
+test("image generation prompt keeps framework terminology internal", () => {
+  const prompt = buildImageGenerationPrompt({
+    template: { description: "A split comparison layout", frameworkKey: "us_vs_them" },
+    plan: { headline: "A better daily choice", subheadline: "Built for busy mornings", cta: "Learn more", supportingPoints: ["Lightweight"] },
+    templateFields: { headline: "US VS THEM", cta: "Shop now" }
+  });
+  assert.match(prompt, /compositional and persuasive structure/);
+  assert.match(prompt, /Do not render the framework name/);
+  assert.match(prompt, /Do not print phrases such as/);
+  assert.match(prompt, /A better daily choice/);
+});
+
+test("generated customer-facing copy removes framework-only labels but preserves explicit customer wording", () => {
+  const safe = sanitizeCustomerFacingPlan({ headline: "US VS THEM", subheadline: "FEATURES & BENEFITS", cta: "QUESTION", supportingPoints: ["BOLD CLAIM", "Leak-proof"] }, form());
+  assert.equal(safe.headline, "Aloe Face Cream");
+  assert.equal(safe.subheadline, null);
+  assert.equal(safe.cta, "Learn more");
+  assert.deepEqual(safe.supportingPoints, ["Leak-proof"]);
+  const explicit = sanitizeCustomerFacingPlan({ headline: "US VS THEM" }, form({ additionalNotes: "Use the exact phrase US VS THEM" }));
+  assert.equal(explicit.headline, "US VS THEM");
 });

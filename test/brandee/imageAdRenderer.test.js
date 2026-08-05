@@ -52,11 +52,12 @@ test("buildAdContent maps product_highlight fields into headline/subcopy/price/c
   assert.equal(content.cta, "Shop Now");
 });
 
-test("buildAdContent maps offer_promo fields and sets an OFFER badge", () => {
+test("buildAdContent maps offer_promo fields without printing an internal OFFER badge", () => {
   const content = buildAdContent("offer_promo", { offer: "20% Off This Week", originalPrice: "PHP 999", promoPrice: "PHP 799", cta: "Grab the Deal" }, baseForm());
   assert.equal(content.headline, "20% Off This Week");
   assert.equal(content.subcopy, "PHP 999 → PHP 799");
-  assert.equal(content.badge, "OFFER");
+  assert.equal(content.badge, null);
+  assert.doesNotMatch(renderImageAdSvg({ templateId: "offer_promo", templateFields: { offer: "20% Off This Week", originalPrice: "PHP 999", promoPrice: "PHP 799", cta: "Grab the Deal" }, form: baseForm(), watermark: true }).svg, />OFFER</);
 });
 
 test("buildAdContent for testimonial_style quotes the real supplied testimonial, never a fabricated one", () => {
