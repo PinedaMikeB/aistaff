@@ -1492,6 +1492,31 @@ function requireProductAdRateLimit(req, res, next) {
   next();
 }
 
+// Dedicated, far more generous limiter for the lightweight analytics ping
+// (/product-ads/track). This endpoint is cheap (no AI calls) and fires
+// often and legitimately — every carousel auto-advance across every
+// approach section on /agents/brandee/image/approaches/ (up to ~10
+// carousels on that page alone) calls track(), plus page-view/nav-click/
+// section-viewed events. It was previously sharing
+// productAdPreviewRateLimiter (20 req/10min) with the expensive
+// AI-generation endpoints below, so normal carousel browsing burned out
+// that whole budget within the first minute on the page — after which the
+// *real* endpoints (image preview/revise/etc.) started silently 429'ing
+// too for the rest of that visitor's 10-minute window. That shared budget
+// was the cause of "sometimes fast, sometimes slow" behavior: it depended
+// entirely on how long someone had been on the page before trying an
+// action, not on anything about the action itself.
+const productAdTrackRateLimiter = createRateLimiter({ windowMs: 60 * 1000, max: 120 });
+
+function requireProductAdTrackRateLimit(req, res, next) {
+  const ip = req.ip || req.headers["x-forwarded-for"] || "unknown";
+  const result = productAdTrackRateLimiter.check(ip);
+  if (!result.allowed) {
+    return res.status(429).json({ error: "Too many requests. Please wait a moment and try again." });
+  }
+  next();
+}
+
 app.get("/api/public/brandee/product-ads/config", asyncHandler(async (req, res) => {
   const [templates, videoStyles, pricing] = await Promise.all([
     templateCatalog.listActiveStaticTemplates({ hasTestimonial: false }),
@@ -1523,7 +1548,7 @@ app.get("/api/public/brandee/product-ads/config", asyncHandler(async (req, res) 
 // before any form submission reaches a server route that could log them
 // itself, so the client posts them here. Only names in ALLOWED_EVENTS are
 // ever accepted; anything else is silently dropped by track() itself.
-app.post("/api/public/brandee/product-ads/track", requireProductAdRateLimit, (req, res) => {
+app.post("/api/public/brandee/product-ads/track", requireProductAdTrackRateLimit, (req, res) => {
   const body = req.body || {};
   const anonymousSessionId = getOrSetBrandeeSessionId(req, res);
   trackBrandeeEvent(String(body.event || ""), body.properties || {}, { anonymousSessionId, userId: req.user?.id || null });
