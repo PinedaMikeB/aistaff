@@ -27,6 +27,8 @@ const { extractProductFromUrl } = require("./productUrlExtractor");
 const { buildBusinessProfile } = require("./businessProfileBuilder");
 const { makeEvidence, isVerified, isUserSupplied, isInferred } = require("./evidenceModel");
 const { normalizeRawPhrase } = require("./copyQuality");
+const { safeFetchAny } = require("./websiteAnalyzer");
+const { validateImageDataUrl, MAX_IMAGE_BYTES } = require("./mediaValidation");
 
 const fetchImpl = (...args) => import("node-fetch").then(({ default: f }) => f(...args));
 // GPT-5.6-family reasoning models take real "thinking" time before
@@ -58,6 +60,40 @@ function claimFromEvidence(evidence, { type = "product" } = {}) {
     sourceIds: evidence.sourceUrl ? [evidence.sourceUrl] : [],
     requiresConfirmation: isInferred(evidence)
   };
+}
+
+// --- Fetching an extracted product photo into a usable state -------------
+// A native <input type="file"> can never be set programmatically from a
+// URL (browser security), which is exactly why extracted product images
+// were previously silently dropped — extraction found them, nothing ever
+// did anything with them. Instead of touching the file input at all, this
+// fetches the image server-side (through the same SSRF-safe primitive
+// websiteAnalyzer.js already uses for the page itself), validates it as a
+// real image via the same magic-byte check every manual upload goes
+// through, and returns a data URL the client sets directly onto its
+// in-memory productImage state — functionally identical to what a manual
+// upload produces, just without asking the owner to re-download and
+// re-upload a photo that was already right there on their own listing.
+async function fetchProductImageAsDataUrl(imageUrl) {
+  if (!imageUrl) return null;
+  try {
+    const normalized = imageUrl.startsWith("//") ? `https:${imageUrl}` : imageUrl;
+    const { body, contentType } = await safeFetchAny(normalized, {
+      acceptContentType: (ct) => ct.startsWith("image/"),
+      maxBytes: MAX_IMAGE_BYTES,
+      timeoutMs: 8000,
+      binary: true
+    });
+    let mime = (contentType || "").split(";")[0].trim().toLowerCase() || "image/jpeg";
+    if (mime === "image/jpg") mime = "image/jpeg"; // non-standard but common header value — normalize to the canonical MIME type
+    if (!/^image\/(png|jpeg|webp)$/i.test(mime)) return null;
+    const dataUrl = `data:${mime};base64,${body.toString("base64")}`;
+    const validated = validateImageDataUrl(dataUrl);
+    if (!validated.ok) return null;
+    return { dataUrl, width: validated.width, height: validated.height, sourceUrl: normalized };
+  } catch {
+    return null;
+  }
 }
 
 // --- Suggestion + response schema -----------------------------------------
@@ -270,6 +306,7 @@ async function analyzeProduct({ productUrl, businessWebsite, productName, produc
   const evidence = [];
 
   let extracted = null;
+  let productImage = null;
   if (productUrl) {
     const result = await extractProductFromUrl(productUrl, fetchHtmlPage ? { fetchHtmlPage } : undefined);
     if (result.ok) {
@@ -277,6 +314,18 @@ async function analyzeProduct({ productUrl, businessWebsite, productName, produc
       sources.push({ id: productUrl, name: "Product listing page", pageTitle: extracted.productName || productUrl, sourceType: "official_product_page", supportsClaims: ["productName", "productDescription", "price"] });
       if (extracted.productName) evidence.push(makeEvidence({ statement: extracted.productName, sourceType: "website", sourceUrl: productUrl, entityType: "product_name" }));
       if (extracted.description) evidence.push(makeEvidence({ statement: extracted.description, sourceType: "website", sourceUrl: productUrl, entityType: "product_description" }));
+      // Try up to the first 2 extracted images — some CDN URLs 404/expire
+      // or block hotlinking even though the listing page itself loaded
+      // fine, so falling through to a second candidate meaningfully raises
+      // the odds of actually getting a usable photo rather than silently
+      // leaving the field empty over one bad URL.
+      for (const candidate of (extracted.images || []).slice(0, 2)) {
+        productImage = await fetchProductImageAsDataUrl(candidate);
+        if (productImage) break;
+      }
+      if (extracted.images?.length && !productImage) {
+        warnings.push("Brandee found product photos on the listing but couldn't download them — please upload one manually.");
+      }
     } else {
       warnings.push(result.message || "Could not read the product page you provided.");
     }
@@ -359,6 +408,12 @@ async function analyzeProduct({ productUrl, businessWebsite, productName, produc
       category: ai?.detectedCategory || null,
       confidence: extracted ? "medium" : "low"
     },
+    // Fetched server-side from the listing's own photos (see
+    // fetchProductImageAsDataUrl above) — null if no productUrl was given,
+    // extraction found no images, or every candidate failed to download
+    // (see warnings in that case). The client sets this directly onto its
+    // in-memory productImage state; it never touches the file input.
+    productImage,
     productCapabilities: base.productCapabilities || [],
     serviceBenefits: base.serviceBenefits || [],
     targetAudiences: ai?.targetAudience ? [ai.targetAudience] : [],
@@ -469,6 +524,7 @@ module.exports = {
   buildFieldAssistPrompt,
   generateFieldAssist,
   describeResearchError,
-  clampAiAnalysisArrays
+  clampAiAnalysisArrays,
+  fetchProductImageAsDataUrl
 };
 

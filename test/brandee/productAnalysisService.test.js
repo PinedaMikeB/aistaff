@@ -214,3 +214,19 @@ test("clampAiAnalysisArrays never throws on null/non-object input", () => {
   assert.equal(clampAiAnalysisArrays(undefined), undefined);
   assert.deepEqual(clampAiAnalysisArrays({}), {});
 });
+
+test("fetchProductImageAsDataUrl returns null (never throws) for missing/invalid input", async () => {
+  const { fetchProductImageAsDataUrl } = require("../../src/brandee/productAnalysisService");
+  assert.equal(await fetchProductImageAsDataUrl(null), null);
+  assert.equal(await fetchProductImageAsDataUrl(""), null);
+  assert.equal(await fetchProductImageAsDataUrl("not a url at all"), null);
+});
+
+test("analyzeProduct's returned shape includes productImage (null when nothing was fetchable) — never omits the key", async () => {
+  const result = await analyzeProduct({
+    productUrl: null, businessWebsite: null, productName: "Fan", productDescription: null,
+    template: COMPARISON_TEMPLATE, existingFields: {}
+  });
+  assert.ok("productImage" in result);
+  assert.equal(result.productImage, null);
+});

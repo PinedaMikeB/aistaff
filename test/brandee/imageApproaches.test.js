@@ -313,6 +313,17 @@ test("Phase 4: Create My Preview starts disabled and enables once required field
   // not just once at page load.
   assert.match(workspaceHtml, /\$\("#workspaceForm"\)\.addEventListener\("input",updateGenerateButtonState\);/);
   assert.match(workspaceHtml, /\$\("#workspaceForm"\)\.addEventListener\("change",updateGenerateButtonState\);/);
-  assert.match(workspaceHtml, /state\.productImage=await fileData\("#productImage"\);updateGenerateButtonState\(\);/);
+  assert.match(workspaceHtml, /state\.productImage=await fileData\("#productImage"\);if\(state\.productImage\)showProductImageThumb\(state\.productImage,false\);updateGenerateButtonState\(\);/);
   assert.match(workspaceHtml, /helpers\.track\("suggestion_applied", \{ fieldKey: suggestion\.fieldKey \}\); updateGenerateButtonState\(\); \}/);
+});
+
+test("Phase 5: extracted product photos are fetched server-side and never touch the file input (which can't be set programmatically)", () => {
+  assert.match(workspaceHtml, /id="productImageThumb"/);
+  assert.match(workspaceHtml, /function showProductImageThumb\(dataUrl, fetched\)/);
+  assert.match(workspaceHtml, /state\.analysis\.productImage\?\.dataUrl && !state\.productImage/);
+  assert.match(workspaceHtml, /state\.productImage = state\.analysis\.productImage\.dataUrl;/);
+  assert.match(workspaceHtml, /showProductImageThumb\(state\.productImage, true\);/);
+  // Same never-overwrite guarantee as every text field — only fills in if
+  // nothing was uploaded yet, and never overwrites a manual upload.
+  assert.doesNotMatch(workspaceHtml, /state\.analysis\.productImage\?\.dataUrl\)\s*\{\s*state\.productImage = state\.analysis\.productImage\.dataUrl;\s*\}/);
 });

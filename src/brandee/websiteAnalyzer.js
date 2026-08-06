@@ -140,7 +140,7 @@ async function fetchWithTimeout(url, timeoutMs) {
   }
 }
 
-async function readBodyWithLimit(response, maxBytes) {
+async function readBodyWithLimit(response, maxBytes, { binary = false } = {}) {
   const contentLength = Number(response.headers.get("content-length") || 0);
   if (contentLength && contentLength > maxBytes) {
     throw new WebsiteAnalysisError("too_large", "The website response was too large to analyze.");
@@ -154,7 +154,15 @@ async function readBodyWithLimit(response, maxBytes) {
     }
     chunks.push(chunk);
   }
-  return Buffer.concat(chunks).toString("utf8");
+  const buffer = Buffer.concat(chunks);
+  // Every existing caller (HTML/sitemap/robots.txt) wants UTF-8 text and
+  // has always gotten it — default unchanged. Binary resources (images)
+  // must skip UTF-8 decoding entirely: reinterpreting arbitrary binary
+  // bytes as UTF-8 is lossy/corrupting (confirmed directly — a real 219KB
+  // JPEG became unrecoverable garbage after round-tripping through
+  // .toString("utf8") here), which is exactly why every extracted product
+  // photo was silently failing to download before this fix.
+  return binary ? buffer : buffer.toString("utf8");
 }
 
 /**
@@ -163,9 +171,12 @@ async function readBodyWithLimit(response, maxBytes) {
  * request, including after each redirect hop. `acceptContentType` is a
  * predicate over the response's content-type header; `maxBytes`/`timeoutMs`
  * are configurable per-caller (the multi-page crawler uses its own, larger,
- * env-configurable budget — see crawler.js getCrawlConfig()).
+ * env-configurable budget — see crawler.js getCrawlConfig()). `binary: true`
+ * returns `body` as a raw Buffer instead of a UTF-8 string — required for
+ * any non-text resource (e.g. an image); every existing text-oriented
+ * caller is unaffected since binary defaults to false.
  */
-async function safeFetchAny(rawUrl, { acceptContentType, maxBytes = MAX_BYTES, timeoutMs = TIMEOUT_MS, skipUrlNormalization = false } = {}) {
+async function safeFetchAny(rawUrl, { acceptContentType, maxBytes = MAX_BYTES, timeoutMs = TIMEOUT_MS, skipUrlNormalization = false, binary = false } = {}) {
   let currentUrl = skipUrlNormalization ? rawUrl : normalizeUrlInput(rawUrl);
   let hops = 0;
 
@@ -195,7 +206,7 @@ async function safeFetchAny(rawUrl, { acceptContentType, maxBytes = MAX_BYTES, t
       throw new WebsiteAnalysisError("unsupported_content", "That page did not return readable content.");
     }
 
-    const body = await readBodyWithLimit(response, maxBytes);
+    const body = await readBodyWithLimit(response, maxBytes, { binary });
     return { body, finalUrl: parsed.toString(), contentType };
   }
 }
