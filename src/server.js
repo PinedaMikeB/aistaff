@@ -83,7 +83,7 @@ const entitlements = require("./brandee/entitlements");
 const { ENTITLEMENT_UNITS, computeComboSavings, PRICING_NOTE } = require("./brandee/pricingConfig");
 const { buildCreativePlan, interpretRevision, sanitizeCustomerFacingPlan } = require("./brandee/creativePlanner");
 const { recommendTemplates } = require("./brandee/templateRecommender");
-const { probeImageProviderAvailability } = require("./brandee/imageGenProvider");
+const { probeImageProviderAvailability, generatePreviewImage } = require("./brandee/imageGenProvider");
 const { getCreativeBrainStatus, validateAllResources, RESOURCE_VALIDATORS } = require("./admin/creativeBrain");
 const systemStatus = require("./admin/systemStatus");
 const { recordAuditEvent, listAuditLogs, AUDIT_ACTIONS } = require("./admin/auditLog");
@@ -1710,18 +1710,40 @@ app.post("/api/public/brandee/product-ads/image/preview", requireProductAdRateLi
 
   trackBrandeeEvent("image_preview_requested", { templateId: form.templateId }, { anonymousSessionId, userId });
 
-  // PART 12: GPT-5.6 Sol plans the creative direction (headline/cta/tone/
-  // etc.) BEFORE any image is produced — falls back to a correct
-  // deterministic plan with zero AI dependency (see creativePlanner.js).
-  const { plan, aiUsed: planningAiUsed } = await buildCreativePlan({ form, template });
+  // PART 12/13/14: GPT-5.6 Sol plans the creative direction (headline/cta/
+  // tone/etc.) and, in parallel (the two don't depend on each other's
+  // output — generation only needs the raw product photo, not the planned
+  // headline text), GPT Image 2 attempts to turn the raw uploaded/fetched
+  // product photo (often a plain-white-background listing photo) into a
+  // clean, professionally lit product shot. Both are independently
+  // AI-optional: buildCreativePlan() falls back to a correct deterministic
+  // plan, and a failed/unavailable image generation falls back to the
+  // ORIGINAL photo as-is — renderImageAdSvg's text/branding layer (proven,
+  // reliably legible) is unaffected either way, only which photo it
+  // composites in changes. Never fabricates a "generated" image that
+  // wasn't actually produced; never invents headline/CTA text via the
+  // image model either (image-generation models are unreliable at
+  // rendering accurate legible text, which is exactly why that stays on
+  // the deterministic SVG layer instead of being asked of GPT Image 2).
+  const [{ plan, aiUsed: planningAiUsed }, imageGenResult] = await Promise.all([
+    buildCreativePlan({ form, template }),
+    form.productImage
+      ? generatePreviewImage({
+          prompt: `Professional product advertisement photography. Remove the plain background from this photo of "${form.productName || "the product"}" and place it on a clean, modern background with soft, warm studio lighting and a subtle shadow beneath it. Keep the product itself completely unchanged — same shape, same color, same details, same angle, same proportions. Do not add any text, logos, watermarks, or graphic overlays of any kind. Just a clean, premium product photo suitable as an ad background.`,
+          productImageDataUrl: form.productImage,
+          width: 1024,
+          height: 1280
+        })
+      : Promise.resolve({ ok: false, reason: "no_product_image" })
+  ]);
 
-  // PART 13/14: attempt a real pixel-generation call if a provider is
-  // actually configured; if not (the default in this environment — no
-  // image-generation API key/model configured, same disclosed status as
-  // this codebase's video pipeline), fall back HONESTLY to the real,
-  // working, deterministic SVG compositor personalized with the plan above.
-  // Never fabricates an "AI image" that wasn't actually produced.
-  const rendered = renderImageAdSvg({ templateId: form.templateId, templateFields: form.templateFields, form, watermark: true, override: plan });
+  const imageAiUsed = imageGenResult.ok;
+  const renderForm = imageAiUsed ? { ...form, productImage: `data:image/png;base64,${imageGenResult.base64}` } : form;
+  if (!imageAiUsed && form.productImage) {
+    trackBrandeeEvent("image_generation_fallback", { templateId: form.templateId, reason: imageGenResult.reason }, { anonymousSessionId, userId });
+  }
+
+  const rendered = renderImageAdSvg({ templateId: form.templateId, templateFields: form.templateFields, form: renderForm, watermark: true, override: plan });
 
   if (!userId) productAdProjectStore.recordAnonymousPreview(anonymousSessionId, "image");
   await productAdProjectStore.updateProject(project.id, {
@@ -1730,7 +1752,7 @@ app.post("/api/public/brandee/product-ads/image/preview", requireProductAdRateLi
     product: form,
     status: "previewed"
   });
-  await productAdProjectStore.addRevision(project.id, { instruction: null, plan, svg: rendered.svg, width: rendered.width, height: rendered.height, watermarked: true, aiUsed: planningAiUsed });
+  await productAdProjectStore.addRevision(project.id, { instruction: null, plan, svg: rendered.svg, width: rendered.width, height: rendered.height, watermarked: true, aiUsed: planningAiUsed || imageAiUsed });
 
   trackBrandeeEvent("image_preview_completed", { templateId: form.templateId }, { anonymousSessionId, userId });
 

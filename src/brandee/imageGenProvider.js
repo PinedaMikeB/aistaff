@@ -19,7 +19,12 @@
 const { getImageGenConfig } = require("./modelConfig");
 
 const fetchImpl = (...args) => import("node-fetch").then(({ default: f }) => f(...args));
-const AI_IMAGE_TIMEOUT_MS = 30000;
+// Measured directly against the live API: a real product-photo edit (not
+// a tiny placeholder) took over 30s and hit the old ceiling. Raised with
+// real margin, matching the same "reasoning/generation models take real
+// time" lesson already learned for the text-based calls elsewhere in this
+// subsystem (see productAnalysisService.js's identical comment).
+const AI_IMAGE_TIMEOUT_MS = 90000;
 
 function probeImageProviderAvailability() {
   const config = getImageGenConfig();
