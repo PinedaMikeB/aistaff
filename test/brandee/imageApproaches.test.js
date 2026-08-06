@@ -327,3 +327,30 @@ test("Phase 5: extracted product photos are fetched server-side and never touch 
   // nothing was uploaded yet, and never overwrites a manual upload.
   assert.doesNotMatch(workspaceHtml, /state\.analysis\.productImage\?\.dataUrl\)\s*\{\s*state\.productImage = state\.analysis\.productImage\.dataUrl;\s*\}/);
 });
+
+test("Phase 6: workspace offers a login option (not just registration), reusing the shared aistaff.click session — no separate Brandee login", () => {
+  assert.match(workspaceHtml, /id="loginLink"/);
+  assert.match(workspaceHtml, /id="loginCard"/);
+  assert.match(workspaceHtml, /id="loginForm"/);
+  assert.match(workspaceHtml, /\/api\/auth\/login/);
+  assert.match(workspaceHtml, /function openLoginCard\(\)/);
+  assert.match(workspaceHtml, /function closeLoginCard\(\)/);
+  // Closes on outside click, matching the same pattern already used for
+  // the assist popover elsewhere on this page.
+  assert.match(workspaceHtml, /card\.contains\(e\.target\) \|\| e\.target\.closest\("#loginLink"\)/);
+});
+
+test("Phase 6: the anonymous-preview-limit error is directly actionable — offers Log In right where the customer got stuck, not just generic text", () => {
+  assert.match(workspaceHtml, /r\.body\?\.code==="ANONYMOUS_PREVIEW_LIMIT_REACHED"/);
+  assert.match(workspaceHtml, /id="formStatusLoginLink"/);
+  assert.match(workspaceHtml, /formStatusLoginLink"\)\.addEventListener\("click",openLoginCard\)/);
+});
+
+test("Phase 6: successful login updates the visible state and tells the customer the limit no longer applies, without a page reload", () => {
+  assert.match(workspaceHtml, /state\.loggedInEmail = r\.body\.user\?\.email/);
+  assert.match(workspaceHtml, /Logged in as \$\{state\.loggedInEmail\}/);
+  assert.match(workspaceHtml, /free-preview limit no longer applies/);
+  // No reload anywhere in the login handler — relies on the shared session
+  // cookie being sent automatically on the next request instead.
+  assert.doesNotMatch(workspaceHtml.match(/\$\("#loginForm"\)\.addEventListener\("submit"[\s\S]{0,700}?\}\);/)?.[0] || "", /location\.reload/);
+});
