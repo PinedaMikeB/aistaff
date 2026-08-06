@@ -156,7 +156,7 @@ async function withTimeout(promise, ms) {
   }
 }
 
-async function callResearchModel(prompt, { timeoutMs = AI_TIMEOUT_MS } = {}) {
+async function callResearchModel(prompt, { timeoutMs = AI_TIMEOUT_MS, imageDataUrl = null } = {}) {
   const config = getImageCreativePlanningConfig();
   if (!config.apiKeyConfigured || !config.model || config.provider === "mock") {
     throw Object.assign(new Error("Research model not configured"), { code: "NOT_CONFIGURED" });
@@ -170,12 +170,21 @@ async function callResearchModel(prompt, { timeoutMs = AI_TIMEOUT_MS } = {}) {
       // own OPENAI_MODEL fallback) need the opposite. Branch on the actual
       // configured model rather than assuming one family unconditionally.
       const reasoning = isReasoningModel(config.model);
+      // When a real product photo is available, send it alongside the text
+      // prompt (confirmed directly against the live API: gpt-5.6-sol reads
+      // real detail off it — e.g. "diagonal-zip front pocket, flap-covered
+      // lower pocket with buckle straps" from an actual bag photo) so
+      // suggestions can be grounded in what the product actually looks
+      // like, not just its text description.
+      const content = imageDataUrl
+        ? [{ type: "text", text: p }, { type: "image_url", image_url: { url: imageDataUrl } }]
+        : p;
       const response = await fetchImpl("https://api.openai.com/v1/chat/completions", {
         method: "POST",
         headers: { "Content-Type": "application/json", Authorization: `Bearer ${process.env.OPENAI_API_KEY}` },
         body: JSON.stringify({
           model: config.model,
-          messages: [{ role: "user", content: p }],
+          messages: [{ role: "user", content }],
           response_format: { type: "json_object" },
           ...(reasoning ? { reasoning_effort: config.reasoningEffort || "medium" } : { temperature: 0.4 })
         })
@@ -243,25 +252,29 @@ function describeResearchError(error) {
 
 function buildResearchPrompt({ template, extracted, businessProfile, productName, productDescription, existingFields }) {
   const fieldKeys = ["productName", "targetCustomer", "productDescription", "mainFeatures", "mainBenefit", ...((template.fields || []).map((f) => f.key))];
+  const hasBeforeAfterFields = fieldKeys.some((k) => /before|after/i.test(k));
   const lines = [
     "You are Brandee, an AI creative strategist helping a small/medium Filipino business owner prepare a truthful image advertisement.",
-    "Never invent specifications, prices, guarantees, customer results, or competitor weaknesses. If you are not confident about a fact, omit it rather than guessing.",
+    "Never invent specifications, prices, guarantees, customer results, or competitor weaknesses that are not grounded in the real information given below (or, if a photo is attached, visible in it). If you are not confident about a FACT, omit it rather than guessing.",
+    "This is different from declining to write ordinary marketing narrative: constructing a benefit-focused story — including a 'before/after' or 'problem/solution' framing — is expected and encouraged as long as it is grounded in the product's real, listed or visible features rather than inventing new ones. Example: a bag with multiple real pockets/compartments genuinely solves a disorganization problem — 'before: essentials scattered with nothing having its place' / 'after: dedicated pockets keep your phone, laptop, and daily items organized' is a legitimate, grounded narrative, NOT a fabricated claim, because it follows directly from the bag's real compartments. What would be fabricated: inventing a specific customer testimonial, a guarantee, a competitor comparison, or a spec the listing/photo never showed.",
+    hasBeforeAfterFields ? "This template asks for a 'before' and 'after' state. It does not require a literal side-by-side photo transformation — a genuine experiential before/after (disorganized/inconvenient before, organized/convenient after; or a comparable real contrast the product's actual features support) is exactly what's wanted here. Ground each side in a real feature, not a generic claim." : null,
     `The owner selected the "${template.name}" creative approach (framework: ${template.frameworkKey || template.id}).`,
     productName ? `Product name so far: ${productName}` : null,
     productDescription ? `Product description so far: ${productDescription}` : null,
     extracted ? `Extracted from the product's own listing page: ${JSON.stringify({ name: extracted.productName, description: extracted.description, price: extracted.price })}` : null,
+    "If a product photo is attached to this message, look at it closely — real visible details (pockets, compartments, materials, straps, construction) are a legitimate source for grounded suggestions, same as the text above.",
     businessProfile ? `Extracted from the business's own website (use ONLY for service/offer context, not product specs): ${JSON.stringify({ offers: businessProfile.offers, productsOrServices: businessProfile.productsOrServices, businessOutcomes: businessProfile.businessOutcomes })}` : null,
     Object.keys(existingFields || {}).length ? `Fields the owner already filled in (do not contradict these, only build on them): ${JSON.stringify(existingFields)}` : null,
     "Return a single JSON object with this exact shape:",
     JSON.stringify({
       detectedCategory: "string or null",
       targetAudience: "one sentence describing the likely customer, or null",
-      productCapabilities: ["verifiable product capability strings, only from what was actually extracted above"],
+      productCapabilities: ["verifiable product capability strings, only from what was actually extracted/visible above"],
       serviceBenefits: ["business/service benefit strings, only from what was actually extracted above"],
       advertisingAngles: ["short phrases naming a distinct advertising angle"],
       fields: Object.fromEntries(fieldKeys.map((k) => [k, "array of up to 3 objects: {text, angle, reason}"]))
     }),
-    "For every field in `fields`, give 2-3 real alternatives grounded in the information above. If there is not enough information to write a specific field responsibly, return an empty array for it rather than inventing content."
+    "For every field in `fields`, give 2-3 real alternatives grounded in the information (and photo, if attached) above. Only return an empty array for a field if there is truly no real feature or detail to ground it in — a benefit-focused narrative built on a real feature is not 'inventing content' and should not be skipped just because it isn't a literal extracted fact."
   ].filter(Boolean);
   return lines.join("\n\n");
 }
@@ -351,7 +364,7 @@ async function analyzeProduct({ productUrl, businessWebsite, productName, produc
   let aiUsed = false;
   if (config.apiKeyConfigured && config.provider !== "mock") {
     try {
-      const raw = await callResearchModel(buildResearchPrompt({ template, extracted, businessProfile, productName, productDescription, existingFields }));
+      const raw = await callResearchModel(buildResearchPrompt({ template, extracted, businessProfile, productName, productDescription, existingFields }), { imageDataUrl: productImage?.dataUrl || null });
       const validated = AiAnalysisResponseSchema.safeParse(clampAiAnalysisArrays(raw));
       if (validated.success) {
         ai = validated.data;

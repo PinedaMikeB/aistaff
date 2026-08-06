@@ -17,7 +17,8 @@ const {
   FIELD_ASSIST_ACTIONS,
   describeResearchError,
   clampAiAnalysisArrays,
-  AiAnalysisResponseSchema
+  AiAnalysisResponseSchema,
+  buildResearchPrompt
 } = require("../../src/brandee/productAnalysisService");
 const { makeEvidence } = require("../../src/brandee/evidenceModel");
 
@@ -229,4 +230,18 @@ test("analyzeProduct's returned shape includes productImage (null when nothing w
   });
   assert.ok("productImage" in result);
   assert.equal(result.productImage, null);
+});
+
+test("buildResearchPrompt explicitly distinguishes grounded narrative construction from fact fabrication, and permits organizational before/after framing", () => {
+  const template = { id: "before_and_after", name: "Before and After", frameworkKey: "before_and_after", fields: [{ key: "beforeState" }, { key: "afterState" }] };
+  const prompt = buildResearchPrompt({ template, extracted: null, businessProfile: null, productName: "Bag", productDescription: "A bag with pockets.", existingFields: {} });
+  assert.match(prompt, /NOT a fabricated claim/);
+  assert.match(prompt, /does not require a literal side-by-side photo transformation/);
+  assert.match(prompt, /real, listed or visible features/);
+});
+
+test("buildResearchPrompt does not add before/after guidance for templates that don't ask for it", () => {
+  const template = { id: "feature_benefit", name: "Features & Benefits", frameworkKey: "features_and_benefits", fields: [{ key: "feature" }, { key: "cta" }] };
+  const prompt = buildResearchPrompt({ template, extracted: null, businessProfile: null, productName: "Bag", productDescription: "A bag.", existingFields: {} });
+  assert.doesNotMatch(prompt, /does not require a literal side-by-side photo transformation/);
 });
