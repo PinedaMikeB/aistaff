@@ -479,6 +479,12 @@ function buildFieldAssistPrompt({ fieldLabel, action, mode, currentValue, templa
     `You are assisting with the field: "${fieldLabel}".`,
     instruction,
     mode === "improve" && currentValue ? `The owner's current answer to rewrite: "${currentValue}"` : null,
+    // Rewrite-style instructions ("Rewrite the owner's current answer…") are
+    // impossible to satisfy when the field is still empty — the model would
+    // (correctly) return nothing and the customer sees a dead button. When
+    // there is no current answer, redirect the same intent into fresh
+    // suggestions instead of a rewrite.
+    mode !== "improve" && !currentValue ? "The owner has not written an answer for this field yet. Instead of rewriting, propose fresh suggested answers that fulfill the same intent for this field." : null,
     mode === "generate_again" ? "Use a genuinely different angle from the obvious/typical phrasing." : null,
     context && Object.keys(context).length ? `Known context: ${JSON.stringify(context)}` : null,
     'Return a single JSON object: { "suggestions": [ {"text": string, "angle": string or null, "reason": string or null}, ... up to 4 items ] }'

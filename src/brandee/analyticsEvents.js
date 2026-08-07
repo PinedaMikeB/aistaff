@@ -82,12 +82,21 @@ const ALLOWED_EVENTS = new Set([
   ,"template_image_load_failed"
   ,"create_with_template_clicked"
   ,"use_this_template_clicked"
+  // Diagnostics that were being silently dropped by this allow-list (their
+  // track() calls already existed in server.js/workspace but the names were
+  // never added here, so image-generation failures left no trail at all):
+  ,"image_generation_fallback"
+  ,"field_assist_requested"
+  ,"image_analysis_started"
+  ,"image_analysis_completed"
+  ,"image_analysis_failed"
+  ,"suggestion_applied"
 ]);
 
 // Only these keys are ever allowed onto an event, and every value is
 // coerced to a primitive — this is a hard boundary against accidentally
 // logging product photos, descriptions, or any other customer content.
-const ALLOWED_PROPERTY_KEYS = new Set(["templateId", "styleId", "kind", "planSlug", "goal", "platform", "language", "reason", "durationMs", "frameworkKey", "audienceType", "filterType", "filterValue"]);
+const ALLOWED_PROPERTY_KEYS = new Set(["templateId", "styleId", "kind", "planSlug", "goal", "platform", "language", "reason", "durationMs", "frameworkKey", "audienceType", "filterType", "filterValue", "fieldKey", "action", "aiUsed", "suggestedFieldCount", "autoFilledCount"]);
 
 function sanitizeProperties(properties = {}) {
   const clean = {};

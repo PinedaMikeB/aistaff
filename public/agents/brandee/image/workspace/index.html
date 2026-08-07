@@ -83,7 +83,7 @@
   .assist-back { margin-bottom:8px; }
   .assist-back button { background:none; border:0; color:#5dd0ff; font-size:11.5px; cursor:pointer; padding:0; }
 
-  .action-row { display:flex; gap:10px; flex-wrap:wrap; margin-top:16px; } .action-row .button-primary { flex:1; justify-content:center; } .button { cursor:pointer; } .button:disabled { opacity:.42; cursor:not-allowed; filter:grayscale(.3); }
+  .action-row { display:flex; gap:10px; flex-wrap:wrap; margin-top:16px; } .action-row .button-primary { flex:1; justify-content:center; } .button { cursor:pointer; } .button:disabled { opacity:.42; cursor:not-allowed; filter:grayscale(.3); } .button.is-blocked { opacity:.55; filter:grayscale(.25); }
   .generate-hint { margin:8px 0 0; color:#ffd990; font-size:11.5px; }
   button.ghost-link { color:#5dd0ff; text-decoration:underline; background:none; border:0; padding:0; font:inherit; cursor:pointer; }
   .login-card { display:none; position:fixed; top:64px; right:24px; z-index:70; width:min(320px,calc(100vw - 32px)); padding:18px; border-radius:14px; border:1px solid rgba(117,204,255,.28); background:linear-gradient(160deg,#132736,#030810); box-shadow:0 24px 60px rgba(0,0,0,.45); }
@@ -92,6 +92,17 @@
   .login-card p { margin:0 0 12px; color:#9fc0d6; font-size:12px; line-height:1.5; }
   .login-card-close { position:absolute; top:10px; right:10px; background:none; border:0; color:#6f8a9c; cursor:pointer; font-size:16px; line-height:1; padding:2px; }
   .login-form { display:grid; gap:8px; }
+  .field-guide-modal { display:none; position:fixed; inset:0; z-index:80; align-items:center; justify-content:center; }
+  .field-guide-modal.is-visible { display:flex; }
+  .field-guide-backdrop { position:absolute; inset:0; background:rgba(2,6,12,.72); backdrop-filter:blur(2px); }
+  .field-guide-panel { position:relative; width:min(420px,calc(100vw - 32px)); padding:26px; border-radius:16px; border:1px solid rgba(117,204,255,.3); background:linear-gradient(160deg,#152c3d,#03080f); box-shadow:0 30px 80px rgba(0,0,0,.55); }
+  .field-guide-eyebrow { margin:0 0 4px; color:#5dd0ff; font:700 10.5px "DM Mono"; letter-spacing:.08em; text-transform:uppercase; }
+  .field-guide-panel h3 { margin:0 0 12px; font-size:21px; color:#fff; }
+  .field-guide-panel p { margin:0 0 10px; color:#b7cbdb; font-size:13.5px; line-height:1.6; }
+  .field-guide-example { padding:10px 12px; border-radius:9px; background:rgba(93,208,255,.08); border:1px solid rgba(93,208,255,.22); color:#d9f1ff !important; font-size:12.5px !important; font-style:italic; }
+  .field-guide-close { position:absolute; top:14px; right:14px; background:none; border:0; color:#6f8a9c; cursor:pointer; font-size:20px; line-height:1; padding:4px; }
+  .field-guide-actions { display:flex; flex-direction:column; gap:9px; margin-top:16px; }
+  .field-guide-actions .button { width:100%; justify-content:center; }
   .revision-card,.gate-card { margin-top:18px; padding:20px; } .revision-card h3,.gate-card h3 { margin:0 0 8px; font-size:19px; } .revision-card p,.gate-card p { margin:0 0 12px; color:#9fc0d6; font-size:13px; line-height:1.5; } .revision-row { display:flex; gap:8px; } .revision-row input { flex:1; } .history { display:flex; gap:8px; overflow-x:auto; margin-top:14px; } .history button { width:76px; flex:none; padding:4px; border:1px solid rgba(117,161,188,.22); border-radius:7px; background:#07131f; color:#9fc0d6; cursor:pointer; } .history svg { display:block; width:100%; height:auto; } .gate-card { display:none; border-color:rgba(61,220,151,.32); } .gate-card.is-visible { display:block; } .gate-form { display:grid; gap:9px; } .plan-list { display:grid; gap:9px; margin-top:15px; } .plan-choice { display:flex; justify-content:space-between; gap:10px; align-items:center; padding:12px; border:1px solid rgba(117,161,188,.2); border-radius:9px; background:#07131f; } .plan-choice strong { display:block; color:#fff; font-size:13px; } .plan-choice small { color:#86a3b7; }
   @media (max-width:900px) { .workspace-shell { width:min(100% - 24px,680px); } .workspace-header { padding-top:48px; display:block; } .workspace-header .button { margin-top:18px; } .workspace-layout { grid-template-columns:1fr; } .preview-column { position:static; } .stage-surface { min-height:0; } }
   @media (max-width:560px) { .form-grid { grid-template-columns:1fr; } .field.full { grid-column:auto; } .revision-row { display:grid; } .assist-popover { left:12px !important; right:12px; bottom:12px !important; top:auto !important; width:auto; max-height:70vh; } }
@@ -105,6 +116,20 @@
   <p>Already have an account? Log in to save this project and skip the free-preview limit.</p>
   <form id="loginForm" class="login-form"><input id="loginEmail" type="email" required placeholder="Email" autocomplete="username" /><input id="loginPassword" type="password" required placeholder="Password" autocomplete="current-password" /><button class="button button-primary" type="submit">Log in</button></form>
   <p class="status" id="loginStatus" role="status" aria-live="polite"></p>
+</div>
+<div class="field-guide-modal" id="fieldGuideModal" role="dialog" aria-modal="true" aria-label="Field guidance">
+  <div class="field-guide-backdrop" id="fieldGuideBackdrop"></div>
+  <div class="field-guide-panel">
+    <button class="field-guide-close" id="fieldGuideClose" type="button" aria-label="Close">×</button>
+    <p class="field-guide-eyebrow">Brandee is asking for</p>
+    <h3 id="fieldGuideTitle"></h3>
+    <p id="fieldGuideHint"></p>
+    <p class="field-guide-example" id="fieldGuideExample" hidden></p>
+    <div class="field-guide-actions">
+      <button class="button button-primary" id="fieldGuideAskBrandee" type="button">Ask Brandee for suggestions</button>
+      <button class="button button-soft" id="fieldGuideDismiss" type="button">I'll fill it in myself</button>
+    </div>
+  </div>
 </div>
 <main class="workspace-shell">
   <header class="workspace-header"><div><span class="kicker">Image Ad Workspace</span><h1 id="workspaceTitle">Your selected approach</h1><p id="workspaceSubtitle">Brandee will personalize this layout using your product, customer, benefits, colors, and call to action.</p></div><a class="button button-soft" href="/agents/brandee/image/approaches">Change Template <span>↗</span></a></header>
@@ -120,7 +145,7 @@
       <div class="form-section"><h3>3. Price and offer</h3><div class="form-grid"><div class="field"><label for="regularPrice">Regular price</label><input id="regularPrice" placeholder="e.g. ₱999" /></div><div class="field"><label for="promoPrice">Promo price</label><input id="promoPrice" placeholder="e.g. ₱799" /></div><div class="field"><label for="discountText">Offer or discount</label><input id="discountText" placeholder="e.g. ₱200 off or free delivery" /></div><div class="field"><label for="offerExpirationDate">Real deadline</label><input id="offerExpirationDate" type="date" /></div><div class="field full"><label for="offerDetails">Offer details</label><input id="offerDetails" placeholder="Only enter a real offer." /></div></div></div>
       <div class="form-section"><h3>4. Brand and proof</h3><div class="form-grid"><div class="field"><label for="brandColor1">Brand color 1</label><input id="brandColor1" type="color" value="#0f172a" /></div><div class="field"><label for="brandColor2">Brand color 2</label><input id="brandColor2" type="color" value="#3b82f6" /></div><div class="field full"><label for="additionalNotes">Additional notes</label><textarea id="additionalNotes" placeholder="Anything Brandee should preserve or emphasize?"></textarea></div><div class="field full"><label for="testimonialQuote">Real customer quote</label><textarea id="testimonialQuote" placeholder="Required for Customer Story."></textarea></div><div class="field"><label for="testimonialAttribution">Quote attribution</label><input id="testimonialAttribution" placeholder="Name or initials" /></div><div class="field full"><label for="logo">Logo (optional)</label><input id="logo" type="file" accept="image/png,image/jpeg,image/webp" /></div></div></div>
       <div class="form-section"><h3>5. Approach details</h3><p class="required-note">Complete the fields marked * for this selected template.</p><div class="template-fields" id="templateFields"></div></div>
-      <p class="status" id="formStatus" role="status" aria-live="polite"></p><div class="action-row"><button class="button button-primary glow-button" id="generateBtn" type="submit" disabled>Create My Preview <span>→</span></button></div><p class="generate-hint" id="generateHint">Complete the required fields (or run Analyze Product) to enable this.</p>
+      <p class="status" id="formStatus" role="status" aria-live="polite"></p><div class="action-row"><button class="button button-primary glow-button is-blocked" id="generateBtn" type="submit">Create My Preview <span>→</span></button></div><p class="generate-hint" id="generateHint">Complete the required fields (or run Analyze Product) to enable this.</p>
     </form></div><div class="gate-card" id="gateCard"><h3>Your design is ready.</h3><p>Create an account to save this project and unlock the clean high-resolution version. Your preview stays visible.</p><form class="gate-form" id="registerForm"><input id="regName" required placeholder="Full name" /><input id="regEmail" type="email" required placeholder="Email" /><input id="regPassword" type="password" minlength="8" required placeholder="Password (8+ characters)" /><button class="button button-primary" type="submit">Create Account</button></form><p class="status" id="gateStatus" role="status" aria-live="polite"></p><div class="plan-list" id="planList" hidden></div></div></section>
   </div>
 </main>
@@ -136,7 +161,7 @@
   async function fileData(id){const f=$(id).files[0];return f?helpers.fileToDataUrl(f):null;}
   function renderTemplateFields(){const wrap=$("#templateFields");wrap.innerHTML="";(state.template.fields||[]).forEach(f=>{const id=`tf_${f.key}`, el=document.createElement("div");el.className="field"+(f.type==="textarea"?" full":"");let input=f.type==="textarea"?`<textarea id="${id}" maxlength="${f.maxLength||300}"></textarea>`:f.type==="select"?`<select id="${id}">${(f.options||[]).map(o=>`<option>${esc(o)}</option>`).join("")}</select>`:`<input id="${id}" type="${f.type==='date'?'date':'text'}" maxlength="${f.maxLength||140}" />`;el.innerHTML=`<label for="${id}">${esc(f.label)}${f.required?" *":""}</label>${input}`;wrap.appendChild(el);if(f.type==="text"||f.type==="textarea")wireAssistIcon(f.key,$(`#${id}`));});}
   function collect(){const v=id=>$(id)?.value.trim()||null;const colors=[$("#brandColor1").value,$("#brandColor2").value];const tf={};(state.template.fields||[]).forEach(f=>tf[f.key]=v(`#tf_${f.key}`));return {productImage:state.productImage,productName:v("#productName"),productDescription:v("#productDescription"),mainFeatures:v("#mainFeatures"),targetCustomer:v("#targetCustomer"),desiredAction:$("#desiredAction").value,productListingUrl:v("#productUrl"),regularPrice:v("#regularPrice"),promoPrice:v("#promoPrice"),discountText:v("#discountText"),offerExpirationDate:v("#offerExpirationDate"),offerDetails:v("#offerDetails"),price:v("#regularPrice"),mainBenefit:v("#mainBenefit"),logo:state.logo,brandColors:colors,preferredLanguage:$("#preferredLanguage").value,additionalNotes:v("#additionalNotes"),testimonialQuote:v("#testimonialQuote"),testimonialAttribution:v("#testimonialAttribution"),projectId:state.projectId,templateId:state.template.id,templateFields:tf};}
-  function validate(form){const required=[["#productImage","Upload a product image."],["#productName","Enter a product name."],["#productDescription","Add a product description."],["#mainFeatures","List the main features."],["#targetCustomer","Enter the target customer."]];for(const [id,msg] of required)if(!form[id.slice(1)])return msg;for(const f of state.template.fields||[])if(f.required&&!form.templateFields[f.key])return `Complete “${f.label}”.`;return null;}
+  function validate(form){const required=[["productImage","Product image","Upload a product image."],["productName","Product name","Enter a product name."],["productDescription","Product description","Add a product description."],["mainFeatures","Main features","List the main features."],["targetCustomer","Who is it for?","Enter the target customer."]];for(const [key,label,msg] of required)if(!form[key])return {fieldKey:key,fieldLabel:label,message:msg};for(const f of state.template.fields||[])if(f.required&&!form.templateFields[f.key])return {fieldKey:f.key,fieldLabel:f.label,message:`Complete “${f.label}”.`};return null;}
   function showStatus(id,msg,error=false){const el=$(id);el.textContent=msg||"";el.classList.toggle("error",Boolean(error));}
   function renderSvg(svg){state.svg=svg;$("#stageSurface").innerHTML=svg;$("#stageNote").textContent="Low-resolution watermarked preview. Revise it below or save when you are ready.";$("#revisionCard").hidden=false;$("#saveFinishBtn").hidden=false;$("#downloadBtn").hidden=false;}
   async function loadHistory(){if(!state.projectId)return;const r=await helpers.fetchJson(`/api/public/brandee/product-ads/image/project/${state.projectId}/revisions`);if(!r.body?.ok)return;$("#history").innerHTML=r.body.revisions.map(x=>`<button type="button" title="${esc(x.instruction||'Original')}">${x.svg}<small>v${x.revisionNumber}</small></button>`).join("");}
@@ -232,7 +257,8 @@
       const card = btn.closest(".suggestion-card");
       const suggestion = r.body.suggestions.find((s)=>s.id===card.dataset.suggestionId);
       if (!suggestion) return;
-      applySuggestion(card, suggestion);
+      const outcome = applySuggestion(card, suggestion, { onConfirmed: closeAssistPopover });
+      if (outcome === "needs_confirmation") return; // keep popover open so the "Replace my answer" confirm UI stays visible
       if (btn.dataset.edit !== undefined) { const targetInput = $(fieldInputSelector(fieldKey)); if (targetInput) { targetInput.focus(); const len=targetInput.value.length; targetInput.setSelectionRange?.(len,len); } }
       closeAssistPopover();
     }));
@@ -336,11 +362,16 @@
   // so there is exactly one definition of "ready."
   function updateGenerateButtonState(){
     const btn = $("#generateBtn"), hint = $("#generateHint");
-    if (!state.template) { btn.disabled = true; return; }
+    if (!state.template) { btn.classList.add("is-blocked"); return; }
     const err = validate(collect());
-    btn.disabled = Boolean(err);
-    hint.textContent = err ? `Still needed: ${err.replace(/^Complete “|”\.$/g, "").replace(/\.$/, "")}` : "";
+    // Visual-only "not ready" state, not a real disabled attribute — a
+    // truly disabled button never fires click, so clicking it couldn't
+    // open the guiding modal below. Actual submission is still gated by
+    // the same validate() call inside the submit handler.
+    btn.classList.toggle("is-blocked", Boolean(err));
+    hint.innerHTML = err ? `Still needed: ${esc(err.fieldLabel)} <button type="button" class="ghost-link" id="generateHintGuideLink">What's this?</button>` : "";
     hint.style.display = err ? "block" : "none";
+    if (err) $("#generateHintGuideLink")?.addEventListener("click", () => openFieldGuideModal(err.fieldKey, err.fieldLabel));
   }
 
   async function runAnalysis(){
@@ -379,25 +410,26 @@
 
   function recordSuggestionDecision(id, decision){ if (!state.projectId) return; helpers.fetchJson(`/api/public/brandee/product-ads/image/project/${state.projectId}/suggestion-decision`, { method:"POST", headers:{"Content-Type":"application/json"}, body: JSON.stringify({ suggestionId:id, decision }) }).catch(()=>{}); }
 
-  function applySuggestion(card, suggestion){
+  function applySuggestion(card, suggestion, { onConfirmed } = {}){
     const selector = fieldInputSelector(suggestion.fieldKey);
     const input = selector ? $(selector) : null;
-    if (!input) return;
+    if (!input) return "no_input";
     const compare = $(".suggestion-compare", card);
     if (input.value.trim() && input.value.trim() !== suggestion.text) {
       compare.innerHTML = `<b>Your current answer</b>${esc(input.value.trim())}<br/><br/><b>Suggested</b>${esc(suggestion.text)}`;
       compare.classList.add("is-visible");
       const replaceBtn = document.createElement("button");
       replaceBtn.type = "button"; replaceBtn.className = "button button-soft"; replaceBtn.textContent = "Replace my answer";
-      replaceBtn.addEventListener("click", () => { input.value = suggestion.text; compare.classList.remove("is-visible"); recordSuggestionDecision(suggestion.id, "accepted"); helpers.track("suggestion_applied", { fieldKey: suggestion.fieldKey }); updateGenerateButtonState(); }, { once: true });
+      replaceBtn.addEventListener("click", () => { input.value = suggestion.text; compare.classList.remove("is-visible"); recordSuggestionDecision(suggestion.id, "accepted"); helpers.track("suggestion_applied", { fieldKey: suggestion.fieldKey }); updateGenerateButtonState(); if (onConfirmed) onConfirmed(); }, { once: true });
       compare.appendChild(document.createElement("br"));
       compare.appendChild(replaceBtn);
-      return;
+      return "needs_confirmation";
     }
     input.value = suggestion.text;
     recordSuggestionDecision(suggestion.id, "accepted");
     helpers.track("suggestion_applied", { fieldKey: suggestion.fieldKey });
     updateGenerateButtonState();
+    return "applied";
   }
 
   function renderSuggestionPanel(){
