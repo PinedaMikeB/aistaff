@@ -186,4 +186,23 @@ function renderImageAdSvg({ templateId, templateFields = {}, form = {}, watermar
   return { svg, width, height, watermarked: watermark, content };
 }
 
-module.exports = { renderImageAdSvg, buildAdContent, wrapText };
+/**
+ * Wraps a FULLY GENERATED ad image (AI_GENERATED_LAYOUT mode — GPT Image 2
+ * produced the entire ad, text and all) in an SVG document so the rest of
+ * the pipeline, which speaks SVG everywhere (preview surface, revision
+ * history thumbnails, PNG export), needs no special case. Unlike
+ * renderImageAdSvg this composites NO text of its own — the image already
+ * contains it. `watermark: true` adds the same repeated preview watermark
+ * used by the free/anonymous preview.
+ */
+function renderGeneratedAdSvg({ imageDataUrl, watermark = true }) {
+  const width = watermark ? 720 : 1080;
+  const height = watermark ? 900 : 1350;
+  const svg = `<svg viewBox="0 0 ${width} ${height}" width="${width}" height="${height}" xmlns="http://www.w3.org/2000/svg">
+    <image href="${imageDataUrl}" x="0" y="0" width="${width}" height="${height}" preserveAspectRatio="xMidYMid slice" />
+    ${watermark ? watermarkOverlay(width, height) : ""}
+  </svg>`;
+  return { svg, width, height, watermarked: watermark, generated: true };
+}
+
+module.exports = { renderImageAdSvg, renderGeneratedAdSvg, buildAdContent, wrapText };

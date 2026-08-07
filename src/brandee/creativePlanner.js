@@ -311,11 +311,81 @@ async function interpretRevision({ form, template, currentContent, instruction }
   }
 }
 
+// --- AI_GENERATED_LAYOUT: compose the final GPT Image 2 prompt -----------
+// The template supplies ART DIRECTION (layout/style, from
+// templateImagePrompts.js via the DB column); the customer supplies the
+// FACTS. Sol merges them into one prompt. Sol is explicitly forbidden from
+// inventing copy: it may only shorten/select from what the customer wrote,
+// because image models render long text badly and a 40-word benefit line
+// would come out as illegible mush.
+
+const ImagePromptSchema = z.object({
+  prompt: z.string().min(40).max(3500),
+  visibleText: z.object({
+    headline: z.string().max(80).optional().nullable(),
+    cta: z.string().max(40).optional().nullable(),
+    lines: z.array(z.string().max(90)).max(6).optional().default([])
+  }).optional().default({})
+});
+
+function buildImagePromptComposerPrompt({ artDirection, form, template, templateFields }) {
+  return [
+    "You are Brandee's art director. Produce ONE final image-generation prompt for an image model.",
+    "",
+    "ART DIRECTION (the layout and visual style you must follow — do not change the structure):",
+    artDirection,
+    "",
+    `CUSTOMER FACTS (the only source of any words that may appear in the ad): ${JSON.stringify({
+      productName: form.productName || null,
+      targetCustomer: form.targetCustomer || null,
+      mainBenefit: form.mainBenefit || null,
+      mainFeatures: form.mainFeatures || null,
+      preferredLanguage: form.preferredLanguage || "english",
+      templateFields: templateFields || {}
+    })}`,
+    "",
+    "RULES:",
+    "1. Every word that will be rendered in the image must come from the customer facts. Never invent a claim, price, statistic, testimonial, guarantee, brand name, or award.",
+    "2. Image models render long text badly. SHORTEN aggressively: headline at most 6 words, call to action at most 4 words, each list/column line at most 5 words. Shortening is allowed; changing the meaning is not.",
+    "3. Include at most 6 short text elements in total across the whole ad. Drop the least important rather than crowding.",
+    "4. Write the text in the customer's preferred language.",
+    FRAMEWORK_COPY_GUARDRAIL,
+    "5. State each exact string to render, in quotes, at its named position in the layout, so the image model spells it correctly.",
+    "6. The reference photo supplied alongside this prompt is the real product/subject — instruct that it be kept exactly as-is, never redrawn or replaced.",
+    "",
+    'Return a single JSON object: { "prompt": "<the complete final image-generation prompt>", "visibleText": { "headline": string|null, "cta": string|null, "lines": [string] } }'
+  ].join("\n");
+}
+
+/**
+ * Builds the final GPT Image 2 prompt for an AI_GENERATED_LAYOUT template.
+ * Returns { prompt, visibleText, aiUsed }. When Sol is unavailable or
+ * returns something unusable, returns { prompt: null } — callers MUST treat
+ * that as "fall back to the deterministic SVG compositor", never as
+ * permission to generate from the art direction alone (which would produce
+ * an ad with placeholder/invented text).
+ */
+async function composeImagePrompt({ form, template, templateFields = {} }) {
+  const artDirection = template?.imageGenPrompt || null;
+  if (!artDirection) return { prompt: null, visibleText: null, aiUsed: false, reason: "no_art_direction" };
+  try {
+    const raw = await callPlanningModel(buildImagePromptComposerPrompt({ artDirection, form, template, templateFields }));
+    const validated = ImagePromptSchema.safeParse(raw);
+    if (!validated.success) return { prompt: null, visibleText: null, aiUsed: false, reason: "invalid_composer_response" };
+    return { prompt: validated.data.prompt, visibleText: validated.data.visibleText || null, aiUsed: true };
+  } catch (error) {
+    return { prompt: null, visibleText: null, aiUsed: false, reason: "composer_error", detail: error.message };
+  }
+}
+
 module.exports = {
   CreativeDirectionSchema,
   RevisionInstructionSchema,
+  ImagePromptSchema,
   callPlanningModel,
   buildImageGenerationPrompt,
+  buildImagePromptComposerPrompt,
+  composeImagePrompt,
   sanitizeCustomerFacingPlan,
   buildCreativePlan,
   interpretRevision,

@@ -72,7 +72,7 @@ const { listPlans: listBrandeePlans, getPlan: getBrandeePlan, ANONYMOUS_LIMITS: 
 const { validateImageDataUrl } = require("./brandee/mediaValidation");
 const { extractProductFromUrl } = require("./brandee/productUrlExtractor");
 const { analyzeProduct, generateFieldAssist } = require("./brandee/productAnalysisService");
-const { renderImageAdSvg, buildAdContent } = require("./brandee/imageAdRenderer");
+const { renderImageAdSvg, renderGeneratedAdSvg, buildAdContent } = require("./brandee/imageAdRenderer");
 const { probeVideoProviderAvailability, generateVideoTeaser, generateFinalVideo } = require("./brandee/videoTeaserRenderer");
 const productAdProjectStore = require("./brandee/productAdProjectStore");
 const { registerAccount, RegistrationError } = require("./brandee/accountRegistration");
@@ -82,9 +82,9 @@ const templateCatalog = require("./brandee/templateCatalog");
 const pricingOverride = require("./brandee/pricingOverride");
 const entitlements = require("./brandee/entitlements");
 const { ENTITLEMENT_UNITS, computeComboSavings, PRICING_NOTE } = require("./brandee/pricingConfig");
-const { buildCreativePlan, interpretRevision, sanitizeCustomerFacingPlan } = require("./brandee/creativePlanner");
+const { buildCreativePlan, interpretRevision, sanitizeCustomerFacingPlan, composeImagePrompt } = require("./brandee/creativePlanner");
 const { recommendTemplates } = require("./brandee/templateRecommender");
-const { probeImageProviderAvailability, generatePreviewImage } = require("./brandee/imageGenProvider");
+const { probeImageProviderAvailability, generatePreviewImage, editPreviewImage } = require("./brandee/imageGenProvider");
 const { getCreativeBrainStatus, validateAllResources, RESOURCE_VALIDATORS } = require("./admin/creativeBrain");
 const systemStatus = require("./admin/systemStatus");
 const { recordAuditEvent, listAuditLogs, AUDIT_ACTIONS } = require("./admin/auditLog");
@@ -1665,6 +1665,13 @@ app.post("/api/public/brandee/product-ads/image/field-assist", requireProductAdR
   res.json({ ok: true, ...result });
 }));
 
+// Pulls the embedded base64 image back out of an AI_GENERATED_LAYOUT SVG so
+// it can be handed to GPT Image 2 as the reference for the next revision.
+function extractEmbeddedImageDataUrl(svg) {
+  const match = String(svg || "").match(/href="(data:image\/[a-z]+;base64,[^"]+)"/i);
+  return match ? match[1] : null;
+}
+
 function requireValidImages(form) {
   const productImageCheck = validateImageDataUrl(form.productImage);
   if (!productImageCheck.ok) return { field: "productImage", ...productImageCheck };
@@ -1715,40 +1722,75 @@ app.post("/api/public/brandee/product-ads/image/preview", requireProductAdRateLi
 
   trackBrandeeEvent("image_preview_requested", { templateId: form.templateId }, { anonymousSessionId, userId });
 
-  // PART 12/13/14: GPT-5.6 Sol plans the creative direction (headline/cta/
-  // tone/etc.) and, in parallel (the two don't depend on each other's
-  // output — generation only needs the raw product photo, not the planned
-  // headline text), GPT Image 2 attempts to turn the raw uploaded/fetched
-  // product photo (often a plain-white-background listing photo) into a
-  // clean, professionally lit product shot. Both are independently
-  // AI-optional: buildCreativePlan() falls back to a correct deterministic
-  // plan, and a failed/unavailable image generation falls back to the
-  // ORIGINAL photo as-is — renderImageAdSvg's text/branding layer (proven,
-  // reliably legible) is unaffected either way, only which photo it
-  // composites in changes. Never fabricates a "generated" image that
-  // wasn't actually produced; never invents headline/CTA text via the
-  // image model either (image-generation models are unreliable at
-  // rendering accurate legible text, which is exactly why that stays on
-  // the deterministic SVG layer instead of being asked of GPT Image 2).
-  const [{ plan, aiUsed: planningAiUsed }, imageGenResult] = await Promise.all([
-    buildCreativePlan({ form, template }),
-    form.productImage
-      ? generatePreviewImage({
-          prompt: `Professional product advertisement photography. Remove the plain background from this photo of "${form.productName || "the product"}" and place it on a clean, modern background with soft, warm studio lighting and a subtle shadow beneath it. Keep the product itself completely unchanged — same shape, same color, same details, same angle, same proportions. Do not add any text, logos, watermarks, or graphic overlays of any kind. Just a clean, premium product photo suitable as an ad background.`,
-          productImageDataUrl: form.productImage,
-          width: 1024,
-          height: 1280
-        })
-      : Promise.resolve({ ok: false, reason: "no_product_image" })
-  ]);
+  // Two render modes, decided per template by the Super Admin catalog:
+  //
+  // AI_GENERATED_LAYOUT — the template carries its own art direction
+  // (imageGenPrompt). GPT-5.6 Sol merges that art direction with the
+  // customer's field answers into one final prompt (composeImagePrompt),
+  // and GPT Image 2 generates the ENTIRE ad from it using the customer's
+  // real photo as the reference subject. Sol may only shorten the
+  // customer's own words, never invent copy.
+  //
+  // COMPOSITE_TEMPLATE — the original path: Sol plans the copy, GPT Image 2
+  // only cleans up the product photo's background, and the deterministic
+  // SVG compositor lays out the text.
+  //
+  // Both degrade honestly: if Sol or GPT Image 2 is unavailable or fails,
+  // this falls all the way back to the composite path (and then to the raw
+  // uploaded photo), and NEVER shows a fabricated "generated" image or an
+  // ad containing placeholder text.
+  const wantsGeneratedLayout = template.renderMode === "AI_GENERATED_LAYOUT" && Boolean(template.imageGenPrompt) && Boolean(form.productImage);
 
-  const imageAiUsed = imageGenResult.ok;
-  const renderForm = imageAiUsed ? { ...form, productImage: `data:image/png;base64,${imageGenResult.base64}` } : form;
-  if (!imageAiUsed && form.productImage) {
-    trackBrandeeEvent("image_generation_fallback", { templateId: form.templateId, reason: imageGenResult.reason }, { anonymousSessionId, userId });
+  let rendered = null;
+  let plan = null;
+  let planningAiUsed = false;
+  let imageAiUsed = false;
+  let generatedLayout = false;
+
+  if (wantsGeneratedLayout) {
+    const composed = await composeImagePrompt({ form, template, templateFields: form.templateFields });
+    if (composed.prompt) {
+      const genResult = await generatePreviewImage({
+        prompt: composed.prompt,
+        productImageDataUrl: form.productImage,
+        width: 1024,
+        height: 1280
+      });
+      if (genResult.ok) {
+        rendered = renderGeneratedAdSvg({ imageDataUrl: `data:image/png;base64,${genResult.base64}`, watermark: true });
+        plan = { generatedPrompt: composed.prompt, visibleText: composed.visibleText || null, mode: "AI_GENERATED_LAYOUT" };
+        planningAiUsed = true;
+        imageAiUsed = true;
+        generatedLayout = true;
+      } else {
+        trackBrandeeEvent("image_generation_fallback", { templateId: form.templateId, reason: genResult.reason }, { anonymousSessionId, userId });
+      }
+    } else {
+      trackBrandeeEvent("image_generation_fallback", { templateId: form.templateId, reason: composed.reason || "prompt_composition_failed" }, { anonymousSessionId, userId });
+    }
   }
 
-  const rendered = renderImageAdSvg({ templateId: form.templateId, templateFields: form.templateFields, form: renderForm, watermark: true, override: plan });
+  if (!rendered) {
+    const [planResult, imageGenResult] = await Promise.all([
+      buildCreativePlan({ form, template }),
+      form.productImage
+        ? generatePreviewImage({
+            prompt: `Professional product advertisement photography. Remove the plain background from this photo of "${form.productName || "the product"}" and place it on a clean, modern background with soft, warm studio lighting and a subtle shadow beneath it. Keep the product itself completely unchanged — same shape, same color, same details, same angle, same proportions. Do not add any text, logos, watermarks, or graphic overlays of any kind. Just a clean, premium product photo suitable as an ad background.`,
+            productImageDataUrl: form.productImage,
+            width: 1024,
+            height: 1280
+          })
+        : Promise.resolve({ ok: false, reason: "no_product_image" })
+    ]);
+    plan = planResult.plan;
+    planningAiUsed = planResult.aiUsed;
+    imageAiUsed = imageGenResult.ok;
+    const renderForm = imageAiUsed ? { ...form, productImage: `data:image/png;base64,${imageGenResult.base64}` } : form;
+    if (!imageAiUsed && form.productImage && !wantsGeneratedLayout) {
+      trackBrandeeEvent("image_generation_fallback", { templateId: form.templateId, reason: imageGenResult.reason }, { anonymousSessionId, userId });
+    }
+    rendered = renderImageAdSvg({ templateId: form.templateId, templateFields: form.templateFields, form: renderForm, watermark: true, override: plan });
+  }
 
   if (!userId) productAdProjectStore.recordAnonymousPreview(anonymousSessionId, "image");
   await productAdProjectStore.updateProject(project.id, {
@@ -1809,6 +1851,56 @@ app.post("/api/public/brandee/product-ads/image/revise", requireProductAdRateLim
   const currentContent = buildAdContent(project.templateId, project.templateFields, project.product, latest.plan);
 
   trackBrandeeEvent("revision_started", { templateId: project.templateId }, { anonymousSessionId, userId });
+
+  // AI_GENERATED_LAYOUT revisions edit the CURRENT GENERATED IMAGE itself
+  // (PART 17's "edit the current preview, preserve everything not asked to
+  // change" — the image-edit call naturally preserves unrelated
+  // composition). The previous version is never overwritten: this appends
+  // a new revision row exactly like the composite path does. If the edit
+  // fails, fall through to the deterministic copy-revision path below
+  // rather than showing the customer nothing.
+  if (latest.plan?.mode === "AI_GENERATED_LAYOUT") {
+    const currentImage = extractEmbeddedImageDataUrl(latest.svg);
+    if (currentImage) {
+      const edited = await editPreviewImage({
+        prompt: [
+          "Edit this existing advertisement image according to the instruction below.",
+          "Preserve everything the instruction does not ask to change — same layout, same product, same colors, same text, same spelling.",
+          "Do not add any text that is not already present or explicitly requested.",
+          `Instruction: ${body.data.instruction}`
+        ].join(" "),
+        currentPreviewDataUrl: currentImage,
+        width: 1024,
+        height: 1280
+      });
+      if (edited.ok) {
+        const rendered = renderGeneratedAdSvg({ imageDataUrl: `data:image/png;base64,${edited.base64}`, watermark: true });
+        const revisedPlan = { ...latest.plan, lastInstruction: body.data.instruction };
+        if (!userId) productAdProjectStore.recordAnonymousRevision(anonymousSessionId, "image");
+        const updatedProject = await productAdProjectStore.addRevision(project.id, {
+          instruction: body.data.instruction,
+          plan: revisedPlan,
+          svg: rendered.svg,
+          width: rendered.width,
+          height: rendered.height,
+          watermarked: true,
+          aiUsed: true
+        });
+        trackBrandeeEvent("revision_completed", { templateId: project.templateId }, { anonymousSessionId, userId });
+        return res.json({
+          ok: true,
+          projectId: project.id,
+          svg: rendered.svg,
+          width: rendered.width,
+          height: rendered.height,
+          plan: revisedPlan,
+          revisionNumber: updatedProject.revisions.length,
+          revisionSummary: "Brandee applied your change to the image."
+        });
+      }
+      trackBrandeeEvent("image_generation_fallback", { templateId: project.templateId, reason: edited.reason }, { anonymousSessionId, userId });
+    }
+  }
 
   const { revision, aiUsed } = await interpretRevision({ form: project.product, template, currentContent, instruction: body.data.instruction });
   if (revision.understood === false) {
@@ -2030,8 +2122,17 @@ app.post("/api/brandee/product-ads/image/final", requireAuth, requireBrandeeSubs
       async () => {
         // PART 22/28: use the customer's latest APPROVED revision — never a
         // fresh, different concept — only the watermark is removed and the
-        // resolution changes.
+        // resolution changes. For AI_GENERATED_LAYOUT projects the approved
+        // artwork IS the generated image, so unwrap and re-wrap it clean
+        // rather than re-compositing it through the SVG text layer (which
+        // would double up the copy already baked into the image).
         const latest = project.revisions?.[project.revisions.length - 1];
+        if (latest?.plan?.mode === "AI_GENERATED_LAYOUT") {
+          const approvedImage = extractEmbeddedImageDataUrl(latest.svg);
+          if (approvedImage) {
+            return { ok: true, rendered: renderGeneratedAdSvg({ imageDataUrl: approvedImage, watermark: false }) };
+          }
+        }
         const rendered = renderImageAdSvg({ templateId: project.templateId, templateFields: project.templateFields, form: project.product, watermark: false, override: latest?.plan || null });
         return { ok: true, rendered };
       }

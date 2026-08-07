@@ -656,6 +656,14 @@ model StaticAdTemplate {
   requiredFieldsSchema  Json      @default("[]")
   optionalFieldsSchema  Json      @default("[]")
   proofRequirements     Json      @default("[]")
+  // Art direction for the AI_GENERATED_LAYOUT render mode: describes the
+  // LAYOUT and VISUAL STYLE this framework should produce (columns, badge,
+  // palette, photography mood) — never the customer's actual copy, which
+  // comes from their field answers at generation time. GPT-5.6 Sol merges
+  // this with those answers into the final GPT Image 2 prompt (see
+  // creativePlanner.composeImagePrompt). Null = this template stays on the
+  // deterministic SVG compositor.
+  imageGenPrompt        String?   @db.Text
   supportedAspectRatios Json      @default("[]")
   defaultAspectRatio    String    @default("4:5")
   defaultLanguage       String    @default("english")

@@ -1,0 +1,3 @@
+[mcp_servers.21st]
+command = "npx"
+args = ["-y", "mcp-remote", "https://21st.dev/api/mcp", "--header", "x-api-key:${API_KEY_21ST}"]

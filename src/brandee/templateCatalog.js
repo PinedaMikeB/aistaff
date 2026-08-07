@@ -67,6 +67,11 @@ function adaptStaticRow(row) {
     isFeatured: Boolean(row.isFeatured),
     supportedAspectRatios: row.supportedAspectRatios,
     proofRequirement: (row.proofRequirements || [])[0] || null,
+    // AI_GENERATED_LAYOUT templates carry their own art direction; anything
+    // without a prompt stays on the deterministic SVG compositor regardless
+    // of renderMode, so a half-configured row can never produce a blank ad.
+    renderMode: row.imageGenPrompt ? (row.renderMode || "COMPOSITE_TEMPLATE") : "COMPOSITE_TEMPLATE",
+    imageGenPrompt: row.imageGenPrompt || null,
     fields: fieldDefsFromDbTemplate(row)
   };
 }
