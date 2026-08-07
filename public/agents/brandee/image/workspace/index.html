@@ -257,8 +257,7 @@
       const card = btn.closest(".suggestion-card");
       const suggestion = r.body.suggestions.find((s)=>s.id===card.dataset.suggestionId);
       if (!suggestion) return;
-      const outcome = applySuggestion(card, suggestion, { onConfirmed: closeAssistPopover });
-      if (outcome === "needs_confirmation") return; // keep popover open so the "Replace my answer" confirm UI stays visible
+      const outcome = applySuggestion(card, suggestion, { forceReplace: true });
       if (btn.dataset.edit !== undefined) { const targetInput = $(fieldInputSelector(fieldKey)); if (targetInput) { targetInput.focus(); const len=targetInput.value.length; targetInput.setSelectionRange?.(len,len); } }
       closeAssistPopover();
     }));
@@ -410,12 +409,12 @@
 
   function recordSuggestionDecision(id, decision){ if (!state.projectId) return; helpers.fetchJson(`/api/public/brandee/product-ads/image/project/${state.projectId}/suggestion-decision`, { method:"POST", headers:{"Content-Type":"application/json"}, body: JSON.stringify({ suggestionId:id, decision }) }).catch(()=>{}); }
 
-  function applySuggestion(card, suggestion, { onConfirmed } = {}){
+  function applySuggestion(card, suggestion, { onConfirmed, forceReplace } = {}){
     const selector = fieldInputSelector(suggestion.fieldKey);
     const input = selector ? $(selector) : null;
     if (!input) return "no_input";
     const compare = $(".suggestion-compare", card);
-    if (input.value.trim() && input.value.trim() !== suggestion.text) {
+    if (!forceReplace && input.value.trim() && input.value.trim() !== suggestion.text) {
       compare.innerHTML = `<b>Your current answer</b>${esc(input.value.trim())}<br/><br/><b>Suggested</b>${esc(suggestion.text)}`;
       compare.classList.add("is-visible");
       const replaceBtn = document.createElement("button");

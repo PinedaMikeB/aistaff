@@ -15,6 +15,7 @@ const {
   verifyPassword,
   signSession,
   requireAuth,
+  attachUserIfPresent,
   setSessionCookie,
   clearSessionCookie
 } = require("./auth");
@@ -175,6 +176,10 @@ app.use(["/api/public/brandee/product-ads", "/api/brandee/product-ads"], express
 app.use(express.json({ limit: "1mb" }));
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
+// Public Brandee routes must RECOGNIZE a logged-in customer (to skip the
+// anonymous free-preview limit and attribute projects to their account)
+// without REQUIRING login. Must come after cookieParser.
+app.use("/api/public/brandee", attachUserIfPresent);
 app.use(morgan("dev"));
 app.use(express.static(path.join(__dirname, "..", "public"), {
   setHeaders(res, filePath) {

@@ -50,6 +50,34 @@ async function requireAuth(req, res, next) {
   }
 }
 
+// Optional-auth variant for PUBLIC routes: if a valid session cookie is
+// present, populate req.user exactly like requireAuth does; if not, continue
+// as anonymous — NEVER 401. This is what lets the public Brandee preview
+// endpoints recognize a logged-in customer and skip the anonymous
+// free-preview limit. Without this, req.user was always undefined on the
+// public routes and logged-in users were treated as anonymous forever.
+async function attachUserIfPresent(req, res, next) {
+  try {
+    const token = req.cookies[COOKIE_NAME] || req.headers.authorization?.replace("Bearer ", "");
+    if (!token) return next();
+    const payload = jwt.verify(token, jwtSecret());
+    const user = await prisma.user.findFirst({
+      where: { id: payload.sub, status: "active" },
+      select: {
+        id: true, company_id: true, name: true, email: true, role: true, status: true,
+        platform_role: true, mfa_enabled: true, last_login_at: true
+      }
+    });
+    if (user) {
+      req.user = user;
+      req.companyId = user.company_id;
+    }
+  } catch (error) {
+    // Expired/invalid token on a public route: proceed anonymously.
+  }
+  next();
+}
+
 function setSessionCookie(res, token) {
   res.cookie(COOKIE_NAME, token, {
     httpOnly: true,
@@ -74,6 +102,7 @@ module.exports = {
   verifyPassword,
   signSession,
   requireAuth,
+  attachUserIfPresent,
   setSessionCookie,
   clearSessionCookie
 };
