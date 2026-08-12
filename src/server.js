@@ -72,7 +72,8 @@ const { listPlans: listBrandeePlans, getPlan: getBrandeePlan, ANONYMOUS_LIMITS: 
 const { validateImageDataUrl } = require("./brandee/mediaValidation");
 const { extractProductFromUrl } = require("./brandee/productUrlExtractor");
 const { analyzeProduct, generateFieldAssist } = require("./brandee/productAnalysisService");
-const { renderImageAdSvg, renderGeneratedAdSvg, buildAdContent } = require("./brandee/imageAdRenderer");
+const { renderImageAdSvg, renderGeneratedAdSvg, readPngDimensions, buildAdContent } = require("./brandee/imageAdRenderer");
+const { getAspectRatio, AD_ASPECT_RATIOS, DEFAULT_ASPECT_RATIO } = require("./brandee/adAspectRatios");
 const { probeVideoProviderAvailability, generateVideoTeaser, generateFinalVideo } = require("./brandee/videoTeaserRenderer");
 const productAdProjectStore = require("./brandee/productAdProjectStore");
 const { registerAccount, RegistrationError } = require("./brandee/accountRegistration");
@@ -1523,6 +1524,15 @@ function requireProductAdTrackRateLimit(req, res, next) {
   next();
 }
 
+// Lightweight session check for public pages: returns the signed-in user
+// if there is one, or { user: null } — never 401. The workspace calls this
+// on load so it knows you're already logged in from a previous visit,
+// instead of only recognising a login performed in that same tab.
+app.get("/api/public/brandee/whoami", (req, res) => {
+  if (!req.user) return res.json({ ok: true, user: null });
+  res.json({ ok: true, user: { id: req.user.id, name: req.user.name, email: req.user.email } });
+});
+
 app.get("/api/public/brandee/product-ads/config", asyncHandler(async (req, res) => {
   const [templates, videoStyles, pricing] = await Promise.all([
     templateCatalog.listActiveStaticTemplates({ hasTestimonial: false }),
@@ -1532,6 +1542,8 @@ app.get("/api/public/brandee/product-ads/config", asyncHandler(async (req, res) 
   res.json({
     templates,
     videoStyles,
+    aspectRatios: Object.values(AD_ASPECT_RATIOS).map((r) => ({ id: r.id, label: r.label, placement: r.placement, recommended: r.recommended })),
+    defaultAspectRatio: DEFAULT_ASPECT_RATIO,
     plans: pricing.plans,
     pricingSource: pricing.source,
     taxMode: pricing.taxMode,
@@ -1740,6 +1752,7 @@ app.post("/api/public/brandee/product-ads/image/preview", requireProductAdRateLi
   // uploaded photo), and NEVER shows a fabricated "generated" image or an
   // ad containing placeholder text.
   const wantsGeneratedLayout = template.renderMode === "AI_GENERATED_LAYOUT" && Boolean(template.imageGenPrompt) && Boolean(form.productImage);
+  const ratio = getAspectRatio(form.aspectRatio);
 
   let rendered = null;
   let plan = null;
@@ -1748,17 +1761,17 @@ app.post("/api/public/brandee/product-ads/image/preview", requireProductAdRateLi
   let generatedLayout = false;
 
   if (wantsGeneratedLayout) {
-    const composed = await composeImagePrompt({ form, template, templateFields: form.templateFields });
+    const composed = await composeImagePrompt({ form, template, templateFields: form.templateFields, aspectRatio: ratio.id });
     if (composed.prompt) {
       const genResult = await generatePreviewImage({
         prompt: composed.prompt,
         productImageDataUrl: form.productImage,
-        width: 1024,
-        height: 1280
+        width: ratio.width,
+        height: ratio.height
       });
       if (genResult.ok) {
         rendered = renderGeneratedAdSvg({ imageDataUrl: `data:image/png;base64,${genResult.base64}`, watermark: true });
-        plan = { generatedPrompt: composed.prompt, visibleText: composed.visibleText || null, mode: "AI_GENERATED_LAYOUT" };
+        plan = { generatedPrompt: composed.prompt, visibleText: composed.visibleText || null, mode: "AI_GENERATED_LAYOUT", aspectRatio: ratio.id };
         planningAiUsed = true;
         imageAiUsed = true;
         generatedLayout = true;
@@ -1828,7 +1841,13 @@ app.post("/api/public/brandee/product-ads/image/recommend", requireProductAdRate
 // revision entry; nothing is ever overwritten (PART 19).
 app.post("/api/public/brandee/product-ads/image/revise", requireProductAdRateLimit, asyncHandler(async (req, res) => {
   const anonymousSessionId = getOrSetBrandeeSessionId(req, res);
-  const body = z.object({ projectId: z.string().min(1), instruction: z.string().min(2).max(300) }).safeParse(req.body);
+  const body = z.object({
+    projectId: z.string().min(1),
+    instruction: z.string().min(2).max(300),
+    // Optional image the customer attached with the revision ("match this
+    // colour scheme", "use this logo"). Validated like every other upload.
+    referenceImage: z.string().optional().nullable()
+  }).safeParse(req.body);
   if (!body.success) return res.status(400).json({ ok: false, error: "Please describe the revision you'd like." });
 
   const project = await productAdProjectStore.getProject(body.data.projectId);
@@ -1862,16 +1881,27 @@ app.post("/api/public/brandee/product-ads/image/revise", requireProductAdRateLim
   if (latest.plan?.mode === "AI_GENERATED_LAYOUT") {
     const currentImage = extractEmbeddedImageDataUrl(latest.svg);
     if (currentImage) {
+      // An attached reference must pass the same upload validation as the
+      // product photo — never hand an unvalidated data URL to the provider.
+      let referenceImage = null;
+      if (body.data.referenceImage) {
+        const check = validateImageDataUrl(body.data.referenceImage);
+        if (!check.ok) return res.status(400).json({ ok: false, error: `Attached image: ${check.error}` });
+        referenceImage = body.data.referenceImage;
+      }
+      const revisionRatio = getAspectRatio(latest.plan.aspectRatio || project.product?.aspectRatio);
       const edited = await editPreviewImage({
         prompt: [
           "Edit this existing advertisement image according to the instruction below.",
           "Preserve everything the instruction does not ask to change — same layout, same product, same colors, same text, same spelling.",
           "Do not add any text that is not already present or explicitly requested.",
+          referenceImage ? "A second image is attached purely as a style/content reference for the instruction. The FIRST image is the advertisement being edited — keep its layout and composition. Do not replace the advertisement with the reference image." : null,
           `Instruction: ${body.data.instruction}`
-        ].join(" "),
+        ].filter(Boolean).join(" "),
         currentPreviewDataUrl: currentImage,
-        width: 1024,
-        height: 1280
+        referenceImageDataUrl: referenceImage,
+        width: revisionRatio.width,
+        height: revisionRatio.height
       });
       if (edited.ok) {
         const rendered = renderGeneratedAdSvg({ imageDataUrl: `data:image/png;base64,${edited.base64}`, watermark: true });
@@ -2087,6 +2117,48 @@ app.post("/api/auth/register", asyncHandler(async (req, res) => {
   res.json({ ok: true, user: { id: user.id, company_id: user.company_id, name: user.name, email: user.email, role: user.role } });
 }));
 
+// Save & Finish: claims the project for the signed-in customer and marks
+// it saved, so it can be reopened later from "My ads". Also fixes the
+// orphan case where someone STARTED anonymously and then logged in rather
+// than registering — claimProjectForUser previously only ran during
+// registration, leaving those projects unreachable ("You don't have
+// access to this project").
+app.post("/api/brandee/product-ads/image/save", requireAuth, asyncHandler(async (req, res) => {
+  const body = z.object({ projectId: z.string().min(1) }).parse(req.body);
+  const anonymousSessionId = req.cookies?.[BRANDEE_SESSION_COOKIE] || null;
+  const project = await productAdProjectStore.getProject(body.projectId);
+  if (!project) return res.status(404).json({ ok: false, error: "Project not found." });
+
+  const ownedByUser = project.userId === req.user.id;
+  const claimable = !project.userId && project.anonymousSessionId === anonymousSessionId;
+  if (!ownedByUser && !claimable) return res.status(403).json({ ok: false, error: "You don't have access to this project." });
+  if (claimable) await productAdProjectStore.claimProjectForUser(project.id, req.user.id);
+
+  await productAdProjectStore.updateProject(project.id, { status: "saved" });
+  trackBrandeeEvent("image_save_finish_clicked", {}, { userId: req.user.id });
+  res.json({ ok: true, projectId: project.id });
+}));
+
+// "My ads" — the customer's saved projects. listProjectsForUser already
+// existed in the store but had no endpoint in front of it, so there was
+// no way back into a past design once the tab was closed.
+app.get("/api/brandee/product-ads/projects", requireAuth, asyncHandler(async (req, res) => {
+  const projects = await productAdProjectStore.listProjectsForUser(req.user.id);
+  res.json({
+    ok: true,
+    projects: projects.map((p) => ({
+      id: p.id,
+      kind: p.kind,
+      templateId: p.templateId,
+      productName: p.product?.productName || null,
+      aspectRatio: p.product?.aspectRatio || null,
+      status: p.status,
+      revisionCount: p.revisions?.length || 0,
+      updatedAt: p.updatedAt || p.createdAt
+    }))
+  });
+}));
+
 app.get("/api/brandee/product-ads/subscription-status", requireAuth, asyncHandler(async (req, res) => {
   const subscription = await getActiveBrandeeSubscriptionForUser(req.user.id);
   res.json({ ok: true, active: Boolean(subscription), subscription });
@@ -2151,7 +2223,12 @@ app.post("/api/brandee/product-ads/image/final", requireAuth, requireBrandeeSubs
   });
   trackBrandeeEvent("final_generation_completed", { kind: "image" }, { userId: req.user.id });
 
-  res.json({ ok: true, svg: rendered.svg, width: rendered.width, height: rendered.height });
+  // AI_GENERATED_LAYOUT finals are a real PNG underneath the SVG wrapper.
+  // Hand that PNG back directly so the browser can save a file the
+  // customer can actually upload to Meta — an SVG is not a valid Facebook
+  // ad asset (Meta accepts JPG/PNG only).
+  const finalPng = extractEmbeddedImageDataUrl(rendered.svg);
+  res.json({ ok: true, svg: rendered.svg, width: rendered.width, height: rendered.height, pngDataUrl: finalPng || null });
 }));
 
 app.post("/api/brandee/product-ads/video/final", requireAuth, requireBrandeeSubscription(), asyncHandler(async (req, res) => {

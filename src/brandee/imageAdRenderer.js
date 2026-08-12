@@ -189,20 +189,42 @@ function renderImageAdSvg({ templateId, templateFields = {}, form = {}, watermar
 /**
  * Wraps a FULLY GENERATED ad image (AI_GENERATED_LAYOUT mode — GPT Image 2
  * produced the entire ad, text and all) in an SVG document so the rest of
- * the pipeline, which speaks SVG everywhere (preview surface, revision
- * history thumbnails, PNG export), needs no special case. Unlike
- * renderImageAdSvg this composites NO text of its own — the image already
- * contains it. `watermark: true` adds the same repeated preview watermark
- * used by the free/anonymous preview.
+ * the pipeline, which speaks SVG everywhere, needs no special case.
+ * Composites NO text of its own — the image already contains it.
+ *
+ * The viewBox is derived from the image's REAL pixel dimensions, and
+ * `preserveAspectRatio="meet"` guarantees the whole image is always
+ * visible. A previous version hardcoded a 720x900 frame with "slice",
+ * which silently cropped 16.7% off the top and bottom of every generated
+ * ad whenever the generated ratio differed from 4:5.
  */
-function renderGeneratedAdSvg({ imageDataUrl, watermark = true }) {
-  const width = watermark ? 720 : 1080;
-  const height = watermark ? 900 : 1350;
+function renderGeneratedAdSvg({ imageDataUrl, watermark = true, imageWidth = null, imageHeight = null }) {
+  const dims = (imageWidth && imageHeight)
+    ? { width: imageWidth, height: imageHeight }
+    : (readPngDimensions(imageDataUrl) || { width: 1280, height: 1600 });
+  const { width, height } = dims;
   const svg = `<svg viewBox="0 0 ${width} ${height}" width="${width}" height="${height}" xmlns="http://www.w3.org/2000/svg">
-    <image href="${imageDataUrl}" x="0" y="0" width="${width}" height="${height}" preserveAspectRatio="xMidYMid slice" />
+    <image href="${imageDataUrl}" x="0" y="0" width="${width}" height="${height}" preserveAspectRatio="xMidYMid meet" />
     ${watermark ? watermarkOverlay(width, height) : ""}
   </svg>`;
   return { svg, width, height, watermarked: watermark, generated: true };
 }
 
-module.exports = { renderImageAdSvg, renderGeneratedAdSvg, buildAdContent, wrapText };
+/**
+ * Reads width/height straight out of a base64 PNG's IHDR chunk so the
+ * wrapper never has to assume a size.
+ */
+function readPngDimensions(dataUrl) {
+  try {
+    const base64 = String(dataUrl || "").split(",")[1];
+    if (!base64) return null;
+    const buffer = Buffer.from(base64.slice(0, 64), "base64");
+    if (buffer.length < 24) return null;
+    if (buffer.toString("ascii", 1, 4) !== "PNG") return null;
+    return { width: buffer.readUInt32BE(16), height: buffer.readUInt32BE(20) };
+  } catch {
+    return null;
+  }
+}
+
+module.exports = { renderImageAdSvg, renderGeneratedAdSvg, readPngDimensions, buildAdContent, wrapText };

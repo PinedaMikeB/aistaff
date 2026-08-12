@@ -24,7 +24,9 @@
     "prisma:studio": "prisma studio",
     "seed": "node prisma/seed.js",
     "remotion:studio": "npm --prefix remotion run studio",
-    "remotion:render": "npm --prefix remotion run render:all"
+    "remotion:render": "npm --prefix remotion run render:all",
+    "pitch": "node src/pitch/index.js",
+    "pitch:test": "node --test test/pitch.test.js"
   },
   "prisma": {
     "seed": "node prisma/seed.js"
@@ -45,6 +47,8 @@
     "pdfkit": "^0.19.1",
     "prisma": "^5.22.0",
     "sharp": "^0.35.3",
+    "sip": "^0.0.6",
+    "ws": "^8.21.3",
     "zod": "^3.24.1"
   }
 }

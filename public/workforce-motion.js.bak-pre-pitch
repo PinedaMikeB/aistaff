@@ -187,7 +187,6 @@ function initCaptionReveal(prefix, titleId) {
   }, { margin: "-10% 0px -10% 0px" });
 }
 
-initCaptionReveal("pitch-caption", "pitchCaptionTitle");
 initCaptionReveal("brandee-caption", "brandeeCaptionTitle");
 initCaptionReveal("closer-caption", "closerCaptionTitle");
 

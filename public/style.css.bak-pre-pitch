@@ -1172,8 +1172,7 @@ tr:hover td { background: #fbf9ff; }
 .modern-home .closer-carousel { padding: 0; min-height: 260px; border-color: rgba(72, 193, 255, .3); background: #030810; }
 .modern-home .service-card-media { padding: 0; display: flex; flex-direction: column; }
 .modern-home .agent-brandee.service-card-media,
-.modern-home .agent-chat.service-live.service-card-media,
-.modern-home .agent-pitch.service-live.service-card-media {
+.modern-home .agent-chat.service-live.service-card-media {
   width: fit-content !important;
   max-width: 96% !important;
   margin-left: auto !important;
@@ -1184,8 +1183,7 @@ tr:hover td { background: #fbf9ff; }
   box-shadow: none !important;
 }
 .modern-home .agent-brandee.service-card-media:hover,
-.modern-home .agent-chat.service-live.service-card-media:hover,
-.modern-home .agent-pitch.service-live.service-card-media:hover {
+.modern-home .agent-chat.service-live.service-card-media:hover {
   transform: none;
   border: none;
   background: transparent;
@@ -1292,8 +1290,6 @@ tr:hover td { background: #fbf9ff; }
   .modern-home .service-card-media { width: min(500px, 88%) !important; margin-left: auto !important; margin-right: auto !important; }
   .modern-home .media-row { flex-direction: column; width: 100%; }
   .modern-home .service-card-media .closer-carousel { width: 100%; }
-  .modern-home .service-card-media .pitch-cardmedia { width: 100%; }
-  .modern-home .pitch-caption,
   .modern-home .brandee-caption,
   .modern-home .closer-caption {
     width: 100%;
@@ -1678,109 +1674,4 @@ tr:hover td { background: #fbf9ff; }
 @media (max-width: 480px) {
   .site-chat-widget { right: 14px; bottom: 14px; }
   .site-chat-panel { width: calc(100vw - 28px); bottom: 66px; }
-}
-
-/* ── Pitch card on the homepage ──────────────────────────────────────────
-   A voice agent has no screenshots, so instead of a carousel this card
-   shows a real call transcript. Sized to match .closer-carousel (440px
-   square) so the existing .media-row centering and responsive rules apply
-   unchanged. */
-.pitch-callcard {
-  width: 440px;
-  aspect-ratio: 1 / 1;
-  flex-shrink: 0;
-  display: flex;
-  flex-direction: column;
-  padding: 22px;
-  border: 1px solid rgba(117, 204, 255, .18);
-  border-radius: 10px;
-  background: linear-gradient(160deg, rgba(19, 39, 54, .55), rgba(3, 8, 16, .82));
-  backdrop-filter: blur(10px);
-}
-.pitch-callcard-head {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  color: #7fb4cf;
-  font: 500 11px "DM Mono", monospace;
-  text-transform: uppercase;
-  letter-spacing: .14em;
-}
-.pitch-live-dot {
-  width: 7px; height: 7px; border-radius: 50%;
-  background: #5dd0ff;
-  box-shadow: 0 0 10px rgba(93, 208, 255, .9);
-  animation: pitchPulse 1.8s ease-in-out infinite;
-}
-@keyframes pitchPulse { 0%,100% { opacity: 1; } 50% { opacity: .35; } }
-.pitch-callcard-body {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  gap: 12px;
-  padding: 18px 0;
-}
-.pitch-line {
-  margin: 0;
-  max-width: 88%;
-  padding: 12px 14px;
-  border-radius: 10px;
-  color: #d9f1ff;
-  font: 15px/1.5 "Manrope", sans-serif;
-}
-.pitch-line b {
-  display: block;
-  margin-bottom: 4px;
-  color: #9edfff;
-  font-size: 11px;
-  text-transform: uppercase;
-  letter-spacing: .06em;
-}
-.pitch-line.agent { background: rgba(11, 25, 36, .7); border: 1px solid rgba(117, 161, 188, .18); }
-.pitch-line.caller { margin-left: auto; background: rgba(36, 169, 255, .1); border: 1px solid rgba(72, 193, 255, .2); }
-.pitch-callcard-foot {
-  padding-top: 14px;
-  border-top: 1px solid rgba(117, 161, 188, .14);
-  color: #86a3b7;
-  font: 500 12px "DM Mono", monospace;
-  letter-spacing: .06em;
-}
-@media (max-width: 1100px) {
-  .pitch-callcard { width: min(500px, 88%); aspect-ratio: auto; }
-}
-
-/* Pitch caption — same treatment as Brandee's, own prefix so
-   initCaptionReveal('brandee-caption') does not grab it via
-   querySelector and animate the wrong card. */
-.modern-home .pitch-caption {
-  display: flex;
-  flex-direction: column;
-  gap: 16px;
-  width: 420px;
-  flex-shrink: 0;
-}
-.modern-home .pitch-caption-eyebrow { margin: 0; opacity: 0; color: var(--cyan); font: 500 13px "DM Mono"; letter-spacing: .16em; text-transform: uppercase; }
-.modern-home .pitch-caption-title { margin: 0; perspective: 600px; color: #f4f8ff; font: 500 clamp(28px, 2.8vw, 38px)/1.1 "Space Grotesk"; letter-spacing: -.03em; }
-.modern-home .pitch-caption-title .word-group { display: inline-block; white-space: nowrap; }
-.modern-home .pitch-caption-title .letter { display: inline-block; opacity: 0; transform-style: preserve-3d; }
-.modern-home .pitch-caption-body { margin: 0; opacity: 0; color: #86a3b7; font: 18px/1.6 "Manrope"; max-width: 36ch; }
-.modern-home .pitch-caption-cta { display: inline-flex; align-items: center; gap: 10px; width: fit-content; opacity: 0; color: #9edfff; font: 600 14px "DM Mono"; letter-spacing: .05em; transition: gap .2s ease, color .2s ease; }
-.modern-home .pitch-caption-cta:hover { gap: 14px; color: #fff; }
-
-/* Pitch homepage card media — 4:3 product image rather than a square
-   carousel, so it keeps a controlled column width the .media-row layout
-   expects while respecting the image's own aspect ratio. */
-.modern-home .pitch-cardmedia {
-  width: min(560px, 52vw);
-  flex-shrink: 0;
-  border-radius: 10px;
-  overflow: hidden;
-  border: 1px solid rgba(117, 204, 255, .18);
-  background: rgba(3, 8, 16, .6);
-  line-height: 0;
-}
-.modern-home .pitch-cardmedia img { width: 100%; height: auto; display: block; }
-@media (max-width: 1100px) {
-  .modern-home .pitch-cardmedia { width: 100%; }
 }

@@ -1,0 +1,737 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Pitch — AI Voice Agent that answers your phone | AIStaff</title>
+<meta name="description" content="Pitch answers your business phone 24/7 and talks to every caller in their own language — English, Tagalog, or Taglish — switching mid-sentence the way Filipinos actually speak." />
+<link rel="icon" href="/aistaff-logo-square.png" type="image/png" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=DM+Mono:wght@500&family=Manrope:wght@500;600;700;800&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="/style.css" />
+</head>
+<body class="modern-home pitch-page">
+<div id="toast" class="toast" hidden></div>
+<header class="site-header cinematic-header">
+  <a class="brand" href="/" aria-label="AIStaff home">
+    <img class="brand-logo" src="/aistaff-logo-square.png" alt="AIStaff" width="42" height="42" />
+  </a>
+  <nav class="site-nav" aria-label="Primary">
+    <a href="/#services">All agents</a>
+    <a href="/pricing/">Pricing</a>
+  </nav>
+  <div class="header-actions">
+    <a class="ghost-link" href="/admin/login">Client login</a>
+    <a class="button button-primary" href="#demo">Book a live demo <span>↗</span></a>
+  </div>
+</header>
+
+<main>
+<section class="pitch-hero">
+  <p class="eyebrow bright"><span class="live-dot"></span> AISTAFF / 03 — PITCH</p>
+  <h1>Pitch answers your phone<br /><em>in whatever language your customer speaks.</em></h1>
+  <p class="hero-sub">A real voice on a real phone line, around the clock. English, Tagalog, or
+    Taglish — Pitch listens to the caller and matches them, switching mid-sentence the way
+    Filipinos actually talk. Nobody chooses a language. Nobody presses 1.</p>
+  <div class="hero-actions">
+    <a class="button button-primary glow-button" href="#real-call">Hear a real call <span>↓</span></a>
+    <a class="text-link" href="#demo">Book a live demo <span>↗</span></a>
+  </div>
+  <p class="pitch-trust">Not a phone menu. Not a recording. A conversation — and it never puts
+    anyone on hold.</p>
+</section>
+
+<section id="problem" class="pitch-section pitch-narrow">
+  <p class="section-kicker">The missed-call leak</p>
+  <h2>Every unanswered ring is a customer calling someone else.</h2>
+  <div class="pitch-pain-grid">
+    <article><span class="pitch-pain-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M17 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9.5" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg></span><p>Calls come in while your staff are already serving someone.</p></article>
+    <article><span class="pitch-pain-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/><path d="M4 4l16 16"/></svg></span><p>Nobody answers after 6pm, on Sundays, or during lunch.</p></article>
+    <article><span class="pitch-pain-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9.1 9a3 3 0 1 1 5.8 1c-.5 1.4-2.1 2-2.7 3"/><path d="M12 17h.01"/><circle cx="12" cy="12" r="9"/></svg></span><p>The same five questions asked twenty times a day.</p></article>
+    <article><span class="pitch-pain-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6A19.79 19.79 0 0 1 2.12 4.18 2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.12.9.32 1.77.59 2.61a2 2 0 0 1-.45 2.11L8 9.69"/><path d="M14.31 16l1.25-1.25a2 2 0 0 1 2.11-.45c.84.27 1.71.47 2.61.59A2 2 0 0 1 22 16.92Z"/><path d="M3 21 21 3"/></svg></span><p>Callers hang up rather than leave a voicemail.</p></article>
+    <article><span class="pitch-pain-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 3h6l1 2h3v16H5V5h3l1-2Z"/><path d="M9 11h6"/><path d="M9 15h4"/></svg></span><p>No record of who called or what they wanted.</p></article>
+    <article><span class="pitch-pain-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2v20"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7H14a3.5 3.5 0 0 1 0 7H6"/></svg></span><p>A receptionist for one shift costs more than the whole system.</p></article>
+  </div>
+  <p class="pitch-statement">A missed call is not a lead you follow up later. It is a customer
+    who dialled the next number on the list before you noticed they rang.</p>
+</section>
+
+<section class="pitch-section pitch-solution">
+  <div>
+    <p class="section-kicker">The focused fix</p>
+    <h2>A voice that picks up on the first ring.</h2>
+  </div>
+  <div>
+    <p>Pitch answers your business number, greets the caller as your business, understands what
+      they are asking for, answers from your approved knowledge, and captures who called and
+      what they wanted — then texts them the details if they want it.</p>
+    <p class="pitch-statement">AI answers. Your team decides.<br />Prices, commitments, bookings,
+      and anything sensitive stay under human control. Pitch is instructed never to promise
+      what it cannot deliver.</p>
+  </div>
+</section>
+
+<section id="pitch-moments" class="pitch-section pitch-visual-story">
+  <div class="pitch-visual-heading">
+    <p class="section-kicker">Pitch in the moments that matter</p>
+    <h2>Calls answered, details captured, next actions ready.</h2>
+  </div>
+  <article class="pitch-moment pitch-moment-after-hours">
+    <figure class="pitch-moment-media">
+      <img src="/agents/pitch/assets/after-hours-call.png" alt="Pitch answering an after-hours customer call and preparing the next action" loading="lazy" width="1122" height="1402" />
+    </figure>
+    <div class="pitch-moment-copy">
+      <p class="pitch-moment-kicker">After-hours calls</p>
+      <h3>Your office is closed. Pitch is still answering.</h3>
+      <p>Pitch answers customer calls after business hours, captures their information, schedules the next action, and prepares a clear call summary for your team.</p>
+      <ul>
+        <li>New opportunity captured</li>
+        <li>Follow-up scheduled</li>
+        <li>Call outcome recorded</li>
+      </ul>
+    </div>
+  </article>
+  <article class="pitch-moment pitch-moment-organized pitch-moment-reverse">
+    <figure class="pitch-moment-media">
+      <img src="/agents/pitch/assets/every-call-organized-v2.jpg" alt="Pitch organizing caller details, appointments, summaries, and next actions" loading="lazy" width="1536" height="1024" />
+    </figure>
+    <div class="pitch-moment-copy">
+      <p class="pitch-moment-kicker">Every call, organized</p>
+      <h3>From scattered notes to clear next actions.</h3>
+      <p>Pitch automatically captures caller information, bookings, conversation summaries, and follow-up actions, so nothing gets buried or forgotten.</p>
+      <ul>
+        <li>Caller details captured</li>
+        <li>Appointments recorded</li>
+        <li>Call summaries prepared</li>
+        <li>Next actions clearly organized</li>
+      </ul>
+    </div>
+  </article>
+  <article class="pitch-moment pitch-moment-focused">
+    <figure class="pitch-moment-media">
+      <img src="/agents/pitch/assets/stay-focused-customers.png" alt="Pitch answering incoming calls while the business team stays focused on customers" loading="lazy" width="1122" height="1402" />
+    </figure>
+    <div class="pitch-moment-copy">
+      <p class="pitch-moment-kicker">Stay focused on your customers</p>
+      <h3>Keep working while Pitch handles the calls.</h3>
+      <p>Pitch answers incoming calls while you serve customers, complete important work, or manage daily operations. It captures caller details, books appointments, and prepares clear call summaries automatically.</p>
+      <ul>
+        <li>Calls answered automatically</li>
+        <li>Customer details captured</li>
+        <li>Appointments booked</li>
+        <li>Call summaries prepared</li>
+      </ul>
+    </div>
+  </article>
+  <article class="pitch-moment pitch-moment-opportunity pitch-moment-reverse">
+    <figure class="pitch-moment-media">
+      <img src="/agents/pitch/assets/real-opportunity.png" alt="Pitch turning a phone inquiry into caller information, qualification, and next action" loading="lazy" width="1122" height="1402" />
+    </figure>
+    <div class="pitch-moment-copy">
+      <p class="pitch-moment-kicker">Turn every inquiry into a real opportunity</p>
+      <h3>Pitch does more than answer the call.</h3>
+      <p>Pitch captures the caller's information, understands what they need, qualifies the opportunity, and records the best next action for your team.</p>
+      <ul>
+        <li>Caller information captured</li>
+        <li>Customer needs identified</li>
+        <li>Lead qualification recorded</li>
+        <li>Next action scheduled</li>
+      </ul>
+    </div>
+  </article>
+  <article class="pitch-moment pitch-moment-follow-up">
+    <figure class="pitch-moment-media">
+      <img src="/agents/pitch/assets/never-forget-follow-up-v2.jpg" alt="Pitch recording a customer follow-up request, schedule, and next action" loading="lazy" width="1122" height="1402" />
+    </figure>
+    <div class="pitch-moment-copy">
+      <p class="pitch-moment-kicker">Never forget a customer follow-up</p>
+      <h3>Turn every promise into a clear next action.</h3>
+      <p>Pitch records the caller's follow-up request, customer details, agreed schedule, and next action, so your team knows exactly what needs to happen next.</p>
+      <ul>
+        <li>Follow-up consent recorded</li>
+        <li>Customer details captured</li>
+        <li>Date and time scheduled</li>
+        <li>Next action clearly organized</li>
+      </ul>
+    </div>
+  </article>
+  <article class="pitch-moment pitch-moment-next-steps pitch-moment-reverse">
+    <figure class="pitch-moment-media">
+      <img src="/agents/pitch/assets/one-call-next-steps-v2.jpg" alt="Pitch organizing every next step from one customer call" loading="lazy" width="1122" height="1402" />
+    </figure>
+    <div class="pitch-moment-copy">
+      <p class="pitch-moment-kicker">One call, every next step organized</p>
+      <h3>Turn one conversation into a complete workflow.</h3>
+      <p>Pitch answers the call, captures the customer&rsquo;s information, records the inquiry, manages the booking, and prepares a clear call summary for your team.</p>
+      <ul>
+        <li>Call answered</li>
+        <li>Lead information captured</li>
+        <li>Appointment booked</li>
+        <li>Call report prepared</li>
+      </ul>
+    </div>
+  </article>
+  <article class="pitch-moment pitch-moment-routine">
+    <figure class="pitch-moment-media">
+      <img src="/agents/pitch/assets/routine-questions-v2.jpg" alt="Pitch answering routine questions using approved business information" loading="lazy" width="1536" height="1024" />
+    </figure>
+    <div class="pitch-moment-copy">
+      <p class="pitch-moment-kicker">Answer routine questions instantly</p>
+      <h3>Give every caller a clear, consistent answer.</h3>
+      <p>Pitch answers common questions using your approved business information, including prices, availability, services, and business hours. It also records the conversation outcome for your team.</p>
+      <ul>
+        <li>Approved answers provided</li>
+        <li>Business information available</li>
+        <li>Call outcome recorded</li>
+        <li>Repetitive calls handled automatically</li>
+      </ul>
+    </div>
+  </article>
+</section>
+
+<section id="how-it-works" class="pitch-section">
+  <p class="section-kicker">How it works</p>
+  <h2>From a ringing phone to a captured lead.</h2>
+  <div class="pitch-steps">
+    <article><span>1</span><h3>A customer dials your business number, day or night.</h3></article>
+    <article><span>2</span><h3>Pitch answers as your business and hears the caller's language from their first sentence.</h3></article>
+    <article><span>3</span><h3>It answers their question from your approved knowledge, and asks what it still needs.</h3></article>
+    <article><span>4</span><h3>It already has their number from caller ID, so it confirms rather than interrogates.</h3></article>
+    <article><span>5</span><h3>The conversation is logged, and details can be sent to the caller by text.</h3></article>
+  </div>
+</section>
+
+<section id="real-call" class="pitch-section pitch-conversation">
+  <div>
+    <p class="section-kicker">A real call, word for word</p>
+    <h2>It doesn't translate. It just talks the way your customer talks.</h2>
+    <p class="pitch-statement">This is an actual transcript from a live call over a normal
+      cellular line. Nobody selected a language. Nobody configured Taglish. The caller opened in
+      English, drifted into Tagalog mid-sentence, and Pitch followed without comment.</p>
+    <p class="pitch-note">Notice what it does <em>not</em> do: it never asks for the mobile
+      number. It already has it from caller ID.</p>
+  </div>
+  <div class="pitch-chat-card">
+    <p class="pitch-transcript-head">Inbound call · 27 seconds · Taglish</p>
+    <p class="pitch-msg agent"><b>Pitch</b> Magandang araw, Marga Enterprises po. Ano po ang maitutulong ko?</p>
+    <p class="pitch-msg customer"><b>Caller</b> Hi. Kailangan ko kasi book ng hotel, na room.</p>
+    <p class="pitch-msg agent"><b>Pitch</b> Sige, tutulungan kita. Ano pong dates at ilang tao po ang kailangan ninyo para sa room?</p>
+    <p class="pitch-msg status"><b>Captured</b> Caller number from caller ID · intent: room booking · still needed: dates, number of guests · language: Taglish, matched automatically.</p>
+  </div>
+</section>
+
+<section id="features" class="pitch-section pitch-narrow">
+  <p class="section-kicker">What Pitch does today</p>
+  <h2>Honest about what is live now.</h2>
+  <div class="pitch-feature-grid">
+    <article>Answers a real phone number</article>
+    <article>Matches English, Tagalog or Taglish</article>
+    <article>Switches language mid-call</article>
+    <article>Natural interruption — talk over it and it stops</article>
+    <article>Knows the caller's number already</article>
+    <article>Answers from your knowledge base</article>
+    <article>Sends a follow-up text on request</article>
+    <article>Full transcript of every call</article>
+    <article>Available 24 hours, every day</article>
+  </div>
+  <p class="pitch-statement">Coming next: checking live availability, booking appointments, and
+    remembering callers between calls. We will tell you when those ship, not before.</p>
+</section>
+
+<section class="pitch-section pitch-narrow">
+  <p class="section-kicker">Best fit</p>
+  <h2>Built for businesses whose phone rings more than their inbox.</h2>
+  <div class="pitch-industry-cloud">
+    <span>Hotels and resorts</span><span>Clinics and dental offices</span><span>Restaurants</span><span>Copier and printer rental</span><span>Aircon service</span><span>Car repair shops</span><span>Laundry services</span><span>Real estate brokers</span><span>Construction suppliers</span><span>Veterinary clinics</span><span>Water refilling stations</span><span>Funeral services</span>
+  </div>
+</section>
+
+<section id="pricing" class="pitch-section">
+  <p class="section-kicker">Pricing</p>
+  <h2>One-time setup, then you only pay for talk time.</h2>
+  <p class="pitch-statement">All prices include 12% VAT. You pay for minutes your customers
+    actually spend talking — ringing, failed and unanswered calls are never charged.</p>
+
+  <h3 class="pitch-price-head">Getting started</h3>
+  <table class="pitch-price-table">
+    <thead><tr><th>Item</th><th>Price</th><th>What it covers</th></tr></thead>
+    <tbody>
+      <tr><td>Pitch Dedicated Voice Channel Kit</td><td>&#8369;17,999 <em>one-time</em></td><td>Your own dedicated voice channel hardware, shipping, preparation and basic warranty support</td></tr>
+      <tr><td>Standard Pitch Setup</td><td>&#8369;14,999 <em>one-time</em></td><td>Business configuration, knowledge setup, lead capture, reports and testing</td></tr>
+      <tr><td>Starting talk-time credit</td><td>&#8369;999 <em>one-time</em></td><td>100 AI talk minutes to begin with</td></tr>
+      <tr class="pitch-price-total"><td>Total to start</td><td>&#8369;33,997</td><td>Complete standard Pitch deployment</td></tr>
+      <tr><td>Pitch Platform Access</td><td>&#8369;999 <em>/month</em></td><td>Begins after activation</td></tr>
+    </tbody>
+  </table>
+  <p class="pitch-note">You provide the SIM, an eligible unlimited call plan, an internet
+    connection, and any on-site installation you need.</p>
+
+  <h3 class="pitch-price-head">Prepaid talk-time credits</h3>
+  <table class="pitch-price-table pitch-price-credits">
+    <thead><tr><th>Package</th><th>Price</th><th>Effective rate</th></tr></thead>
+    <tbody>
+      <tr><td>100 minutes</td><td>&#8369;999</td><td>&#8369;9.99/min</td></tr>
+      <tr><td>150 minutes</td><td>&#8369;1,499</td><td>&#8369;9.99/min</td></tr>
+      <tr><td>300 minutes</td><td>&#8369;2,499</td><td>&#8369;8.33/min</td></tr>
+      <tr><td>1,000 minutes</td><td>&#8369;7,999</td><td>&#8369;8.00/min</td></tr>
+      <tr><td>1,500 minutes</td><td>&#8369;11,499</td><td>&#8369;7.67/min</td></tr>
+      <tr><td>3,000 minutes</td><td>&#8369;21,999</td><td>&#8369;7.33/min</td></tr>
+      <tr><td>4,000 minutes</td><td>&#8369;27,999</td><td>&#8369;7.00/min</td></tr>
+    </tbody>
+  </table>
+  <p class="pitch-note">Usage is measured by the second. Incoming and outgoing answered calls
+    consume credits.</p>
+
+  <div class="pitch-includes">
+    <div>
+      <h3 class="pitch-price-head">The &#8369;999 monthly platform access includes</h3>
+      <ul>
+        <li>Pitch dashboard</li>
+        <li>Talk-time credit balance and usage</li>
+        <li>Voice channel and connection monitoring</li>
+        <li>Knowledge-base hosting</li>
+        <li>Lead capture and management</li>
+        <li>Call history, summaries and outcomes</li>
+        <li>Follow-up consent and activity records</li>
+        <li>Standard software and security updates</li>
+        <li>Basic remote technical support</li>
+      </ul>
+    </div>
+    <div>
+      <h3 class="pitch-price-head">The &#8369;14,999 setup includes</h3>
+      <ul>
+        <li>One business account and one administrator account</li>
+        <li>Voice channel and SIM line configuration</li>
+        <li>One simultaneous call channel</li>
+        <li>Secure connection to AIStaff</li>
+        <li>One Pitch role, such as receptionist or sales assistant</li>
+        <li>Choice of male or female voice</li>
+        <li>English, Filipino and Taglish support</li>
+        <li>Customised greeting</li>
+        <li>Business hours, holidays and escalation contacts</li>
+        <li>Basic FAQs, services, products, prices and policies</li>
+        <li>Lead capture and categorisation</li>
+        <li>Call summaries and reports</li>
+        <li>Inbound and outbound call testing</li>
+        <li>Administrator orientation</li>
+        <li>Up to 14 days of setup assistance</li>
+      </ul>
+    </div>
+  </div>
+
+  <h3 class="pitch-price-head">Add-ons and custom integrations</h3>
+  <table class="pitch-price-table">
+    <tbody>
+      <tr><td>Additional Pitch role or department</td><td>&#8369;5,000&#8211;&#8369;15,000</td></tr>
+      <tr><td>Standard webhook, Make or n8n workflow</td><td>&#8369;5,000&#8211;&#8369;15,000</td></tr>
+      <tr><td>External CRM integration</td><td>&#8369;15,000&#8211;&#8369;40,000</td></tr>
+      <tr><td>Custom booking system or API</td><td>&#8369;25,000&#8211;&#8369;100,000+</td></tr>
+      <tr><td>Additional voice channel configuration</td><td>&#8369;5,000 plus hardware</td></tr>
+      <tr><td>On-site installation</td><td>Based on location</td></tr>
+      <tr><td>Advanced data migration</td><td>Custom quotation</td></tr>
+    </tbody>
+  </table>
+
+  <h3 class="pitch-price-head">Important terms</h3>
+  <ul class="pitch-terms">
+    <li>All displayed prices include 12% VAT.</li>
+    <li>Hardware, setup, monthly platform access and talk-time credits are separate charges.</li>
+    <li>The customer provides or pays for the SIM, mobile plan and internet.</li>
+    <li>Your telecom plan may offer unlimited eligible calls, but AI talk time is prepaid and is not unlimited.</li>
+    <li>One voice channel supports one simultaneous call unless confirmed otherwise through testing.</li>
+    <li>External integrations depend on the third-party provider's available API.</li>
+    <li>Custom development is quoted separately.</li>
+  </ul>
+
+  <a class="button button-primary glow-button" href="#demo">Book a live demo <span>&#8599;</span></a>
+</section>
+
+<section id="demo" class="pitch-section pitch-audit">
+  <div>
+    <p class="eyebrow bright">Live demo</p>
+    <h2>Let Pitch call you.</h2>
+    <p>Pick a time and we will have Pitch phone you as if you were your own customer. Speak
+      English, Tagalog, or switch mid-sentence and try to catch it out.</p>
+  </div>
+  <form id="pitchDemoForm" class="pitch-demo-form">
+    <input required name="company" placeholder="Company name" />
+    <input required name="person" placeholder="Contact person" />
+    <input required name="mobile" placeholder="Mobile number we should call" />
+    <input required type="email" name="email" placeholder="Email" />
+    <input required name="page" placeholder="Facebook Page or website" />
+    <input name="business" placeholder="Business type" />
+    <input name="inquiries" placeholder="Roughly how many calls per day?" />
+    <textarea name="message" placeholder="What should Pitch be able to answer for your callers?"></textarea>
+    <button class="button button-primary glow-button" type="submit">Request a live demo call</button>
+    <p id="pitchDemoSuccess" class="success-message" hidden>Thank you. We'll be in touch to arrange a time for Pitch to call you.</p>
+  </form>
+</section>
+
+<section id="faq" class="pitch-section pitch-narrow">
+  <p class="section-kicker">FAQ</p>
+  <h2>Questions owners usually ask.</h2>
+  <div class="pitch-faq-list">
+    <details open><summary>Will callers know it is an AI?</summary><p>If they ask, yes — Pitch is instructed to say plainly that it is an AI assistant and never to claim otherwise. Most callers work it out and carry on regardless, because they get an answer instead of a ringing phone.</p></details>
+    <details><summary>Do we have to choose a language?</summary><p>No, and there is no setting for it. Pitch hears how the caller speaks and replies the same way, including switching mid-call. That is deliberate: any language setting would be wrong the moment a caller mixes English and Tagalog, which is most of them.</p></details>
+    <details><summary>Can it book appointments or check availability?</summary><p>Not yet. Today it answers questions, captures who called and what they wanted, and can text them. It is instructed never to confirm a booking or a price as final. Booking and live availability are next on the roadmap.</p></details>
+    <details><summary>How many calls can it take at once?</summary><p>One line handles one caller at a time, exactly like a normal phone. If you expect overlapping calls, we add lines. We would rather tell you this upfront than have your second caller hear a busy tone.</p></details>
+    <details><summary>Do we keep our number?</summary><p>Pitch answers on a dedicated number we provision for you. Your existing line can be forwarded to it, so customers keep dialling the number they already know.</p></details>
+    <details><summary>What happens to the call recordings?</summary><p>Every call produces a transcript you can review. Recording and retention are configured with you, in line with the Data Privacy Act — we will not switch anything on without telling you.</p></details>
+  </div>
+</section>
+
+<section class="pitch-section pitch-final-cta">
+  <h2>Ready to stop missing calls?</h2>
+  <p>Book a live demo. Pitch will call you, and you can try your best to trip it up in three languages.</p>
+  <a class="button button-primary glow-button" href="#demo">Book a live demo <span>↗</span></a>
+</section>
+</main>
+
+<footer class="site-footer">
+  <b>AIStaff.click</b>
+  <span>Pitch — AI Voice Agent</span>
+  <span>support@aistaff.click</span>
+  <a href="/about/">About Us</a>
+  <a href="/contact/">Contact Us</a>
+  <a href="/pricing/">Pricing</a>
+  <a href="/privacy">Privacy Policy</a>
+  <a href="/terms">Terms</a>
+  <a href="/refund-policy/">Refund Policy</a>
+  <a href="/support/">Support</a>
+</footer>
+<style>
+  html { overflow-x: hidden; }
+  .pitch-page { overflow-x: hidden !important; overflow-y: visible !important; }
+  .pitch-hero { padding: clamp(120px,16vh,170px) clamp(20px,8vw,130px) clamp(60px,9vh,100px); }
+  .pitch-hero h1 { margin: 22px 0; color: #fff; font: 600 clamp(44px,6.5vw,84px)/1.02 "Space Grotesk"; letter-spacing: -.05em; max-width: 960px; }
+  .pitch-hero h1 em { color: var(--ice); font-style: normal; font-weight: 400; }
+  .pitch-hero .hero-sub { max-width: 640px; color: rgba(232,244,255,.72); font: 17px/1.6 "Manrope"; margin: 0 0 26px; }
+  .pitch-trust { max-width: 600px; margin-top: 22px; color: #86a3b7; font: 600 15px/1.6 "Manrope"; }
+  .pitch-section { width: min(1180px, calc(100% - 40px)); margin: 0 auto; padding: 70px 0; }
+  .pitch-narrow { width: min(920px, calc(100% - 40px)); }
+  .pitch-section h2 { color: #f4f8ff; font: 500 clamp(30px,4vw,52px)/1.08 "Space Grotesk"; letter-spacing: -.03em; margin: 16px 0 30px; max-width: 780px; }
+  .pitch-statement { color: #d9f1ff; font: 600 17px/1.6 "Manrope"; max-width: 640px; }
+  .pitch-note { color: #86a3b7; font: 15px/1.6 "Manrope"; max-width: 600px; }
+  .pitch-note em { color: #9edfff; font-style: normal; }
+</style>
+<style>
+  .pitch-pain-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 12px; }
+  .pitch-pain-grid article {
+    display: grid;
+    gap: 14px;
+    min-height: 128px;
+    margin: 0;
+    padding: 20px;
+    border: 1px solid rgba(117,161,188,.18);
+    border-radius: 4px;
+    background: linear-gradient(145deg,rgba(19,39,54,.6),rgba(5,13,21,.85));
+    box-shadow: inset 0 1px 0 rgba(173,232,255,.06);
+    transition: border-color .25s ease, transform .25s ease, box-shadow .25s ease;
+  }
+  .pitch-pain-grid article:hover {
+    transform: translateY(-3px);
+    border-color: rgba(72,193,255,.42);
+    box-shadow: 0 14px 42px rgba(7,114,177,.13), inset 0 1px 0 rgba(173,232,255,.1);
+  }
+  .pitch-pain-grid p {
+    margin: 0;
+    color: #a5c3d6;
+    font: 700 15px/1.48 "Manrope";
+  }
+  .pitch-pain-icon {
+    width: 36px;
+    height: 36px;
+    display: grid;
+    place-items: center;
+    border: 1px solid rgba(91,190,241,.34);
+    border-radius: 50%;
+    color: #9edfff;
+    background: rgba(36,169,255,.08);
+    box-shadow: 0 0 24px rgba(36,169,255,.14);
+  }
+  .pitch-pain-icon svg {
+    width: 18px;
+    height: 18px;
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 1.8;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+  .pitch-solution { display: grid; grid-template-columns: .9fr 1.1fr; gap: 40px; align-items: start; }
+  .pitch-solution p { color: #86a3b7; font: 16px/1.65 "Manrope"; }
+  .pitch-steps { display: grid; grid-template-columns: repeat(5,1fr); gap: 12px; }
+  .pitch-steps article { padding: 22px; min-height: 170px; border: 1px solid rgba(117,161,188,.18); border-radius: 4px; background: linear-gradient(145deg,rgba(19,39,54,.6),rgba(5,13,21,.85)); }
+  .pitch-steps span { width: 30px; height: 30px; display: grid; place-items: center; margin-bottom: 18px; border-radius: 50%; border: 1px solid rgba(91,190,241,.3); color: var(--cyan); font: 700 13px "Space Grotesk"; box-shadow: 0 0 20px rgba(36,169,255,.12); }
+  .pitch-steps h3 { margin: 0; color: #d9f1ff; font: 500 15px/1.4 "Manrope"; }
+  .pitch-feature-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 12px; margin-bottom: 28px; }
+  .pitch-feature-grid article { min-height: 80px; padding: 18px; display: grid; align-items: end; border: 1px solid rgba(117,161,188,.18); border-radius: 4px; background: rgba(11,25,36,.5); color: #d9f1ff; font: 600 14px "Manrope"; }
+  .pitch-visual-story { width: min(1240px, calc(100% - 40px)); padding-top: 46px; }
+  .pitch-visual-heading { max-width: 720px; margin-bottom: 44px; }
+  .pitch-moment {
+    display: grid;
+    grid-template-columns: minmax(0, .96fr) minmax(340px, .74fr);
+    gap: clamp(28px, 5vw, 72px);
+    align-items: center;
+    min-height: min(760px, 92vh);
+    padding: clamp(34px, 5vw, 66px) 0;
+  }
+  .pitch-moment-reverse { grid-template-columns: minmax(340px, .74fr) minmax(0, .96fr); }
+  .pitch-moment-reverse .pitch-moment-media { order: 2; }
+  .pitch-moment-reverse .pitch-moment-copy { order: 1; }
+  .pitch-moment-media {
+    position: relative;
+    margin: 0;
+    overflow: hidden;
+    border: 1px solid rgba(117, 204, 255, .2);
+    border-radius: 6px;
+    background: linear-gradient(160deg, rgba(19, 39, 54, .45), rgba(3, 8, 16, .82));
+    box-shadow: 0 22px 90px rgba(7, 114, 177, .14), 0 0 0 1px rgba(93, 208, 255, .04);
+    aspect-ratio: 4 / 5;
+    opacity: 0;
+    transform: translate3d(-42px, 26px, 0) scale(.96);
+  }
+  .pitch-moment-reverse .pitch-moment-media { transform: translate3d(42px, 26px, 0) scale(.96); }
+  .pitch-moment-organized .pitch-moment-media,
+  .pitch-moment-routine .pitch-moment-media { aspect-ratio: 3 / 2; }
+  .pitch-moment-media::after {
+    position: absolute;
+    inset: 0;
+    content: "";
+    background: linear-gradient(115deg, transparent 18%, rgba(102, 210, 255, .11) 46%, transparent 72%);
+    transform: translateX(-115%);
+    pointer-events: none;
+  }
+  .pitch-moment-media img {
+    width: 100%;
+    height: 100%;
+    display: block;
+    object-fit: cover;
+  }
+  .pitch-moment-copy {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    max-width: 460px;
+    opacity: 0;
+    transform: translate3d(38px, 22px, 0);
+  }
+  .pitch-moment-reverse .pitch-moment-copy { transform: translate3d(-38px, 22px, 0); }
+  .pitch-moment-kicker {
+    margin: 0;
+    color: var(--cyan);
+    font: 500 12px "DM Mono";
+    letter-spacing: .16em;
+    text-transform: uppercase;
+  }
+  .pitch-moment-copy h3 {
+    margin: 0;
+    color: #f4f8ff;
+    font: 500 clamp(30px, 4vw, 50px)/1.05 "Space Grotesk";
+    letter-spacing: -.03em;
+  }
+  .pitch-moment-copy p:not(.pitch-moment-kicker) {
+    margin: 0;
+    color: #91acbd;
+    font: 17px/1.65 "Manrope";
+  }
+  .pitch-moment-copy ul {
+    display: grid;
+    gap: 10px;
+    margin: 8px 0 0;
+    padding: 0;
+    list-style: none;
+  }
+  .pitch-moment-copy li {
+    position: relative;
+    padding-left: 22px;
+    color: #d9f1ff;
+    font: 600 14px/1.45 "Manrope";
+  }
+  .pitch-moment-copy li::before {
+    position: absolute;
+    left: 0;
+    top: .62em;
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    content: "";
+    background: #5dd0ff;
+    box-shadow: 0 0 12px rgba(93, 208, 255, .8);
+  }
+  .pitch-moment.is-visible .pitch-moment-media,
+  .pitch-moment.is-visible .pitch-moment-copy {
+    opacity: 1;
+    transform: translate3d(0, 0, 0) scale(1);
+    transition: opacity .8s ease, transform .9s cubic-bezier(.2,.8,.2,1);
+  }
+  .pitch-moment.is-visible .pitch-moment-copy { transition-delay: .16s; }
+  .pitch-moment.is-visible .pitch-moment-media::after { animation: pitchMomentScan 1.1s .38s ease-out both; }
+  @keyframes pitchMomentScan { to { transform: translateX(115%); } }
+</style>
+<style>
+  .pitch-conversation { display: grid; grid-template-columns: .74fr 1.26fr; gap: 32px; align-items: start; }
+  .pitch-chat-card { padding: 24px; display: grid; gap: 12px; border: 1px solid rgba(117,161,188,.18); border-radius: 4px; background: linear-gradient(145deg,rgba(19,39,54,.7),rgba(5,13,21,.92)); }
+  .pitch-transcript-head { margin: 0 0 4px; color: #7fb4cf; font: 500 12px "DM Mono"; text-transform: uppercase; letter-spacing: .14em; }
+  .pitch-msg { width: fit-content; max-width: 84%; margin: 0; padding: 12px 14px; border-radius: 8px; line-height: 1.55; font: 15px "Manrope"; color: #d9f1ff; }
+  .pitch-msg b { display: block; margin-bottom: 4px; color: #9edfff; font-size: 12px; text-transform: uppercase; letter-spacing: .06em; }
+  .pitch-msg.customer { margin-left: auto; background: rgba(36,169,255,.1); border: 1px solid rgba(72,193,255,.2); }
+  .pitch-msg.agent { background: rgba(11,25,36,.7); border: 1px solid rgba(117,161,188,.18); }
+  .pitch-msg.status { max-width: 100%; background: rgba(93,208,255,.08); border: 1px solid rgba(93,208,255,.25); color: #9fe5ff; font-size: 13px; }
+  .pitch-industry-cloud { display: flex; gap: 10px; flex-wrap: wrap; }
+  .pitch-industry-cloud span { padding: 10px 14px; border: 1px solid rgba(117,161,188,.25); border-radius: 999px; background: rgba(11,25,36,.5); color: #9edfff; font: 600 13px "DM Mono"; }
+</style>
+<style>
+  .pitch-audit { display: grid; grid-template-columns: .7fr 1.3fr; gap: 40px; align-items: start; }
+  .pitch-audit p { color: #86a3b7; font: 16px/1.65 "Manrope"; }
+  .pitch-demo-form { display: grid; grid-template-columns: repeat(2,1fr); gap: 12px; padding: 24px; border: 1px solid rgba(117,161,188,.25); border-radius: 4px; background: rgba(11,25,36,.76); }
+  .pitch-demo-form textarea, .pitch-demo-form button, .pitch-demo-form .success-message { grid-column: 1 / -1; }
+  .pitch-demo-form input, .pitch-demo-form textarea { width: 100%; min-height: 44px; padding: 10px 12px; border-radius: 0; border: 1px solid rgba(117,161,188,.25); background: rgba(4,13,21,.8); color: #d9f1ff; outline: none; font: 14px "Manrope"; }
+  .pitch-demo-form input::placeholder, .pitch-demo-form textarea::placeholder { color: #587789; }
+  .pitch-demo-form input:focus, .pitch-demo-form textarea:focus { border-color: #39baff; box-shadow: 0 0 0 2px rgba(36,169,255,.14); }
+  .pitch-demo-form input:-webkit-autofill,
+  .pitch-demo-form input:-webkit-autofill:hover,
+  .pitch-demo-form input:-webkit-autofill:focus {
+    -webkit-text-fill-color: #d9f1ff;
+    caret-color: #d9f1ff;
+    -webkit-box-shadow: 0 0 0 1000px rgba(4,13,21,.95) inset;
+    border-color: rgba(117,161,188,.25);
+    transition: background-color 9999s ease-in-out 0s, color 9999s ease-in-out 0s;
+  }
+  .pitch-demo-form textarea { min-height: 90px; resize: vertical; }
+  .pitch-demo-form .success-message { background: rgba(41,145,184,.18); color: #9fe5ff; border: 1px solid rgba(75,193,244,.35); padding: 12px; border-radius: 4px; }
+  .pitch-price-head { color: #d9f1ff; font: 500 20px/1.3 "Space Grotesk"; letter-spacing: -.01em; margin: 40px 0 16px; }
+  .pitch-price-table { width: 100%; border-collapse: collapse; margin-bottom: 12px; border: 1px solid rgba(117,161,188,.18); background: rgba(11,25,36,.5); }
+  .pitch-price-table th { padding: 14px 16px; text-align: left; color: #7fb4cf; font: 500 11px "DM Mono"; text-transform: uppercase; letter-spacing: .14em; border-bottom: 1px solid rgba(117,161,188,.18); }
+  .pitch-price-table td { padding: 14px 16px; color: #a5c3d6; font: 15px/1.5 "Manrope"; border-bottom: 1px solid rgba(117,161,188,.1); vertical-align: top; }
+  .pitch-price-table td:nth-child(2) { color: #f4f8ff; font-weight: 700; white-space: nowrap; }
+  .pitch-price-table td em { color: #86a3b7; font-style: normal; font-weight: 500; font-size: 13px; }
+  .pitch-price-table tr:last-child td { border-bottom: none; }
+  .pitch-price-total td { background: rgba(93,208,255,.07); color: #9fe5ff !important; font-weight: 700; }
+  .pitch-price-credits td:nth-child(3) { color: #9edfff; font: 600 14px "DM Mono"; white-space: nowrap; }
+  .pitch-includes { display: grid; grid-template-columns: 1fr 1fr; gap: 32px; align-items: start; }
+  .pitch-includes ul, .pitch-terms { margin: 0; padding-left: 20px; display: grid; gap: 8px; }
+  .pitch-includes li, .pitch-terms li { color: #86a3b7; font: 15px/1.5 "Manrope"; }
+  .pitch-terms { margin-bottom: 32px; }
+  .pitch-faq-list { display: grid; gap: 10px; }
+  .pitch-faq-list details { padding: 18px 20px; border: 1px solid rgba(117,161,188,.18); border-radius: 4px; background: rgba(11,25,36,.5); }
+  .pitch-faq-list summary { cursor: pointer; color: #f4f8ff; font: 700 15px "Manrope"; }
+  .pitch-faq-list p { margin: 10px 0 0; color: #86a3b7; font: 15px/1.6 "Manrope"; }
+  .pitch-final-cta { text-align: center; padding: 100px 0 140px; }
+  .pitch-final-cta p { max-width: 560px; margin: 0 auto 26px; color: #86a3b7; font: 16px/1.6 "Manrope"; }
+</style>
+<style>
+  @media (max-width: 1000px) {
+    .pitch-pain-grid, .pitch-feature-grid { grid-template-columns: repeat(2,1fr); }
+    .pitch-steps { grid-template-columns: repeat(2,1fr); }
+    .pitch-solution, .pitch-conversation, .pitch-audit { grid-template-columns: 1fr; gap: 20px; }
+    .pitch-moment,
+    .pitch-moment-reverse {
+      grid-template-columns: 1fr;
+      min-height: 0;
+      gap: 24px;
+      padding: 44px 0;
+    }
+    .pitch-moment-reverse .pitch-moment-media,
+    .pitch-moment-reverse .pitch-moment-copy { order: initial; }
+    .pitch-moment-media,
+    .pitch-moment-organized .pitch-moment-media,
+    .pitch-moment-routine .pitch-moment-media {
+      width: min(560px, 100%);
+      margin: 0 auto;
+      aspect-ratio: 4 / 5;
+    }
+    .pitch-moment-copy {
+      max-width: 640px;
+      margin: 0 auto;
+    }
+    .pitch-demo-form { grid-template-columns: 1fr; }
+    .pitch-includes { grid-template-columns: 1fr; gap: 8px; }
+    .pitch-price-table td, .pitch-price-table th { padding: 11px 12px; font-size: 14px; }
+  }
+  @media (max-width: 600px) {
+    .pitch-pain-grid, .pitch-feature-grid, .pitch-steps { grid-template-columns: 1fr; }
+    .site-nav { display: none; }
+    .pitch-visual-story { width: min(100% - 28px, 1240px); }
+    .pitch-moment-copy h3 { font-size: 34px; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .pitch-moment-media,
+    .pitch-moment-reverse .pitch-moment-media,
+    .pitch-moment-copy,
+    .pitch-moment-reverse .pitch-moment-copy {
+      opacity: 1;
+      transform: none;
+      transition: none;
+    }
+    .pitch-moment-media::after { display: none; }
+  }
+</style>
+
+<script src="https://cdn.jsdelivr.net/npm/motion@11/dist/motion.js"></script>
+<script type="module">
+  const pitchMoments = [...document.querySelectorAll('.pitch-moment')];
+  const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  if (pitchMoments.length) {
+    if (typeof window.Motion !== 'undefined' && !reducedMotion) {
+      pitchMoments.forEach((moment) => {
+        const media = moment.querySelector('.pitch-moment-media');
+        const copy = moment.querySelector('.pitch-moment-copy');
+        const reverse = moment.classList.contains('pitch-moment-reverse');
+        const mediaStartX = reverse ? 42 : -42;
+        const copyStartX = reverse ? -38 : 38;
+        const reset = () => {
+          moment.classList.remove('is-visible');
+          if (media) {
+            media.style.opacity = 0;
+            media.style.transform = `translate3d(${mediaStartX}px, 26px, 0) scale(.96)`;
+          }
+          if (copy) {
+            copy.style.opacity = 0;
+            copy.style.transform = `translate3d(${copyStartX}px, 22px, 0)`;
+          }
+        };
+        reset();
+        window.Motion.inView(moment, () => {
+          moment.classList.add('is-visible');
+          window.Motion.animate(media, { opacity: [0, 1], x: [mediaStartX, 0], y: [26, 0], scale: [.96, 1] }, { duration: .85, easing: [.2, .8, .2, 1] });
+          window.Motion.animate(copy, { opacity: [0, 1], x: [copyStartX, 0], y: [22, 0] }, { delay: .16, duration: .8, easing: [.2, .8, .2, 1] });
+          return reset;
+        }, { margin: '-16% 0px -16% 0px' });
+      });
+    } else if ('IntersectionObserver' in window) {
+      const observer = new IntersectionObserver((entries) => {
+        entries.forEach((entry) => entry.target.classList.toggle('is-visible', entry.isIntersecting));
+      }, { rootMargin: '-12% 0px -12% 0px', threshold: .18 });
+      pitchMoments.forEach((moment) => observer.observe(moment));
+    } else {
+      pitchMoments.forEach((moment) => moment.classList.add('is-visible'));
+    }
+  }
+
+  const form = document.getElementById('pitchDemoForm');
+  form.addEventListener('submit', async (event) => {
+    event.preventDefault();
+    const data = Object.fromEntries(new FormData(event.currentTarget));
+    try {
+      const res = await fetch('/api/public/audit-request', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          company: data.company, person: data.person, mobile: data.mobile,
+          email: data.email, page: data.page, business: data.business || null,
+          inquiries: data.inquiries || null, quotations: null,
+          message: `[PITCH DEMO REQUEST] ${data.message || ''}`.trim()
+        })
+      });
+      if (!res.ok) throw new Error('Could not submit demo request');
+      document.getElementById('pitchDemoSuccess').hidden = false;
+      form.reset();
+    } catch (err) {
+      alert(err.message || 'Could not submit demo request');
+    }
+  });
+</script>
+</body>
+</html>

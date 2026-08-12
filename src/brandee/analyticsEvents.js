@@ -91,6 +91,8 @@ const ALLOWED_EVENTS = new Set([
   ,"image_analysis_completed"
   ,"image_analysis_failed"
   ,"suggestion_applied"
+  ,"aspect_ratio_selected"
+  ,"final_download_clicked"
 ]);
 
 // Only these keys are ever allowed onto an event, and every value is

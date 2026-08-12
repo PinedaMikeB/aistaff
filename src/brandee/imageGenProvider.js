@@ -17,6 +17,7 @@
 // "show a fabricated image."
 
 const { getImageGenConfig } = require("./modelConfig");
+const { snapToProviderGrid } = require("./adAspectRatios");
 
 const fetchImpl = (...args) => import("node-fetch").then(({ default: f }) => f(...args));
 // Measured directly against the live API: a real product-photo edit (not
@@ -78,7 +79,13 @@ async function generatePreviewImage({ prompt, productImageDataUrl, width = 1024,
     form.append("model", config.model);
     form.append("prompt", prompt.slice(0, 4000));
     form.append("image", new BlobImpl([productBuffer], { type: "image/png" }), "product.png");
-    form.append("size", `${width}x${height}` === "1024x1280" ? "1024x1536" : "1024x1024");
+    // gpt-image-2 accepts any size whose width AND height are divisible by
+    // 16, so the requested ad ratio is passed through exactly rather than
+    // substituted. (This previously forced every 4:5 request to 2:3, and
+    // the SVG wrapper then cropped 16.7% off the top and bottom to hide
+    // the mismatch — losing CTA buttons and headlines.)
+    const size = snapToProviderGrid(width, height);
+    form.append("size", `${size.width}x${size.height}`);
     form.append("n", "1");
 
     const response = await withTimeout(fetchImpl("https://api.openai.com/v1/images/edits", {
@@ -107,7 +114,7 @@ async function generatePreviewImage({ prompt, productImageDataUrl, width = 1024,
  * image, not the original template/product, so unrelated composition is
  * naturally preserved by the underlying image-edit call.
  */
-async function editPreviewImage({ prompt, currentPreviewDataUrl, width = 1024, height = 1280 }) {
+async function editPreviewImage({ prompt, currentPreviewDataUrl, referenceImageDataUrl = null, width = 1280, height = 1600 }) {
   const config = getImageGenConfig();
   const availability = probeImageProviderAvailability();
   if (!availability.available) return { ok: false, reason: availability.reason };
@@ -124,7 +131,18 @@ async function editPreviewImage({ prompt, currentPreviewDataUrl, width = 1024, h
     form.append("model", config.model);
     form.append("prompt", prompt.slice(0, 4000));
     form.append("image", new BlobImpl([currentBuffer], { type: "image/png" }), "current-preview.png");
-    form.append("size", "1024x1536");
+    // Optional second reference the customer attached with their revision
+    // ("match this color scheme", "use this logo"). The current preview
+    // stays FIRST so it remains the primary reference and the edit keeps
+    // the existing composition rather than redrawing toward the new image.
+    if (referenceImageDataUrl) {
+      const referenceBuffer = dataUrlToBuffer(referenceImageDataUrl);
+      if (referenceBuffer) {
+        form.append("image", new BlobImpl([referenceBuffer], { type: "image/png" }), "reference.png");
+      }
+    }
+    const size = snapToProviderGrid(width, height);
+    form.append("size", `${size.width}x${size.height}`);
     form.append("n", "1");
 
     const response = await withTimeout(fetchImpl("https://api.openai.com/v1/images/edits", {

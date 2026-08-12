@@ -1,5 +1,7 @@
 node_modules
 .env
+.env.*
+!.env.example
 .DS_Store
 dist
 coverage
@@ -23,3 +25,13 @@ data/.admin-write-probe
 # committed). Keeping the raw originals out of git avoids bloating the repo
 # with ~38MB of source photos that have no runtime purpose.
 /Assets/
+
+# AIO100 gateway config snapshots (Dinstar proprietary binary) and the vendor
+# manual. Kept on disk in backups/aio100/ as restore points, but deliberately
+# NOT committed: they are opaque blobs git cannot diff, they encode the SIP
+# and network setup, and the manual is 6.3MB of vendor PDF.
+# If the gateway config is ever lost, restore from backups/aio100/ — and keep
+# a copy off this machine, since git is no longer the safety net for them.
+*.bin
+backups/
+AIO100-1V-User-Manual.pdf

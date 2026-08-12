@@ -60,6 +60,10 @@ const SharedProductFormSchema = z.object({
 
 const ImageAdRequestSchema = SharedProductFormSchema.extend({
   templateId: z.string().min(1),
+  // Customer-chosen ad shape. Decided BEFORE generation because it sets
+  // the actual pixel size sent to the image model and changes the layout
+  // the art director composes (see adAspectRatios.js).
+  aspectRatio: z.enum(["4:5", "1:1", "9:16"]).optional().default("4:5"),
   templateFields: z.record(z.string(), z.any()).default({})
 });
 

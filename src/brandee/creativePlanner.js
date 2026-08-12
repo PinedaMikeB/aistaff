@@ -16,6 +16,7 @@
 
 const { z } = require("zod");
 const { getImageCreativePlanningConfig, isReasoningModel } = require("./modelConfig");
+const { getAspectRatio, DEFAULT_ASPECT_RATIO } = require("./adAspectRatios");
 
 const fetchImpl = (...args) => import("node-fetch").then(({ default: f }) => f(...args));
 // See productAnalysisService.js's identical comment — GPT-5.6-family
@@ -328,12 +329,16 @@ const ImagePromptSchema = z.object({
   }).optional().default({})
 });
 
-function buildImagePromptComposerPrompt({ artDirection, form, template, templateFields }) {
+function buildImagePromptComposerPrompt({ artDirection, form, template, templateFields, ratio }) {
+  const shape = ratio.id === "1:1" ? "square" : ratio.id === "9:16" ? "tall full-screen vertical" : "vertical";
   return [
     "You are Brandee's art director. Produce ONE final image-generation prompt for an image model.",
     "",
     "ART DIRECTION (the layout and visual style you must follow — do not change the structure):",
     artDirection,
+    "",
+    `CANVAS: ${ratio.id} ${shape}, ${ratio.width}x${ratio.height} pixels. Adapt the layout above to this shape — the art direction may describe a different default proportion, and the canvas wins. On a square canvas, tighten vertical stacking and reduce the number of stacked rows rather than shrinking the text. On a tall vertical canvas, spread the composition over the full height.`,
+    ratio.safeZoneNote ? `SAFE ZONES: ${ratio.safeZoneNote} Keep ALL text, logos and the call-to-action inside the middle band of the canvas, clear of those areas.` : null,
     "",
     `CUSTOMER FACTS (the only source of any words that may appear in the ad): ${JSON.stringify({
       productName: form.productName || null,
@@ -354,7 +359,7 @@ function buildImagePromptComposerPrompt({ artDirection, form, template, template
     "6. The reference photo supplied alongside this prompt is the real product/subject — instruct that it be kept exactly as-is, never redrawn or replaced.",
     "",
     'Return a single JSON object: { "prompt": "<the complete final image-generation prompt>", "visibleText": { "headline": string|null, "cta": string|null, "lines": [string] } }'
-  ].join("\n");
+  ].filter(Boolean).join("\n");
 }
 
 /**
@@ -365,14 +370,15 @@ function buildImagePromptComposerPrompt({ artDirection, form, template, template
  * permission to generate from the art direction alone (which would produce
  * an ad with placeholder/invented text).
  */
-async function composeImagePrompt({ form, template, templateFields = {} }) {
+async function composeImagePrompt({ form, template, templateFields = {}, aspectRatio = DEFAULT_ASPECT_RATIO }) {
   const artDirection = template?.imageGenPrompt || null;
   if (!artDirection) return { prompt: null, visibleText: null, aiUsed: false, reason: "no_art_direction" };
+  const ratio = getAspectRatio(aspectRatio);
   try {
-    const raw = await callPlanningModel(buildImagePromptComposerPrompt({ artDirection, form, template, templateFields }));
+    const raw = await callPlanningModel(buildImagePromptComposerPrompt({ artDirection, form, template, templateFields, ratio }));
     const validated = ImagePromptSchema.safeParse(raw);
     if (!validated.success) return { prompt: null, visibleText: null, aiUsed: false, reason: "invalid_composer_response" };
-    return { prompt: validated.data.prompt, visibleText: validated.data.visibleText || null, aiUsed: true };
+    return { prompt: validated.data.prompt, visibleText: validated.data.visibleText || null, aiUsed: true, ratio };
   } catch (error) {
     return { prompt: null, visibleText: null, aiUsed: false, reason: "composer_error", detail: error.message };
   }
