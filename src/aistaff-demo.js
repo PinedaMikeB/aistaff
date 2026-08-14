@@ -54,17 +54,9 @@ const OFF_TOPIC_PATTERNS = [
   /\b(who won|score|game last night)\b/i
 ];
 
-const MINIMUM_OFFER = {
-  name: "Basic AI Inbox Sales Assistant",
-  price: "₱15,000 setup + ₱3,000/month",
-  channel: "Facebook Messenger chat only — no voice calls",
-  includes: [
-    "Chat-only AI replies on Facebook Messenger (no voice calls)",
-    "Reviews your public Facebook Page and website to understand products and services",
-    "Qualifies Messenger inquiries in real time",
-    "Prepares quotation drafts and asks for email only when missing"
-  ]
-};
+// Pricing is DERIVED from payments.js (the thing that actually bills).
+// Do not reintroduce literal prices here — see src/closer-pricing.js.
+const { MINIMUM_OFFER, OFFICIAL_PACKAGES, PLAN_PRICE_PATTERN } = require("./closer-pricing");
 
 function chatOnlyNotice(isTagalog = false) {
   return isTagalog
@@ -97,38 +89,9 @@ const OFFICIAL_SERVICE_PROMISE = [
   "Prepare quotation drafts for admin approval before sending"
 ].join("; ");
 
-const OFFICIAL_PACKAGES = {
-  starter: {
-    price: "₱15,000 setup + ₱3,000/month",
-    bestFor: "moderate Messenger inquiry volume",
-    includes: [
-      "Instant AI replies on Facebook Messenger",
-      "Lead capture in your dashboard",
-      "Qualification questions for your business",
-      "Quotation drafts with admin approval before sending"
-    ]
-  },
-  growth: {
-    price: "₱25,000 setup + ₱6,000/month",
-    bestFor: "higher inquiry volume with more customized qualification flow",
-    includes: [
-      "Everything in Starter",
-      "Higher inquiry volume capacity",
-      "More customized qualification questions",
-      "Managed onboarding support"
-    ]
-  },
-  pro: {
-    price: "₱50,000 setup + ₱12,000/month",
-    bestFor: "high inquiry volume with full managed setup",
-    includes: [
-      "Everything in Growth",
-      "Highest inquiry volume capacity",
-      "Full managed onboarding and tuning",
-      "Priority onboarding support from our team"
-    ]
-  }
-};
+// OFFICIAL_PACKAGES now comes from closer-pricing.js (derived from payments.js).
+// Note the plan slugs are starter / growth / SCALE — the old third key was
+// "pro", which was never a real plan name.
 
 const FORBIDDEN_PLAN_CLAIMS = [
   /multi-?agent/i,
@@ -936,6 +899,12 @@ async function handleStartFresh(psid, messageText) {
 
 function getAistaffSession(psid) {
   const session = aistaffSessions.get(psid) || {
+    // Real messages to the AIStaff Page default to Closer answering AS
+    // AIStaff (its own knowledge base). This flag opts a conversation INTO
+    // the "preview Closer for MY OWN business" roleplay demo instead — set
+    // only by an explicit ref=demo entry link or a demo postback, never by
+    // default. See messenger-webhook.js wantsDemoFlow().
+    explicitDemoMode: false,
     seenIntro: false,
     customerName: "",
     companyName: "",
@@ -1738,8 +1707,8 @@ function pricingGateReply(session, isTagalog = false) {
     ? "Ang packages namin ay managed setup para sa AI Messenger sales assistant — instant reply, lead capture, qualification, at quotation drafts na ia-approve ng admin."
     : "Our packages are managed setup for an AI Messenger sales assistant — instant replies, lead capture, qualification, and admin-approved quotation drafts.";
   const range = isTagalog
-    ? "Nagsisimula ang packages around ₱15,000 setup + ₱3,000/month depende sa inquiry volume."
-    : "Packages start around ₱15,000 setup + ₱3,000/month depending on inquiry volume.";
+    ? `Nagsisimula ang packages sa ${MINIMUM_OFFER.price} depende sa inquiry volume.`
+    : `Packages start at ${MINIMUM_OFFER.price} depending on inquiry volume.`;
   const question = isTagalog
     ? "Pahingi muna ng contact person, mobile number, at email para ma-send ko ang exact package fit?"
     : "May I get contact person, mobile number, and email so I can send the exact package fit?";
@@ -1779,14 +1748,14 @@ function sanitizeAistaffReply(reply, session, context = {}) {
   }
 
   if (stripForbiddenPlanClaims(text) === null) {
-    if (/starter|growth|pro|difference|compare|plan/i.test(context.customerMessage || "")) {
+    if (/starter|growth|scale|pro|difference|compare|plan/i.test(context.customerMessage || "")) {
       text = buildPlanCompareReply(session, "starter", "growth", isTagalog);
     } else {
       text = buildOfficialPricingReply(session, isTagalog);
     }
   }
 
-  if (!hasEmail(session) && /₱15,000|₱25,000|₱50,000|PHP 15,000|PHP 25,000|PHP 50,000|15,000 setup|25,000 setup|50,000 setup/i.test(text)) {
+  if (!hasEmail(session) && PLAN_PRICE_PATTERN.test(text)) {
     text = isTagalog
       ? `${MINIMUM_OFFER.name} ay nagsisimula sa ${MINIMUM_OFFER.price}. Ano po ang email ninyo para ma-send ang quotation?`
       : `${MINIMUM_OFFER.name} starts at ${MINIMUM_OFFER.price}. What email should we use to send your quotation?`;
@@ -1913,8 +1882,8 @@ function nextQualificationPrompt(session, isTagalog = false) {
   }
   if (!hasPageDetails(session)) {
     const prefix = isTagalog
-      ? "Ang Basic AI Inbox Sales Assistant ay sumasagot sa Messenger, nagq-qualify ng leads, at naghahanda ng quotation drafts."
-      : "The Basic AI Inbox Sales Assistant replies on Messenger, qualifies leads, and prepares quotation drafts.";
+      ? `Ang ${MINIMUM_OFFER.name} ay sumasagot sa Messenger, nagq-qualify ng leads, at naghahanda ng quotation drafts.`
+      : `The ${MINIMUM_OFFER.name} replies on Messenger, qualifies leads, and prepares quotation drafts.`;
     return `${prefix} ${nextQualificationQuestionOnly(session, isTagalog)}`;
   }
   if (!hasWebsiteAnswered(session)) {
@@ -2732,7 +2701,7 @@ function buildAistaffTools() {
       inquiryTopics: optionalString,
       sendsQuotations: optionalString
     }),
-    tool("offer_quotation", "Present the Basic AI Inbox Sales Assistant quotation", {}),
+    tool("offer_quotation", `Present the ${MINIMUM_OFFER.name} quotation`, {}),
     tool("confirm_quotation_email", "Customer agreed to email the quotation", {})
   ];
 }
@@ -3752,11 +3721,12 @@ async function generateAistaffRuleBasedReply(messageText, psid, session) {
     return finalizeAistaffReply(reply, session, messageText);
   }
 
-  if (/starter|growth|pro|difference|compare|plan/i.test(lower)) {
+  if (/starter|growth|scale|pro|difference|compare|plan/i.test(lower)) {
     if (/starter.*growth|growth.*starter|difference|compare/i.test(lower)) {
       reply = buildPlanCompareReply(session, "starter", "growth", isTagalog);
-    } else if (/growth.*pro|pro.*growth/i.test(lower)) {
-      reply = buildPlanCompareReply(session, "growth", "pro", isTagalog);
+    } else if (/growth.*(pro|scale)|(pro|scale).*growth/i.test(lower)) {
+      // "pro" kept as an input synonym only — the real third plan is Scale.
+      reply = buildPlanCompareReply(session, "growth", "scale", isTagalog);
     } else {
       reply = buildOfficialPricingReply(session, isTagalog);
     }

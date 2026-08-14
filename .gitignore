@@ -35,3 +35,5 @@ data/.admin-write-probe
 *.bin
 backups/
 AIO100-1V-User-Manual.pdf
+output/
+tmp/

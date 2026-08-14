@@ -26,7 +26,13 @@ async function main() {
   const contactNumber = await ask(rl, "Company contact number", "");
   const adminName = await ask(rl, "Admin name", "Admin");
   const adminEmail = await ask(rl, "Admin login email");
-  const adminPassword = await ask(rl, "Admin password", "ChangeMe123!");
+  // No shared default. A fixed default password means every tenant created
+  // by this script starts with the SAME known credential — that is how
+  // "ChangeMe123!" ended up live on more than one account. Blank input now
+  // generates a strong random password, printed once at the end.
+  const generatedPassword = require("crypto").randomBytes(12).toString("base64url");
+  const adminPassword = (await ask(rl, "Admin password (blank = generate a strong one)", "")) || generatedPassword;
+  const passwordWasGenerated = adminPassword === generatedPassword;
   const pageId = await ask(rl, "Facebook Page ID (optional, add later if blank)", "");
   const pageName = await ask(rl, "Facebook Page name (optional)", "");
   const pageToken = await ask(rl, "Page access token (optional)", "");
@@ -111,7 +117,7 @@ async function main() {
   console.log("\nClient created successfully.");
   console.log(`Company ID: ${company.id}`);
   console.log(`Admin login: ${adminEmail}`);
-  console.log(`Password: ${adminPassword}`);
+  console.log(`Password: ${adminPassword}${passwordWasGenerated ? "   <-- generated, shown once, save it now" : ""}`);
   console.log("\nNext steps:");
   console.log("1. Log in at http://localhost:3000/admin/login");
   console.log("2. Add knowledge base entries for this client");

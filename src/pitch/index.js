@@ -5,6 +5,7 @@ const { log } = require("./log");
 const smsAgent = require("./sms-agent");
 const { SipUa } = require("./sip/ua");
 const { Call } = require("./call");
+const { startInternalApi } = require("./internal-api");
 
 /**
  * Pitch entry point — its own process, separate from src/server.js.
@@ -97,6 +98,13 @@ async function main() {
   });
 
   ua.start();
+
+  // Loopback bridge so the API process can send SMS through this SIP UA.
+  // Off unless PITCH_INTERNAL_TOKEN is set; never fatal if it cannot bind.
+  startInternalApi({
+    getUa: () => ua,
+    isCallActive: () => Boolean(activeCall)
+  });
 }
 
 function shutdown(signal) {

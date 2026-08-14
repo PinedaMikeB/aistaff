@@ -4,6 +4,10 @@ const { prisma } = require("./db");
 
 const COOKIE_NAME = "ai_inbox_session";
 
+// Session lifetime. Change here only — both the JWT and the cookie read it.
+const SESSION_TTL_DAYS = 30;
+const SESSION_TTL_MS = SESSION_TTL_DAYS * 24 * 60 * 60 * 1000;
+
 function jwtSecret() {
   return process.env.JWT_SECRET || "local-dev-secret-change-me";
 }
@@ -18,10 +22,34 @@ async function verifyPassword(hash, password) {
 
 function signSession(user) {
   return jwt.sign(
-    { sub: user.id, company_id: user.company_id, role: user.role },
+    {
+      sub: user.id,
+      company_id: user.company_id,
+      role: user.role,
+      // Stamped into the token so a password reset can kill every existing
+      // session immediately. Compared against the DB value on each request.
+      epoch: user.session_epoch || 0
+    },
     jwtSecret(),
-    { expiresIn: "8h" }
+    // 30 days. Long sessions suit alternating admin staff who would otherwise
+    // re-authenticate constantly. This is only safe BECAUSE of session_epoch
+    // above: a password reset bumps the epoch and every outstanding token dies
+    // immediately, so a long-lived token is revocable rather than a 30-day
+    // window an attacker keeps. Kept in step with the cookie maxAge below — a
+    // cookie outliving its token produces confusing 401s.
+    { expiresIn: SESSION_TTL_DAYS + "d" }
   );
+}
+
+/**
+ * True when the token was issued before the user's sessions were invalidated.
+ *
+ * Tokens minted before session_epoch existed carry no `epoch` claim; those are
+ * treated as epoch 0, which matches every current user's default. Existing
+ * sessions therefore keep working and nobody is logged out by this change.
+ */
+function sessionIsStale(payload, user) {
+  return Number(payload.epoch || 0) !== Number(user.session_epoch || 0);
 }
 
 async function requireAuth(req, res, next) {
@@ -37,10 +65,14 @@ async function requireAuth(req, res, next) {
         // Read fresh from the database on every request — never trust the JWT
         // payload or any client-supplied value for these. Safe to select
         // broadly here since none of these are secrets (no hashes/tokens).
-        platform_role: true, mfa_enabled: true, last_login_at: true
+        platform_role: true, mfa_enabled: true, last_login_at: true, session_epoch: true
       }
     });
     if (!user) return res.status(401).json({ error: "Invalid session" });
+    if (sessionIsStale(payload, user)) {
+      clearSessionCookie(res);
+      return res.status(401).json({ error: "Session expired, please sign in again" });
+    }
 
     req.user = user;
     req.companyId = user.company_id;
@@ -65,10 +97,12 @@ async function attachUserIfPresent(req, res, next) {
       where: { id: payload.sub, status: "active" },
       select: {
         id: true, company_id: true, name: true, email: true, role: true, status: true,
-        platform_role: true, mfa_enabled: true, last_login_at: true
+        platform_role: true, mfa_enabled: true, last_login_at: true, session_epoch: true
       }
     });
-    if (user) {
+    // Stale token on a PUBLIC route: stay anonymous rather than 401, matching
+    // this function's contract.
+    if (user && !sessionIsStale(payload, user)) {
       req.user = user;
       req.companyId = user.company_id;
     }
@@ -88,7 +122,7 @@ function setSessionCookie(res, token) {
     // still works. Set NODE_ENV=production in the deployed environment for
     // this to take effect.
     secure: process.env.NODE_ENV === "production",
-    maxAge: 8 * 60 * 60 * 1000
+    maxAge: SESSION_TTL_MS
   });
 }
 
@@ -98,9 +132,12 @@ function clearSessionCookie(res) {
 
 module.exports = {
   COOKIE_NAME,
+  SESSION_TTL_DAYS,
+  SESSION_TTL_MS,
   hashPassword,
   verifyPassword,
   signSession,
+  sessionIsStale,
   requireAuth,
   attachUserIfPresent,
   setSessionCookie,

@@ -102,7 +102,7 @@
 
     <main id="adminApp" class="admin-app" hidden>
       <aside class="admin-sidebar">
-        <a class="brand" href="/admin/dashboard"><img class="brand-logo" src="/logo.png" alt="AIStaff" width="130" height="40" /></a>
+        <a class="brand" href="/admin/dashboard"><img class="brand-logo" src="/aistaff-logo-square.png" alt="AIStaff" width="40" height="40" /></a>
         <nav id="adminNav"></nav>
         <button id="logoutBtn" class="sidebar-logout">Log out</button>
       </aside>
@@ -123,12 +123,32 @@
 
     <main id="loginPage" class="login-page" hidden>
       <form id="loginForm" class="login-panel">
-        <a class="brand" href="/"><img class="brand-logo" src="/logo.png" alt="AIStaff" width="130" height="40" /></a>
+        <a class="brand" href="/"><img class="brand-logo" src="/aistaff-logo-square.png" alt="AIStaff" width="48" height="48" /></a>
         <h2>Admin Login</h2>
         <p>Manage Messenger inquiries, quotation drafts, handoffs, and follow-ups.</p>
-        <label>Email<input required type="email" name="email" value="admin@aistaff.click" /></label>
-        <label>Password<input required type="password" name="password" value="ChangeMe123!" /></label>
+        <label>Email<input required type="email" name="email" autocomplete="username" placeholder="you@company.com" /></label>
+        <label>Password<input required type="password" name="password" autocomplete="current-password" placeholder="Your password" /></label>
         <button class="button button-primary" type="submit">Login</button>
+        <p class="login-help"><a href="/admin/forgot-password">Forgot your password?</a></p>
+      </form>
+
+      <form id="forgotForm" class="login-panel" hidden>
+        <a class="brand" href="/"><img class="brand-logo" src="/aistaff-logo-square.png" alt="AIStaff" width="48" height="48" /></a>
+        <h2>Reset your password</h2>
+        <p>Enter the email address on your account and we&rsquo;ll send you a link to set a new password.</p>
+        <label>Email<input required type="email" name="email" autocomplete="username" placeholder="you@company.com" /></label>
+        <button class="button button-primary" type="submit">Send reset link</button>
+        <p class="login-help"><a href="/admin/login">Back to sign in</a></p>
+      </form>
+
+      <form id="resetForm" class="login-panel" hidden>
+        <a class="brand" href="/"><img class="brand-logo" src="/aistaff-logo-square.png" alt="AIStaff" width="48" height="48" /></a>
+        <h2 id="resetHeading">Set your password</h2>
+        <p id="resetIntro">Choose a password for your AIStaff account. At least 8 characters.</p>
+        <label>New password<input required type="password" name="password" autocomplete="new-password" minlength="8" placeholder="At least 8 characters" /></label>
+        <label>Confirm password<input required type="password" name="confirm" autocomplete="new-password" minlength="8" placeholder="Type it again" /></label>
+        <button class="button button-primary" type="submit">Save password</button>
+        <p class="login-help"><a href="/admin/login">Back to sign in</a></p>
       </form>
     </main>
 

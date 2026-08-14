@@ -153,13 +153,36 @@ function renderSummary() {
 
 function validateCheckout() {
   const form = qs("#checkoutForm");
-  const ready = commerceState.cart?.items?.length && form.checkValidity();
-  qs("#checkoutBtn").disabled = !ready || commerceState.processing;
+  const btn = qs("#checkoutBtn");
+  const hasCart = Boolean(commerceState.cart?.items?.length);
+
+  // Only ever disabled while a request is in flight, or before a plan is
+  // chosen. It used to be disabled whenever the form was incomplete — but the
+  // disabled state looks identical, so the button appeared clickable, did
+  // nothing when tapped, and never ran reportValidity() to say which field was
+  // missing. A silent dead button is worse than an error message.
+  btn.disabled = commerceState.processing || !hasCart;
+  btn.title = hasCart ? "" : "Choose a plan first";
+
+  const incomplete = hasCart && !form.checkValidity();
+  btn.textContent = commerceState.processing
+    ? "Preparing checkout..."
+    : (incomplete ? "Complete your details to continue" : "Checkout");
 }
 
 async function submitCheckout() {
   const form = qs("#checkoutForm");
-  if (!form.reportValidity() || !commerceState.cart) return;
+  if (!commerceState.cart) {
+    qs("#cart").scrollIntoView({ behavior: "smooth", block: "start" });
+    return;
+  }
+  if (!form.reportValidity()) {
+    // On mobile the invalid field is often far above the fold, so the native
+    // bubble appears off-screen and the tap looks ignored.
+    const firstInvalid = form.querySelector(":invalid");
+    if (firstInvalid) firstInvalid.scrollIntoView({ behavior: "smooth", block: "center" });
+    return;
+  }
   commerceState.processing = true;
   qs("#checkoutBtn").textContent = "Preparing checkout...";
   validateCheckout();

@@ -27,9 +27,20 @@ const {
   clearAistaffAiConfigCache,
   getMessengerMemoryForPsid,
   buildAdminPromptPreview,
+  formatKnowledgeBaseForPrompt,
   DEFAULT_AI_GOAL
 } = require("./aistaff-ai-config");
+
+// AIStaff's own company record — the Facebook Page (1164341106754995) and
+// this website widget both represent AIStaff itself, and both must read the
+// SAME knowledge_base rows so pricing/services never drift between channels.
+// NOT the "AIStaff.click Demo Company" seed row (00000000-...-001), which is
+// the sandbox prospects use to preview Closer for THEIR OWN business.
+const AISTAFF_INTERNAL_COMPANY_ID = "e00666f5-05e0-4a60-ae19-2a94c1377cfe";
 const { buildPresenceSnapshot, formatSnapshotForMessenger } = require("./page-intelligence");
+const { closerPricingFacts } = require("./closer-pricing");
+const { provisionPaidOrder } = require("./provisioning");
+const { extractPriceList, MAX_BYTES } = require("./price-list-extract");
 const {
   getMarketingOverview,
   listCreatives,
@@ -174,6 +185,9 @@ app.post("/api/webhooks/stripe", express.raw({ type: "application/json", limit: 
 // parsed, so the general 1MB limit never truncates/rejects these requests.
 app.use(["/api/public/brandee/product-ads", "/api/brandee/product-ads"], express.json({ limit: "24mb" }));
 
+// Price lists arrive base64-encoded, so they need headroom above the 1mb
+// default. Scoped to this one route, same pattern as the Brandee line above.
+app.use("/api/public/demo/price-list", express.json({ limit: "12mb" }));
 app.use(express.json({ limit: "1mb" }));
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
@@ -450,12 +464,24 @@ async function processPaymentWebhook(provider, req, res) {
     create: { provider, external_event_id: externalEventId, event_type: eventType, payload, signature_verified: true, processing_status: "processing" }
   });
 
-  const externalPaymentId = String(payload.external_id || payload.id || payload.data?.object?.id || payload.data?.id || "");
+  // Xendit sends BOTH: `id` is their invoice id (what we stored in
+  // order.external_payment_id) and `external_id` is OUR order number. Looking
+  // up external_id against external_payment_id never matches, so a real
+  // payment would leave the order unpaid. Keep both and try each.
+  const externalPaymentId = String(payload.id || payload.data?.object?.id || payload.data?.id || "");
+  const externalOrderNumber = String(payload.external_id || "");
   const paid = ["PAID", "SUCCEEDED", "paid", "succeeded", "checkout.session.completed", "invoice.paid"].includes(payload.status || payload.type);
   const failed = ["FAILED", "EXPIRED", "failed", "expired", "payment_intent.payment_failed"].includes(payload.status || payload.type);
 
-  if (externalPaymentId && (paid || failed)) {
-    const order = await prisma.order.findFirst({ where: { external_payment_id: externalPaymentId } });
+  if ((externalPaymentId || externalOrderNumber) && (paid || failed)) {
+    const order = await prisma.order.findFirst({
+      where: {
+        OR: [
+          externalPaymentId ? { external_payment_id: externalPaymentId } : undefined,
+          externalOrderNumber ? { order_number: externalOrderNumber } : undefined
+        ].filter(Boolean)
+      }
+    });
     if (order) {
       if (paid) {
         const periodEnd = nextBillingDate(order.billing_frequency);
@@ -465,6 +491,18 @@ async function processPaymentWebhook(provider, req, res) {
           prisma.subscription.updateMany({ where: { order_id: order.id }, data: { status: "active", current_period_start: new Date(), current_period_end: periodEnd } }),
           prisma.invoice.updateMany({ where: { order_id: order.id }, data: { status: "paid", paid_at: new Date() } })
         ]);
+
+        // Payment alone left the customer with nothing to log into: checkout
+        // creates Customer/Order/Subscription but no Company or User. Create
+        // the workspace now and email a set-password link. Idempotent, and it
+        // never throws — a provisioning problem must not make Xendit retry a
+        // payment we have already recorded.
+        const provisioned = await provisionPaidOrder(order.id);
+        if (!provisioned.ok) {
+          console.error(`[webhook] order ${order.order_number} paid but NOT provisioned:`, provisioned.reason);
+        } else if (!provisioned.alreadyProvisioned) {
+          console.log(`[webhook] order ${order.order_number} provisioned -> ${provisioned.accountNumber}`);
+        }
       } else {
         await prisma.$transaction([
           prisma.payment.updateMany({ where: { order_id: order.id, provider }, data: { status: "failed", failed_at: new Date(), provider_response: payload } }),
@@ -1047,7 +1085,7 @@ const SITE_CHAT_SYSTEM_PROMPT = [
   "",
   "AGENT 1 — CLOSER (AI Chat Sales Agent), LIVE, has real pricing:",
   "Handles written sales inquiries on Facebook Messenger and website chat. Understands customer needs, asks qualifying questions, captures leads (name, contact, requirements), recommends offers, handles objections, prepares quotation drafts for owner approval, and keeps leads moving toward a sale. Runs 24/7.",
-  "Pricing (monthly): Starter ₱4,999/mo (1 Facebook Page, up to 1,500 AI conversations/mo, basic qualification, lead dashboard). Growth ₱24,999/mo, most popular (up to 3 Facebook Pages, 8,000 conversations/mo, advanced qualification, follow-up automation, quotation handling, CRM-style pipeline). Scale ₱59,999/mo (up to 10 Facebook Pages, 25,000 conversations/mo, multi-branch, API/webhook access, dedicated onboarding). Enterprise: custom, starting ₱100,000/mo for large companies, hotels, clinics, multi-branch operations, private deployments. Annual billing saves 10%. Full details and checkout: /pricing/",
+  closerPricingFacts(),
   "",
   "AGENT 2 — BRANDEE (AI UGC Brand Agent), NEW, pricing not finalized:",
   "Turns one product photo into a finished UGC-style ad video. Client picks an avatar and a scene (home, kitchen, office, car, etc.), uploads a product photo, and Brandee writes the script, matches the voice, and generates the video — no filming, no talent booking, no editing software needed. Same presenter identity stays consistent across every video and every product. If asked about Brandee's price, say pricing is being finalized and to check /agents/brandee/ or contact the team — do not state specific numbers for Brandee.",
@@ -1088,6 +1126,15 @@ app.post("/api/public/site-chat", asyncHandler(async (req, res) => {
     return res.status(503).json({ ok: false, error: "Chat is not configured yet." });
   }
 
+  // Same knowledge_base rows the Messenger channel reads, so the website
+  // widget and Facebook chat never quote different facts for AIStaff.
+  const aiConfig = await loadAistaffAiConfig(AISTAFF_INTERNAL_COMPANY_ID).catch((error) => {
+    console.warn("Site chat: could not load AIStaff knowledge base, falling back to static prompt:", error.message);
+    return null;
+  });
+  const kbAddendum = aiConfig ? formatKnowledgeBaseForPrompt(aiConfig.knowledgeBase) : "";
+  const systemPrompt = kbAddendum ? `${SITE_CHAT_SYSTEM_PROMPT}\n\n${kbAddendum}` : SITE_CHAT_SYSTEM_PROMPT;
+
   const fetch = (...args) => import("node-fetch").then(({ default: f }) => f(...args));
   const response = await fetch("https://api.openai.com/v1/chat/completions", {
     method: "POST",
@@ -1096,9 +1143,11 @@ app.post("/api/public/site-chat", asyncHandler(async (req, res) => {
       Authorization: `Bearer ${process.env.OPENAI_API_KEY}`
     },
     body: JSON.stringify({
-      model: "gpt-5.6-luna",
+      // Was hardcoded to "gpt-5.6-luna" — the only model in the codebase not
+      // read from env, so it silently diverged from everything else.
+      model: process.env.SITE_CHAT_MODEL || "gpt-5.6-luna",
       messages: [
-        { role: "system", content: SITE_CHAT_SYSTEM_PROMPT },
+        { role: "system", content: systemPrompt },
         ...body.messages
       ],
       temperature: 0.4,
@@ -1487,6 +1536,27 @@ app.get("/agents/brandee/plan/:planId", (req, res) => {
 // scoped, near the top of the file (see the express.json call right before
 // the app-wide 1MB default), so it runs before the general limit would
 // reject the request.
+
+const {
+  createDemoSession, runScrape, replyToDemoMessage, extractFacts,
+  MAX_MESSAGES_PER_SESSION
+} = require("./demo-agent");
+const demoStartRateLimiter = createRateLimiter({ windowMs: 60 * 60 * 1000, max: 5 });
+const demoChatRateLimiter = createRateLimiter({ windowMs: 60 * 1000, max: 20 });
+
+const { requestReset, resetPassword } = require("./password-reset");
+
+// Auth limiters. Login had NONE before 2026-08-12 — unlimited password guesses
+// against a known address. Two axes on the reset route: per-IP alone lets one
+// attacker spam many victims; per-email alone lets them spray from one address.
+const loginRateLimiter = createRateLimiter({ windowMs: 15 * 60 * 1000, max: 10 });
+const forgotByIpRateLimiter = createRateLimiter({ windowMs: 60 * 60 * 1000, max: 10 });
+const forgotByEmailRateLimiter = createRateLimiter({ windowMs: 60 * 60 * 1000, max: 5 });
+const resetRateLimiter = createRateLimiter({ windowMs: 15 * 60 * 1000, max: 10 });
+
+function clientIp(req) {
+  return req.ip || req.headers["x-forwarded-for"] || "unknown";
+}
 
 const productAdPreviewRateLimiter = createRateLimiter({ windowMs: 10 * 60 * 1000, max: 20 });
 
@@ -2362,13 +2432,260 @@ app.get("/api/onboarding-status", requireAuth, asyncHandler(async (req, res) => 
 
 app.post("/api/auth/login", asyncHandler(async (req, res) => {
   const body = z.object({ email: z.string().email(), password: z.string().min(1) }).parse(req.body);
+
+  // Keyed on IP + address so one attacker cannot spray many accounts, and one
+  // account cannot be hammered from a single machine. Message stays generic:
+  // a distinct "rate limited" reply on a real address would leak that it
+  // exists, which is exactly what the generic 401 below avoids.
+  const limitKey = `${clientIp(req)}:${body.email.toLowerCase()}`;
+  const limited = loginRateLimiter.check(limitKey);
+  if (!limited.allowed) {
+    return res.status(429).json({
+      error: "Too many sign-in attempts. Please wait a few minutes and try again.",
+      retryAfterMs: limited.retryAfterMs
+    });
+  }
+
   const user = await prisma.user.findUnique({ where: { email: body.email } });
   if (!user || user.status !== "active") return res.status(401).json({ error: "Invalid email or password" });
   const ok = await verifyPassword(user.password_hash, body.password);
   if (!ok) return res.status(401).json({ error: "Invalid email or password" });
+  loginRateLimiter.reset(limitKey);
   const token = signSession(user);
   setSessionCookie(res, token);
   res.json({ user: { id: user.id, company_id: user.company_id, name: user.name, email: user.email, role: user.role } });
+}));
+
+// ---------------------------------------------------------------------
+// Password reset. NEW routes — /api/auth/login is untouched, and no
+// Meta-reviewed URL moves. See HANDOFF-CLOSER.md §12.
+// ---------------------------------------------------------------------
+
+// Admin view of demo sessions — this answers "where can I see the knowledge
+// base that was scraped?". Before demo_sessions existed the scrape was
+// formatted into a message and discarded, so there was nothing to look at.
+app.get("/api/demo-sessions", requireAuth, asyncHandler(async (req, res) => {
+  const sessions = await prisma.demoSession.findMany({
+    orderBy: { created_at: "desc" },
+    take: 50
+  });
+  res.json({
+    sessions: sessions.map((session) => {
+      const facts = extractFacts(session.snapshot);
+      return {
+        id: session.id,
+        name: session.name,
+        email: session.email,
+        mobile_number: session.mobile_number,
+        business_name: session.business_name,
+        website_url: session.website_url,
+        facebook_url: session.facebook_url,
+        scrape_status: session.scrape_status,
+        scrape_error: session.scrape_error,
+        fact_count: facts.factCount,
+        service_hints: facts.serviceHints,
+        message_count: session.message_count,
+        sms_sent: session.sms_sent,
+        created_at: session.created_at,
+        expires_at: session.expires_at
+      };
+    })
+  });
+}));
+
+// Full scraped knowledge base for one session — what the agent actually knew.
+app.get("/api/demo-sessions/:id", requireAuth, asyncHandler(async (req, res) => {
+  const session = await prisma.demoSession.findUnique({ where: { id: req.params.id } });
+  if (!session) return res.status(404).json({ error: "Not found" });
+  const { buildDemoPrompt } = require("./demo-agent");
+  res.json({
+    session,
+    facts: extractFacts(session.snapshot),
+    // The exact prompt the agent ran with — so a weak demo can be diagnosed
+    // rather than guessed at.
+    prompt: buildDemoPrompt(session)
+  });
+}));
+
+// ---------------------------------------------------------------------
+// Public demo. New routes; nothing Meta-reviewed is touched (§12).
+// ---------------------------------------------------------------------
+
+app.post("/api/public/demo/start", asyncHandler(async (req, res) => {
+  const body = z.object({
+    name: z.string().min(2),
+    email: z.string().email(),
+    website_url: z.string().optional().nullable(),
+    facebook_url: z.string().optional().nullable(),
+    mobile: z.string().optional().nullable()
+  }).parse(req.body);
+
+  if (!body.website_url) {
+    // Facebook was dropped as an input: logged out it serves a block page
+    // (measured at ~1.5KB, <title>Error</title>), and automating a logged-in
+    // session would risk the published Meta app (§12).
+    return res.status(400).json({ ok: false, error: "Please give us your website or store link so the agent has something to learn from." });
+  }
+  if (!demoStartRateLimiter.check(clientIp(req)).allowed) {
+    return res.status(429).json({ ok: false, error: "Too many demo requests. Please try again later." });
+  }
+
+  const session = await createDemoSession({
+    name: body.name,
+    email: body.email,
+    websiteUrl: body.website_url,
+    facebookUrl: body.facebook_url,
+    mobile: body.mobile,
+    ip: clientIp(req)
+  });
+
+  // Scrape inline: the prospect is waiting and the value IS the scrape.
+  const scraped = await runScrape(session.id);
+  const facts = extractFacts(scraped && scraped.snapshot);
+
+  res.json({
+    ok: true,
+    sessionId: session.id,
+    status: scraped ? scraped.scrape_status : "failed",
+    businessName: facts.businessName || null,
+    factCount: facts.factCount
+  });
+}));
+
+app.post("/api/public/demo/price-list", asyncHandler(async (req, res) => {
+  // base64 JSON rather than multipart: no new upload middleware, and the files
+  // are price lists (a few hundred KB), not media.
+  const body = z.object({
+    sessionId: z.string().uuid(),
+    filename: z.string().min(1).max(200),
+    mimeType: z.string().min(3).max(120),
+    data: z.string().min(10)
+  }).parse(req.body);
+
+  if (!demoChatRateLimiter.check(clientIp(req)).allowed) {
+    return res.json({ ok: false, error: "Please wait a moment before uploading again." });
+  }
+
+  const session = await prisma.demoSession.findUnique({ where: { id: body.sessionId } });
+  if (!session) return res.json({ ok: false, error: "Demo session not found." });
+  if (session.expires_at < new Date()) return res.json({ ok: false, error: "This demo has expired." });
+
+  const base64 = body.data.indexOf(",") !== -1 ? body.data.split(",").pop() : body.data;
+  const buffer = Buffer.from(base64, "base64");
+  if (buffer.length > MAX_BYTES) {
+    return res.json({ ok: false, error: "That file is too large. Please keep it under 8MB." });
+  }
+
+  const result = await extractPriceList({
+    buffer,
+    mimeType: body.mimeType,
+    filename: body.filename
+  });
+
+  if (!result.ok) {
+    const messages = {
+      unsupported_type: "Please upload an image, PDF, Excel file or Word document.",
+      nothing_readable: "We could not read any text from that file. Try a clearer image?",
+      file_too_large: "That file is too large. Please keep it under 8MB.",
+      empty_file: "That file appears to be empty."
+    };
+    return res.json({ ok: false, error: messages[result.reason] || "We could not read that file." });
+  }
+
+  await prisma.demoSession.update({
+    where: { id: session.id },
+    data: {
+      price_list_text: result.text,
+      price_list_kind: result.kind,
+      price_list_name: body.filename
+    }
+  });
+
+  const lineCount = result.text.split("\n").filter((l) => l.trim()).length;
+  res.json({ ok: true, kind: result.kind, lines: lineCount, preview: result.text.slice(0, 400) });
+}));
+
+app.post("/api/public/demo/chat", asyncHandler(async (req, res) => {
+  const body = z.object({
+    sessionId: z.string().uuid(),
+    messages: z.array(z.object({
+      role: z.enum(["user", "assistant"]),
+      content: z.string().min(1).max(2000)
+    })).min(1).max(40)
+  }).parse(req.body);
+
+  if (!demoChatRateLimiter.check(clientIp(req)).allowed) {
+    return res.status(429).json({ ok: false, error: "Slow down a moment, then try again." });
+  }
+
+  const session = await prisma.demoSession.findUnique({ where: { id: body.sessionId } });
+  if (!session) return res.status(404).json({ ok: false, error: "Demo session not found." });
+  if (session.expires_at < new Date()) {
+    return res.status(410).json({ ok: false, error: "This demo has expired. Start a new one." });
+  }
+  if (session.message_count >= MAX_MESSAGES_PER_SESSION) {
+    return res.status(429).json({ ok: false, error: "This demo has reached its message limit." });
+  }
+
+  const result = await replyToDemoMessage({ session, messages: body.messages });
+  await prisma.demoSession.update({
+    where: { id: session.id },
+    data: { message_count: { increment: 1 } }
+  });
+
+  if (!result.ok) {
+    // 200, deliberately. Cloudflare replaces a 5xx body with its own HTML
+    // error page, so the browser's res.json() throws "Unexpected token '<'"
+    // and the real reason never reaches the client.
+    return res.json({ ok: false, error: result.error, retryable: true });
+  }
+  res.json({ ok: true, reply: result.reply, actions: result.actions });
+}));
+
+app.post("/api/auth/forgot-password", asyncHandler(async (req, res) => {
+  const body = z.object({ email: z.string().email() }).parse(req.body);
+  const email = body.email.toLowerCase();
+
+  // Identical response on every path below, including when rate limited or
+  // when SMTP is down. Any difference — status code, wording, timing — turns
+  // this into a way to test whether an address is a customer.
+  const generic = {
+    ok: true,
+    message: "If an account exists for that address, we've sent a reset link."
+  };
+
+  if (!forgotByIpRateLimiter.check(clientIp(req)).allowed) return res.json(generic);
+  if (!forgotByEmailRateLimiter.check(email).allowed) return res.json(generic);
+
+  await requestReset({ email, ip: clientIp(req) });
+  return res.json(generic);
+}));
+
+app.post("/api/auth/reset-password", asyncHandler(async (req, res) => {
+  const body = z.object({
+    token: z.string().min(1),
+    password: z.string().min(8)
+  }).parse(req.body);
+
+  if (!resetRateLimiter.check(clientIp(req)).allowed) {
+    return res.status(429).json({ ok: false, error: "Too many attempts. Please wait and try again." });
+  }
+
+  const result = await resetPassword({ token: body.token, newPassword: body.password });
+  if (!result.ok) {
+    const messages = {
+      invalid_token: "This reset link is not valid. Please request a new one.",
+      token_expired: "This reset link has expired. Please request a new one.",
+      token_already_used: "This reset link has already been used. Please request a new one.",
+      weak_password: "Password must be at least 8 characters."
+    };
+    return res.status(400).json({ ok: false, code: result.code, error: messages[result.code] || messages.invalid_token });
+  }
+
+  // Deliberately NOT signing them in here. Resetting proves control of the
+  // inbox, not of the password they just chose — make them type it once.
+  // It also means a stolen reset link cannot become a live session silently.
+  return res.json({ ok: true, message: "Password updated. Please sign in." });
 }));
 
 app.post("/api/auth/logout", (req, res) => {
@@ -3068,7 +3385,11 @@ app.get("*", (req, res) => {
 });
 
 app.use((error, req, res, next) => {
-  console.error(error);
+  // console.error(error) on some Prisma/Zod errors throws inside Node's
+  // inspect(), which crashes the error handler and hides the real cause —
+  // the client just gets a bare HTML 500. Log the useful fields directly.
+  console.error("[error]", req.method, req.originalUrl, "->", error && error.name, error && error.message);
+  if (error && error.stack) console.error(String(error.stack).split("\n").slice(0, 6).join("\n"));
   if (error.name === "ZodError") return res.status(400).json({ error: "Validation failed", details: error.errors });
   res.status(500).json({ error: error.message || "Server error" });
 });

@@ -9,6 +9,12 @@ datasource db {
 
 model Company {
   id                 String                  @id @default(uuid())
+  // Human-readable tenant reference (AIS-2026-0001). The customer's accountant
+  // puts this on purchase orders and bank-transfer remittance slips, and both
+  // sides say it out loud on support calls. NOT an identity key — `id` is.
+  // One per serviced workspace, so a payer running two businesses can split
+  // the cost across their own books.
+  account_number     String?                 @unique
   name               String
   industry           String?
   website            String?
@@ -24,6 +30,7 @@ model Company {
   qualification_questions QualificationQuestion[]
   conversations      Conversation[]
   messages           Message[]
+  subscriptions      Subscription[]
   leads              Lead[]
   quotation_templates QuotationTemplate[]
   quotations         Quotation[]
@@ -52,6 +59,12 @@ model User {
   // the same helper already used for facebook_pages.page_access_token_encrypted.
   mfa_secret_encrypted  String?
   mfa_backup_codes_hash String[] @default([])
+  // Bumped whenever every existing session for this user must die at once:
+  // password reset, password change, forced logout. The value is embedded in
+  // the JWT and compared on every request. Without this a stateless 8h JWT
+  // stays valid AFTER a reset, so an attacker keeps their session for up to
+  // 8 hours and the reset achieves nothing.
+  session_epoch Int      @default(0)
   last_login_at DateTime?
   created_at    DateTime  @default(now())
   updated_at    DateTime  @updatedAt
@@ -64,6 +77,7 @@ model User {
   carts         Cart[]
   customers     Customer[]
   admin_audit_logs AdminAuditLog[] @relation("AdminAuditActor")
+  password_reset_tokens PasswordResetToken[]
 
   @@index([platform_role])
   @@map("users")
@@ -134,6 +148,7 @@ model KnowledgeBase {
   category   String
   question   String
   answer     String
+  media      Json?    // [{type: "video"|"image"|"pdf", url, caption}] — lets the agent send actual files when asked, not just describe them
   tags       String[] @default([])
   active     Boolean  @default(true)
   created_at DateTime @default(now())
@@ -162,7 +177,9 @@ model Conversation {
   id               String         @id @default(uuid())
   company_id       String
   facebook_page_id String?
-  psid             String
+  psid             String?
+  external_id      String?
+  contact_number   String?
   customer_name    String?
   channel          String         @default("facebook_messenger")
   status           String         @default("open")
@@ -182,6 +199,7 @@ model Conversation {
   ai_logs          AiLog[]
 
   @@unique([company_id, psid])
+  @@unique([company_id, channel, external_id])
   @@map("conversations")
 }
 
@@ -544,6 +562,11 @@ model Payment {
 model Subscription {
   id                       String      @id @default(uuid())
   customer_id              String
+  // The tenant this subscription provisions. Nullable because subscriptions
+  // predating tenant provisioning have no workspace, and because payment can
+  // land before the Company is created. Customer = who pays; Company = what
+  // they bought. One Customer may hold several, one per business.
+  company_id               String?
   order_id                 String
   pricing_plan_id          String
   provider                 String
@@ -559,10 +582,12 @@ model Subscription {
   created_at               DateTime    @default(now())
   updated_at               DateTime    @updatedAt
   customer                 Customer    @relation(fields: [customer_id], references: [id], onDelete: Restrict)
+  company                  Company?    @relation(fields: [company_id], references: [id], onDelete: SetNull)
   order                    Order       @relation(fields: [order_id], references: [id], onDelete: Cascade)
   pricing_plan             PricingPlan @relation(fields: [pricing_plan_id], references: [id], onDelete: Restrict)
 
   @@index([customer_id])
+  @@index([company_id])
   @@index([order_id])
   @@index([pricing_plan_id])
   @@index([status])
@@ -904,4 +929,85 @@ model ProductAdImageAsset {
   @@index([projectId])
   @@index([scopeId])
   @@map("product_ad_image_assets")
+}
+
+/// Password reset tokens.
+///
+/// The raw token is NEVER stored. Only sha256(token) is persisted, so a
+/// database leak yields nothing usable — the same reasoning that applies to
+/// password hashes. The raw value exists only in the email we send.
+///
+/// Single use, short lived, and all of a user's outstanding tokens are
+/// invalidated when any one of them is redeemed.
+model PasswordResetToken {
+  id         String   @id @default(uuid())
+  user_id    String
+  /// sha256 hex of the raw token. Unique so redemption is a single indexed
+  /// lookup rather than a scan — this is the hot path at scale.
+  token_hash String   @unique
+  expires_at DateTime
+  used_at    DateTime?
+  /// Recorded for abuse investigation, not for access decisions.
+  requested_ip String?
+  created_at DateTime @default(now())
+  user       User     @relation(fields: [user_id], references: [id], onDelete: Cascade)
+
+  @@index([user_id])
+  @@index([expires_at])
+  @@map("password_reset_tokens")
+}
+
+/// A prospect trying Closer on their OWN business data, before buying.
+///
+/// Deliberately NOT a User or a Customer:
+///   - the email is unverified, so anyone could type a competitor's address
+///   - User.email is globally unique, so a demo row would BLOCK their real
+///     signup later with a confusing "already registered"
+///   - Customer is the billing record and must stay clean
+///
+/// `snapshot` is the scraped presence data from page-intelligence.js. Before
+/// this table existed the scrape was formatted into a message body and thrown
+/// away, so there was no way to review what the agent had learned, correct it,
+/// or reuse it when the prospect bought. That reuse is exactly what the
+/// setup fee covers.
+model DemoSession {
+  id             String    @id @default(uuid())
+  name           String
+  email          String
+  /// E.164, normalised by src/phone.js. The ONLY number the demo will text —
+  /// the model composes the message but never chooses the recipient.
+  mobile_number  String?
+  website_url    String?
+  facebook_url   String?
+  business_name  String?
+  /// Structured output of buildPresenceSnapshot(). Facts only; the model
+  /// writes every word it says (docs/handoff-masterplan.md).
+  snapshot       Json?
+  /// Plain text pulled from an uploaded price list (image, PDF, spreadsheet or
+  /// doc). A Facebook Page can publish every price inside promo GRAPHICS,
+  /// which Open Graph scraping cannot see — this is how those prices reach
+  /// the agent. Facts only; the model writes its own words.
+  price_list_text String?
+  price_list_kind String?
+  /// ISO code of the currency the scraped/uploaded prices are in. Without
+  /// this the agent could read "$100" from a US store and quote it to a
+  /// Filipino customer as if it were pesos.
+  price_currency  String?
+  price_list_name String?
+  scrape_status  String    @default("pending")
+  scrape_error   String?
+  message_count  Int       @default(0)
+  sms_sent       Int       @default(0)
+  requested_ip   String?
+  /// Retention limit. A stranger's business data and mobile number are
+  /// personal data under the Data Privacy Act — purged, not kept forever.
+  expires_at     DateTime
+  converted_at   DateTime?
+  created_at     DateTime  @default(now())
+  updated_at     DateTime  @updatedAt
+
+  @@index([email])
+  @@index([expires_at])
+  @@index([created_at])
+  @@map("demo_sessions")
 }

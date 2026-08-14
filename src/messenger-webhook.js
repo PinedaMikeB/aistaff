@@ -411,7 +411,7 @@ async function handleMessengerWebhook(payload, { maybeCreateQuotationDraft }) {
       continue;
     }
 
-    const useDemoFlow = isAistaffMarketingPage(pageId);
+    const isMarketingPage = isAistaffMarketingPage(pageId);
 
     for (const event of entry.messaging || []) {
       const psid = event.sender?.id;
@@ -425,6 +425,23 @@ async function handleMessengerWebhook(payload, { maybeCreateQuotationDraft }) {
       }
 
       const leadContact = extractLeadContactFromMessengerEvent(event);
+
+      // Default: real inquiries to the AIStaff Page are answered by Closer
+      // AS AIStaff (handleClientMessengerEvent, AIStaff's own knowledge
+      // base). The "preview Closer for MY OWN business" roleplay demo is
+      // opt-in only — via an explicit m.me/<id>?ref=demo entry link, or a
+      // demo postback — and once opted in, stays on for the rest of that
+      // conversation (session-persisted) so a multi-message demo doesn't
+      // flip back to the AIStaff identity mid-flow.
+      let useDemoFlow = false;
+      if (isMarketingPage) {
+        const ref = event.referral?.ref || event.postback?.referral?.ref || "";
+        const session = getAistaffSession(psid);
+        if (ref === "demo" || postbackPayload.startsWith("PAGE_PICK:")) {
+          session.explicitDemoMode = true;
+        }
+        useDemoFlow = session.explicitDemoMode;
+      }
 
       if (useDemoFlow) {
         await handleDemoMessengerEvent({ page, pageId, psid, text, leadContact, postbackPayload });

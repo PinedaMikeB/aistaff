@@ -15,13 +15,9 @@ const {
   buildAssessmentFactsPayload
 } = require("./aistaff-assessment-principles");
 
-const MINIMUM_OFFER = {
-  name: "Basic AI Inbox Sales Assistant",
-  setup: 15000,
-  monthly: 3000,
-  price: "₱15,000 setup + ₱3,000/month",
-  channel: "Facebook Messenger chat only — no voice calls"
-};
+// Derived from payments.js — this module writes real Quotation.amount values,
+// so a wrong number here becomes a written quote the customer can hold us to.
+const { MINIMUM_OFFER } = require("./closer-pricing");
 
 async function nextQuotationNumber(companyId) {
   const count = await prisma.quotation.count({ where: { company_id: companyId } });
@@ -241,8 +237,16 @@ async function makeQuotationDraftTool(session, { companyId, psid, pageId } = {})
       customer_company: lead.company_name,
       service_needed: lead.service_needed,
       quotation_details: details,
-      amount: MINIMUM_OFFER.setup,
-      terms: `Monthly managed fee: PHP ${MINIMUM_OFFER.monthly.toLocaleString()}/month after setup. Subject to admin review and approval before email send.`,
+      // Plans are pure monthly recurring — there is no mandatory setup fee.
+      // Onboarding items in MINIMUM_OFFER.optionalSetup are quoted separately.
+      amount: MINIMUM_OFFER.monthly,
+      terms: [
+        `Monthly subscription: PHP ${MINIMUM_OFFER.monthly.toLocaleString()}/month (${MINIMUM_OFFER.name}).`,
+        `Includes up to ${MINIMUM_OFFER.conversationLimit.toLocaleString()} AI-assisted conversations per month.`,
+        "No setup fee. Optional one-time onboarding add-ons are quoted separately:",
+        MINIMUM_OFFER.optionalSetup.map((a) => `${a.name} ${a.priceLabel}`).join("; ") + ".",
+        "Subject to admin review and approval before email send."
+      ].join(" "),
       status: settings?.quotation_requires_admin_approval === false ? "draft" : "pending_approval",
       mode: settings?.quotation_mode || "approval_required"
     }

@@ -26,7 +26,8 @@
     "remotion:studio": "npm --prefix remotion run studio",
     "remotion:render": "npm --prefix remotion run render:all",
     "pitch": "node src/pitch/index.js",
-    "pitch:test": "node --test test/pitch.test.js"
+    "pitch:test": "node --test test/pitch.test.js",
+    "simulate:paid": "node scripts/simulate-payment.js"
   },
   "prisma": {
     "seed": "node prisma/seed.js"
@@ -40,15 +41,18 @@
     "express": "^4.21.2",
     "helmet": "^8.0.0",
     "jsonwebtoken": "^9.0.2",
+    "mammoth": "^1.12.1",
     "morgan": "^1.10.0",
     "motion": "^12.43.0",
     "node-fetch": "^3.3.2",
     "nodemailer": "^8.0.11",
     "pdfkit": "^0.19.1",
+    "playwright": "^1.62.1",
     "prisma": "^5.22.0",
     "sharp": "^0.35.3",
     "sip": "^0.0.6",
     "ws": "^8.21.3",
+    "xlsx": "^0.18.5",
     "zod": "^3.24.1"
   }
 }

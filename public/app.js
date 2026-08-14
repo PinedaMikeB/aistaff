@@ -118,12 +118,20 @@ function rowLink(route, id, text) {
   return `<a href="${adminPath(route, id)}"><b>${text || "Open"}</b></a>`;
 }
 
-function setMode(mode) {
+function setMode(mode, panel = "login") {
   $("[data-public].site-header").hidden = mode !== "public";
   $("#publicSite").hidden = mode !== "public";
   $("[data-public].site-footer").hidden = mode !== "public";
   $("#adminApp").hidden = mode !== "admin";
   $("#loginPage").hidden = mode !== "login";
+  // The login shell hosts three panels: sign in, request a reset, set a new
+  // password. All must work BEFORE authentication, so they live here rather
+  // than behind the session gate below.
+  if (mode === "login") {
+    $("#loginForm").hidden = panel !== "login";
+    $("#forgotForm").hidden = panel !== "forgot";
+    $("#resetForm").hidden = panel !== "reset";
+  }
 }
 
 function renderAdminNav(active) {
@@ -1315,6 +1323,23 @@ async function routeHandler() {
     return;
   }
 
+  if (routeName === "forgot-password") {
+    setMode("login", "forgot");
+    document.title = "Reset your password | AIStaff.click";
+    return;
+  }
+
+  if (routeName === "reset-password") {
+    setMode("login", "reset");
+    document.title = "Set your password | AIStaff.click";
+    // A brand-new customer arrives here from the welcome email, so the copy
+    // should read as setting a password, not resetting a forgotten one.
+    if (!new URLSearchParams(location.search).get("token")) {
+      $("#resetIntro").textContent = "This link is missing its token. Please use the link from your email, or request a new one.";
+    }
+    return;
+  }
+
   if (!state.user && !(await loadSession())) {
     history.replaceState(null, "", adminPath("login"));
     setMode("login");
@@ -1385,6 +1410,70 @@ if ($("#auditForm")) {
       event.currentTarget.reset();
     } catch (error) {
       toast(error.message || "Could not submit audit request");
+    }
+  };
+}
+
+if ($("#forgotForm")) {
+  $("#forgotForm").onsubmit = async (event) => {
+    event.preventDefault();
+    const form = event.currentTarget;
+    const btn = form.querySelector("button[type=submit]");
+    btn.disabled = true;
+    btn.textContent = "Sending...";
+    try {
+      const body = Object.fromEntries(new FormData(form));
+      const res = await fetch("/api/auth/forgot-password", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email: body.email })
+      });
+      const json = await res.json();
+      // Deliberately the same message whether or not the address exists —
+      // anything else turns this form into a way to test who our customers
+      // are. The server behaves identically for the same reason.
+      toast(json.message || "If an account exists for that address, we've sent a reset link.");
+      form.reset();
+    } catch (error) {
+      toast("Could not send the reset link. Please try again.");
+    } finally {
+      btn.disabled = false;
+      btn.textContent = "Send reset link";
+    }
+  };
+}
+
+if ($("#resetForm")) {
+  $("#resetForm").onsubmit = async (event) => {
+    event.preventDefault();
+    const form = event.currentTarget;
+    const body = Object.fromEntries(new FormData(form));
+    if (body.password !== body.confirm) return toast("Those passwords do not match.");
+    if (String(body.password).length < 8) return toast("Password must be at least 8 characters.");
+
+    const token = new URLSearchParams(location.search).get("token");
+    if (!token) return toast("This link is missing its token. Please use the link from your email.");
+
+    const btn = form.querySelector("button[type=submit]");
+    btn.disabled = true;
+    btn.textContent = "Saving...";
+    try {
+      const res = await fetch("/api/auth/reset-password", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ token, password: body.password })
+      });
+      const json = await res.json();
+      if (!json.ok) throw new Error(json.error || "Could not set your password.");
+      toast("Password saved. Please sign in.");
+      // Not signed in automatically: holding the emailed link proves control
+      // of the inbox, not of the password just chosen.
+      setTimeout(() => { location.href = adminPath("login"); }, 1200);
+    } catch (error) {
+      toast(error.message);
+    } finally {
+      btn.disabled = false;
+      btn.textContent = "Save password";
     }
   };
 }
