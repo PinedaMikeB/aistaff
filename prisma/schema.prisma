@@ -16,6 +16,11 @@ model Company {
   // the cost across their own books.
   account_number     String?                 @unique
   name               String
+  /// The real person we deal with — who answers when we call about their
+  /// account. `name` is the business; this is the human. Added 2026-08-17
+  /// because support calls and the live-data assessment both need a name to
+  /// ask for, and "AIStaff.click Demo Company" is not a person.
+  contact_person     String?
   industry           String?
   website            String?
   contact_email      String?
@@ -27,6 +32,7 @@ model Company {
   settings           CompanySetting?
   facebook_pages     FacebookPage[]
   knowledge_base     KnowledgeBase[]
+  knowledge_gaps     KnowledgeGap[]
   qualification_questions QualificationQuestion[]
   conversations      Conversation[]
   messages           Message[]
@@ -35,6 +41,9 @@ model Company {
   quotation_templates QuotationTemplate[]
   quotations         Quotation[]
   follow_ups         FollowUp[]
+  booking_settings   BookingSetting?
+  booking_services   BookingService[]
+  bookings           Booking[]
   human_handoffs     HumanHandoff[]
   ai_logs            AiLog[]
 
@@ -120,6 +129,17 @@ model CompanySetting {
   quotation_requires_admin_approval Boolean  @default(true)
   notify_email                      String?
   ai_custom_instructions            String?  @db.Text
+  /// Intake wizard state: { industryPack, currentStep, completed: [stepId],
+  /// skipped: [stepId] }. Progress must survive leaving the page — an owner
+  /// who loses six steps of typing does not come back.
+  intake_progress                   Json?
+  intake_completed_at               DateTime?
+  /// What the customer uses today for live availability: none | paper |
+  /// google_sheet | google_calendar | own_system. Recorded by the last wizard
+  /// step. Closer reads this to be honest about what it can confirm; it does
+  /// NOT activate any integration.
+  live_data_source                  String?
+  live_data_interest                Boolean  @default(false)
   created_at                        DateTime @default(now())
   updated_at                        DateTime @updatedAt
   company                           Company  @relation(fields: [company_id], references: [id], onDelete: Cascade)
@@ -142,19 +162,178 @@ model FacebookPage {
   @@map("facebook_pages")
 }
 
+/// A record of AIStaff staff entering a customer's workspace to help.
+///
+/// Added 2026-08-19 with /platform. Staff reading a tenant's conversations is a
+/// real intrusion — those threads contain the tenant's own customers' messages,
+/// phone numbers and buying intent. The audit trail is what makes assisting
+/// defensible: who entered, whose workspace, when, and why.
+///
+/// Written on ENTRY, not on exit, so an abandoned session is still recorded.
+model AssistSession {
+  id            String    @id @default(uuid())
+  /// The AIStaff user doing the assisting.
+  staff_user_id String
+  staff_email   String
+  /// The tenant being assisted.
+  company_id    String
+  company_name  String
+  reason        String?
+  started_at    DateTime  @default(now())
+  ended_at      DateTime?
+
+  @@index([company_id, started_at])
+  @@index([staff_user_id, started_at])
+  @@map("assist_sessions")
+}
+
+/// A question a real customer asked that Closer could not answer.
+///
+/// Added 2026-08-18. This is the mechanism behind ongoing improvement support:
+/// real unanswered customer questions turn into specific knowledge-base work
+/// without anyone remembering to manually track them.
+///
+/// The FAQ step predicts what customers will ask. This records what they
+/// ACTUALLY asked and got no answer to, which is better evidence: it is
+/// specific to this business, ranked by real frequency, and it never stops
+/// arriving. §6 calls this the highest-value feature nobody else builds.
+///
+/// Closer flags these itself — it already knows when it had to say it could
+/// not confirm something, so no keyword matching or guesswork is involved.
+model KnowledgeGap {
+  id              String   @id @default(uuid())
+  company_id      String
+  /// The customer's question, in their own words.
+  question        String
+  /// Short label the model assigns, so near-identical questions group.
+  topic           String
+  conversation_id String?
+  /// open | answered | dismissed
+  status          String   @default("open")
+  /// Incremented when the same topic comes up again — this is what ranks the
+  /// list by what is actually costing sales.
+  times_asked     Int      @default(1)
+  last_asked_at   DateTime @default(now())
+  created_at      DateTime @default(now())
+  company         Company  @relation(fields: [company_id], references: [id], onDelete: Cascade)
+
+  @@index([company_id, status, times_asked])
+  @@map("knowledge_gaps")
+}
+
+/// Which model runs which function. Editable in AI Studio, no deploy needed.
+///
+/// Added 2026-08-18. Model choices were scattered across .env and code
+/// defaults and had already drifted — GEMINI_MODEL still said
+/// "gemini-1.5-flash", which is what a provider switch would silently have
+/// used. Nobody chose that; it was just never updated.
+///
+/// Same reasoning as PromptRevision: the things that decide how Closer behaves
+/// belong somewhere a human can see and change, not buried in code.
+model ModelSetting {
+  /// Function key, e.g. "closer_reply", "upload_relevance", "vision_extract".
+  fn         String   @id
+  provider   String
+  model      String
+  /// Free text so a new model can be added without a migration.
+  note       String?
+  updated_by String?
+  updated_at DateTime @updatedAt
+
+  @@map("model_settings")
+}
+
+/// A versioned, human-editable instruction block for an agent.
+///
+/// Added 2026-08-18. Closer's operating instructions used to live as string
+/// literals inside buildGuardrailPrompt() — invisible to the person running the
+/// business, unchangeable without a deploy, and with no record of what changed
+/// or when. That is the same "hardcoded copy" mistake this codebase forbids
+/// everywhere else, applied to the most important text in the product.
+///
+/// Every save writes a NEW ROW rather than overwriting: the history is the
+/// point. When a reply goes wrong you need to know which instructions were live
+/// at the time, and be able to put the previous set back immediately.
+///
+/// Rollback flips `is_active` to an earlier revision rather than copying its
+/// text forward, so the log stays an honest record of what was actually run.
+///
+/// This holds INSTRUCTIONS ONLY. Company name, knowledge base, lead state and
+/// the customer's message are assembled in code around it — so an edit here can
+/// change behaviour but can never break variable substitution.
+model PromptRevision {
+  id         String   @id @default(uuid())
+  /// Which instruction block. "closer_system" is the Messenger reply prompt.
+  key        String
+  version    Int
+  content    String   @db.Text
+  /// Why this change was made — shown in the revision list.
+  note       String?
+  /// Email of whoever saved it. Null for the seeded original.
+  created_by String?
+  is_active  Boolean  @default(false)
+  created_at DateTime @default(now())
+
+  @@unique([key, version])
+  @@index([key, is_active])
+  @@map("prompt_revisions")
+}
+
+/// One unit of business knowledge the agent may answer from.
+///
+/// Was Q&A-only. Widened 2026-08-17 for the intake wizard: a sales agent needs
+/// price lists, promos, policies, shipping tables and media, which are not
+/// questions. Nothing was renamed or dropped — existing rows are kind="qa" and
+/// behave exactly as before.
+///
+/// RULE 2 (docs/handoff-masterplan.md): every field here is a FACT. Never store
+/// a sentence for the agent to recite. The model writes the words at reply time.
 model KnowledgeBase {
   id         String   @id @default(uuid())
   company_id String
   category   String
-  question   String
+  /// qa | prose | pricelist | promo | policy | shipping | media | instruction
+  /// Controls how buildGuardrailPrompt renders the row. Unknown kinds fall
+  /// back to prose rendering rather than being dropped.
+  kind       String   @default("qa")
+  /// Human label for non-Q&A rows ("Mission and vision", "Shipping rates").
+  /// A price list is not a question and must not be forced into one.
+  title      String?
+  /// Only kind="qa" rows have a question. Nullable since 2026-08-17.
+  question   String?
   answer     String
+  /// Structured rows for tabular kinds: shipping rates by area, spec tables,
+  /// price rows. Prose in a prompt makes the model do lookup and arithmetic in
+  /// a paragraph; rows let it read one line. Shape: [{label, value, note}].
+  data       Json?
   media      Json?    // [{type: "video"|"image"|"pdf", url, caption}] — lets the agent send actual files when asked, not just describe them
+  /// NULL = no expiry, which is the common case and the wizard default outside
+  /// the promo step. Set for anything dated. Promos auto-deactivate on expiry;
+  /// prices and policies only flag for review — see src/knowledge-base.js.
+  valid_until DateTime?
+  /// Where this came from, so the wizard can show its source ("from
+  /// pricelist-aug.xlsx"). A suggestion with no source must never be stored:
+  /// an invented fact served for months is §9's phantom pricing at scale.
+  source_name String?
+  /// upload | facebook_page | website | typed — how we obtained it.
+  source_kind String?
+  /// ISO code for any amounts in this row. DemoSession learned this the hard
+  /// way: "100" read off a US store and quoted as ₱100 is a number the
+  /// business gets held to.
+  currency    String?
+  /// TRUE by default on purpose. Anything a human typed or saved is confirmed
+  /// by that act, and defaulting false would have silently dropped the 6
+  /// existing rows out of the prompt on migration. Only the AI-suggestion path
+  /// writes false, and unconfirmed rows never reach the agent.
+  confirmed   Boolean  @default(true)
+  display_order Int    @default(0)
   tags       String[] @default([])
   active     Boolean  @default(true)
   created_at DateTime @default(now())
   updated_at DateTime @updatedAt
   company    Company  @relation(fields: [company_id], references: [id], onDelete: Cascade)
 
+  @@index([company_id, active, kind])
   @@map("knowledge_base")
 }
 
@@ -181,6 +360,17 @@ model Conversation {
   external_id      String?
   contact_number   String?
   customer_name    String?
+  /// Facebook profile picture URL, fetched once from the Graph API on the
+  /// first message. Added 2026-08-19 so the inquiry list shows a face and a
+  /// real name instead of a 17-digit PSID.
+  ///
+  /// NOTE: Meta's profile_pic URLs are signed and EXPIRE, so this is a
+  /// convenience for the dashboard, not durable storage. A broken image is
+  /// expected after a while and the initials fallback covers it.
+  profile_pic_url  String?
+  /// When we last asked Meta for this profile, so we do not re-fetch on every
+  /// message.
+  profile_fetched_at DateTime?
   channel          String         @default("facebook_messenger")
   status           String         @default("open")
   intent           String?
@@ -195,8 +385,10 @@ model Conversation {
   leads            Lead[]
   quotations       Quotation[]
   follow_ups       FollowUp[]
+  bookings         Booking[]
   human_handoffs   HumanHandoff[]
   ai_logs          AiLog[]
+  source_orders     Order[]        @relation("OrderSourceConversation")
 
   @@unique([company_id, psid])
   @@unique([company_id, channel, external_id])
@@ -211,6 +403,14 @@ model Message {
   sender_id       String?
   message_text    String
   ai_generated    Boolean      @default(false)
+  /// Files attached to this message: [{type, url, caption}].
+  ///
+  /// Added 2026-08-18 because Closer sent the SAME image twice in one
+  /// conversation. The transcript only held text, so the model had no way to
+  /// know it had already attached something — every turn it saw the entry
+  /// saying "send this image when asked about X" and sent it again.
+  /// Recording what went out is what makes "do not repeat" possible.
+  attachments     Json?
   created_at      DateTime     @default(now())
   company         Company      @relation(fields: [company_id], references: [id], onDelete: Cascade)
   conversation    Conversation @relation(fields: [conversation_id], references: [id], onDelete: Cascade)
@@ -243,6 +443,7 @@ model Lead {
   assigned_user     User?        @relation("LeadAssignedTo", fields: [assigned_to], references: [id], onDelete: SetNull)
   quotations        Quotation[]
   follow_ups        FollowUp[]
+  bookings          Booking[]
 
   @@map("leads")
 }
@@ -328,6 +529,77 @@ model FollowUp {
   assigned_user   User?        @relation("FollowUpAssignedTo", fields: [assigned_to], references: [id], onDelete: SetNull)
 
   @@map("follow_ups")
+}
+
+model BookingSetting {
+  id                    String   @id @default(uuid())
+  company_id            String   @unique
+  enabled               Boolean  @default(false)
+  timezone              String   @default("Asia/Manila")
+  slot_interval_minutes Int      @default(30)
+  min_notice_minutes    Int      @default(120)
+  max_days_ahead        Int      @default(30)
+  business_hours        Json     @default("{}")
+  booking_type          String   @default("general")
+  field_mode            String   @default("preset")
+  required_fields       Json     @default("[]")
+  instructions          String?  @db.Text
+  created_at            DateTime @default(now())
+  updated_at            DateTime @updatedAt
+  company               Company  @relation(fields: [company_id], references: [id], onDelete: Cascade)
+
+  @@map("booking_settings")
+}
+
+model BookingService {
+  id               String    @id @default(uuid())
+  company_id       String
+  name             String
+  description      String?   @db.Text
+  duration_minutes Int       @default(60)
+  price            Decimal?  @db.Decimal(12, 2)
+  deposit_amount   Decimal?  @db.Decimal(12, 2)
+  location         String?
+  active           Boolean   @default(true)
+  display_order    Int       @default(0)
+  created_at       DateTime  @default(now())
+  updated_at       DateTime  @updatedAt
+  company          Company   @relation(fields: [company_id], references: [id], onDelete: Cascade)
+  bookings         Booking[]
+
+  @@index([company_id, active])
+  @@map("booking_services")
+}
+
+model Booking {
+  id              String          @id @default(uuid())
+  company_id      String
+  service_id      String?
+  conversation_id String?
+  lead_id         String?
+  customer_name   String
+  mobile_number   String?
+  email           String?
+  service_name    String
+  start_at        DateTime
+  end_at          DateTime
+  status          String          @default("requested") // requested | pending_confirmation | confirmed | paid | cancelled | completed | no_show
+  source          String          @default("admin")
+  field_values    Json            @default("{}")
+  notes           String?         @db.Text
+  created_at      DateTime        @default(now())
+  updated_at      DateTime        @updatedAt
+  company         Company         @relation(fields: [company_id], references: [id], onDelete: Cascade)
+  service         BookingService? @relation(fields: [service_id], references: [id], onDelete: SetNull)
+  conversation    Conversation?   @relation(fields: [conversation_id], references: [id], onDelete: SetNull)
+  lead            Lead?           @relation(fields: [lead_id], references: [id], onDelete: SetNull)
+
+  @@index([company_id, start_at])
+  @@index([company_id, status])
+  @@index([service_id])
+  @@index([conversation_id])
+  @@index([lead_id])
+  @@map("bookings")
 }
 
 model HumanHandoff {
@@ -501,11 +773,16 @@ model Order {
   order_status          String      @default("awaiting_payment")
   external_payment_id   String?
   external_checkout_url String?
+  /// Messenger/source conversation that created this checkout link. This lets
+  /// payment webhooks send the post-payment onboarding message back to the same
+  /// chat instead of guessing by email.
+  source_conversation_id String?
   paid_at               DateTime?
   created_at            DateTime    @default(now())
   updated_at            DateTime    @updatedAt
   customer              Customer    @relation(fields: [customer_id], references: [id], onDelete: Restrict)
   cart                  Cart?       @relation(fields: [cart_id], references: [id], onDelete: SetNull)
+  source_conversation   Conversation? @relation("OrderSourceConversation", fields: [source_conversation_id], references: [id], onDelete: SetNull)
   items                 OrderItem[]
   payments              Payment[]
   subscriptions         Subscription[]
@@ -517,6 +794,7 @@ model Order {
   @@index([payment_status])
   @@index([order_status])
   @@index([external_payment_id])
+  @@index([source_conversation_id])
   @@map("orders")
 }
 

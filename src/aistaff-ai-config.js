@@ -1,4 +1,5 @@
 const { prisma } = require("./db");
+const { renderKnowledgeForPrompt } = require("./knowledge-base");
 
 const DEFAULT_AI_GOAL = [
   "PRIMARY GOAL: You orchestrate the full Messenger conversation — read chat history, call tools to capture state and execute actions, then reply naturally.",
@@ -60,12 +61,13 @@ function clearAistaffAiConfigCache() {
 
 function formatKnowledgeBaseForPrompt(entries = []) {
   if (!entries.length) return "";
-  const lines = entries.map((entry) => (
-    `[${entry.category}] Q: ${entry.question}\nA: ${entry.answer}`
-  ));
+  // Kind-aware since 2026-08-17. Was `[cat] Q: … A: …` for every row, which
+  // misrepresents a price list, promo or shipping table as a question.
+  const body = renderKnowledgeForPrompt(entries);
+  if (!body) return "";
   return [
     "Approved knowledge base (use when relevant — do not invent pricing or policies beyond this):",
-    ...lines
+    body
   ].join("\n");
 }
 

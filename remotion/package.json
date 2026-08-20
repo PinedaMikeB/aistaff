@@ -10,6 +10,9 @@
     "render:quotation-feed": "remotion render src/index.ts AdQuotation-Feed out/ad-quotation-feed.mp4",
     "render:feed-vo": "remotion render src/index.ts AdLostSales-Feed-VO out/ad-lost-sales-feed-vo.mp4",
     "generate:voiceover": "node scripts/generate-voiceover.js",
+    "generate:closer-knowledge-vo": "node scripts/generate-closer-knowledge-voiceover.js",
+    "render:closer-knowledge": "remotion render src/index.ts CloserKnowledgeExplainer out/closer-knowledge-explainer.mp4",
+    "render:closer-knowledge-story": "remotion render src/index.ts CloserKnowledgeExplainer-Story out/closer-knowledge-explainer-story.mp4",
     "render:all": "npm run render:feed && npm run render:story && npm run render:quotation-feed"
   },
   "dependencies": {

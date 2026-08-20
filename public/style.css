@@ -367,10 +367,47 @@ tr:hover td { background: #fbf9ff; }
 .score.hot { background: #ffe9ef; color: #9d2145; }
 .score.warm { background: #fff1dc; color: #8a5510; }
 .score.cold { background: #edf2ff; color: #314e9d; }
-.status.sent, .status.approved, .status.won { background: #e7f8ed; color: #246739; }
-.status.pending_approval, .status.quotation_ready { background: #fff1dc; color: #8a5510; }
-.status.rejected, .status.lost { background: #ffe9ef; color: #9d2145; }
+.status.sent, .status.approved, .status.won,
+.status.enabled, .status.confirmed, .status.paid, .status.completed { background: #e7f8ed; color: #246739; }
+.status.pending_approval, .status.quotation_ready,
+.status.requested, .status.pending_confirmation { background: #fff1dc; color: #8a5510; }
+.status.rejected, .status.lost,
+.status.inactive, .status.cancelled, .status.no_show { background: #ffe9ef; color: #9d2145; }
 .split { display: grid; grid-template-columns: 0.95fr 1.05fr; gap: 14px; align-items: start; }
+/* Settings stacks in one column rather than using .split. Reading order is the
+   real hierarchy here: identify the business first, then decide how the agent
+   behaves. Side by side, the two forms competed and the right-hand column
+   turned into a cramped 2-up grid of eleven selects. Nothing was removed —
+   every control from the two-column version is still present. */
+.settings-stack { display: grid; grid-template-columns: minmax(0, 860px); gap: 14px; align-items: start; }
+.settings-lede { margin: -6px 0 16px; font-size: 13px; }
+/* Group headings are structural, not decorative: each one names the decision
+   the controls under it make. */
+.settings-group { margin: 10px 0 -2px; padding-bottom: 6px; border-bottom: 1px solid rgba(120,130,160,.18);
+  color: var(--muted); font: 800 11px/1.2 inherit; letter-spacing: .09em; text-transform: uppercase; }
+.settings-group:first-of-type { margin-top: 0; }
+.settings-warning { margin: 0 0 16px; padding: 12px 14px; border-left: 3px solid #d99b24; background: #fff8ec; border-radius: 0 8px 8px 0; font-size: 13px; }
+.prompt-live { display: inline-block; margin-left: 6px; padding: 2px 7px; border-radius: 99px; background: #e7f6ec; color: #22694a; font: 800 10px inherit; letter-spacing: .06em; }
+.prompt-readonly summary { cursor: pointer; font-weight: 700; padding: 8px 0; }
+.closer-covers, .closer-behaviours, .closer-missing { margin: 8px 0 16px; padding-left: 20px; font-size: 13px; line-height: 1.9; }
+.closer-covers li b { display: inline-block; min-width: 22px; }
+.closer-missing li { color: #8a5a00; }
+/* Attachments inside the transcript, so a reviewed conversation shows exactly
+   what the customer received rather than only the words. */
+.message-media { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px; }
+.message-media img { max-width: 220px; max-height: 220px; border-radius: 8px; border: 1px solid rgba(120,130,160,.22); display: block; }
+.message-media a { text-decoration: none; }
+.message-file { display: inline-block; padding: 8px 12px; border-radius: 8px; background: rgba(120,130,160,.12);
+  font-size: 12px; font-weight: 700; color: inherit; }
+.inquiry-person { display: flex; align-items: center; gap: 12px; margin: -4px 0 16px; }
+.inquiry-avatar { width: 48px; height: 48px; border-radius: 50%; object-fit: cover; flex: 0 0 auto;
+  border: 1px solid rgba(120,130,160,.25); }
+.inquiry-avatar.is-initials { display: grid; place-items: center; background: rgba(107,77,255,.12);
+  color: #4b3ecf; font: 800 18px inherit; }
+.inquiry-person b { display: block; font-size: 15px; }
+.inquiry-open-chat { font-size: 13px; color: #4b3ecf; font-weight: 700; }
+.prompt-readonly pre { white-space: pre-wrap; word-break: break-word; max-height: 320px; overflow: auto;
+  background: #f7f8fb; padding: 14px; border-radius: 8px; font: 13px/1.55 inherit; margin: 6px 0 0; }
 .form-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; }
 .form-grid label { display: grid; gap: 6px; color: var(--muted); font-weight: 800; font-size: 13px; }
 .form-grid .full { grid-column: 1 / -1; }
@@ -394,6 +431,150 @@ tr:hover td { background: #fbf9ff; }
   font-size: 12px;
 }
 .message p { margin: 0; white-space: pre-wrap; word-break: break-word; }
+
+.booking-stack { grid-template-columns: minmax(0, 1100px); }
+.booking-calendar {
+  display: grid;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+  gap: 8px;
+}
+.booking-day {
+  min-height: 112px;
+  padding: 10px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: #fff;
+}
+.booking-day.is-today {
+  border-color: var(--lavender-strong);
+  box-shadow: inset 0 0 0 1px rgba(169, 146, 232, .18);
+}
+.booking-day header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 8px;
+  color: var(--muted);
+  font-size: 12px;
+}
+.booking-day header span {
+  display: grid;
+  width: 26px;
+  height: 26px;
+  place-items: center;
+  border-radius: 999px;
+  background: #f3efff;
+  color: var(--ink);
+  font-weight: 900;
+}
+.booking-chip {
+  display: grid;
+  gap: 2px;
+  margin-top: 6px;
+  padding: 7px 8px;
+  border-radius: 7px;
+  background: #f7f5ff;
+  border-left: 3px solid var(--lavender-strong);
+  font-size: 12px;
+}
+.booking-chip time { color: var(--muted); font-weight: 900; }
+.booking-chip span {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.booking-chip.confirmed, .booking-chip.paid { border-left-color: var(--green); background: #f3fbf6; }
+.booking-chip.cancelled, .booking-chip.no_show { border-left-color: var(--rose); background: #fff4f7; }
+.booking-chip.pending_confirmation { border-left-color: var(--amber); background: #fff8ed; }
+.booking-calendar-feed {
+  display: grid;
+  gap: 10px;
+  margin-top: 14px;
+  padding: 14px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: #fbfaff;
+}
+.booking-calendar-feed b { display: block; margin-bottom: 4px; }
+.booking-calendar-feed p { margin: 0; }
+.booking-feed-copy {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 8px;
+}
+.booking-feed-copy input {
+  min-width: 0;
+  font-size: 12px;
+}
+.booking-fields-panel {
+  padding: 14px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: #fff;
+}
+.booking-fields-panel .panel-header { margin-bottom: 8px; }
+.booking-fields-panel .panel-header h2 { font-size: 15px; }
+.booking-field-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8px;
+}
+.booking-field-option {
+  display: flex !important;
+  min-height: 46px;
+  align-items: center;
+  gap: 8px !important;
+  padding: 9px 10px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: #fbfaff;
+  color: var(--ink) !important;
+  font-size: 12px !important;
+  line-height: 1.25;
+}
+.booking-field-option input { width: 18px; height: 18px; flex: 0 0 auto; }
+.booking-extra-fields {
+  display: grid;
+  gap: 8px;
+  padding: 12px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: #fbfaff;
+}
+.booking-extra-fields p { margin: 0; font-size: 12px; font-weight: 800; }
+.booking-service-list { display: grid; gap: 8px; margin-top: 14px; }
+.booking-service {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 12px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: #fff;
+}
+.booking-service.is-inactive { opacity: .62; }
+.booking-service b { display: block; }
+.booking-service p { margin: 4px 0 0; font-size: 12px; line-height: 1.5; }
+.booking-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 900;
+  white-space: nowrap;
+}
+.booking-toggle input { width: 18px; height: 18px; }
+.booking-status-select {
+  min-height: 34px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  padding: 0 10px;
+  background: #fbfaff;
+  font-size: 12px;
+  font-weight: 800;
+}
 .review-toolbar { display: flex; gap: 10px; margin-bottom: 14px; flex-wrap: wrap; }
 .review-layout { align-items: start; }
 .review-meta .detail-list {
@@ -703,6 +884,8 @@ tr:hover td { background: #fbf9ff; }
 @media (max-width: 1050px) {
   .site-nav { display: none; }
   .hero, .solution, .conversation-sample, .audit, .split { grid-template-columns: 1fr; }
+  .settings-stack { grid-template-columns: 1fr; }
+  .form-grid { grid-template-columns: 1fr; }
   .product-visual { min-height: auto; }
   .steps { grid-template-columns: repeat(2, 1fr); }
   .pain-grid, .feature-grid, .pricing-grid { grid-template-columns: repeat(2, 1fr); }
@@ -715,6 +898,9 @@ tr:hover td { background: #fbf9ff; }
   .product-visual { display: none; }
   .pain-grid, .feature-grid, .pricing-grid, .steps, .audit-form, .metrics, .form-grid { grid-template-columns: 1fr; }
   .creative-card, .funnel-steps, .metrics-compact { grid-template-columns: 1fr; }
+  .booking-field-grid { grid-template-columns: 1fr; }
+  .booking-feed-copy { grid-template-columns: 1fr; }
+  .booking-calendar { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .connection-summary { grid-template-columns: 1fr; }
   .managed-page-card { align-items: flex-start; flex-direction: column; }
   .admin-app { grid-template-columns: 1fr; }
@@ -722,6 +908,10 @@ tr:hover td { background: #fbf9ff; }
   #adminNav { grid-template-columns: repeat(2, 1fr); }
   .admin-topbar { align-items: flex-start; flex-direction: column; }
   .chat-card p { max-width: 100%; }
+}
+
+@media (max-width: 420px) {
+  .booking-calendar { grid-template-columns: 1fr; }
 }
 
 /* AI Staff cinematic public experience */
@@ -1392,8 +1582,34 @@ tr:hover td { background: #fbf9ff; }
 .commerce-price-card dd { color: #d9f1ff; }
 .commerce-price-card li { line-height: 1.55; }
 .plan-badge { top: 18px; right: 18px; border: 1px solid rgba(117, 204, 255, .4); background: rgba(36, 169, 255, .14); color: #9fe5ff; font: 500 10px/1 "DM Mono", monospace; letter-spacing: .04em; }
+.modern-home .commerce-pricing-grid.is-compact {
+  grid-template-columns: repeat(4, minmax(236px, 270px));
+  justify-content: center;
+  align-items: stretch;
+}
+.modern-home .commerce-pricing-grid.is-compact .commerce-price-card { display: flex; flex-direction: column; min-width: 0; }
+.modern-home .commerce-pricing-grid.is-compact .plan-badge { position: static; align-self: flex-end; width: fit-content; margin: -4px 0 4px; }
+.modern-home .commerce-pricing-grid.is-compact .commerce-price-card strong { font-size: clamp(30px, 2.55vw, 40px); }
+.modern-home .commerce-pricing-grid.is-compact .commerce-price-card p { color: var(--commerce-muted, var(--ice)); line-height: 1.6; }
+.modern-home .commerce-pricing-grid.is-compact .commerce-price-card dl { margin-top: 6px; }
+.modern-home .commerce-pricing-grid.is-compact .commerce-price-card ul { margin-top: 6px; }
+.modern-home .commerce-pricing-grid.is-compact .commerce-price-card .button { width: 100%; margin-top: auto; text-align: center; }
+.commerce-plan-total { margin: auto 0 18px; padding-top: 16px; border-top: 1px solid rgba(117, 161, 188, .18); color: var(--ice); font: 600 14px/1.5 "Manrope"; }
+.commerce-plan-total em { display: block; margin-top: 3px; color: var(--commerce-muted, var(--ice)); font: 500 13px "Manrope"; font-style: normal; }
+.plan-note { width: fit-content; margin: 2px 0 6px; padding: 5px 10px; border: 1px solid rgba(117, 204, 255, .3); border-radius: 999px; background: rgba(36, 169, 255, .1); color: var(--ice) !important; font: 700 11px/1 "Manrope"; }
+.commerce-pricing-grid [hidden] { display: none !important; }
+.commerce-pricing-grid .bill-annual { display: none !important; }
+.commerce-pricing-grid.is-annual .bill-monthly { display: none !important; }
+.commerce-pricing-grid.is-annual .bill-annual { display: block !important; }
+@media (max-width: 1180px) { .modern-home .commerce-pricing-grid.is-compact { grid-template-columns: repeat(2, minmax(260px, 360px)); } }
+@media (max-width: 760px) { .modern-home .commerce-pricing-grid.is-compact { grid-template-columns: minmax(0, 1fr); } }
 .enterprise-panel { padding: clamp(28px, 5vw, 64px); border: 1px solid rgba(76, 185, 241, .4); border-radius: 4px; background: radial-gradient(circle at 85% 25%, rgba(23, 135, 199, .22), transparent 33%), linear-gradient(120deg, #0c2536, #06121c); }
 .enterprise-panel p { color: #86a3b7; }
+.modern-home .enterprise-panel { margin-top: 22px; }
+.modern-home .enterprise-panel h2 { max-width: none; color: #f4f8ff; font: 500 clamp(34px, 5vw, 68px)/.98 "Space Grotesk", "Manrope", sans-serif; letter-spacing: -.05em; }
+.modern-home .enterprise-form input,
+.modern-home .enterprise-form textarea { border-radius: 3px; }
+.modern-home .enterprise-form .success-message { grid-column: 1 / -1; background: rgba(41,145,184,.18); color: #9fe5ff; border: 1px solid rgba(75,193,244,.35); }
 .commerce-page input, .commerce-page textarea, .commerce-page select { border-color: rgba(117, 161, 188, .25); border-radius: 3px; background: rgba(4, 13, 21, .8); color: #d9f1ff; }
 .commerce-page input::placeholder, .commerce-page textarea::placeholder { color: #587789; }
 .commerce-page input:focus, .commerce-page textarea:focus, .commerce-page select:focus { outline: 0; border-color: #39baff; box-shadow: 0 0 0 2px rgba(36, 169, 255, .14); }
@@ -1645,6 +1861,30 @@ tr:hover td { background: #fbf9ff; }
   color: #d9f1ff;
   border-bottom-left-radius: 3px;
 }
+.site-chat-media-bubble {
+  padding: 8px;
+  max-width: min(84%, 260px);
+}
+.site-chat-media-link {
+  display: block;
+  color: #9ee8ff;
+  text-decoration: none;
+}
+.site-chat-media-link img {
+  display: block;
+  width: 100%;
+  max-height: 260px;
+  object-fit: contain;
+  border-radius: 10px;
+  border: 1px solid rgba(117, 204, 255, .18);
+  background: rgba(3, 8, 16, .45);
+}
+.site-chat-media-caption {
+  margin-top: 8px;
+  color: #9fc0d6;
+  font-size: 12px;
+  line-height: 1.45;
+}
 .site-chat-bubble.typing { color: #7fa0b3; letter-spacing: 2px; animation: site-chat-typing 1.2s ease-in-out infinite; }
 @keyframes site-chat-typing { 0%,100% { opacity: .4; } 50% { opacity: 1; } }
 .site-chat-bubble.error { border-color: rgba(255, 99, 99, .35); color: #ffb3b3; }
@@ -1784,3 +2024,144 @@ tr:hover td { background: #fbf9ff; }
 @media (max-width: 1100px) {
   .modern-home .pitch-cardmedia { width: 100%; }
 }
+
+/* ===========================================================================
+ * MOBILE ADMIN (2026-08-19)
+ *
+ * Most AIStaff customers run their business from a phone — they are Facebook
+ * sellers, not desk workers. The admin was built desktop-first and the only
+ * mobile rules stacked the sidebar; everything inside a panel still overflowed.
+ *
+ * Approach: nothing is hidden. A phone gets the same features, laid out so
+ * they fit — tables scroll, forms go single column, the nav becomes a
+ * horizontal strip, and touch targets grow to 44px.
+ * ========================================================================= */
+
+@media (max-width: 760px) {
+  /* Sidebar becomes a scrolling strip pinned to the top, so the nav never
+     costs half a screen of vertical space before any content appears. */
+  .admin-sidebar {
+    position: sticky; top: 0; z-index: 40;
+    display: flex; align-items: center; gap: 10px;
+    padding: 8px 12px; overflow: visible;
+    background: var(--card, #fff); border-bottom: 1px solid var(--line, rgba(120,130,160,.2));
+  }
+  .admin-sidebar .brand { flex: 0 0 auto; margin: 0; }
+  .admin-sidebar .brand-logo { width: 32px; height: 32px; }
+
+  #adminNav {
+    display: flex; grid-template-columns: none; gap: 6px;
+    overflow-x: auto; scrollbar-width: none; -webkit-overflow-scrolling: touch;
+    flex: 1; min-width: 0; padding-bottom: 2px;
+  }
+  #adminNav::-webkit-scrollbar { display: none; }
+  #adminNav a {
+    flex: 0 0 auto; white-space: nowrap; padding: 9px 14px;
+    border-radius: 999px; font-size: 13px; min-height: 40px;
+    display: inline-flex; align-items: center;
+  }
+  /* The single-letter badge is desktop decoration; on a strip it doubles the
+     width of every item for no benefit. */
+  #adminNav a > span { display: none; }
+
+  .sidebar-user { flex: 0 0 auto; }
+  .sidebar-user .sidebar-user-meta { display: none; }
+  .sidebar-logout { flex: 0 0 auto; padding: 8px 12px; font-size: 12px; min-height: 40px; }
+
+  .admin-main { padding: 14px 12px 32px; }
+  .admin-topbar { gap: 10px; margin-bottom: 14px; }
+  .admin-topbar h2 { font-size: 20px; }
+  .admin-topbar .eyebrow { font-size: 10px; }
+  .topbar-actions { flex-wrap: wrap; gap: 8px; width: 100%; }
+  .topbar-actions .button { flex: 1 1 auto; min-height: 44px; justify-content: center; }
+}
+
+@media (max-width: 760px) {
+  /* Panels: less padding, full width, no horizontal overflow anywhere. */
+  .panel { padding: 16px 14px; border-radius: 12px; }
+  .split, .review-layout, .settings-stack, .intake-layout { grid-template-columns: 1fr; gap: 12px; }
+  .stat-grid, .metrics, .metrics-compact { grid-template-columns: repeat(2, 1fr); gap: 10px; }
+
+  /* Tables scroll sideways rather than squashing to unreadable columns.
+     A momentum-scrolling wrapper beats truncated text a customer cannot act on. */
+  .table-wrap { overflow-x: auto; -webkit-overflow-scrolling: touch; margin: 0 -14px; padding: 0 14px; }
+  .table-wrap table { min-width: 560px; }
+
+  /* Forms: one column, and 16px inputs so iOS does not zoom on focus —
+     the zoom is disorienting and leaves the page scrolled sideways. */
+  .form-grid { grid-template-columns: 1fr; }
+  input, select, textarea, .button { font-size: 16px; }
+  input, select { min-height: 44px; }
+  .button { min-height: 44px; padding: 12px 16px; }
+  .actions-row { flex-direction: column; }
+  .actions-row .button { width: 100%; justify-content: center; }
+
+  /* Conversation transcript reads like a chat app rather than a data table. */
+  .message-list.transcript { max-height: none; }
+  .message { padding: 12px; }
+  .message-media img { max-width: 100%; }
+
+  /* Wizard */
+  .intake-rail { position: static; }
+  .intake-steps { display: flex; overflow-x: auto; gap: 6px; padding-bottom: 4px; }
+  .intake-step-item { flex: 0 0 auto; white-space: nowrap; }
+  .intake-row { grid-template-columns: 1fr; }
+  .intake-actions { flex-direction: column; }
+  .intake-actions .button { width: 100%; justify-content: center; }
+  .qual-item { grid-template-columns: 1fr; }
+
+  /* Modals become sheets — a centred box on a phone wastes the screen and
+     puts the action buttons under the thumb-unfriendly middle. */
+  .intake-modal-backdrop { padding: 0; align-items: flex-end; }
+  .intake-modal { max-width: 100%; width: 100%; border-radius: 16px 16px 0 0; max-height: 92vh; overflow: auto; }
+  .intake-modal-actions { flex-direction: column; }
+  .intake-modal-actions .button { width: 100%; justify-content: center; }
+
+  .closer-status span:last-child { display: none; }
+  .inquiry-person { flex-wrap: wrap; }
+}
+
+@media (max-width: 420px) {
+  .stat-grid, .metrics, .metrics-compact { grid-template-columns: 1fr; }
+  .admin-main { padding: 12px 10px 28px; }
+}
+
+/* Signed-in identity in the sidebar. */
+.sidebar-user {
+  display: flex; align-items: center; gap: 10px;
+  margin-top: auto; padding: 12px 10px;
+  border-top: 1px solid var(--line, rgba(120,130,160,.2));
+}
+.sidebar-avatar {
+  width: 34px; height: 34px; border-radius: 50%; flex: 0 0 auto;
+  display: grid; place-items: center;
+  background: rgba(107,77,255,.14); color: #4b3ecf; font: 800 14px inherit;
+}
+.sidebar-user-meta { display: grid; gap: 1px; min-width: 0; font-size: 12px; }
+.sidebar-user-meta b { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 13px; }
+.sidebar-user-meta .muted { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+/* ===========================================================================
+ * Chosen-plan confirmation (2026-08-19)
+ *
+ * Replaces the plan card grid on /pricing/ when a plan arrives via ?plan=.
+ * Scrolling past the cards was not enough: they sat above the form, so any
+ * scroll up read as a second pricing page and the buyer wondered whether their
+ * first click registered. Quiet by design — the decision is made, the form is
+ * the job now.
+ * ========================================================================= */
+.chosen-plan {
+  display: flex; align-items: center; justify-content: space-between;
+  gap: 20px; flex-wrap: wrap; padding: 22px 26px; border-radius: 16px;
+  border: 1px solid rgba(91, 190, 241, .18);
+  background: rgba(12, 26, 38, .55);
+  backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px);
+}
+.chosen-plan-kicker { margin: 0; color: #9edfff; font-size: 11px; font-weight: 600;
+  letter-spacing: .08em; text-transform: uppercase; }
+.chosen-plan h2 { margin: 6px 0 4px; color: #fff; font-size: 24px; line-height: 1.2; letter-spacing: -.02em; }
+.chosen-plan-detail { margin: 0; color: #86a3b7; font-size: 14px; line-height: 1.5; }
+.chosen-plan-change { color: #9edfff; font-size: 13px; font-weight: 600; text-decoration: none;
+  border-bottom: 1px solid rgba(158, 223, 255, .4); }
+.chosen-plan-change:hover { border-bottom-color: #9edfff; }
+@media (max-width: 640px) { .chosen-plan { flex-direction: column; align-items: flex-start; } }

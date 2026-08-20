@@ -40,10 +40,10 @@
         <div id="pricingCards" class="commerce-pricing-grid" aria-live="polite"></div>
       </section>
 
-      <section class="commerce-section">
+      <section id="customPricing" class="commerce-section">
         <div class="enterprise-panel">
           <div>
-            <p class="eyebrow">Enterprise</p>
+            <p class="eyebrow">Custom operations</p>
             <h2>Custom pricing for complex AI sales and support operations</h2>
             <p>Starting at ₱100,000 per month for large companies, hotels, clinics, property developers, multi-branch businesses, high-volume support, private deployments, custom workflows, and dedicated infrastructure.</p>
           </div>
@@ -58,8 +58,8 @@
             <input name="required_integrations" placeholder="Required integrations" />
             <input name="preferred_contact_schedule" placeholder="Preferred contact schedule" />
             <textarea name="additional_requirements" placeholder="Additional requirements"></textarea>
-            <button class="button button-primary full" type="submit">Request an Enterprise Proposal</button>
-            <p class="success-message" hidden>Enterprise request prepared. Our team will contact you through the details provided.</p>
+            <button class="button button-primary full" type="submit">Request a Custom Proposal</button>
+            <p class="success-message" hidden>Custom proposal request prepared. Our team will contact you through the details provided.</p>
           </form>
         </div>
       </section>
@@ -97,7 +97,7 @@
           </div>
 
           <div class="checkout-block">
-            <p class="eyebrow">Payment Method</p>
+            <p class="eyebrow">QRPh Payment</p>
             <div id="paymentMethods" class="payment-methods"></div>
             <p id="paymentModeNote" class="note"></p>
           </div>
@@ -115,9 +115,9 @@
             <button id="clearCartBtn" class="button button-soft" type="button">Remove item</button>
           </div>
           <div id="orderSummary" class="summary-lines empty-state"><p>Select a package to begin checkout.</p></div>
-          <div class="coupon-row"><input placeholder="Coupon code for future use" disabled /><button class="button button-soft" disabled>Apply</button></div>
-          <button id="checkoutBtn" class="button button-primary full" type="button" disabled>Checkout</button>
-          <p class="note">No card information is stored by AIStaff. Payment provider secrets are never exposed in frontend code.</p>
+          <div class="coupon-row"><input id="couponCode" name="coupon_code" placeholder="Discount code" autocomplete="off" /><button id="applyCouponBtn" class="button button-soft" type="button">Apply</button></div>
+          <button id="checkoutBtn" class="button button-primary full" type="button" disabled>Continue to QRPh Payment</button>
+          <p class="note">AIStaff never asks for OTPs, passwords, card numbers, or private payment screenshots.</p>
         </aside>
       </section>
     </main>
@@ -125,6 +125,6 @@
     <footer class="commerce-footer">
       <span>AIStaff Solutions Corporation</span><span>Registration details pending verified business profile</span><a href="/about/">About Us</a><a href="/contact/">Contact Us</a><a href="/support/">Support</a><a href="/refund-policy/">Refund Policy</a><a href="/cancellation-policy/">Cancellation Policy</a><a href="/service-fulfillment-policy/">Service Fulfillment Policy</a><a href="/terms/">Terms</a><a href="/privacy/">Privacy</a>
     </footer>
-    <script src="/pricing-checkout.js"></script>
+    <script src="/pricing-checkout.js?v=20260820-selected-plan"></script>
   </body>
 </html>

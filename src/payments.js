@@ -1,6 +1,44 @@
 const crypto = require("crypto");
 
 const PAYMENT_MODE = process.env.PAYMENT_MODE || "test";
+
+/**
+ * PayMongo live/test switching.
+ *
+ * Both key sets stay in .env permanently; PAYMONGO_MODE decides which is used,
+ * so flipping back to test for a rebuild is a one-word change and never
+ * requires re-pasting a key. Falls back to the legacy unsuffixed vars so an
+ * older .env keeps working.
+ */
+const PAYMONGO_MODE = String(process.env.PAYMONGO_MODE || "test").toLowerCase();
+const PAYMONGO_IS_LIVE = PAYMONGO_MODE === "live";
+
+function paymongoSecretKey() {
+  return (PAYMONGO_IS_LIVE
+    ? process.env.PAYMONGO_SECRET_KEY_LIVE
+    : process.env.PAYMONGO_SECRET_KEY_TEST) || process.env.PAYMONGO_SECRET_KEY || "";
+}
+
+function paymongoWebhookSecret() {
+  return (PAYMONGO_IS_LIVE
+    ? process.env.PAYMONGO_WEBHOOK_SECRET_LIVE
+    : process.env.PAYMONGO_WEBHOOK_SECRET_TEST) || process.env.PAYMONGO_WEBHOOK_SECRET || "";
+}
+
+// Guard against the expensive mistake: charging real cards with a test key, or
+// (worse) believing you are in test while a live key takes real money.
+(function assertPaymongoKeyMatchesMode() {
+  const key = paymongoSecretKey();
+  if (!key) return;
+  const looksLive = key.startsWith("sk_live_");
+  if (PAYMONGO_IS_LIVE && !looksLive) {
+    console.error("[paymongo] PAYMONGO_MODE=live but the key is not sk_live_ — refusing to pretend. Payments will fail.");
+  } else if (!PAYMONGO_IS_LIVE && looksLive) {
+    console.error("[paymongo] PAYMONGO_MODE=test but a LIVE key is configured — this would charge real money. Fix .env.");
+  } else {
+    console.log(`[paymongo] mode=${PAYMONGO_MODE} key=${key.slice(0, 8)}...`);
+  }
+})();
 const CURRENCY = "PHP";
 
 const BUSINESS_IDENTITY = {
@@ -28,17 +66,47 @@ const PRODUCT = {
  * built live in ROADMAP_FEATURES below and are deliberately NOT sold yet
  * (HANDOFF-CLOSER.md build order items 3 and 4).
  */
+/**
+ * What every plan includes. Capability never differs by tier — only capacity
+ * and which channels the agent answers on.
+ *
+ * WRITTEN AS OUTCOMES, NOT COMPONENTS. "Lead capture and scoring" is an
+ * engineering word for something the owner experiences as knowing who is
+ * serious. The list a buyer reads should describe what changes for them.
+ *
+ * NO TIME PROMISES. Support says "onboarding assistance" rather than "2-day
+ * onboarding": an unbounded promise you always keep is worth more than a
+ * specific one you might miss, and a missed number is the kind of thing a
+ * customer quotes back at you.
+ *
+ * Everything listed here is BUILT and verified. Booking assistance was removed
+ * on 2026-08-19 — there is no live availability check, so Closer can take a
+ * booking request but cannot confirm one, and selling it as a feature is the
+ * §15 mistake (a customer reaching something that looks live and is not).
+ */
 const SHARED_FEATURES = [
-  "Replies from your knowledge base",
-  "Matches how the customer writes, including Taglish",
-  "Product media in-thread",
-  "Quotation drafts with owner approval",
-  "Mobile number capture",
-  "Booking assistance",
-  "Lead capture and scoring",
-  "Dashboard and reports",
-  "Human handoff",
-  "Unanswered-question log"
+  "Answers instantly, 24/7, only from what you approve",
+  "Replies in your customer's language — English, Tagalog or Taglish",
+  "Sends your photos, posters and price lists in the chat",
+  "Asks your qualification questions and captures contact details",
+  "Marks who is hot, warm or cold so you know who to call first",
+  "Prepares quotation drafts for your approval",
+  "Hands over to you the moment a customer needs a person",
+  "Tells you every question it could not answer, so it keeps improving",
+  "Guided setup wizard — upload a price list, photo or PDF and it reads it",
+  "Dashboard for inquiries, leads and conversations on any device"
+];
+
+/**
+ * Support and onboarding, listed separately from product features because
+ * buyers weigh them differently — the service is often what decides a sale at
+ * this price point.
+ */
+const SUPPORT_FEATURES = [
+  "Onboarding assistance to get your knowledge base right",
+  "Ongoing tech support to optimise your Closer",
+  "24/7 AI chat assistance",
+  "We review the questions your customers actually asked and help you answer them"
 ];
 
 /**
@@ -70,71 +138,129 @@ const PITCH_BUNDLE = {
 };
 
 /**
- * Setup covers: intake call, knowledge base loaded and tested, media tagged by
- * offering, Facebook Page connection, qualification flow, escalation rules,
- * orientation, and 14 days of support. Waived on annual payment.
+ * SETUP FEE REMOVED 2026-08-17. Set to 0, not deleted — three existing
+ * OrderItem rows carry a "One-time setup" line (AS-20260813-955B98 pending,
+ * AS-20260813-1E9338 paid) and those are price snapshots that must keep
+ * resolving. calculateCart already skips the line when this is 0.
  *
- * Annual = 10 x the monthly rate: two months free, on top of the waived setup.
+ * Why: the knowledge base intake wizard makes setup self-serve, and the §17
+ * Meta fixes (config_id, public_profile Advanced, subscribed_apps) were
+ * platform work that every future customer now gets for free. Charging for
+ * labour that no longer happens is a fee you cannot describe.
+ *
+ * The annual benefit is now purely TWO MONTHS FREE (annualPrice is 10x
+ * monthly, not 12x). That stands on its own without the waiver.
  */
-const SETUP_FEE = 4999;
+const SETUP_FEE = 0;
 
 const PRICING_PLANS = [
   {
     name: "Starter",
     slug: "starter",
-    monthlyPrice: 4999,
-    annualPrice: 49990,
+    monthlyPrice: 1499,
+    annualPrice: 14990,
     setupPrice: SETUP_FEE,
     setupWaivedOnAnnual: true,
-    bestFor: "Single-page businesses that want every capability at the smallest capacity.",
-    conversationLimit: 1500,
+    available: true,
+    bestFor: "Getting started on Messenger, with everything Closer can do.",
+    conversationLimit: 100,
+    channels: ["messenger"],
+    channelLabel: "Facebook Messenger",
     facebookPageLimit: 1,
     staffLoginLimit: 1,
-    onboarding: "Standard onboarding",
+    onboarding: "Onboarding assistance and ongoing tech support",
     cta: "Start with Starter",
+    features: SHARED_FEATURES
+  },
+  {
+    name: "Essential",
+    slug: "essential",
+    monthlyPrice: 2999,
+    annualPrice: 29990,
+    setupPrice: SETUP_FEE,
+    setupWaivedOnAnnual: true,
+    available: true,
+    bestFor: "Steady inquiry volume, on whichever channel your customers use.",
+    conversationLimit: 300,
+    channels: ["messenger", "website"],
+    channelChoice: 1,
+    channelLabel: "Messenger or website chat (choose one)",
+    facebookPageLimit: 1,
+    staffLoginLimit: 2,
+    onboarding: "Onboarding assistance and ongoing tech support",
+    cta: "Choose Essential",
     features: SHARED_FEATURES
   },
   {
     name: "Professional",
     slug: "professional",
-    monthlyPrice: 9999,
-    annualPrice: 99990,
+    monthlyPrice: 4499,
+    annualPrice: 44990,
     setupPrice: SETUP_FEE,
     setupWaivedOnAnnual: true,
+    available: true,
     badge: "Most Popular",
-    bestFor: "Multi-page businesses with steadier inquiry volume.",
-    conversationLimit: 5000,
-    facebookPageLimit: 3,
+    bestFor: "Answering everywhere your customers reach you.",
+    conversationLimit: 600,
+    channels: ["messenger", "website"],
+    channelLabel: "Messenger and website chat",
+    facebookPageLimit: 1,
     staffLoginLimit: 3,
-    onboarding: "Standard onboarding",
+    onboarding: "Onboarding assistance and ongoing tech support",
     cta: "Choose Professional",
     features: SHARED_FEATURES
   },
   {
-    name: "Growth",
-    slug: "growth",
-    monthlyPrice: 19999,
-    annualPrice: 199990,
+    name: "Enterprise",
+    slug: "enterprise",
+    monthlyPrice: 6999,
+    annualPrice: 69990,
     setupPrice: SETUP_FEE,
     setupWaivedOnAnnual: true,
-    bestFor: "Multi-branch operations and higher inquiry volume.",
-    conversationLimit: 15000,
-    facebookPageLimit: 8,
+    available: true,
+    bestFor: "High inquiry volume across both channels.",
+    conversationLimit: 1200,
+    channels: ["messenger", "website"],
+    channelLabel: "Messenger and website chat",
+    facebookPageLimit: 1,
     staffLoginLimit: 10,
-    onboarding: "Standard onboarding",
-    cta: "Choose Growth",
-    features: [...SHARED_FEATURES, "Branch routing", "Priority support"]
+    onboarding: "Onboarding assistance, tech support and priority response",
+    cta: "Choose Enterprise",
+    features: [...SHARED_FEATURES, "Priority support response"]
   }
 ];
+
+/**
+ * Plans a customer may actually buy today. PRICING_PLANS stays complete so
+ * existing Subscription/Order rows still resolve their slug; this is what any
+ * customer-facing surface should read. Hiding a card without this filter still
+ * leaves the plan purchasable by POSTing its slug to /api/cart.
+ */
+const AVAILABLE_PLANS = PRICING_PLANS.filter((plan) => plan.available !== false);
 
 const ADD_ONS = [
   { name: "Additional Facebook Page", slug: "additional-facebook-page", description: "Connect one additional Facebook Page.", price: 2500, billingType: "monthly_recurring" },
   { name: "Additional 1,000 Conversations", slug: "additional-1000-conversations", description: "Adds 1,000 AI-assisted conversations to the selected plan.", price: 1500, billingType: "monthly_recurring" },
   { name: "Custom Landing Page", slug: "custom-landing-page", description: "One-time landing page design and build for campaigns.", price: 15000, billingType: "one_time" },
-  { name: "AI Knowledge Base Setup", slug: "ai-knowledge-base-setup", description: "One-time setup for FAQs, product/service knowledge, and qualification content.", price: 10000, billingType: "one_time" },
-  { name: "Custom Integration", slug: "custom-integration", description: "Their API, webhook or n8n workflow, CRM, or booking system. Quoted after technical review.", price: 14999, billingType: "custom_quotation", startsAt: true },
+  // HIDDEN 2026-08-17: the intake wizard does this free. Kept (not deleted)
+  // because order AS-20260727-BA0FAE and one active cart still reference the
+  // slug — deleting it would make those rows unresolvable.
+  { name: "AI Knowledge Base Setup", slug: "ai-knowledge-base-setup", description: "One-time setup for FAQs, product/service knowledge, and qualification content.", price: 10000, billingType: "one_time", available: false },
+  // Price is a RANGE, quoted after technical review — what it costs depends
+  // entirely on what the customer already runs (a Google Calendar connection is
+  // not a POS integration). `price` is the floor and `priceMax` the ceiling;
+  // billingType custom_quotation means neither is charged automatically.
+  //
+  // One integration serves the whole account, not one agent: connecting a
+  // customer's system gives Closer live availability AND gives Pitch the same
+  // data when it is developed. They share the customer platform, so this is
+  // never billed twice.
+  { name: "Custom Integration", slug: "custom-integration", description: "Their API, webhook or n8n workflow, CRM, POS, or booking system. Quoted after technical review. Covers every AIStaff agent on the account — Closer and Pitch share the same connection.", price: 10000, priceMax: 15000, billingType: "custom_quotation", startsAt: true },
   { name: "Priority Onboarding", slug: "priority-onboarding", description: "One-time priority onboarding scheduling and setup assistance.", price: 7500, billingType: "one_time" }
 ];
+
+/** Add-ons still offered. Same reasoning as AVAILABLE_PLANS above. */
+const AVAILABLE_ADD_ONS = ADD_ONS.filter((addon) => addon.available !== false);
 
 function formatMoney(amount, currency = CURRENCY) {
   return new Intl.NumberFormat("en-PH", { style: "currency", currency }).format(Number(amount || 0));
@@ -154,6 +280,9 @@ function recurringAddonPrice(addon, billingFrequency) {
 function calculateCart({ planSlug, billingFrequency = "monthly", addOnSlugs = [] }) {
   const plan = PRICING_PLANS.find((item) => item.slug === planSlug);
   if (!plan) throw new Error("Selected package is not available");
+  // A hidden plan is not a buyable plan. Without this, hiding the card only
+  // hides the button — the slug still works if posted directly.
+  if (plan.available === false) throw new Error("Selected package is not available");
   const frequency = billingFrequency === "annual" ? "annual" : "monthly";
   const items = [{
     itemType: "pricing_plan",
@@ -165,8 +294,11 @@ function calculateCart({ planSlug, billingFrequency = "monthly", addOnSlugs = []
     lineTotal: billingPrice(plan, frequency)
   }];
 
-  // One-time setup. Waived on annual payment — that waiver IS the annual
-  // benefit (annualPrice is a straight monthly x12, no separate discount).
+  // One-time setup, waived on annual payment. CORRECTION 2026-08-17: the old
+  // comment here said annualPrice was a straight monthly x12 with no discount.
+  // It is not — annualPrice is 10x monthly, i.e. two months free, and the
+  // waived setup is on TOP of that. Starter annual is 49,990 (not 59,988),
+  // which is 4,166/month and a 14,997 total saving. Do not "fix" it back.
   // If they leave early on a waived annual, the setup is invoiced back; that
   // clawback belongs in the terms, not here.
   const setupWaived = frequency === "annual" && plan.setupWaivedOnAnnual;
@@ -206,10 +338,16 @@ function calculateCart({ planSlug, billingFrequency = "monthly", addOnSlugs = []
 
 function paymentProviderForCountry(country, requestedProvider = "") {
   if (requestedProvider === "manual_bank_transfer") return "manual_bank_transfer";
-  return String(country || "").toLowerCase().includes("philippines") ? "xendit" : "stripe";
+  // PayMongo, not Xendit, for the Philippines since 2026-08-19 — QR Ph was
+  // live on signup. XenditProvider is kept, not deleted, in case a second
+  // acquirer is ever wanted.
+  return String(country || "").toLowerCase().includes("philippines") ? "paymongo" : "stripe";
 }
 
 function providerReady(provider) {
+  // PayMongo needs only the SECRET key: all calls are server-side and the
+  // hosted checkout page handles card entry, so there is no public key in play.
+  if (provider === "paymongo") return Boolean(paymongoSecretKey());
   if (provider === "xendit") return Boolean(process.env.XENDIT_SECRET_KEY && process.env.XENDIT_PUBLIC_KEY);
   if (provider === "stripe") return Boolean(process.env.STRIPE_SECRET_KEY && process.env.STRIPE_PUBLISHABLE_KEY);
   if (provider === "manual_bank_transfer") return true;
@@ -268,6 +406,119 @@ class MockPaymentProvider extends PaymentProvider {
       status: "pending",
       mode: PAYMENT_MODE,
       message: "Secure online payment integration is currently in test mode."
+    };
+  }
+}
+
+/**
+ * PayMongo — the acquirer AIStaff actually uses (2026-08-19).
+ *
+ * Chosen over Xendit because QR Ph was active on signup with no separate
+ * application. That matters: one QR Ph code reaches GCash, Maya, UnionBank,
+ * BDO, BPI and the rest, which covers most Filipino buyers on day one. Cards
+ * are activated separately and mostly matter for the annual plan, where the
+ * InstaPay ceiling can bite.
+ *
+ * Uses CHECKOUT SESSIONS, not Links. A session carries the customer's email and
+ * our own reference_number, so the webhook says exactly which order was paid.
+ * That is what makes attribution automatic rather than matching payments to
+ * people by hand — the reason a static bank QR was rejected.
+ *
+ * AMOUNTS ARE IN CENTAVOS. ₱4,999 is 499900. Getting this wrong charges someone
+ * 100x, so conversion happens in exactly one place: toCentavos().
+ */
+class PayMongoProvider extends PaymentProvider {
+  constructor() {
+    super("paymongo");
+    this.baseUrl = process.env.PAYMONGO_API_URL || "https://api.paymongo.com";
+  }
+
+  authHeader() {
+    const key = paymongoSecretKey();
+    return "Basic " + Buffer.from(`${key}:`).toString("base64");
+  }
+
+  toCentavos(amount) {
+    return Math.round(Number(amount) * 100);
+  }
+
+  async request(path, options = {}) {
+    const fetchImpl = (...args) => import("node-fetch").then(({ default: f }) => f(...args));
+    const response = await fetchImpl(`${this.baseUrl}${path}`, {
+      ...options,
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: this.authHeader(),
+        ...(options.headers || {})
+      }
+    });
+    const text = await response.text();
+    let json = {};
+    try { json = text ? JSON.parse(text) : {}; } catch { json = { raw: text }; }
+    if (!response.ok) {
+      // PayMongo returns { errors: [{ detail }] }. Surface the detail —
+      // "paymongo_400" alone is useless when a payment fails at 2am.
+      const detail = json?.errors?.[0]?.detail || json?.errors?.[0]?.code || `paymongo_${response.status}`;
+      const error = new Error(detail);
+      error.status = response.status;
+      error.body = json;
+      throw error;
+    }
+    return json;
+  }
+
+  async createInvoice(order, options = {}) {
+    const base = (process.env.PUBLIC_BASE_URL || "https://aistaff.click").replace(/\/+$/, "");
+    const lineItems = (order.items || []).map((item) => ({
+      name: String(item.itemName || item.item_name || "AIStaff").slice(0, 120),
+      quantity: Number(item.quantity || 1),
+      amount: this.toCentavos(item.unitPrice ?? item.unit_price ?? item.lineTotal ?? item.line_total ?? 0),
+      currency: CURRENCY
+    })).filter((i) => i.amount > 0);
+
+    // Never send an empty basket — PayMongo rejects it, and a single fallback
+    // line is more honest than a failed checkout.
+    const items = lineItems.length ? lineItems : [{
+      name: `AIStaff ${order.plan_name || "subscription"}`,
+      quantity: 1,
+      amount: this.toCentavos(order.total_amount || 0),
+      currency: CURRENCY
+    }];
+
+    const payload = {
+      data: {
+        attributes: {
+          line_items: items,
+          // Only methods actually activated on the account. QR Ph is live now;
+          // cards and wallets appear here as they are approved.
+          payment_method_types: (process.env.PAYMONGO_METHODS || "qrph,card,gcash,paymaya,grab_pay")
+            .split(",").map((m) => m.trim()).filter(Boolean),
+          // The webhook matches on this. It is the ONE link between a PayMongo
+          // payment and an AIStaff order.
+          reference_number: order.order_number,
+          description: `AIStaff ${order.plan_name || "subscription"} — ${order.order_number}`.slice(0, 200),
+          send_email_receipt: true,
+          show_line_items: true,
+          success_url: `${base}/checkout/success?order=${encodeURIComponent(order.order_number)}`,
+          cancel_url: `${base}/checkout/cancelled?order=${encodeURIComponent(order.order_number)}`,
+          ...(options.email || order.customer_email
+            ? { billing: { email: options.email || order.customer_email, name: order.customer_name || undefined } }
+            : {})
+        }
+      }
+    };
+
+    const result = await this.request("/v1/checkout_sessions", {
+      method: "POST",
+      body: JSON.stringify(payload)
+    });
+
+    return {
+      provider: this.name,
+      providerPaymentId: result?.data?.id || null,
+      checkoutUrl: result?.data?.attributes?.checkout_url || null,
+      status: "pending",
+      raw: result?.data || null
     };
   }
 }
@@ -426,6 +677,7 @@ class ManualBankTransferProvider extends MockPaymentProvider {
 }
 
 function getPaymentProvider(name) {
+  if (name === "paymongo") return providerReady("paymongo") ? new PayMongoProvider() : new MockPaymentProvider("paymongo");
   if (name === "xendit") return providerReady("xendit") ? new XenditProvider() : new MockPaymentProvider("xendit");
   if (name === "stripe") return providerReady("stripe") ? new StripeProvider() : new MockPaymentProvider("stripe");
   if (name === "manual_bank_transfer") return new ManualBankTransferProvider();
@@ -433,6 +685,40 @@ function getPaymentProvider(name) {
 }
 
 function verifyWebhookSignature(provider, rawBody, signature) {
+  /**
+   * PayMongo signs `${timestamp}.${rawBody}` with HMAC-SHA256 and sends it as
+   * `paymongo-signature: t=<ts>,te=<test sig>,li=<live sig>`. Test and live
+   * events are signed with different keys, hence two fields.
+   *
+   * Verified with timingSafeEqual — a plain === leaks information through
+   * comparison time, which is the standard way signature checks get broken.
+   */
+  if (provider === "paymongo") {
+    const secret = paymongoWebhookSecret();
+    // No secret configured means we cannot verify, and an unverified payment
+    // webhook must never be trusted — it would let anyone mark an order paid.
+    if (!secret || !signature) return false;
+
+    const parts = Object.fromEntries(
+      String(signature).split(",").map((p) => p.split("=").map((s) => s.trim()))
+    );
+    const timestamp = parts.t;
+    // Live events are signed as li=, test events as te=. Preferring te=
+    // unconditionally makes every LIVE webhook fail verification, so the
+    // active mode decides which field to trust.
+    const provided = PAYMONGO_IS_LIVE ? (parts.li || parts.te) : (parts.te || parts.li);
+    if (!timestamp || !provided) return false;
+
+    const expected = crypto
+      .createHmac("sha256", secret)
+      .update(`${timestamp}.${rawBody.toString("utf8")}`)
+      .digest("hex");
+
+    const a = Buffer.from(expected, "utf8");
+    const b = Buffer.from(provided, "utf8");
+    return a.length === b.length && crypto.timingSafeEqual(a, b);
+  }
+
   if (provider === "xendit") {
     const token = process.env.XENDIT_WEBHOOK_TOKEN;
     if (!token || !signature) return false;
@@ -461,12 +747,16 @@ module.exports = {
   BUSINESS_IDENTITY,
   PRODUCT,
   PRICING_PLANS,
+  AVAILABLE_PLANS,
   SHARED_FEATURES,
+  SUPPORT_FEATURES,
   BUILD_DEBT,
   PITCH_BUNDLE,
   ADD_ONS,
+  AVAILABLE_ADD_ONS,
   CURRENCY,
   PaymentProvider,
+  PayMongoProvider,
   XenditProvider,
   StripeProvider,
   ManualBankTransferProvider,

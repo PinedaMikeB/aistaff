@@ -1,0 +1,57 @@
+{
+  "generatedAt": "2026-08-20T06:39:38.413Z",
+  "voice": "Samantha",
+  "rate": "185",
+  "fullAudio": "voiceovers/closer-knowledge-explainer/closer-knowledge-explainer-full.mp3",
+  "totalDurationSeconds": 77.713,
+  "scenes": [
+    {
+      "id": "scene-01",
+      "file": "voiceovers/closer-knowledge-explainer/scene-01.mp3",
+      "durationSeconds": 9.221,
+      "narration": "Closer does not guess. It works from the information you give it: your business details, products, prices, photos, rules, and the way you want customers handled."
+    },
+    {
+      "id": "scene-02",
+      "file": "voiceovers/closer-knowledge-explainer/scene-02.mp3",
+      "durationSeconds": 8.777,
+      "narration": "First, open your tenant workspace. This is the control room for one company. Each customer has their own workspace, their own knowledge base, and their own settings."
+    },
+    {
+      "id": "scene-03",
+      "file": "voiceovers/closer-knowledge-explainer/scene-03.mp3",
+      "durationSeconds": 8.307,
+      "narration": "Start with the basics: who you are, what you sell, your service area, your contact details, and what kind of customers you want Closer to qualify."
+    },
+    {
+      "id": "scene-04",
+      "file": "voiceovers/closer-knowledge-explainer/scene-04.mp3",
+      "durationSeconds": 11.128,
+      "narration": "Next, add your products, services, pricing, inclusions, promos, payment terms, delivery rules, and anything Closer must never invent. This is the sales truth it will use in chat."
+    },
+    {
+      "id": "scene-05",
+      "file": "voiceovers/closer-knowledge-explainer/scene-05.mp3",
+      "durationSeconds": 11.363,
+      "narration": "If customers need to see something, upload it. Product photos, posters, price cards, videos, and PDFs can be attached to knowledge entries, so Closer can send the right file at the right moment."
+    },
+    {
+      "id": "scene-06",
+      "file": "voiceovers/closer-knowledge-explainer/scene-06.mp3",
+      "durationSeconds": 10.553,
+      "narration": "Then set the behavior in AI Studio. The platform general prompt and tenant settings tell Closer the tone, language behavior, qualification flow, handoff rules, and what to do next."
+    },
+    {
+      "id": "scene-07",
+      "file": "voiceovers/closer-knowledge-explainer/scene-07.mp3",
+      "durationSeconds": 8.62,
+      "narration": "The same brain can power Messenger and the website chat widget. If you update the knowledge base or the AI Studio rules, both channels can use the latest approved information."
+    },
+    {
+      "id": "scene-08",
+      "file": "voiceovers/closer-knowledge-explainer/scene-08.mp3",
+      "durationSeconds": 9.744,
+      "narration": "When prices change, promos expire, new products launch, or policies update, edit the knowledge base. Closer stays useful because your team keeps the source of truth clean."
+    }
+  ]
+}

@@ -2,7 +2,9 @@ import React from "react";
 import { Composition } from "remotion";
 import { AdLostSales } from "./compositions/AdLostSales";
 import { AdQuotationFlow } from "./compositions/AdQuotationFlow";
+import { CloserKnowledgeExplainer } from "./compositions/CloserKnowledgeExplainer";
 import { ProductTeaser } from "./compositions/ProductTeaser";
+import { closerKnowledgeTotalSeconds } from "./data/closerKnowledgeExplainer";
 import { DURATION_SECONDS, FPS } from "./theme";
 
 export const RemotionRoot: React.FC = () => (
@@ -60,6 +62,24 @@ export const RemotionRoot: React.FC = () => (
       height={1920}
       fps={FPS}
       defaultProps={{ layout: "story" as const }}
+    />
+    <Composition
+      id="CloserKnowledgeExplainer"
+      component={CloserKnowledgeExplainer}
+      durationInFrames={Math.ceil(closerKnowledgeTotalSeconds * FPS)}
+      width={1920}
+      height={1080}
+      fps={FPS}
+      defaultProps={{ layout: "landscape" as const, withVoiceover: true }}
+    />
+    <Composition
+      id="CloserKnowledgeExplainer-Story"
+      component={CloserKnowledgeExplainer}
+      durationInFrames={Math.ceil(closerKnowledgeTotalSeconds * FPS)}
+      width={1080}
+      height={1920}
+      fps={FPS}
+      defaultProps={{ layout: "story" as const, withVoiceover: true }}
     />
     {/* Brandee product-ad MVP — parameterized teaser rendered dynamically
         via `remotion render ProductTeaser --props='{...}'` (see

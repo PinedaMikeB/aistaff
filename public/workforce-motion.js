@@ -1,6 +1,6 @@
 (() => {
   const section = document.querySelector("#services");
-  const cards = [...document.querySelectorAll("#services .service-card")];
+  const cards = [...document.querySelectorAll("#services .service-card")].filter((card) => !card.closest("[hidden]"));
   if (!section || !cards.length) return;
 
   section.classList.add("workforce-reveal-ready");
@@ -36,6 +36,7 @@
 // Card image carousels (Brandee, Closer, etc.) — Motion-powered crossfade,
 // synced progress bars, click-to-pause, swipe. Initializes every [data-carousel] independently.
 document.querySelectorAll("[data-carousel]").forEach((carousel) => {
+  if (carousel.closest("[hidden]")) return;
   const images = [...carousel.querySelectorAll(".carousel-track img")];
   const segments = [...carousel.querySelectorAll(".carousel-progress span")];
   const fills = segments.map((s) => s.querySelector("i"));
@@ -148,6 +149,7 @@ function initCaptionReveal(prefix, titleId) {
   const caption = document.querySelector(`.${prefix}`);
   const title = document.getElementById(titleId);
   if (!caption || !title) return;
+  if (caption.closest("[hidden]")) return;
 
   const eyebrow = caption.querySelector(`.${prefix}-eyebrow`);
   const body = caption.querySelector(`.${prefix}-body`);

@@ -19,9 +19,25 @@ const {
 // so a wrong number here becomes a written quote the customer can hold us to.
 const { MINIMUM_OFFER } = require("./closer-pricing");
 
-async function nextQuotationNumber(companyId) {
-  const count = await prisma.quotation.count({ where: { company_id: companyId } });
-  return `Q-${new Date().getFullYear()}-${String(count + 1).padStart(5, "0")}`;
+/**
+ * Next quotation number. SECOND COPY of the same logic that lived in
+ * server.js — and it carried the same two bugs (count-based numbering breaks
+ * on gaps; per-company count against a globally-unique column collides across
+ * tenants). Fixed identically 2026-08-18.
+ *
+ * TODO: these two should be one shared helper. Two copies of a numbering rule
+ * is how they drift apart, which is exactly what a duplicate-key crash is.
+ */
+async function nextQuotationNumber() {
+  const year = new Date().getFullYear();
+  const prefix = `Q-${year}-`;
+  const latest = await prisma.quotation.findFirst({
+    where: { quotation_number: { startsWith: prefix } },
+    orderBy: { quotation_number: "desc" },
+    select: { quotation_number: true }
+  });
+  const current = latest ? Number(latest.quotation_number.slice(prefix.length)) : 0;
+  return `${prefix}${String((Number.isFinite(current) ? current : 0) + 1).padStart(5, "0")}`;
 }
 
 function buildQuotationDetails(session) {

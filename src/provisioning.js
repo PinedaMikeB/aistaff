@@ -29,6 +29,7 @@ const {
   TOKEN_TTL_MINUTES
 } = require("./password-reset");
 const { BUSINESS_IDENTITY } = require("./payments");
+const { notifyNewSale } = require("./notify");
 
 /** Set-password links are longer-lived than a reset — this is onboarding. */
 const SETUP_TOKEN_TTL_HOURS = 72;
@@ -190,9 +191,19 @@ async function sendWelcomeEmail(userId, setupUrl, kind) {
     }
     const user = await prisma.user.findUnique({
       where: { id: userId },
-      select: { email: true, name: true, company: { select: { name: true, account_number: true } } }
+      select: { email: true, name: true, company: { select: { id: true, name: true, account_number: true } } }
     });
     if (!user) return;
+
+    // Payment details belong IN the welcome email, not in a separate receipt.
+    // The customer has just paid and is waiting to get in — two emails split
+    // the one thing they need (the password link) away from the reassurance
+    // that their money arrived.
+    const paidOrder = await prisma.order.findFirst({
+      where: { customer: { email: user.email }, payment_status: "paid" },
+      orderBy: { paid_at: "desc" },
+      select: { order_number: true, total: true, currency: true, billing_frequency: true, paid_at: true }
+    });
 
     const brand = BUSINESS_IDENTITY.brandName || "AIStaff";
     const lines = [
@@ -200,27 +211,79 @@ async function sendWelcomeEmail(userId, setupUrl, kind) {
       "",
       `Your ${brand} account is ready.`,
       "",
+      ...(paidOrder ? [
+        "PAYMENT CONFIRMED",
+        `Amount   : ${paidOrder.currency} ${Number(paidOrder.total).toLocaleString("en-PH", { minimumFractionDigits: 2 })} (${paidOrder.billing_frequency})`,
+        `Order    : ${paidOrder.order_number}`,
+        `Paid on  : ${new Date(paidOrder.paid_at).toLocaleString("en-PH")}`,
+        ""
+      ] : []),
       `Workspace: ${user.company.name}`,
       user.company.account_number ? `Account number: ${user.company.account_number}` : "",
       "",
       kind === "returning"
         ? "This was added to the workspace you already have. Sign in as usual — and if you need to reset your password, use the link below."
-        : "Set your password here to sign in for the first time:",
+        : "STEP 1 — Set your password and sign in:",
       setupUrl,
       "",
       `The link works once and expires in ${SETUP_TOKEN_TTL_HOURS} hours. If it lapses, use "Forgot password" on the sign-in page.`,
       "",
-      "We'll be in touch shortly to set up your knowledge base and connect your Facebook Page.",
+      "STEP 2 — Connect your Facebook Page so Closer can reply to your customers:",
+      "https://aistaff.click/admin/settings/facebook-page-connection",
+      "",
+      "STEP 3 — Teach Closer about your business. The guided setup walks you through your products, prices, promos, delivery and policies:",
+      "https://aistaff.click/admin/knowledge-base",
+      "",
+      "Closer only answers from what you approve. If it does not know a price, stock level, schedule or policy, it will say the exact detail still needs confirmation rather than guess.",
+      "",
+      "Need help setting it up? Reply to this email or message us with your preferred day and time, and we can assist you with onboarding.",
+      "",
+      "Want us to save you time? Send us the information below and we can help set up Closer for you:",
+      "- Products or services",
+      "- Prices, packages and promos",
+      "- FAQs and common customer objections",
+      "- Photos, posters, price lists, menus, PDFs or documents Closer may send or refer to",
+      "- Payment, checkout, booking, delivery and policy rules",
+      "- Qualification questions Closer should ask customers",
+      "- When Closer should ask staff to confirm a detail",
       "",
       brand
     ].filter((line) => line !== "");
 
     await createTransport().sendMail({
-      from: process.env.SMTP_FROM || process.env.SMTP_USER,
+      // support@ for everything customer-facing — it is the address AIStaff
+      // uses for sales and support alike, so replies land where someone reads
+      // them. sales@ remains the authenticated SMTP user for this transport.
+      from: `AIStaff <${process.env.NOTIFY_SMTP_USER || process.env.SMTP_FROM || process.env.SMTP_USER}>`,
+      replyTo: process.env.NOTIFY_SMTP_USER || undefined,
       to: user.email,
       subject: `Your ${brand} account is ready`,
       text: lines.join("\n")
     });
+
+    // Tell the team a sale closed. Separate from the customer email on
+    // purpose: different audience, different content, and a failure here must
+    // never stop the customer getting their password link.
+    try {
+      const adminEmail = process.env.ADMIN_ALERT_EMAIL || process.env.SEED_ADMIN_EMAIL;
+      if (adminEmail && paidOrder) {
+        const customer = await prisma.customer.findFirst({
+          where: { email: user.email },
+          orderBy: { created_at: "desc" }
+        });
+        if (customer) {
+          await notifyNewSale({
+            to: adminEmail,
+            customer,
+            order: paidOrder,
+            company: user.company,
+            setupPercent: 0
+          });
+        }
+      }
+    } catch (error) {
+      console.error("[provisioning] new-sale alert failed:", error.message);
+    }
   } catch (error) {
     console.error("[provisioning] welcome email failed:", error.message);
   }

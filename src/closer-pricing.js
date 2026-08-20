@@ -15,7 +15,11 @@
  *       the words (HANDOFF-CLOSER.md §0 rule 2).
  */
 
-const { PRICING_PLANS, ADD_ONS, PRODUCT, PITCH_BUNDLE } = require("./payments");
+// AVAILABLE_PLANS, not PRICING_PLANS: this module feeds customer-facing
+// surfaces (site chat widget, Closer's quotation draft). A plan hidden from
+// the pricing page must not be quoted by the agent, or we recreate §9 — the
+// agent naming a package the customer cannot actually buy.
+const { AVAILABLE_PLANS: PRICING_PLANS, AVAILABLE_ADD_ONS: ADD_ONS, PRODUCT, PITCH_BUNDLE } = require("./payments");
 
 /** "₱4,999" — no decimals; these are whole-peso plan prices. */
 function peso(amount) {
@@ -111,17 +115,32 @@ function closerPricingFacts() {
     return `${plan.name}: ${bits.join(", ")}`;
   }).join(". ");
 
-  const setup = PRICING_PLANS[0].setupPrice;
+  const entry = PRICING_PLANS[0];
+  const annualSaving = entry.monthlyPrice * 12 - entry.annualPrice;
 
   return [
     `Pricing. Every plan includes every feature; plans differ on capacity, not capability. ${plans}.`,
-    `One-time setup ${peso(setup)} on any plan, waived on annual payment.`,
-    "Setup covers: intake call, knowledge base loaded and tested, media tagged by offering, Facebook Page connection, qualification flow, escalation rules, orientation, and 14 days of support.",
-    "Annual billing is twelve months at the monthly rate; the saving is the waived setup fee.",
+    "There is no setup fee and no activation fee. The plan price is the whole price.",
+    "Onboarding is self-serve: a guided setup wizard in the dashboard collects products, prices, promos, photos, shipping, policies and qualification rules, and the agent starts answering from it.",
+    `Annual billing is ten months at the monthly rate, so two months are free: ${peso(entry.annualPrice)} for twelve months on ${entry.name}, a saving of ${peso(annualSaving)}.`,
     "Past the conversation limit Closer keeps replying — the limit is a soft cap, never a cut-off.",
-    `Custom integrations (their API, webhook or n8n, CRM, booking system) are quoted from ${peso(14999)} after technical review.`,
+    // Derived from the add-on, never retyped — a hardcoded number here is how
+    // §9's phantom pricing happened. One connection covers every agent on the
+    // account, so this must not read as a per-agent charge.
+    (() => {
+      const integration = ADD_ONS.find((a) => a.slug === "custom-integration");
+      if (!integration) return "Custom integrations are quoted after technical review.";
+      const range = integration.priceMax
+        ? `${peso(integration.price)} to ${peso(integration.priceMax)}`
+        : `${peso(integration.price)}`;
+      return `Custom integrations (their API, webhook or n8n, CRM, POS, booking system) run ${range}, quoted after technical review. One integration covers every AIStaff agent on the account — Closer and Pitch share the same connection, so it is never charged twice.`;
+    })(),
     `SMS follow-up is NOT part of any Closer plan. It requires ${PITCH_BUNDLE.requires}, because the message is sent from the gateway's own SIM. Bundling Pitch with Closer unlocks: ${PITCH_BUNDLE.features.join("; ")}.`,
-    "Enterprise is a custom quotation, not a listed price — direct them to the Enterprise form on /pricing/.",
+    // REMOVED 2026-08-19: "Enterprise is a custom quotation, not a listed
+    // price." Enterprise is now a listed ₱6,999 tier, and that line would have
+    // had Closer refuse to quote a price it can see in the same prompt — the
+    // §9 phantom-pricing shape again, from the opposite direction.
+    "Channels differ by plan: Starter answers on Facebook Messenger. Essential answers on Messenger OR the website chat widget — the customer chooses one. Professional and Enterprise answer on both, sharing one conversation allowance rather than two separate pools.",
     "Full details and checkout: /pricing/"
   ].join(" ");
 }

@@ -10,7 +10,7 @@ const morgan = require("morgan");
 const { z } = require("zod");
 
 const { prisma } = require("./db");
-const { encryptSecret } = require("./crypto");
+const { encryptSecret, decryptSecret } = require("./crypto");
 const {
   verifyPassword,
   signSession,
@@ -19,7 +19,7 @@ const {
   setSessionCookie,
   clearSessionCookie
 } = require("./auth");
-const { generateSalesReply, scoreLead, quotationReady } = require("./ai");
+const { generateSalesReply, quotationReady } = require("./ai");
 const { verifyMessengerSignature, handleMessengerWebhook, sendMessengerText } = require("./messenger-webhook");
 const { generateAistaffDemoReply, getAistaffSession } = require("./aistaff-demo");
 const {
@@ -27,19 +27,21 @@ const {
   clearAistaffAiConfigCache,
   getMessengerMemoryForPsid,
   buildAdminPromptPreview,
-  formatKnowledgeBaseForPrompt,
   DEFAULT_AI_GOAL
 } = require("./aistaff-ai-config");
 
-// AIStaff's own company record — the Facebook Page (1164341106754995) and
-// this website widget both represent AIStaff itself, and both must read the
-// SAME knowledge_base rows so pricing/services never drift between channels.
-// NOT the "AIStaff.click Demo Company" seed row (00000000-...-001), which is
-// the sandbox prospects use to preview Closer for THEIR OWN business.
-const AISTAFF_INTERNAL_COMPANY_ID = "e00666f5-05e0-4a60-ae19-2a94c1377cfe";
+/**
+ * The AIStaff tenant — the workspace that owns the Facebook Page, the
+ * knowledge base and the conversations.
+ *
+ * Was AIS-2026-0002 "AIStaff Internal", which meant the SITE CHAT WIDGET and
+ * the FACEBOOK PAGE answered from two different knowledge bases. The comment
+ * that used to sit here claimed they shared rows; that was false. Repointed to
+ * AIS-2026-0001 on 2026-08-19 and 0002 retired.
+ */
+const AISTAFF_INTERNAL_COMPANY_ID = "00000000-0000-0000-0000-000000000001";
 const { buildPresenceSnapshot, formatSnapshotForMessenger } = require("./page-intelligence");
-const { closerPricingFacts } = require("./closer-pricing");
-const { provisionPaidOrder } = require("./provisioning");
+const { provisionPaidOrder, issueSetupLink } = require("./provisioning");
 const { extractPriceList, MAX_BYTES } = require("./price-list-extract");
 const {
   getMarketingOverview,
@@ -59,7 +61,9 @@ const {
   BUSINESS_IDENTITY,
   PRODUCT,
   PRICING_PLANS,
+  AVAILABLE_PLANS,
   ADD_ONS,
+  AVAILABLE_ADD_ONS,
   calculateCart,
   getPaymentProvider,
   nextBillingDate,
@@ -67,6 +71,25 @@ const {
   providerReady,
   verifyWebhookSignature
 } = require("./payments");
+const { createCheckoutLink } = require("./checkout-link");
+const { stepsForPack, suggestPack, INDUSTRY_PACKS, VALIDITY_OPTIONS } = require("./intake-steps");
+/** Words per knowledge base entry. Sent to the client so the counter and the
+ *  server enforce exactly the same number — two copies drift. */
+const INTAKE_WORD_LIMIT = 3000;
+/** Words allowed in an entry's title. Generous on purpose — people describe
+ *  rather than label, and rejecting a whole save over a long label is the
+ *  wrong trade. Enforced in words to match the answer field. */
+const INTAKE_TITLE_WORD_LIMIT = 100;
+const { checkRelevance, structureRows } = require("./intake-relevance");
+const { normaliseLinks } = require("./knowledge-base");
+const { saveMedia, deleteMedia } = require("./media-store");
+const { getCloserHealth } = require("./closer-health");
+const { normaliseRole, can, requirePermission, ROLES, PERMISSIONS } = require("./platform-roles");
+const { listCustomers } = require("./platform");
+const { getActiveInstructions, saveRevision, activateRevision, listRevisions } = require("./prompt-store");
+const { listSettings, setModelFor, CATALOGUE: MODEL_CATALOGUE } = require("./model-registry");
+const { generateFaqCheck, generateQualificationQuestions, LEAD_FIELDS } = require("./faq-generator");
+const { notifyHandoff, notifySetupMilestone, notifyGapDigest, notifyConfigured, sendNotification, FROM_ADDRESS } = require("./notify");
 const { AnalyzeRequestSchema, WebsiteBusinessAnalysisSchema } = require("./brandee/schemas");
 const { WebsiteAnalysisError, normalizeUrlInput } = require("./brandee/websiteAnalyzer");
 const { buildBusinessProfile } = require("./brandee/businessProfileBuilder");
@@ -118,6 +141,66 @@ const metaVerifyToken = process.env.META_VERIFY_TOKEN || "aistaff_verify_2026";
 const metaOauthStates = new Map();
 const metaAuthorizedPagesByUser = new Map();
 
+function looksTaglish(text) {
+  return /\b(po|ba|naman|kayo|ninyo|ko|kami|magpa|pwede|gusto|kailangan|salamat|sige)\b/i.test(String(text || ""));
+}
+
+async function notifyMessengerPaymentConfirmed(orderId) {
+  const order = await prisma.order.findUnique({
+    where: { id: orderId },
+    include: {
+      customer: true,
+      source_conversation: {
+        include: {
+          facebook_page: true,
+          messages: { orderBy: { created_at: "desc" }, take: 8 }
+        }
+      }
+    }
+  });
+
+  const conversation = order?.source_conversation;
+  const page = conversation?.facebook_page;
+  if (!order || !conversation?.psid || !page) return { ok: false, reason: "no_source_conversation" };
+
+  const customerText = [...(conversation.messages || [])]
+    .filter((m) => m.sender_type === "customer")
+    .map((m) => m.message_text)
+    .join("\n");
+  const taglish = looksTaglish(customerText);
+  const firstName = String(order.customer?.full_name || "").trim().split(/\s+/)[0] || "";
+  const namePart = firstName ? `${firstName}, ` : "";
+
+  const text = taglish
+    ? [
+      `Payment confirmed na, ${namePart}thank you! Ginagawa na namin ang AIStaff workspace mo at nag-email na kami ng login/setup instructions.`,
+      "",
+      "Pwede kang mag-reply dito o sa email kung anong araw at oras mo gustong magpa-assist sa setup.",
+      "",
+      "Kung gusto mong kami na ang tumulong mag-set up para makatipid ka sa oras, send mo lang: products/services, prices/packages, promos, FAQs, files/photos, payment or booking rules, policies, qualification questions, at kailan kailangan mag-confirm ang staff."
+    ].join("\n")
+    : [
+      `Payment confirmed, ${namePart}thank you! We are preparing your AIStaff workspace and emailed your login/setup instructions.`,
+      "",
+      "You can reply here or by email with your preferred setup day and time if you want onboarding assistance.",
+      "",
+      "If you want us to save you time and help set up Closer for you, send your products/services, prices/packages, promos, FAQs, files/photos, payment or booking rules, policies, qualification questions, and when staff should confirm details."
+    ].join("\n");
+
+  await sendMessengerText(page, conversation.psid, text);
+  await prisma.message.create({
+    data: {
+      company_id: conversation.company_id,
+      conversation_id: conversation.id,
+      sender_type: "ai",
+      sender_id: "ai_sales_assistant",
+      message_text: text,
+      ai_generated: true
+    }
+  });
+  return { ok: true };
+}
+
 app.use(helmet({ contentSecurityPolicy: false }));
 app.use(cors({ origin: true, credentials: true }));
 
@@ -164,6 +247,21 @@ app.post("/webhooks/meta/messenger", express.raw({ type: "application/json", lim
   next();
 }, messengerWebhookReceive);
 
+/**
+ * PayMongo webhook. Raw body required — the signature is computed over the
+ * exact bytes, so any JSON re-serialisation breaks verification.
+ *
+ * This is the step that turns money into an account: it marks the order paid,
+ * which fires provisionPaidOrder() and the set-your-password email that
+ * already work.
+ */
+app.post("/api/webhooks/paymongo", express.raw({ type: "application/json", limit: "1mb" }), (req, res) => {
+  processPaymentWebhook("paymongo", req, res).catch((error) => {
+    console.error("PayMongo webhook failed:", error);
+    res.status(500).json({ error: "Webhook processing failed" });
+  });
+});
+
 app.post("/api/webhooks/xendit", express.raw({ type: "application/json", limit: "1mb" }), (req, res) => {
   processPaymentWebhook("xendit", req, res).catch((error) => {
     console.error("Xendit webhook failed:", error);
@@ -188,6 +286,12 @@ app.use(["/api/public/brandee/product-ads", "/api/brandee/product-ads"], express
 // Price lists arrive base64-encoded, so they need headroom above the 1mb
 // default. Scoped to this one route, same pattern as the Brandee line above.
 app.use("/api/public/demo/price-list", express.json({ limit: "12mb" }));
+// The wizard's upload route needs the same headroom as the demo's price-list
+// route. Without this it fell through to the 1mb global limit below and every
+// real phone photo failed with "request entity too large" — Express rejecting
+// the body before the handler ever ran, so MAX_BYTES never got a say.
+// 12mb of JSON covers an 8mb file, since base64 inflates by about a third.
+app.use("/api/intake/extract", express.json({ limit: "12mb" }));
 app.use(express.json({ limit: "1mb" }));
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
@@ -198,7 +302,10 @@ app.use("/api/public/brandee", attachUserIfPresent);
 app.use(morgan("dev"));
 app.use(express.static(path.join(__dirname, "..", "public"), {
   setHeaders(res, filePath) {
-    if (filePath.endsWith("app.js") || filePath.endsWith("index.html") || filePath.endsWith("style.css") || filePath.endsWith("workforce-motion.js") || filePath.endsWith("site-chat.js")) {
+    // intake-wizard.js added 2026-08-17. Without it the file was served with
+    // max-age=14400, so wizard fixes did not reach the browser for four hours
+    // and looked like they had not been applied.
+    if (filePath.endsWith("app.js") || filePath.endsWith("index.html") || filePath.endsWith("style.css") || filePath.endsWith("pricing-checkout.js") || filePath.endsWith("checkout-status.js") || filePath.endsWith("workforce-motion.js") || filePath.endsWith("site-chat.js") || filePath.endsWith("intake-wizard.js") || filePath.endsWith("closer-status.js") || filePath.endsWith("platform.js")) {
       res.setHeader("Cache-Control", "no-cache");
     }
   }
@@ -260,6 +367,7 @@ function publicCompanySelect() {
   return {
     id: true,
     name: true,
+    contact_person: true,
     industry: true,
     website: true,
     contact_email: true,
@@ -402,8 +510,11 @@ function publicPricingPayload() {
       stripe: providerReady("stripe") ? "configured" : "test_mode",
       manual_bank_transfer: "prepared"
     },
-    plans: PRICING_PLANS,
-    addOns: ADD_ONS,
+    // AVAILABLE_PLANS, not PRICING_PLANS: hidden tiers must not render on
+    // /pricing/ either. calculateCart already refuses them, but a visible card
+    // with a dead button is worse than no card.
+    plans: AVAILABLE_PLANS,
+    addOns: AVAILABLE_ADD_ONS,
     enterprise: {
       name: "Enterprise",
       priceLabel: "Custom pricing",
@@ -440,9 +551,55 @@ function invoiceNumber() {
   return `INV-${stamp}-${crypto.randomBytes(3).toString("hex").toUpperCase()}`;
 }
 
+function normaliseTestDiscountCode(value) {
+  return String(value || "").trim().toUpperCase();
+}
+
+function testDiscountTargetTotal() {
+  const amount = Number(process.env.PAYMONGO_LIVE_TEST_TOTAL || 10);
+  return Number.isFinite(amount) && amount > 0 ? amount : 10;
+}
+
+function applyTestDiscount(calculated, couponCode) {
+  const configuredCode = normaliseTestDiscountCode(process.env.PAYMONGO_LIVE_TEST_CODE);
+  const submittedCode = normaliseTestDiscountCode(couponCode);
+  if (!configuredCode || !submittedCode) return { ...calculated, discountApplied: false };
+  if (submittedCode !== configuredCode) {
+    const error = new Error("Invalid discount code");
+    error.statusCode = 400;
+    throw error;
+  }
+
+  const targetTotal = Math.min(testDiscountTargetTotal(), calculated.total);
+  const discountAmount = calculated.total - targetTotal;
+  if (discountAmount <= 0) return { ...calculated, discountApplied: false };
+
+  return {
+    ...calculated,
+    subtotal: targetTotal,
+    tax: 0,
+    total: targetTotal,
+    discountApplied: true,
+    items: [
+      ...calculated.items,
+      {
+        itemType: "discount",
+        itemId: "paymongo-live-test",
+        itemName: "Payment gateway live test discount",
+        billingFrequency: "one_time",
+        unitPrice: -discountAmount,
+        quantity: 1,
+        lineTotal: -discountAmount
+      }
+    ]
+  };
+}
+
 async function processPaymentWebhook(provider, req, res) {
   const rawBody = Buffer.isBuffer(req.body) ? req.body : Buffer.from(JSON.stringify(req.body || {}));
-  const signature = provider === "xendit" ? req.get("x-callback-token") : req.get("stripe-signature");
+  const signature = provider === "paymongo" ? req.get("paymongo-signature")
+    : provider === "xendit" ? req.get("x-callback-token")
+    : req.get("stripe-signature");
   const signatureVerified = verifyWebhookSignature(provider, rawBody, signature);
   if (!signatureVerified) return res.status(400).json({ error: "Invalid webhook signature" });
 
@@ -451,6 +608,36 @@ async function processPaymentWebhook(provider, req, res) {
     payload = JSON.parse(rawBody.toString("utf8"));
   } catch {
     return res.status(400).json({ error: "Invalid JSON payload" });
+  }
+
+  /**
+   * PayMongo nests everything two levels deep and names things differently:
+   *   payload.data.id                                  -> event id
+   *   payload.data.attributes.type                     -> "checkout_session.payment.paid"
+   *   payload.data.attributes.data.attributes.…        -> the resource itself
+   *
+   * The reference_number we set when creating the session is OUR order number,
+   * and it is the only reliable link between a PayMongo payment and an AIStaff
+   * order. Read it before the generic handling below, which is Xendit-shaped.
+   */
+  let paymongo = null;
+  if (provider === "paymongo") {
+    const attributes = payload?.data?.attributes || {};
+    const resource = attributes?.data?.attributes || {};
+    paymongo = {
+      eventId: payload?.data?.id || null,
+      eventType: attributes.type || "",
+      // On checkout_session events the reference sits on the session; on
+      // payment events it may sit on the payment instead.
+      reference: resource.reference_number
+        || resource?.payment_intent?.attributes?.metadata?.reference_number
+        || null,
+      resourceId: attributes?.data?.id || null,
+      amountCentavos: resource.amount ?? null,
+      email: resource?.billing?.email || resource?.payer_email || null
+    };
+    console.log("[paymongo] event=%s ref=%s resource=%s",
+      paymongo.eventType, paymongo.reference, paymongo.resourceId);
   }
 
   const externalEventId = String(payload.id || payload.event_id || payload.data?.id || crypto.createHash("sha256").update(rawBody).digest("hex"));
@@ -468,10 +655,14 @@ async function processPaymentWebhook(provider, req, res) {
   // order.external_payment_id) and `external_id` is OUR order number. Looking
   // up external_id against external_payment_id never matches, so a real
   // payment would leave the order unpaid. Keep both and try each.
-  const externalPaymentId = String(payload.id || payload.data?.object?.id || payload.data?.id || "");
-  const externalOrderNumber = String(payload.external_id || "");
-  const paid = ["PAID", "SUCCEEDED", "paid", "succeeded", "checkout.session.completed", "invoice.paid"].includes(payload.status || payload.type);
-  const failed = ["FAILED", "EXPIRED", "failed", "expired", "payment_intent.payment_failed"].includes(payload.status || payload.type);
+  const externalPaymentId = String(paymongo?.resourceId || payload.id || payload.data?.object?.id || payload.data?.id || "");
+  const externalOrderNumber = String(paymongo?.reference || payload.external_id || "");
+  const paid = paymongo
+    ? /\.payment\.paid$|^payment\.paid$/.test(paymongo.eventType)
+    : ["PAID", "SUCCEEDED", "paid", "succeeded", "checkout.session.completed", "invoice.paid"].includes(payload.status || payload.type);
+  const failed = paymongo
+    ? /payment\.failed$/.test(paymongo.eventType)
+    : ["FAILED", "EXPIRED", "failed", "expired", "payment_intent.payment_failed"].includes(payload.status || payload.type);
 
   if ((externalPaymentId || externalOrderNumber) && (paid || failed)) {
     const order = await prisma.order.findFirst({
@@ -502,6 +693,12 @@ async function processPaymentWebhook(provider, req, res) {
           console.error(`[webhook] order ${order.order_number} paid but NOT provisioned:`, provisioned.reason);
         } else if (!provisioned.alreadyProvisioned) {
           console.log(`[webhook] order ${order.order_number} provisioned -> ${provisioned.accountNumber}`);
+          try {
+            const messengerNotice = await notifyMessengerPaymentConfirmed(order.id);
+            if (messengerNotice.ok) console.log(`[webhook] order ${order.order_number} onboarding message sent in Messenger`);
+          } catch (error) {
+            console.warn(`[webhook] order ${order.order_number} Messenger onboarding notice failed:`, error.message);
+          }
         }
       } else {
         await prisma.$transaction([
@@ -524,9 +721,33 @@ function numberOrNull(value) {
   return Number(value);
 }
 
-async function nextQuotationNumber(companyId) {
-  const count = await prisma.quotation.count({ where: { company_id: companyId } });
-  return `Q-${new Date().getFullYear()}-${String(count + 1).padStart(5, "0")}`;
+/**
+ * Next quotation number.
+ *
+ * FIXED 2026-08-18. Was `count(where: company) + 1`, which had two bugs:
+ *
+ *  1. Count-based numbering breaks the moment numbers are not contiguous. A
+ *     gap (deleted row, or an insert that failed) makes it regenerate a number
+ *     that already exists — forever. Company AIS-2026-0001 held Q-2026-00001
+ *     and Q-2026-00003, so count=2 produced Q-2026-00003 on every attempt and
+ *     the unique constraint rejected it every time.
+ *  2. `quotation_number` is GLOBALLY unique but the count was per company, so
+ *     the second tenant to raise a quotation collided with the first.
+ *
+ * Now derived from the highest existing number across all companies, so it is
+ * unique by construction. Sequence gaps per company are harmless — a quotation
+ * number is an identifier, not a count.
+ */
+async function nextQuotationNumber() {
+  const year = new Date().getFullYear();
+  const prefix = `Q-${year}-`;
+  const latest = await prisma.quotation.findFirst({
+    where: { quotation_number: { startsWith: prefix } },
+    orderBy: { quotation_number: "desc" },
+    select: { quotation_number: true }
+  });
+  const current = latest ? Number(latest.quotation_number.slice(prefix.length)) : 0;
+  return `${prefix}${String((Number.isFinite(current) ? current : 0) + 1).padStart(5, "0")}`;
 }
 
 async function maybeCreateQuotationDraft({ companyId, lead, conversationId, preparedBy = null }) {
@@ -592,10 +813,11 @@ app.post("/api/cart", asyncHandler(async (req, res) => {
     planSlug: z.string().min(1),
     billingFrequency: z.enum(["monthly", "annual"]).default("monthly"),
     addOnSlugs: z.array(z.string()).default([]),
+    couponCode: z.string().max(120).optional().nullable(),
     guestToken: z.string().optional().nullable()
   }).parse(req.body);
   const guestToken = body.guestToken || crypto.randomUUID();
-  const calculated = calculateCart(body);
+  const calculated = applyTestDiscount(calculateCart(body), body.couponCode);
   const cart = await prisma.cart.create({
     data: {
       guest_token: guestToken,
@@ -632,17 +854,18 @@ app.patch("/api/cart/:id", asyncHandler(async (req, res) => {
   const body = z.object({
     planSlug: z.string().min(1).optional(),
     billingFrequency: z.enum(["monthly", "annual"]).optional(),
-    addOnSlugs: z.array(z.string()).optional()
+    addOnSlugs: z.array(z.string()).optional(),
+    couponCode: z.string().max(120).optional().nullable()
   }).parse(req.body);
   const existing = await prisma.cart.findUnique({ where: { id: req.params.id }, include: { items: true } });
   if (!existing) return res.status(404).json({ error: "Cart not found" });
   const currentPlan = existing.items.find((item) => item.item_type === "pricing_plan");
   const currentAddOns = existing.items.filter((item) => item.item_type === "add_on").map((item) => item.item_id);
-  const calculated = calculateCart({
+  const calculated = applyTestDiscount(calculateCart({
     planSlug: body.planSlug || currentPlan?.item_id,
     billingFrequency: body.billingFrequency || currentPlan?.billing_frequency || "monthly",
     addOnSlugs: body.addOnSlugs || currentAddOns
-  });
+  }), body.couponCode);
   const cart = await prisma.$transaction(async (tx) => {
     await tx.cartItem.deleteMany({ where: { cart_id: existing.id } });
     return tx.cart.update({
@@ -742,7 +965,8 @@ app.post("/api/checkout", asyncHandler(async (req, res) => {
       correct: z.boolean()
     }),
     requestedProvider: z.string().optional().nullable(),
-    paymentMethod: z.string().optional().nullable()
+    paymentMethod: z.string().optional().nullable(),
+    couponCode: z.string().max(120).optional().nullable()
   }).parse(req.body);
 
   if (!Object.values(body.agreements).every(Boolean)) {
@@ -753,11 +977,12 @@ app.post("/api/checkout", asyncHandler(async (req, res) => {
   if (!cart || !cart.items.length) return res.status(400).json({ error: "Cart is empty or unavailable" });
   const planItem = cart.items.find((item) => item.item_type === "pricing_plan");
   if (!planItem) return res.status(400).json({ error: "A subscription package is required" });
-  const official = calculateCart({
+  const discountItem = cart.items.find((item) => item.item_type === "discount" && item.item_id === "paymongo-live-test");
+  const official = applyTestDiscount(calculateCart({
     planSlug: planItem.item_id,
     billingFrequency: planItem.billing_frequency,
     addOnSlugs: cart.items.filter((item) => item.item_type === "add_on").map((item) => item.item_id)
-  });
+  }), body.couponCode || (discountItem ? process.env.PAYMONGO_LIVE_TEST_CODE : ""));
   const provider = paymentProviderForCountry(body.customer.country, body.requestedProvider || "");
   const customerData = {
     ...body.customer,
@@ -1077,25 +1302,6 @@ app.post("/api/public/audit-request", asyncHandler(async (req, res) => {
   res.json({ ok: true, message: "Audit request received" });
 }));
 
-const SITE_CHAT_SYSTEM_PROMPT = [
-  "You are the AIStaff website assistant, embedded as a chat widget on aistaff.click.",
-  "You represent AIStaff, an AI workforce platform for Philippine businesses. Answer only using the facts below. Never invent pricing, features, or timelines.",
-  "",
-  "COMPANY: AIStaff (aistaff.click) builds specialized AI agents for business growth. Two agents are live today; more are planned (AI Voice Sales, AI Marketing, AI Facebook Ads).",
-  "",
-  "AGENT 1 — CLOSER (AI Chat Sales Agent), LIVE, has real pricing:",
-  "Handles written sales inquiries on Facebook Messenger and website chat. Understands customer needs, asks qualifying questions, captures leads (name, contact, requirements), recommends offers, handles objections, prepares quotation drafts for owner approval, and keeps leads moving toward a sale. Runs 24/7.",
-  closerPricingFacts(),
-  "",
-  "AGENT 2 — BRANDEE (AI UGC Brand Agent), NEW, pricing not finalized:",
-  "Turns one product photo into a finished UGC-style ad video. Client picks an avatar and a scene (home, kitchen, office, car, etc.), uploads a product photo, and Brandee writes the script, matches the voice, and generates the video — no filming, no talent booking, no editing software needed. Same presenter identity stays consistent across every video and every product. If asked about Brandee's price, say pricing is being finalized and to check /agents/brandee/ or contact the team — do not state specific numbers for Brandee.",
-  "",
-  "HOW TO ENGAGE: For a live demo of how Closer actually talks to customers, direct people to the Messenger chat link on the site (the 'Chat with Closer' button) or /agents/closer/. For Brandee details, point to /agents/brandee/. For full pricing/checkout, point to /pricing/. For anything about a specific account, billing issue, or something you don't know, tell them to use the contact form at /contact/ or email support@aistaff.click.",
-  "",
-  "TONE: Warm, concise, helpful — like a knowledgeable teammate, not a pushy salesperson. Keep answers short (2-4 sentences) unless the person asks for detail. Never make up features, integrations, or launch dates for agents that aren't live yet (Voice, Marketing, Facebook Ads) — say they're planned/in development if asked.",
-  "Respond in the same language the visitor uses (English or Taglish is fine)."
-].join("\n");
-
 const siteChatRateLimitStore = new Map();
 function checkSiteChatRateLimit(ip) {
   const now = Date.now();
@@ -1116,56 +1322,238 @@ app.post("/api/public/site-chat", asyncHandler(async (req, res) => {
   }
 
   const body = z.object({
+    visitorId: z.string().trim().min(8).max(80).regex(/^[a-zA-Z0-9_-]+$/).optional(),
     messages: z.array(z.object({
       role: z.enum(["user", "assistant"]),
       content: z.string().min(1).max(2000)
     })).min(1).max(20)
   }).parse(req.body);
 
-  if (!process.env.OPENAI_API_KEY) {
-    return res.status(503).json({ ok: false, error: "Chat is not configured yet." });
+  const latest = body.messages[body.messages.length - 1];
+  if (latest.role !== "user") {
+    return res.status(400).json({ ok: false, error: "Please send a customer message." });
   }
 
-  // Same knowledge_base rows the Messenger channel reads, so the website
-  // widget and Facebook chat never quote different facts for AIStaff.
-  const aiConfig = await loadAistaffAiConfig(AISTAFF_INTERNAL_COMPANY_ID).catch((error) => {
-    console.warn("Site chat: could not load AIStaff knowledge base, falling back to static prompt:", error.message);
-    return null;
-  });
-  const kbAddendum = aiConfig ? formatKnowledgeBaseForPrompt(aiConfig.knowledgeBase) : "";
-  const systemPrompt = kbAddendum ? `${SITE_CHAT_SYSTEM_PROMPT}\n\n${kbAddendum}` : SITE_CHAT_SYSTEM_PROMPT;
+  const companyId = AISTAFF_INTERNAL_COMPANY_ID;
+  const channel = "website_chat";
+  const visitorId = body.visitorId || `web_${crypto.randomUUID().replace(/[^a-zA-Z0-9_-]/g, "")}`;
+  const visitorLabel = `Website visitor ${visitorId.slice(-6).toUpperCase()}`;
+  const now = new Date();
 
-  const fetch = (...args) => import("node-fetch").then(({ default: f }) => f(...args));
-  const response = await fetch("https://api.openai.com/v1/chat/completions", {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      Authorization: `Bearer ${process.env.OPENAI_API_KEY}`
+  const conversation = await prisma.conversation.upsert({
+    where: {
+      company_id_channel_external_id: {
+        company_id: companyId,
+        channel,
+        external_id: visitorId
+      }
     },
-    body: JSON.stringify({
-      // Was hardcoded to "gpt-5.6-luna" — the only model in the codebase not
-      // read from env, so it silently diverged from everything else.
-      model: process.env.SITE_CHAT_MODEL || "gpt-5.6-luna",
-      messages: [
-        { role: "system", content: systemPrompt },
-        ...body.messages
-      ],
-      temperature: 0.4,
-      max_tokens: 400
-    })
+    create: {
+      company_id: companyId,
+      channel,
+      external_id: visitorId,
+      customer_name: visitorLabel,
+      intent: "aistaff_website_chat",
+      last_message_at: now
+    },
+    update: { last_message_at: now }
   });
 
-  if (!response.ok) {
-    const errText = await response.text().catch(() => "");
-    console.error("Site chat OpenAI error:", response.status, errText);
-    return res.status(502).json({ ok: false, error: "Could not reach the chat agent." });
+  const existingMessageCount = await prisma.message.count({
+    where: { company_id: companyId, conversation_id: conversation.id }
+  });
+  const initialAssistantMessage = body.messages.find((item) => item.role === "assistant" && item.content.trim());
+  if (!existingMessageCount && initialAssistantMessage) {
+    await prisma.message.create({
+      data: {
+        company_id: companyId,
+        conversation_id: conversation.id,
+        sender_type: "ai",
+        sender_id: "ai_sales_assistant",
+        message_text: initialAssistantMessage.content,
+        ai_generated: true
+      }
+    });
   }
 
-  const json = await response.json();
-  const reply = json.choices?.[0]?.message?.content?.trim();
-  if (!reply) return res.status(502).json({ ok: false, error: "Empty response from chat agent." });
+  await prisma.message.create({
+    data: {
+      company_id: companyId,
+      conversation_id: conversation.id,
+      sender_type: "customer",
+      sender_id: visitorId,
+      message_text: latest.content
+    }
+  });
 
-  res.json({ ok: true, reply });
+  let lead = await prisma.lead.findFirst({ where: { company_id: companyId, conversation_id: conversation.id } });
+  if (!lead) {
+    lead = await prisma.lead.create({
+      data: {
+        company_id: companyId,
+        conversation_id: conversation.id,
+        customer_name: visitorLabel,
+        service_needed: "AIStaff website chat inquiry",
+        notes: [
+          "Source: AIStaff website chat widget",
+          `Website visitor ID: ${visitorId}`,
+          `Conversation ID: ${conversation.id}`,
+          "Identity: anonymous until they share contact details or continue in Messenger"
+        ].join("\n")
+      }
+    });
+  }
+
+  let ai;
+  try {
+    ai = await generateSalesReply({ companyId, conversationId: conversation.id, message: latest.content });
+  } catch (error) {
+    console.error("[site-chat] REPLY GENERATION FAILED company=%s conversation=%s: %s",
+      companyId, conversation.id, error.message);
+    await prisma.conversation.update({
+      where: { id: conversation.id },
+      data: { needs_human: true, status: "handoff" }
+    }).catch(() => {});
+    await prisma.humanHandoff.create({
+      data: {
+        company_id: companyId,
+        conversation_id: conversation.id,
+        reason: `Website chat reply failed: ${error.message}`
+      }
+    }).catch(() => {});
+    return res.status(502).json({ ok: false, error: "Closer could not reply right now. Please try again in a moment." });
+  }
+
+  const updatedLead = await prisma.lead.update({
+    where: { id: lead.id },
+    data: {
+      ...ai.leadPatch,
+      lead_score: ai.leadScore,
+      quotation_ready: ai.quotationReady,
+      lead_status: ai.quotationReady ? "quotation_ready" : "contacted"
+    }
+  });
+
+  await prisma.conversation.update({
+    where: { id: conversation.id },
+    data: {
+      intent: ai.intent,
+      lead_score: ai.leadScore,
+      needs_human: ai.needsHuman,
+      status: ai.needsHuman ? "handoff" : "open",
+      last_message_at: new Date()
+    }
+  });
+
+  const settings = ai.settings;
+  if (ai.needsHuman && settings?.human_handoff_enabled) {
+    await prisma.humanHandoff.create({
+      data: {
+        company_id: companyId,
+        conversation_id: conversation.id,
+        reason: ai.handoffReason || "Website chat requested human handoff"
+      }
+    }).catch(() => {});
+
+    if (settings?.notify_email) {
+      const company = await prisma.company.findUnique({
+        where: { id: companyId },
+        select: { name: true }
+      });
+      await notifyHandoff({
+        to: settings.notify_email,
+        companyName: company?.name || "AIStaff",
+        lead: updatedLead,
+        reason: ai.handoffReason,
+        lastMessage: latest.content,
+        conversationId: conversation.id
+      }).catch((error) => console.warn("[site-chat] handoff email failed:", error.message));
+    }
+  }
+
+  await maybeCreateQuotationDraft({ companyId, lead: updatedLead, conversationId: conversation.id }).catch((error) => {
+    console.warn("[site-chat] quotation draft failed:", error.message);
+  });
+
+  if (ai.unanswered && ai.unanswered.topic) {
+    const existing = await prisma.knowledgeGap.findFirst({
+      where: { company_id: companyId, topic: ai.unanswered.topic, status: "open" }
+    });
+    if (existing) {
+      await prisma.knowledgeGap.update({
+        where: { id: existing.id },
+        data: { times_asked: { increment: 1 }, last_asked_at: new Date() }
+      });
+    } else {
+      await prisma.knowledgeGap.create({
+        data: {
+          company_id: companyId,
+          question: ai.unanswered.question || ai.unanswered.topic,
+          topic: ai.unanswered.topic,
+          conversation_id: conversation.id
+        }
+      });
+    }
+  }
+
+  const media = Array.isArray(ai.sendMedia) ? ai.sendMedia : [];
+  await prisma.message.create({
+    data: {
+      company_id: companyId,
+      conversation_id: conversation.id,
+      sender_type: "ai",
+      sender_id: "ai_sales_assistant",
+      message_text: ai.reply,
+      attachments: media.length ? media : undefined,
+      ai_generated: true
+    }
+  });
+
+  const followUpMessages = [];
+  if (ai.paymentRequest) {
+    const result = await createCheckoutLink({
+      companyId,
+      conversationId: conversation.id,
+      email: ai.paymentRequest.email,
+      name: ai.paymentRequest.name || updatedLead.customer_name,
+      mobile: ai.paymentRequest.mobile || updatedLead.mobile_number,
+      planSlug: ai.paymentRequest.plan,
+      billingFrequency: ai.paymentRequest.billing
+    }).catch((error) => {
+      console.warn("[site-chat] checkout link failed:", error.message);
+      return null;
+    });
+
+    if (result?.ok) {
+      const peso = (n) => `₱${Number(n).toLocaleString("en-PH")}`;
+      const lines = result.billingFrequency === "annual"
+        ? [`${peso(result.amount)} for 12 months — that is ${peso(result.monthlyEquivalent)}/month, saving ${peso(result.saving)}.`]
+        : [`${peso(result.amount)} per month.`];
+      lines.push(result.url);
+      lines.push(`Reference: ${result.orderNumber}`);
+      const paymentMessage = lines.join("\n");
+      followUpMessages.push(paymentMessage);
+      await prisma.message.create({
+        data: {
+          company_id: companyId,
+          conversation_id: conversation.id,
+          sender_type: "ai",
+          sender_id: "ai_sales_assistant",
+          message_text: paymentMessage,
+          ai_generated: true
+        }
+      });
+    }
+  }
+
+  res.json({
+    ok: true,
+    visitorId,
+    conversationId: conversation.id,
+    reply: ai.reply,
+    followUpMessages,
+    media
+  });
 }));
 
 // ---------------------------------------------------------------------------
@@ -2734,6 +3122,7 @@ app.get("/api/company", requireAuth, asyncHandler(async (req, res) => {
 app.put("/api/company", requireAuth, asyncHandler(async (req, res) => {
   const body = z.object({
     name: z.string().min(1),
+    contact_person: z.string().optional().nullable(),
     industry: z.string().optional().nullable(),
     website: z.string().optional().nullable(),
     contact_email: z.string().optional().nullable(),
@@ -2829,7 +3218,13 @@ app.get("/api/meta/facebook/connect", requireAuth, asyncHandler(async (req, res)
   authUrl.searchParams.set("redirect_uri", getMetaRedirectUri(req));
   authUrl.searchParams.set("state", state);
   authUrl.searchParams.set("response_type", "code");
-  authUrl.searchParams.set("scope", "pages_show_list,pages_messaging,pages_manage_metadata");
+  // Facebook Login for Business: the permission set comes from the dashboard
+  // configuration, not a raw scope string. A raw scope only works for people
+  // holding a role on the app, which is why non-role users were refused.
+  const loginConfigId = process.env.META_LOGIN_CONFIG_ID || "1615847410149532";
+  authUrl.searchParams.set("config_id", loginConfigId);
+  authUrl.searchParams.set("override_default_response_type", "true");
+  console.log("[fb-connect] redirecting to Facebook with config_id=%s", loginConfigId);
   res.redirect(302, authUrl.toString());
 }));
 
@@ -2868,6 +3263,17 @@ app.get("/api/meta/facebook/callback", asyncHandler(async (req, res) => {
   pagesUrl.searchParams.set("fields", "id,name,category,tasks,access_token");
   const pagesResponse = await fetch(pagesUrl);
   const pagesJson = await pagesResponse.json();
+  console.log("[fb-connect] /me/accounts status=%s raw_count=%s error=%s",
+    pagesResponse.status,
+    Array.isArray(pagesJson?.data) ? pagesJson.data.length : "NO_DATA_ARRAY",
+    pagesJson?.error ? JSON.stringify(pagesJson.error) : "none");
+  if (Array.isArray(pagesJson?.data)) {
+    pagesJson.data.forEach((pg) => {
+      console.log("[fb-connect]   page id=%s name=%s has_access_token=%s tasks=%s",
+        pg?.id || "?", pg?.name || "?", Boolean(pg?.access_token),
+        Array.isArray(pg?.tasks) ? pg.tasks.join("|") : "none");
+    });
+  }
   if (!pagesResponse.ok) {
     const message = pagesJson?.error?.message || "Could not load Facebook Pages.";
     return res.redirect(302, facebookConnectionPath({ meta_error: message.slice(0, 180) }));
@@ -2884,6 +3290,10 @@ app.get("/api/meta/facebook/callback", asyncHandler(async (req, res) => {
         accessToken: String(page.access_token)
       }))
     : [];
+
+  console.log("[fb-connect] kept_after_filter=%s dropped_by_filter=%s",
+    pages.length,
+    (Array.isArray(pagesJson?.data) ? pagesJson.data.length : 0) - pages.length);
 
   setMetaAuthForUser(authRequest.userId, {
     companyId: authRequest.companyId,
@@ -2933,6 +3343,36 @@ app.post("/api/facebook-page-connection/select", requireAuth, asyncHandler(async
     select: { id: true, page_id: true, page_name: true, status: true, updated_at: true }
   });
 
+  // Subscribe THIS Page to our webhook using THIS Page's own access token.
+  // Without this call Meta never delivers Messenger events for the Page, so the
+  // dashboard would report "Enabled" while nothing ever arrived. Each Page is
+  // subscribed independently and routes to its own company via page_id.
+  let messengerReplies = "Disabled";
+  let subscribeError = null;
+  try {
+    const subUrl = `https://graph.facebook.com/v20.0/${encodeURIComponent(selected.id)}/subscribed_apps`;
+    const subResponse = await fetch(subUrl, {
+      method: "POST",
+      headers: { "Content-Type": "application/x-www-form-urlencoded" },
+      body: new URLSearchParams({
+        subscribed_fields: "messages,messaging_postbacks",
+        access_token: selected.accessToken
+      })
+    });
+    const subJson = await subResponse.json().catch(() => ({}));
+    if (subResponse.ok && subJson && subJson.success) {
+      messengerReplies = "Enabled";
+      console.log("[fb-subscribe] page_id=%s OK", selected.id);
+    } else {
+      subscribeError = (subJson && subJson.error && subJson.error.message)
+        || `Webhook subscription failed (HTTP ${subResponse.status})`;
+      console.log("[fb-subscribe] page_id=%s FAILED error=%s", selected.id, subscribeError);
+    }
+  } catch (err) {
+    subscribeError = err.message;
+    console.log("[fb-subscribe] page_id=%s THREW error=%s", selected.id, err.message);
+  }
+
   res.json({
     ok: true,
     connectedPage: {
@@ -2940,9 +3380,68 @@ app.post("/api/facebook-page-connection/select", requireAuth, asyncHandler(async
       pageId: page.page_id,
       name: page.page_name,
       status: page.status,
-      messengerReplies: "Enabled",
+      messengerReplies,
       updatedAt: page.updated_at
+    },
+    subscribeError
+  });
+}));
+
+/**
+ * Disconnect a Page. Added 2026-08-17.
+ *
+ * ADDITION alongside the §12-reviewed connection screen — the "Connect
+ * Facebook Page" button and the connection-status panel are untouched, since
+ * they are the evidence for two permissions.
+ *
+ * Marks the Page INACTIVE rather than deleting it: Conversation rows reference
+ * facebook_page_id, and deleting would orphan every past customer thread. Also
+ * calls Meta's DELETE /{page-id}/subscribed_apps, because leaving the app
+ * subscribed means Meta keeps delivering events for a Page we no longer answer
+ * — which is exactly the unknown-Page case the webhook now rejects.
+ */
+app.post("/api/facebook-page-connection/disconnect", requireAuth, asyncHandler(async (req, res) => {
+  const body = z.object({ pageId: z.string().min(1) }).parse(req.body);
+
+  const page = await prisma.facebookPage.findFirst({
+    where: { page_id: body.pageId, company_id: req.companyId }
+  });
+  // Scoped to req.companyId so one tenant can never disconnect another's Page.
+  if (!page) return res.status(404).json({ ok: false, error: "That Page is not connected to this account." });
+
+  let unsubscribed = false;
+  let unsubscribeError = null;
+  try {
+    const token = decryptSecret(page.page_access_token_encrypted) || process.env.META_PAGE_ACCESS_TOKEN || "";
+    if (!token) throw new Error("No stored Page access token");
+    const url = `https://graph.facebook.com/v20.0/${encodeURIComponent(page.page_id)}/subscribed_apps?access_token=${encodeURIComponent(token)}`;
+    const response = await fetch(url, { method: "DELETE" });
+    const json = await response.json().catch(() => ({}));
+    if (response.ok && json && json.success) {
+      unsubscribed = true;
+      console.log("[fb-unsubscribe] page_id=%s OK", page.page_id);
+    } else {
+      unsubscribeError = (json && json.error && json.error.message) || `HTTP ${response.status}`;
+      console.log("[fb-unsubscribe] page_id=%s FAILED error=%s", page.page_id, unsubscribeError);
     }
+  } catch (err) {
+    unsubscribeError = err.message;
+    console.log("[fb-unsubscribe] page_id=%s THREW error=%s", page.page_id, err.message);
+  }
+
+  // Mark inactive regardless. If Meta's call failed the customer still expects
+  // us to stop replying, and the webhook checks status before answering.
+  const updated = await prisma.facebookPage.update({
+    where: { id: page.id },
+    data: { status: "disconnected" },
+    select: { page_id: true, page_name: true, status: true, updated_at: true }
+  });
+
+  res.json({
+    ok: true,
+    page: updated,
+    unsubscribed,
+    unsubscribeError
   });
 }));
 
@@ -2999,6 +3498,1195 @@ app.delete("/api/knowledge-base/:id", requireAuth, asyncHandler(async (req, res)
   res.json({ ok: true });
 }));
 
+/* ---------------------------------------------------------------------------
+ * Knowledge base intake wizard (added 2026-08-17, HANDOFF-CLOSER.md §18).
+ * ADDITIONS ONLY — no reviewed route renamed, moved or redirected (§12).
+ * The "Knowledge Base" nav item already exists; the wizard lives under it.
+ * ------------------------------------------------------------------------- */
+
+/** Steps, packs and current progress. Drives the wizard, the % and the modal. */
+/** Header status pill. Polled by the admin shell; derived, never a stored flag. */
+app.get("/api/closer/health", requireAuth, asyncHandler(async (req, res) => {
+  res.json(await getCloserHealth(req.companyId));
+}));
+
+app.get("/api/intake/state", requireAuth, asyncHandler(async (req, res) => {
+  const [company, settings, rows, questionCount, page] = await Promise.all([
+    prisma.company.findUnique({ where: { id: req.companyId } }),
+    prisma.companySetting.findUnique({ where: { company_id: req.companyId } }),
+    prisma.knowledgeBase.findMany({
+      where: { company_id: req.companyId, active: true },
+      orderBy: [{ display_order: "asc" }, { created_at: "asc" }]
+    }),
+    prisma.qualificationQuestion.count({ where: { company_id: req.companyId, active: true } }),
+    prisma.facebookPage.findFirst({ where: { company_id: req.companyId, status: "active" } })
+  ]);
+
+  const progress = settings?.intake_progress || {};
+  const pack = progress.industryPack || suggestPack(company || {}, page?.page_name || "");
+  const steps = stepsForPack(pack);
+
+  // A step counts as done when it actually produced something, not when the
+  // user clicked past it. Skipped steps count as addressed for the bar but are
+  // listed separately so they can be returned to.
+  const byCategory = new Map();
+  const latestByCategory = new Map();
+  for (const row of rows) {
+    byCategory.set(row.category, (byCategory.get(row.category) || 0) + 1);
+    latestByCategory.set(row.category, row);
+  }
+  const skipped = new Set(progress.skipped || []);
+
+  const stepState = steps.map((step) => {
+    let done = false;
+    if (step.qualification) done = questionCount > 0;
+    else if (step.liveData) done = Boolean(settings?.live_data_source);
+    else done = (byCategory.get(step.category) || 0) > 0;
+    const canHydrateLatestEntry = Boolean(step.paymentSetup || step.painSetup);
+    const latestEntry = canHydrateLatestEntry ? latestByCategory.get(step.category) : null;
+    return {
+      id: step.id,
+      title: step.title,
+      why: step.why,
+      note: step.note || null,
+      kind: step.kind,
+      category: step.category,
+      required: Boolean(step.required),
+      allowUpload: Boolean(step.allowUpload),
+      uploadHint: step.uploadHint || null,
+      docUploadTitle: step.docUploadTitle || null,
+      docUploadHint: step.docUploadHint || null,
+      photoUploadTitle: step.photoUploadTitle || null,
+      photoUploadHint: step.photoUploadHint || null,
+      structured: Boolean(step.structured),
+      rowLabels: step.rowLabels || null,
+      qualification: Boolean(step.qualification),
+      faqCheck: Boolean(step.faqCheck),
+      liveData: Boolean(step.liveData),
+      paymentSetup: Boolean(step.paymentSetup),
+      painSetup: Boolean(step.painSetup),
+      painTemplates: step.painTemplates || null,
+      validityDefault: step.validityDefault || "",
+      fields: step.fields || [],
+      latestEntry: latestEntry
+        ? {
+            id: latestEntry.id,
+            title: latestEntry.title,
+            answer: latestEntry.answer,
+            data: latestEntry.data || [],
+            currency: latestEntry.currency,
+            validUntil: latestEntry.valid_until,
+            sourceKind: latestEntry.source_kind,
+            sourceName: latestEntry.source_name
+          }
+        : null,
+      entryCount: step.qualification ? questionCount : (byCategory.get(step.category) || 0),
+      done,
+      skipped: skipped.has(step.id)
+    };
+  });
+
+  const addressed = stepState.filter((s) => s.done || s.skipped).length;
+  const percent = steps.length ? Math.round((addressed / steps.length) * 100) : 0;
+  const firstUnfinished = stepState.find((s) => !s.done && !s.skipped);
+
+  res.json({
+    industryPack: pack,
+    wordLimit: INTAKE_WORD_LIMIT,
+    titleWordLimit: INTAKE_TITLE_WORD_LIMIT,
+    packs: Object.entries(INDUSTRY_PACKS).map(([key, value]) => ({ key, label: value.label })),
+    validityOptions: VALIDITY_OPTIONS,
+    steps: stepState,
+    percent,
+    addressed,
+    totalSteps: steps.length,
+    complete: percent === 100,
+    completedAt: settings?.intake_completed_at || null,
+    currentStepId: firstUnfinished ? firstUnfinished.id : (stepState[0] ? stepState[0].id : null),
+    pageConnected: Boolean(page),
+    pageName: page?.page_name || null,
+    liveDataSource: settings?.live_data_source || null,
+    liveDataInterest: Boolean(settings?.live_data_interest)
+  });
+}));
+
+/** Save one step's entry. Writes a typed KnowledgeBase row. */
+app.post("/api/intake/step/:stepId", requireAuth, asyncHandler(async (req, res) => {
+  // 3,000 words per entry. Checked BEFORE zod so an over-long entry returns a
+  // sentence the person can act on — a raw ZodError shows up in the browser
+  // console as "Validation failed" and the person sees nothing at all, which
+  // is exactly what happened on the first real run.
+  //
+  // Counted in WORDS, not characters, because that is what the person writing
+  // it can estimate. The client shows a live counter so this is never a
+  // surprise. Anything longer belongs in several entries, which also reads
+  // better to the agent than one enormous block.
+  const wordCount = String(req.body?.answer || "").trim().split(/\s+/).filter(Boolean).length;
+  if (wordCount > INTAKE_WORD_LIMIT) {
+    return res.status(400).json({
+      ok: false,
+      error: `That entry is ${wordCount.toLocaleString()} words and the limit is ${INTAKE_WORD_LIMIT.toLocaleString()} per entry. Save what fits, then add the rest as a second entry on this same step.`
+    });
+  }
+
+  const titleWords = String(req.body?.title || "").trim().split(/\s+/).filter(Boolean).length;
+  if (titleWords > INTAKE_TITLE_WORD_LIMIT) {
+    return res.status(400).json({
+      ok: false,
+      error: `That title is ${titleWords} words and the limit is ${INTAKE_TITLE_WORD_LIMIT}. Keep the title short and put the detail in the box below it.`
+    });
+  }
+  const body = z.object({
+    // 500, not 300. A title is meant to be a short label, but people
+    // reasonably paste a full sentence into "What does this show?" and losing
+    // the entire save over it is the wrong trade. The input also carries a
+    // maxlength so the browser stops it before the request is made.
+    title: z.string().max(1200).optional().nullable(),
+    question: z.string().max(500).optional().nullable(),
+    answer: z.string().min(1),
+    currency: z.string().max(8).optional().nullable(),
+    validUntil: z.string().optional().nullable(),
+    sourceName: z.string().max(300).optional().nullable(),
+    sourceKind: z.string().max(40).optional().nullable(),
+    data: z.array(z.object({
+      label: z.string().max(200).optional().default(""),
+      value: z.string().max(200).optional().default(""),
+      note: z.string().max(200).optional().default("")
+    })).optional().nullable()
+  }).parse(req.body);
+
+  const settings = await prisma.companySetting.findUnique({ where: { company_id: req.companyId } });
+  const progress = settings?.intake_progress || {};
+  const pack = progress.industryPack || "general";
+  const step = stepsForPack(pack).find((s) => s.id === req.params.stepId);
+  if (!step) return res.status(404).json({ ok: false, error: "Unknown step" });
+
+  const count = await prisma.knowledgeBase.count({ where: { company_id: req.companyId } });
+  const setupSingleRecord = Boolean(step.paymentSetup || step.painSetup);
+  const existingSetupRow = setupSingleRecord
+    ? await prisma.knowledgeBase.findFirst({
+        where: {
+          company_id: req.companyId,
+          category: step.category,
+          kind: step.kind || "prose",
+          active: true
+        },
+        orderBy: [{ display_order: "desc" }, { created_at: "desc" }]
+      })
+    : null;
+
+  const rowData = {
+    category: step.category,
+    kind: step.kind || "prose",
+    title: body.title || step.title,
+    question: body.question || null,
+    // Links normalised at save so every channel gets a tappable URL —
+    // Messenger only auto-links a URL that carries a scheme, and it does not
+    // render markdown at all.
+    answer: normaliseLinks(body.answer),
+    data: body.data && body.data.length ? body.data : undefined,
+    currency: body.currency || null,
+    valid_until: body.validUntil ? new Date(body.validUntil) : null,
+    source_name: body.sourceName || null,
+    source_kind: body.sourceKind || "typed",
+    // Typed or reviewed by a human in the wizard, so confirmed. Only the
+    // AI-suggestion path may write false.
+    confirmed: true
+  };
+
+  const row = existingSetupRow
+    ? await prisma.knowledgeBase.update({
+        where: { id: existingSetupRow.id },
+        data: rowData
+      })
+    : await prisma.knowledgeBase.create({
+        data: {
+          ...rowData,
+          company_id: req.companyId,
+          display_order: count + 1
+        }
+      });
+
+  clearAistaffAiConfigCache();
+
+  // Setup milestone. Fires once at 50% and once at 100% — a message on every
+  // step is nagging, and people ignore what arrives too often. The thresholds
+  // already reached are recorded so a re-save never sends a duplicate.
+  await maybeNotifyMilestone(req.companyId).catch((error) =>
+    console.error("[notify] milestone check failed company=%s: %s", req.companyId, error.message));
+
+  res.json({ ok: true, entry: row });
+}));
+
+/**
+ * Send a setup milestone if a new threshold has just been crossed.
+ * Thresholds already sent live on intake_progress, so this is idempotent.
+ */
+async function maybeNotifyMilestone(companyId) {
+  const [company, settings, rows, questionCount] = await Promise.all([
+    prisma.company.findUnique({ where: { id: companyId }, select: { name: true } }),
+    prisma.companySetting.findUnique({ where: { company_id: companyId } }),
+    prisma.knowledgeBase.findMany({
+      where: { company_id: companyId, active: true, confirmed: true },
+      select: { category: true }
+    }),
+    prisma.qualificationQuestion.count({ where: { company_id: companyId, active: true } })
+  ]);
+  if (!settings?.notify_email) return;
+
+  const progress = settings.intake_progress || {};
+  const steps = stepsForPack(progress.industryPack || "general");
+  const skipped = new Set(progress.skipped || []);
+  const byCategory = new Map();
+  for (const row of rows) byCategory.set(row.category, (byCategory.get(row.category) || 0) + 1);
+
+  const isDone = (s) => s.qualification ? questionCount > 0 : Boolean(byCategory.get(s.category));
+  const addressed = steps.filter((s) => isDone(s) || skipped.has(s.id)).length;
+  const percent = steps.length ? Math.round((addressed / steps.length) * 100) : 0;
+
+  const sent = new Set(progress.milestonesSent || []);
+  const threshold = percent >= 100 ? 100 : (percent >= 50 ? 50 : null);
+  if (!threshold || sent.has(threshold)) return;
+
+  await notifySetupMilestone({
+    to: settings.notify_email,
+    companyName: company?.name || "Your business",
+    percent,
+    done: addressed,
+    total: steps.length,
+    missing: steps.filter((s) => !isDone(s) && !skipped.has(s.id)).map((s) => s.title)
+  });
+
+  sent.add(threshold);
+  await prisma.companySetting.update({
+    where: { company_id: companyId },
+    data: { intake_progress: { ...progress, milestonesSent: [...sent] } }
+  });
+}
+
+/** Skip a step, or come back to it. Skipping is a first-class state. */
+app.post("/api/intake/skip/:stepId", requireAuth, asyncHandler(async (req, res) => {
+  const undo = req.body && req.body.undo === true;
+  const settings = await prisma.companySetting.findUnique({ where: { company_id: req.companyId } });
+  const progress = settings?.intake_progress || {};
+  const skipped = new Set(progress.skipped || []);
+  if (undo) skipped.delete(req.params.stepId);
+  else skipped.add(req.params.stepId);
+
+  await prisma.companySetting.update({
+    where: { company_id: req.companyId },
+    data: { intake_progress: { ...progress, skipped: [...skipped] } }
+  });
+  res.json({ ok: true, skipped: [...skipped] });
+}));
+
+/** Choose the industry pack. Reorders and relabels steps; storage is unchanged. */
+app.post("/api/intake/pack", requireAuth, asyncHandler(async (req, res) => {
+  const body = z.object({ pack: z.string().min(1).max(40) }).parse(req.body);
+  if (!INDUSTRY_PACKS[body.pack]) return res.status(400).json({ ok: false, error: "Unknown industry" });
+  const settings = await prisma.companySetting.findUnique({ where: { company_id: req.companyId } });
+  const progress = settings?.intake_progress || {};
+  await prisma.companySetting.update({
+    where: { company_id: req.companyId },
+    data: { intake_progress: { ...progress, industryPack: body.pack } }
+  });
+  res.json({ ok: true, pack: body.pack });
+}));
+
+/**
+ * The live-data step. Records what they use today and whether they want help.
+ * Deliberately activates NOTHING — see §15's Stripe dead end: a customer must
+ * never reach something that looks connected and is not.
+ */
+app.post("/api/intake/live-data", requireAuth, asyncHandler(async (req, res) => {
+  const body = z.object({
+    source: z.string().max(500),
+    availabilityItems: z.array(z.string().max(120)).max(30).optional().default([]),
+    sources: z.array(z.string().max(120)).max(30).optional().default([]),
+    access: z.array(z.string().max(120)).max(30).optional().default([]),
+    behavior: z.array(z.string().max(160)).max(30).optional().default([]),
+    requestCall: z.boolean().optional().default(false),
+    contactName: z.string().max(120).optional().nullable(),
+    contactMobile: z.string().max(40).optional().nullable(),
+    contactEmail: z.string().max(160).optional().nullable(),
+    preferredDay: z.string().max(40).optional().nullable(),
+    preferredTime: z.string().max(60).optional().nullable()
+  }).parse(req.body);
+
+  // A call request needs a way to reach them, or it is not a request.
+  if (body.requestCall && !(body.contactName && body.contactMobile)) {
+    return res.status(400).json({ ok: false, error: "Please give a name and mobile number so we can call you." });
+  }
+
+  const settings = await prisma.companySetting.findUnique({ where: { company_id: req.companyId } });
+  const progress = settings?.intake_progress || {};
+  const setup = {
+    updatedAt: new Date().toISOString(),
+    source: body.source,
+    availabilityItems: body.availabilityItems,
+    sources: body.sources,
+    access: body.access,
+    behavior: body.behavior
+  };
+
+  // Stored on intake_progress rather than a new column: this is a sales lead,
+  // and it belongs in a proper admin view (see §19.6) rather than a settings
+  // field. Keeping it here avoids a second migration for a shape that will
+  // move anyway.
+  const request = body.requestCall
+    ? {
+      requestedAt: new Date().toISOString(),
+      source: body.source,
+      availabilityItems: body.availabilityItems,
+      sources: body.sources,
+      access: body.access,
+      behavior: body.behavior,
+      name: body.contactName,
+      mobile: body.contactMobile,
+      email: body.contactEmail || null,
+        preferredDay: body.preferredDay || null,
+        preferredTime: body.preferredTime || null,
+        status: "new"
+      }
+    : null;
+
+  await prisma.companySetting.update({
+    where: { company_id: req.companyId },
+    data: {
+      live_data_source: body.source,
+      live_data_interest: body.requestCall,
+      intake_progress: { ...progress, liveDataSetup: setup, ...(request ? { liveDataRequest: request } : {}) }
+    }
+  });
+
+  console.log(
+    "[intake] live-data company=%s source=%s items=%s call=%s contact=%s/%s when=%s %s",
+    req.companyId, body.source, body.availabilityItems.join("|") || "-",
+    body.requestCall,
+    body.contactName || "-", body.contactMobile || "-",
+    body.preferredDay || "-", body.preferredTime || "-"
+  );
+
+  res.json({ ok: true, requested: body.requestCall });
+}));
+
+/** Qualification step: what they need to know, and what makes a lead hot. */
+app.post("/api/intake/qualification", requireAuth, asyncHandler(async (req, res) => {
+  const body = z.object({
+    questions: z.array(z.union([
+      z.string().min(1).max(300),
+      z.object({ question: z.string().min(1).max(300), field_key: z.string().max(40).optional() })
+    ])).max(20).optional().default([]),
+    hotSignal: z.string().max(2000).optional().nullable(),
+    // From the wizard: these questions REPLACE what is there. Without it the
+    // seeded copier-rental defaults ("Where is your office or project
+    // location?") sit alongside the new ones forever and Closer asks both.
+    replace: z.boolean().optional().default(false)
+  }).parse(req.body);
+
+  if (body.replace) {
+    // Deactivated, not deleted — Lead rows and past conversations reference
+    // these field keys, and history should stay readable.
+    await prisma.qualificationQuestion.updateMany({
+      where: { company_id: req.companyId },
+      data: { active: false }
+    });
+  }
+
+  const existing = body.replace ? 0 : await prisma.qualificationQuestion.count({ where: { company_id: req.companyId } });
+  let order = existing;
+  for (const item of body.questions) {
+    order += 1;
+    const question = typeof item === "string" ? item : item.question;
+    const fieldKey = typeof item === "string"
+      ? (question.toLowerCase().replace(/[^a-z0-9]+/g, "_").replace(/^_|_$/g, "").slice(0, 40) || `field_${order}`)
+      : (item.field_key || "notes");
+    await prisma.qualificationQuestion.create({
+      data: { company_id: req.companyId, question, field_key: fieldKey, display_order: order }
+    });
+  }
+
+  if (body.hotSignal) {
+    const count = await prisma.knowledgeBase.count({ where: { company_id: req.companyId } });
+    await prisma.knowledgeBase.create({
+      data: {
+        company_id: req.companyId,
+        category: "Qualification",
+        kind: "instruction",
+        title: "What a ready buyer sounds like",
+        answer: body.hotSignal,
+        confirmed: true,
+        source_kind: "typed",
+        display_order: count + 1
+      }
+    });
+  }
+
+  clearAistaffAiConfigCache();
+  res.json({ ok: true });
+}));
+
+/**
+ * Detect a vision model narrating that it found nothing, instead of extracting.
+ *
+ * The extraction prompt says "do not comment on the image" and the model does
+ * it anyway when the photo has no text — returning e.g. "There are no visible
+ * services, products, prices, package names, inclusions, promo dates, branch
+ * details, or contact details in this image."
+ *
+ * Without this check that sentence is stored as a PRICE LIST and Closer quotes
+ * it to a customer. That is §9's phantom pricing arriving through a new door,
+ * so the check belongs here rather than in a prompt instruction that has
+ * already proven it can be ignored.
+ */
+function looksLikeNoContentFound(text) {
+  const raw = String(text || "").trim();
+  if (!raw) return true;
+  const t = raw.toLowerCase();
+
+  const NARRATION = /(there (are|is) no|no visible|does not contain|doesn't contain|cannot (see|read|find)|can't (see|read|find)|unable to (see|read|find)|no (text|price|product|service)s? (are |is )?(visible|present|shown|found)|appears to (be|contain) no)/;
+  if (!NARRATION.test(t)) return false;
+
+  // The phrase alone is not enough. A real salon price list containing
+  // "No visible damage guarantee" was rejected by an earlier version of this
+  // check — silently discarding the client's actual prices, which is far worse
+  // than letting one narration line through.
+  //
+  // Narration is a SINGLE short sentence with no prices. Real extracted content
+  // has multiple lines, or amounts, or both. Require all three signals.
+  const lines = raw.split("\n").map((l) => l.trim()).filter(Boolean);
+  if (lines.length > 1) return false;
+  if (raw.length > 400) return false;
+  const hasAmount = /(₱|php|usd|\$|\d[\d,]{2,})/i.test(raw);
+  if (hasAmount) return false;
+
+  return true;
+}
+
+/**
+ * Turn "Black tshirt P200.jpg" into "Black tshirt P200".
+ *
+ * Deterministic on purpose — no model involved. A filename is a fact the seller
+ * typed; running it through a model to "interpret" it would invent detail. We
+ * hand it back verbatim (minus extension and separators) and the owner confirms
+ * it in the wizard, so it follows the sourced-suggestion rule (§19.5).
+ *
+ * Rejects anything that is not a human-authored name: camera defaults
+ * (IMG_2043, DSC00012), and machine IDs like Facebook's CDN names
+ * ("766861373_2140477466824416_6245324033165997458_n.jpg"), which otherwise
+ * become a "product" called 766861373 2140477466824416.
+ */
+function filenameAsFact(filename) {
+  const base = String(filename || "").replace(/\.[a-z0-9]{1,5}$/i, "").trim();
+  if (!base) return "";
+  const cleaned = base.replace(/[_-]+/g, " ").replace(/\s{2,}/g, " ").trim();
+  if (cleaned.length < 3) return "";
+
+  const cameraDefault = /^(img|dsc|dscn|pxl|photo|image|screenshot|whatsapp image|viber image|fb img|received|untitled|download|unnamed)[\s\d._-]*$/i;
+  if (cameraDefault.test(cleaned)) return "";
+  if (/^\d+$/.test(cleaned)) return "";
+
+  // Machine IDs: mostly digits once spaces are removed. A real product name
+  // ("Black tshirt P200") is well under half digits; a CDN name is over 90%.
+  const compact = cleaned.replace(/\s/g, "");
+  const digits = (compact.match(/\d/g) || []).length;
+  if (compact.length && digits / compact.length > 0.6) return "";
+
+  // Require at least one real word — three or more letters in a row. Rejects
+  // "766861373 ... n" (the trailing "n" is not a word).
+  if (!/[a-z]{3,}/i.test(cleaned)) return "";
+
+  return cleaned;
+}
+
+/**
+ * Read an uploaded price list / document into plain text for the wizard.
+ * Reuses src/price-list-extract.js — already handles image (Gemini vision reads
+ * prices off promo graphics), PDF, xlsx/csv and docx, already in production on
+ * the demo. The text is PRE-FILLED for the owner to check; nothing is stored
+ * here, so an unread extraction can never become a fact the agent quotes.
+ */
+app.post("/api/intake/extract", requireAuth, asyncHandler(async (req, res) => {
+  const body = z.object({
+    filename: z.string().min(1).max(200),
+    mimeType: z.string().min(3).max(120),
+    data: z.string().min(10),
+    stepId: z.string().max(40).optional().nullable()
+  }).parse(req.body);
+
+  const base64 = body.data.indexOf(",") !== -1 ? body.data.split(",").pop() : body.data;
+  const buffer = Buffer.from(base64, "base64");
+  if (buffer.length > MAX_BYTES) {
+    return res.json({ ok: false, error: "That file is too large. Please keep it under 8MB." });
+  }
+
+  const result = await extractPriceList({ buffer, mimeType: body.mimeType, filename: body.filename });
+  if (!result.ok) {
+    const messages = {
+      unsupported_type: "Please upload an image, PDF, Excel file or Word document.",
+      nothing_readable: "We could not read any text from that file. Try a clearer photo?",
+      file_too_large: "That file is too large. Please keep it under 8MB.",
+      empty_file: "That file appears to be empty."
+    };
+    // A photo of a product often carries no readable text at all — the seller
+    // put the detail in the FILENAME ("Black tshirt P200.jpg"), which is how
+    // people actually organise photos. That is still a real, sourced fact, so
+    // return it rather than calling the upload a failure.
+    //
+    // Covers BOTH failure reasons on purpose: a plain product photo comes back
+    // as `extraction_failed`, not `nothing_readable`. Measured — a solid-colour
+    // PNG returns extraction_failed, so matching only nothing_readable made
+    // this fallback dead code for the exact case it exists to serve.
+    const recoverable = new Set(["nothing_readable", "extraction_failed", "empty_response"]);
+    const fromName = filenameAsFact(body.filename);
+    if (recoverable.has(result.reason) && fromName) {
+      return res.json({
+        ok: true,
+        kind: "filename",
+        text: fromName,
+        lines: 1,
+        note: "We could not read any text inside that photo, so we used the file name."
+      });
+    }
+    return res.json({ ok: false, error: messages[result.reason] || "We could not read that file." });
+  }
+
+  // Prepend the filename even on success: a price list photo named
+  // "August rates.jpg" tells the owner which upload a line came from, and a
+  // product photo may carry the name and price only in the filename.
+  const fromName = filenameAsFact(body.filename);
+
+  // The model "succeeded" but only narrated that it found nothing. Treat that
+  // exactly like a failed read — never as content.
+  if (looksLikeNoContentFound(result.text)) {
+    if (fromName) {
+      return res.json({
+        ok: true,
+        kind: "filename",
+        text: fromName,
+        lines: 1,
+        note: "No readable text in this photo — we used the file name instead."
+      });
+    }
+    return res.json({
+      ok: false,
+      kind: "empty",
+      error: "No readable text found. Rename the file to describe it (for example \"Black tshirt P200.jpg\") and add it again, or type the details below."
+    });
+  }
+
+  const text = fromName && !result.text.includes(fromName) ? `${fromName}\n${result.text}` : result.text;
+
+  // Does this file belong in this step? Warn, never block — see
+  // src/intake-relevance.js. A wrong-document upload otherwise becomes a
+  // knowledge base entry the agent quotes.
+  const relevance = await checkRelevance({ stepId: body.stepId, filename: body.filename, text });
+
+  // Structured steps (shipping) get the text flattened into editable rows so a
+  // courier matrix does not become 30 lines of manual typing.
+  const rows = await structureRows({ stepId: body.stepId, text });
+
+  res.json({
+    ok: true,
+    kind: result.kind,
+    text,
+    rows: rows && rows.length ? rows : null,
+    lines: text.split("\n").filter((l) => l.trim()).length,
+    mismatch: relevance.checked && relevance.matches === false,
+    looksLike: relevance.looksLike || null
+  });
+}));
+
+/* ---------------------------------------------------------------------------
+ * Closer instructions: view, edit, history, rollback. Added 2026-08-18.
+ * Staff only — these govern every tenant, so a customer must never edit them.
+ * ------------------------------------------------------------------------- */
+
+/**
+ * Legacy guard, kept for any route not yet mapped to a specific permission.
+ * Prefer requirePermission("...") — see src/platform-roles.js.
+ */
+function requirePlatformRole(req, res, next) {
+  if (!normaliseRole(req.user?.platform_role)) {
+    return res.status(403).json({ error: "This area is for AIStaff staff only." });
+  }
+  next();
+}
+
+/** Which model runs which function, plus the catalogue for the dropdown. */
+app.get("/api/models", requireAuth, requirePermission("platform.behaviour"), asyncHandler(async (req, res) => {
+  res.json({ settings: await listSettings(), catalogue: MODEL_CATALOGUE });
+}));
+
+app.post("/api/models", requireAuth, requirePermission("platform.behaviour"), asyncHandler(async (req, res) => {
+  const body = z.object({
+    fn: z.string().min(1).max(60),
+    provider: z.string().min(1).max(40),
+    model: z.string().min(1).max(80)
+  }).parse(req.body);
+  const saved = await setModelFor({ ...body, updatedBy: req.user.email });
+  if (!saved) return res.status(400).json({ ok: false, error: "Unknown function" });
+  if (saved.error) return res.status(400).json({ ok: false, error: saved.error });
+  res.json({ ok: true });
+}));
+
+/** Current instructions plus the full revision history. */
+app.get("/api/prompts/closer", requireAuth, requirePermission("platform.behaviour"), asyncHandler(async (req, res) => {
+  const revisions = await listRevisions();
+  const active = revisions.find((r) => r.is_active) || revisions[0] || null;
+  res.json({
+    active,
+    revisions: revisions.map((r) => ({
+      id: r.id, version: r.version, note: r.note, created_by: r.created_by,
+      is_active: r.is_active, created_at: r.created_at, chars: r.content.length,
+      content: r.content
+    }))
+  });
+}));
+
+/** Save a new revision and make it live. Never overwrites history. */
+app.post("/api/prompts/closer", requireAuth, requirePermission("platform.behaviour"), asyncHandler(async (req, res) => {
+  const body = z.object({
+    content: z.string().min(20),
+    note: z.string().max(300).optional().nullable()
+  }).parse(req.body);
+  const created = await saveRevision({ content: body.content, note: body.note, createdBy: req.user.email });
+  res.json({ ok: true, version: created.version });
+}));
+
+/** Roll back to an earlier revision. */
+app.post("/api/prompts/closer/activate", requireAuth, requirePermission("platform.behaviour"), asyncHandler(async (req, res) => {
+  const body = z.object({ version: z.number().int().positive() }).parse(req.body);
+  const target = await activateRevision({ version: body.version, createdBy: req.user.email });
+  if (!target) return res.status(404).json({ ok: false, error: "That version does not exist." });
+  res.json({ ok: true, version: target.version });
+}));
+
+/**
+ * Exactly what this company's Closer is running right now — platform
+ * instructions plus their own additions, assembled the same way the reply path
+ * assembles it. Available to the CUSTOMER too (no platform role required), so
+ * they can verify their extra instructions were understood.
+ */
+app.get("/api/prompts/closer/preview", requireAuth, asyncHandler(async (req, res) => {
+  const [company, settings, active, rows, questionCount, gapCount] = await Promise.all([
+    prisma.company.findUnique({ where: { id: req.companyId } }),
+    prisma.companySetting.findUnique({ where: { company_id: req.companyId } }),
+    getActiveInstructions(),
+    prisma.knowledgeBase.findMany({
+      where: { company_id: req.companyId, active: true, confirmed: true },
+      select: { category: true }
+    }),
+    prisma.qualificationQuestion.count({ where: { company_id: req.companyId, active: true } }),
+    prisma.knowledgeGap.count({ where: { company_id: req.companyId, status: "open" } })
+  ]);
+
+  // DERIVED, never a stored description. The raw platform rules used to be
+  // shown here, which was wrong twice over: they are written for the model
+  // rather than the owner, and the CONFIDENTIALITY block tells a tenant about
+  // "other customers, other businesses using this service" — platform-internal
+  // language on a customer's screen.
+  //
+  // Computing this from the real state means it cannot drift. Add a wizard
+  // step or fill in a gap and this panel accounts for it with no edit.
+  const byCategory = new Map();
+  for (const row of rows) byCategory.set(row.category, (byCategory.get(row.category) || 0) + 1);
+
+  const progress = settings?.intake_progress || {};
+  const steps = stepsForPack(progress.industryPack || "general");
+  const skipped = new Set(progress.skipped || []);
+  const missing = steps
+    .filter((s) => !s.liveData && !s.faqCheck)
+    .filter((s) => s.qualification ? questionCount === 0 : !byCategory.get(s.category))
+    .map((s) => ({ id: s.id, label: s.title, skipped: skipped.has(s.id) }));
+
+  // Behaviours reflect this company's actual settings, so the list is true for
+  // them rather than a generic feature description.
+  const behaviours = [
+    settings?.auto_reply_enabled
+      ? "Replies to your customers automatically, day and night"
+      : "Drafts replies for you to send — auto-reply is switched off",
+    "Answers only from what you have entered — it will not invent a price, a policy or a delivery date",
+    "Replies in whatever language your customer writes in, including Taglish",
+    questionCount
+      ? `Asks your ${questionCount} qualification question${questionCount === 1 ? "" : "s"}, one at a time, to turn a chat into a lead`
+      : "Has no qualification questions yet, so it will not collect lead details",
+    settings?.human_handoff_enabled
+      ? "Passes the conversation to you when someone asks for a person or raises a complaint"
+      : "Will not hand over to a person — handoff is switched off",
+    settings?.quotation_requires_admin_approval
+      ? "Never sends a quotation without your approval"
+      : "May send quotations without approval"
+  ];
+
+  res.json({
+    version: active.version,
+    companyName: company?.name || "",
+    knowledgeCount: rows.length,
+    covers: [...byCategory.entries()].map(([label, count]) => ({ label, count })).sort((a, b) => b.count - a.count),
+    missing,
+    behaviours,
+    openGaps: gapCount,
+    customInstructions: settings?.ai_custom_instructions || ""
+  });
+}));
+
+/* ---------------------------------------------------------------------------
+ * Suggested questions (2026-08-18). The customer should never face an empty
+ * box: editing beats authoring, and rejecting beats inventing.
+ * ------------------------------------------------------------------------- */
+
+async function intakeContext(companyId) {
+  const [company, settings, knowledge] = await Promise.all([
+    prisma.company.findUnique({ where: { id: companyId } }),
+    prisma.companySetting.findUnique({ where: { company_id: companyId } }),
+    prisma.knowledgeBase.findMany({
+      where: { company_id: companyId, active: true, confirmed: true },
+      orderBy: [{ display_order: "asc" }]
+    })
+  ]);
+  return { company, knowledge, industryPack: (settings?.intake_progress || {}).industryPack || "general" };
+}
+
+/** What will my customers ask, and can Closer already answer it? */
+app.post("/api/intake/suggest-faq", requireAuth, asyncHandler(async (req, res) => {
+  const { company, knowledge, industryPack } = await intakeContext(req.companyId);
+  if (!knowledge.length) {
+    return res.json({ ok: false, error: "Add your business details and prices first — suggestions from an empty knowledge base would just be generic." });
+  }
+  try {
+    const questions = await generateFaqCheck({ company, knowledge, industryPack, count: 30 });
+    res.json({ ok: true, questions });
+  } catch (error) {
+    console.error("[faq] generation failed company=%s: %s", req.companyId, error.message);
+    res.json({ ok: false, error: "Could not generate suggestions right now. Please try again." });
+  }
+}));
+
+/** Save only the questions the owner actually answered. */
+app.post("/api/intake/faq", requireAuth, asyncHandler(async (req, res) => {
+  const body = z.object({
+    items: z.array(z.object({
+      question: z.string().min(1).max(300),
+      answer: z.string().min(1).max(4000),
+      category: z.string().max(40).optional().default("Business")
+    })).max(60)
+  }).parse(req.body);
+
+  // Anything marked not applicable, or already covered by an existing entry,
+  // never reaches this endpoint — the client sends only newly-answered rows.
+  // That is what keeps "NA" out of the knowledge base and stops a price being
+  // stored twice.
+  let order = await prisma.knowledgeBase.count({ where: { company_id: req.companyId } });
+  const created = [];
+  for (const item of body.items) {
+    order += 1;
+    created.push(await prisma.knowledgeBase.create({
+      data: {
+        company_id: req.companyId,
+        category: item.category || "Business",
+        kind: "qa",
+        question: item.question,
+        answer: normaliseLinks(item.answer),
+        confirmed: true,
+        source_kind: "faq_review",
+        display_order: order
+      }
+    }));
+  }
+  clearAistaffAiConfigCache();
+  res.json({ ok: true, added: created.length });
+}));
+
+/** Draft the qualification questions for this business. */
+app.post("/api/intake/suggest-qualification", requireAuth, asyncHandler(async (req, res) => {
+  const { company, knowledge, industryPack } = await intakeContext(req.companyId);
+  if (!knowledge.length) {
+    return res.json({ ok: false, error: "Add your business details and prices first, then we can suggest what to ask a buyer." });
+  }
+  try {
+    const questions = await generateQualificationQuestions({ company, knowledge, industryPack, count: 8 });
+    res.json({ ok: true, questions, fields: LEAD_FIELDS });
+  } catch (error) {
+    console.error("[qualification] generation failed company=%s: %s", req.companyId, error.message);
+    res.json({ ok: false, error: "Could not generate suggestions right now. Please try again." });
+  }
+}));
+
+/* ---------------------------------------------------------------------------
+ * Knowledge gaps — real questions Closer could not answer.
+ *
+ * This is what makes ongoing improvement support operational rather than a
+ * promise someone has to remember. Predicted questions (the FAQ step) are a
+ * good start; these are better evidence, because a real customer actually asked
+ * and actually did not get an answer.
+ * ------------------------------------------------------------------------- */
+
+app.get("/api/knowledge-gaps", requireAuth, asyncHandler(async (req, res) => {
+  const gaps = await prisma.knowledgeGap.findMany({
+    where: { company_id: req.companyId, status: "open" },
+    orderBy: [{ times_asked: "desc" }, { last_asked_at: "desc" }],
+    take: 50
+  });
+  res.json({ gaps });
+}));
+
+/** Answer a gap: writes the knowledge entry and closes the gap together. */
+app.post("/api/knowledge-gaps/:id/answer", requireAuth, asyncHandler(async (req, res) => {
+  const body = z.object({
+    answer: z.string().min(1).max(20000),
+    category: z.string().max(40).optional().default("Business")
+  }).parse(req.body);
+
+  const gap = await prisma.knowledgeGap.findFirst({
+    where: { id: req.params.id, company_id: req.companyId }
+  });
+  if (!gap) return res.status(404).json({ ok: false, error: "Not found" });
+
+  const count = await prisma.knowledgeBase.count({ where: { company_id: req.companyId } });
+  await prisma.$transaction([
+    prisma.knowledgeBase.create({
+      data: {
+        company_id: req.companyId,
+        category: body.category || "Business",
+        kind: "qa",
+        question: gap.question,
+        answer: normaliseLinks(body.answer),
+        confirmed: true,
+        source_kind: "customer_question",
+        display_order: count + 1
+      }
+    }),
+    prisma.knowledgeGap.update({ where: { id: gap.id }, data: { status: "answered" } })
+  ]);
+
+  clearAistaffAiConfigCache();
+  res.json({ ok: true });
+}));
+
+/** Dismiss a gap without answering — not every question deserves an entry. */
+app.post("/api/knowledge-gaps/:id/dismiss", requireAuth, asyncHandler(async (req, res) => {
+  await prisma.knowledgeGap.updateMany({
+    where: { id: req.params.id, company_id: req.companyId },
+    data: { status: "dismissed" }
+  });
+  res.json({ ok: true });
+}));
+
+/**
+ * Notification status and a live test. Staff only.
+ *
+ * The test exists because email fails silently by nature — a wrong password or
+ * a rejected sender looks identical to "no notifications were due". One button
+ * that actually sends is the difference between believing it works and knowing.
+ */
+app.get("/api/notify/status", requireAuth, requirePermission("platform.behaviour"), asyncHandler(async (req, res) => {
+  res.json({
+    configured: notifyConfigured(),
+    from: FROM_ADDRESS,
+    host: process.env.SMTP_HOST || null,
+    hint: notifyConfigured()
+      ? null
+      : "Set NOTIFY_SMTP_USER=support@aistaff.click and NOTIFY_SMTP_PASS in .env. Hostinger rejects sending as an address the authenticated mailbox does not own, so support@ needs its own password."
+  });
+}));
+
+app.post("/api/notify/test", requireAuth, requirePermission("platform.behaviour"), asyncHandler(async (req, res) => {
+  const settings = await prisma.companySetting.findUnique({ where: { company_id: req.companyId } });
+  const to = settings?.notify_email || req.user.email;
+  const result = await sendNotification({
+    to,
+    subject: "AIStaff notifications are working",
+    text: `This is a test from your AIStaff dashboard.\n\nHandoffs, setup milestones and unanswered-question digests will arrive at ${to}.`
+  });
+  res.json({ ...result, to });
+}));
+
+/** Unanswered-question digest. Triggered by evidence, never by the clock. */
+app.post("/api/notify/gap-digest", requireAuth, requirePermission("platform.behaviour"), asyncHandler(async (req, res) => {
+  const [company, settings, gaps] = await Promise.all([
+    prisma.company.findUnique({ where: { id: req.companyId }, select: { name: true } }),
+    prisma.companySetting.findUnique({ where: { company_id: req.companyId } }),
+    prisma.knowledgeGap.findMany({
+      where: { company_id: req.companyId, status: "open" },
+      orderBy: [{ times_asked: "desc" }, { last_asked_at: "desc" }],
+      take: 15
+    })
+  ]);
+  const result = await notifyGapDigest({
+    to: settings?.notify_email,
+    companyName: company?.name || "Your business",
+    gaps
+  });
+  res.json({ ...result, gapCount: gaps.length });
+}));
+
+/* ---------------------------------------------------------------------------
+ * Media attached to a knowledge base entry.
+ *
+ * These files must be publicly fetchable: Messenger attachments are sent BY
+ * URL and Facebook's own servers retrieve them, so anything behind requireAuth
+ * fails silently from Meta's side. Served from public/media with random UUID
+ * filenames rather than access control.
+ *
+ * RAW BINARY, NOT BASE64, AND NEVER THE COMPRESSED COPY.
+ * The wizard downsizes images to 1600px JPEG before OCR — right for reading a
+ * price list, wrong for storage. This is the file a CUSTOMER will see, so it
+ * is stored exactly as uploaded. Raw upload also avoids base64's 33% inflation.
+ * ------------------------------------------------------------------------- */
+app.use("/api/knowledge-base/:id/media", express.raw({ type: "*/*", limit: "30mb" }));
+
+app.post("/api/knowledge-base/:id/media", requireAuth, asyncHandler(async (req, res) => {
+  const mimeType = String(req.get("content-type") || "").split(";")[0].trim();
+  const filename = decodeURIComponent(String(req.get("x-filename") || "upload"));
+  const caption = decodeURIComponent(String(req.get("x-caption") || ""));
+
+  if (!Buffer.isBuffer(req.body) || !req.body.length) {
+    return res.status(400).json({ ok: false, error: "No file received." });
+  }
+
+  const entry = await prisma.knowledgeBase.findFirst({
+    where: { id: req.params.id, company_id: req.companyId }
+  });
+  if (!entry) return res.status(404).json({ ok: false, error: "Entry not found" });
+
+  const saved = saveMedia({ buffer: req.body, mimeType, filename, companyId: req.companyId });
+  if (!saved.ok) return res.status(400).json({ ok: false, error: saved.error });
+
+  // Append rather than replace — an entry may hold several photos of the same
+  // product.
+  const existing = Array.isArray(entry.media) ? entry.media : [];
+  const media = [...existing, { ...saved.entry, caption: caption || entry.title || "" }];
+
+  await prisma.knowledgeBase.update({ where: { id: entry.id }, data: { media } });
+  clearAistaffAiConfigCache();
+  console.log("[media] saved company=%s entry=%s %s (%d KB)",
+    req.companyId, entry.id, filename, Math.round(req.body.length / 1024));
+  res.json({ ok: true, media });
+}));
+
+app.delete("/api/knowledge-base/:id/media", requireAuth, express.json(), asyncHandler(async (req, res) => {
+  const body = z.object({ url: z.string().min(5) }).parse(req.body);
+  const entry = await prisma.knowledgeBase.findFirst({
+    where: { id: req.params.id, company_id: req.companyId }
+  });
+  if (!entry) return res.status(404).json({ ok: false, error: "Entry not found" });
+
+  const media = (Array.isArray(entry.media) ? entry.media : []).filter((m) => m.url !== body.url);
+  deleteMedia(body.url);
+  await prisma.knowledgeBase.update({ where: { id: entry.id }, data: { media } });
+  clearAistaffAiConfigCache();
+  res.json({ ok: true, media });
+}));
+
+/* ---------------------------------------------------------------------------
+ * PLATFORM (2026-08-19) — AIStaff staff managing all customers.
+ *
+ * Separate from /admin because /admin is ONE workspace, and AIStaff staff are
+ * themselves tenants. Pure addition: nothing under /admin/* changes (§12).
+ *
+ * Every route is behind requirePermission, which reads platform_role fresh from
+ * the database on each request. Someone with no session gets 401; a customer
+ * who types /platform gets 403 and reaches no data.
+ * ------------------------------------------------------------------------- */
+
+/** Who am I, and what may I do? Drives which platform screens render. */
+app.get("/api/platform/me", requireAuth, asyncHandler(async (req, res) => {
+  const role = normaliseRole(req.user.platform_role);
+  if (!role) return res.status(403).json({ error: "Not a platform user" });
+  res.json({
+    email: req.user.email,
+    name: req.user.name,
+    role,
+    can: {
+      users: can(req.user, "platform.users"),
+      pricing: can(req.user, "platform.pricing"),
+      behaviour: can(req.user, "platform.behaviour"),
+      customersView: can(req.user, "customers.view"),
+      customersStatus: can(req.user, "customers.status"),
+      customersAssist: can(req.user, "customers.assist")
+    }
+  });
+}));
+
+/** Every customer, with the numbers that decide who needs attention. */
+app.get("/api/platform/customers", requireAuth, requirePermission("customers.view"), asyncHandler(async (req, res) => {
+  res.json({ customers: await listCustomers() });
+}));
+
+app.put("/api/platform/customers/:id/status", requireAuth, requirePermission("customers.status"), asyncHandler(async (req, res) => {
+  const body = z.object({ status: z.enum(["active", "inactive"]) }).parse(req.body || {});
+  const existing = await prisma.company.findUnique({
+    where: { id: req.params.id },
+    select: { id: true, name: true, status: true }
+  });
+  if (!existing) return res.status(404).json({ error: "Customer not found" });
+  if (existing.status === body.status) return res.json({ ok: true, company: existing });
+
+  const company = await prisma.company.update({
+    where: { id: req.params.id },
+    data: { status: body.status },
+    select: { id: true, name: true, status: true }
+  });
+  console.log("[platform] %s set customer %s (%s) status=%s", req.user.email, company.name, company.id, company.status);
+  res.json({ ok: true, company });
+}));
+
+/**
+ * Enter a customer's workspace.
+ *
+ * Recorded on ENTRY rather than exit, so an abandoned session is still logged.
+ * The session cookie is re-issued against their company id — the same
+ * mechanism as signing in, so every existing tenant-scoped route works without
+ * modification and cannot leak across tenants.
+ */
+app.post("/api/platform/assist/:companyId", requireAuth, requirePermission("customers.assist"), asyncHandler(async (req, res) => {
+  const body = z.object({ reason: z.string().max(300).optional().nullable() }).parse(req.body || {});
+  const company = await prisma.company.findUnique({
+    where: { id: req.params.companyId },
+    select: { id: true, name: true, account_number: true }
+  });
+  if (!company) return res.status(404).json({ error: "Customer not found" });
+
+  const session = await prisma.assistSession.create({
+    data: {
+      staff_user_id: req.user.id,
+      staff_email: req.user.email,
+      company_id: company.id,
+      company_name: company.name,
+      reason: body.reason || null
+    }
+  });
+
+  console.log("[assist] %s entered %s (%s) session=%s",
+    req.user.email, company.account_number, company.name, session.id);
+
+  setSessionCookie(res, signSession({
+    sub: req.user.id,
+    companyId: company.id,
+    assistSessionId: session.id
+  }));
+
+  res.json({ ok: true, company, sessionId: session.id });
+}));
+
+/** Leave assist mode and return to your own workspace. */
+app.post("/api/platform/assist/exit", requireAuth, asyncHandler(async (req, res) => {
+  const user = await prisma.user.findUnique({
+    where: { id: req.user.id },
+    select: { company_id: true, company: { select: { name: true } } }
+  });
+
+  await prisma.assistSession.updateMany({
+    where: { staff_user_id: req.user.id, ended_at: null },
+    data: { ended_at: new Date() }
+  });
+
+  setSessionCookie(res, signSession({ sub: req.user.id, companyId: user.company_id }));
+  console.log("[assist] %s exited assist mode", req.user.email);
+  res.json({ ok: true, company: user.company });
+}));
+
+/** Who has been in whose workspace. Visible to anyone who can view customers. */
+app.get("/api/platform/assist-log", requireAuth, requirePermission("customers.view"), asyncHandler(async (req, res) => {
+  const sessions = await prisma.assistSession.findMany({
+    orderBy: { started_at: "desc" },
+    take: 100
+  });
+  res.json({ sessions });
+}));
+
+/* ---- Platform staff: create, change role, deactivate. Admin only. ---- */
+
+app.get("/api/platform/users", requireAuth, requirePermission("platform.users"), asyncHandler(async (req, res) => {
+  const users = await prisma.user.findMany({
+    where: { platform_role: { not: null } },
+    orderBy: { created_at: "asc" },
+    select: {
+      id: true, email: true, name: true, platform_role: true, role: true,
+      status: true, last_login_at: true,
+      company: { select: { account_number: true, name: true } }
+    }
+  });
+  res.json({ users, roles: ROLES, permissions: PERMISSIONS });
+}));
+
+/**
+ * Create a staff member.
+ *
+ * They get no password here — the same set-password email a paying customer
+ * receives is sent instead, so a password is never typed by one person on
+ * behalf of another or sent over chat.
+ *
+ * Staff still need a tenant company (the schema requires one), so they join
+ * the AIStaff workspace as an account_user unless told otherwise.
+ */
+app.post("/api/platform/users", requireAuth, requirePermission("platform.users"), asyncHandler(async (req, res) => {
+  const body = z.object({
+    email: z.string().email(),
+    name: z.string().min(1).max(120),
+    platformRole: z.enum(["admin", "manager", "support"]),
+    tenantRole: z.enum(["account_admin", "account_user"]).optional().default("account_user")
+  }).parse(req.body);
+
+  const existing = await prisma.user.findUnique({ where: { email: body.email } });
+  if (existing) {
+    // Already a user — promote rather than refuse. A customer who joins the
+    // team should keep their history, not get a duplicate account.
+    const updated = await prisma.user.update({
+      where: { id: existing.id },
+      data: { platform_role: body.platformRole }
+    });
+    console.log("[platform] %s granted %s by %s", body.email, body.platformRole, req.user.email);
+    return res.json({ ok: true, promoted: true, user: { email: updated.email, platform_role: updated.platform_role } });
+  }
+
+  const company = await prisma.company.findUnique({ where: { id: AISTAFF_INTERNAL_COMPANY_ID } });
+  const user = await prisma.user.create({
+    data: {
+      company_id: company.id,
+      email: body.email,
+      name: body.name,
+      role: body.tenantRole,
+      platform_role: body.platformRole,
+      status: "active",
+      password_hash: crypto.randomBytes(32).toString("hex")
+    }
+  });
+
+  const sent = await issueSetupLink(user.id, "new").catch((error) => {
+    console.error("[platform] setup email failed for %s: %s", body.email, error.message);
+    return false;
+  });
+
+  console.log("[platform] created %s (%s) by %s", body.email, body.platformRole, req.user.email);
+  res.json({ ok: true, created: true, emailSent: Boolean(sent), user: { email: user.email, platform_role: user.platform_role } });
+}));
+
+app.put("/api/platform/users/:id", requireAuth, requirePermission("platform.users"), asyncHandler(async (req, res) => {
+  const body = z.object({
+    platformRole: z.enum(["admin", "manager", "support"]).nullable().optional(),
+    status: z.enum(["active", "inactive"]).optional()
+  }).parse(req.body);
+
+  // Nobody removes their own admin rights — that is how a platform ends up
+  // with no administrator and no way back in.
+  if (req.params.id === req.user.id && body.platformRole !== "admin") {
+    return res.status(400).json({ error: "You cannot remove your own admin role. Ask another admin." });
+  }
+
+  const user = await prisma.user.update({
+    where: { id: req.params.id },
+    data: {
+      ...(body.platformRole !== undefined ? { platform_role: body.platformRole } : {}),
+      ...(body.status ? { status: body.status } : {})
+    },
+    select: { email: true, platform_role: true, status: true }
+  });
+  console.log("[platform] %s updated %s -> role=%s status=%s", req.user.email, user.email, user.platform_role, user.status);
+  res.json({ ok: true, user });
+}));
+
 app.get("/api/ai-studio", requireAuth, asyncHandler(async (req, res) => {
   const config = await loadAistaffAiConfig(req.companyId);
   res.json({
@@ -3009,6 +4697,74 @@ app.get("/api/ai-studio", requireAuth, asyncHandler(async (req, res) => {
     knowledgeBaseCount: config.knowledgeBase.length,
     knowledgeBase: config.knowledgeBase
   });
+}));
+
+/* Customer's own instructions — versioned per company, same mechanism as the
+ * platform prompt. `prompt_revisions.key` is namespaced by company id, so one
+ * tenant can never see or roll back another's. Live value stays on
+ * CompanySetting.ai_custom_instructions, which is what the reply path reads;
+ * the revisions are the history around it. */
+const customKey = (companyId) => `closer_custom:${companyId}`;
+
+app.get("/api/prompts/custom", requireAuth, asyncHandler(async (req, res) => {
+  const revisions = await prisma.promptRevision.findMany({
+    where: { key: customKey(req.companyId) },
+    orderBy: { version: "desc" },
+    select: { id: true, version: true, note: true, created_by: true, is_active: true, created_at: true, content: true }
+  });
+  res.json({ revisions });
+}));
+
+app.post("/api/prompts/custom", requireAuth, asyncHandler(async (req, res) => {
+  const body = z.object({ content: z.string().max(12000) }).parse(req.body);
+  const key = customKey(req.companyId);
+  const text = body.content.trim();
+
+  const latest = await prisma.promptRevision.findFirst({ where: { key }, orderBy: { version: "desc" } });
+  // Do not record a version when nothing changed — the history should be a
+  // list of decisions, not of save-button presses.
+  if (latest && latest.content === text) {
+    return res.json({ ok: true, unchanged: true });
+  }
+
+  await prisma.$transaction([
+    prisma.promptRevision.updateMany({ where: { key, is_active: true }, data: { is_active: false } }),
+    prisma.promptRevision.create({
+      data: {
+        key,
+        version: (latest?.version || 0) + 1,
+        content: text,
+        created_by: req.user.email,
+        is_active: true
+      }
+    }),
+    prisma.companySetting.update({
+      where: { company_id: req.companyId },
+      data: { ai_custom_instructions: text || null }
+    })
+  ]);
+
+  clearAistaffAiConfigCache();
+  res.json({ ok: true, version: (latest?.version || 0) + 1 });
+}));
+
+app.post("/api/prompts/custom/activate", requireAuth, asyncHandler(async (req, res) => {
+  const body = z.object({ version: z.number().int().positive() }).parse(req.body);
+  const key = customKey(req.companyId);
+  const target = await prisma.promptRevision.findFirst({ where: { key, version: body.version } });
+  if (!target) return res.status(404).json({ ok: false, error: "That version does not exist." });
+
+  await prisma.$transaction([
+    prisma.promptRevision.updateMany({ where: { key, is_active: true }, data: { is_active: false } }),
+    prisma.promptRevision.update({ where: { id: target.id }, data: { is_active: true } }),
+    prisma.companySetting.update({
+      where: { company_id: req.companyId },
+      data: { ai_custom_instructions: target.content || null }
+    })
+  ]);
+
+  clearAistaffAiConfigCache();
+  res.json({ ok: true, version: target.version });
 }));
 
 app.put("/api/ai-studio/instructions", requireAuth, asyncHandler(async (req, res) => {
@@ -3125,8 +4881,14 @@ app.get("/api/leads/:id", requireAuth, asyncHandler(async (req, res) => {
 app.put("/api/leads/:id", requireAuth, asyncHandler(async (req, res) => {
   const data = { ...req.body };
   if (data.follow_up_date) data.follow_up_date = new Date(data.follow_up_date);
-  data.lead_score = scoreLead(data);
-  data.quotation_ready = quotationReady(data);
+  // scoreLead() removed 2026-08-18 — it was English keyword matching. When a
+  // human edits a lead by hand, their edit stands; the score is only
+  // recalculated by the model on the next customer message. quotation_ready is
+  // derived from this tenant's own required fields.
+  const questions = await prisma.qualificationQuestion.findMany({
+    where: { company_id: req.companyId, active: true }
+  });
+  data.quotation_ready = quotationReady(data, questions);
   const lead = await prisma.lead.update({ where: { id: req.params.id, company_id: req.companyId }, data });
   await maybeCreateQuotationDraft({ companyId: req.companyId, lead, conversationId: lead.conversation_id, preparedBy: req.user.id });
   res.json(lead);
@@ -3233,6 +4995,325 @@ app.post("/api/quotations/:id/send", requireAuth, asyncHandler(async (req, res) 
     }
   });
   res.json(sent);
+}));
+
+const BOOKING_STATUSES = new Set(["requested", "pending_confirmation", "confirmed", "paid", "cancelled", "completed", "no_show"]);
+const BOOKING_CALENDAR_VISIBLE_STATUSES = new Set(["requested", "pending_confirmation", "confirmed", "paid", "completed"]);
+
+async function ensureBookingSetting(companyId) {
+  return prisma.bookingSetting.upsert({
+    where: { company_id: companyId },
+    update: {},
+    create: { company_id: companyId }
+  });
+}
+
+function serializeBookingService(service) {
+  if (!service) return null;
+  return {
+    ...service,
+    price: service.price == null ? null : Number(service.price),
+    deposit_amount: service.deposit_amount == null ? null : Number(service.deposit_amount)
+  };
+}
+
+function serializeBooking(booking) {
+  if (!booking) return null;
+  return {
+    ...booking,
+    service: serializeBookingService(booking.service)
+  };
+}
+
+function calendarSecret() {
+  return process.env.BOOKING_CALENDAR_SECRET || process.env.JWT_SECRET || "local-dev-secret-change-me";
+}
+
+function signBookingCalendarToken(companyId) {
+  const signature = crypto
+    .createHmac("sha256", calendarSecret())
+    .update(String(companyId))
+    .digest("base64url");
+  return `${companyId}.${signature}`;
+}
+
+function verifyBookingCalendarToken(token) {
+  const raw = String(token || "");
+  const dot = raw.lastIndexOf(".");
+  if (dot <= 0) return null;
+  const companyId = raw.slice(0, dot);
+  const expected = signBookingCalendarToken(companyId);
+  const a = Buffer.from(raw);
+  const b = Buffer.from(expected);
+  if (a.length !== b.length || !crypto.timingSafeEqual(a, b)) return null;
+  return companyId;
+}
+
+function bookingCalendarFeedUrl(req, companyId) {
+  return `${getAppUrl(req)}/api/bookings/calendar.ics?token=${encodeURIComponent(signBookingCalendarToken(companyId))}`;
+}
+
+function icsDate(value) {
+  return new Date(value).toISOString().replace(/[-:]/g, "").replace(/\.\d{3}Z$/, "Z");
+}
+
+function icsEscape(value) {
+  return String(value || "")
+    .replace(/\\/g, "\\\\")
+    .replace(/\n/g, "\\n")
+    .replace(/;/g, "\\;")
+    .replace(/,/g, "\\,");
+}
+
+function icsLine(name, value) {
+  const raw = `${name}:${icsEscape(value)}`;
+  const chunks = [];
+  let current = raw;
+  while (current.length > 74) {
+    chunks.push(current.slice(0, 74));
+    current = ` ${current.slice(74)}`;
+  }
+  chunks.push(current);
+  return chunks.join("\r\n");
+}
+
+function renderBookingCalendarIcs({ company, setting, bookings }) {
+  const calendarName = `AIStaff Bookings - ${company.name}`;
+  const lines = [
+    "BEGIN:VCALENDAR",
+    "VERSION:2.0",
+    "PRODID:-//AIStaff//Tenant Bookings//EN",
+    "CALSCALE:GREGORIAN",
+    "METHOD:PUBLISH",
+    icsLine("X-WR-CALNAME", calendarName),
+    icsLine("X-WR-TIMEZONE", setting?.timezone || "Asia/Manila")
+  ];
+
+  for (const booking of bookings) {
+    const ref = `BK-${String(booking.id).slice(0, 8).toUpperCase()}`;
+    const contact = [booking.mobile_number, booking.email].filter(Boolean).join(" · ");
+    const detailValues = booking.field_values && typeof booking.field_values === "object"
+      ? Object.entries(booking.field_values).map(([key, value]) => `${key}: ${value}`)
+      : [];
+    const description = [
+      `Reference: ${ref}`,
+      `Status: ${String(booking.status || "").replace(/_/g, " ")}`,
+      contact ? `Contact: ${contact}` : "",
+      booking.notes || "",
+      ...detailValues
+    ].filter(Boolean).join("\n");
+    const location = booking.service?.location
+      || booking.field_values?.branch_location
+      || booking.field_values?.address
+      || "";
+
+    lines.push(
+      "BEGIN:VEVENT",
+      icsLine("UID", `${booking.id}@aistaff.click`),
+      icsLine("DTSTAMP", icsDate(booking.updated_at || booking.created_at || new Date())),
+      icsLine("DTSTART", icsDate(booking.start_at)),
+      icsLine("DTEND", icsDate(booking.end_at)),
+      icsLine("SUMMARY", `${booking.service_name} - ${booking.customer_name}`),
+      icsLine("DESCRIPTION", description),
+      location ? icsLine("LOCATION", location) : "",
+      icsLine("STATUS", booking.status === "confirmed" || booking.status === "paid" || booking.status === "completed" ? "CONFIRMED" : "TENTATIVE"),
+      "END:VEVENT"
+    );
+  }
+
+  lines.push("END:VCALENDAR");
+  return `${lines.filter(Boolean).join("\r\n")}\r\n`;
+}
+
+app.get("/api/bookings", requireAuth, asyncHandler(async (req, res) => {
+  const today = new Date();
+  const from = new Date(today);
+  from.setDate(from.getDate() - 7);
+  const to = new Date(today);
+  to.setDate(to.getDate() + 45);
+
+  const [setting, services, bookings] = await Promise.all([
+    ensureBookingSetting(req.companyId),
+    prisma.bookingService.findMany({
+      where: { company_id: req.companyId },
+      orderBy: [{ active: "desc" }, { display_order: "asc" }, { created_at: "asc" }]
+    }),
+    prisma.booking.findMany({
+      where: { company_id: req.companyId, start_at: { gte: from, lte: to } },
+      orderBy: { start_at: "asc" },
+      include: { service: true, lead: { select: { customer_name: true, service_needed: true } }, conversation: { select: { channel: true, psid: true, external_id: true } } }
+    })
+  ]);
+
+  res.json({
+    setting,
+    calendar_feed_url: bookingCalendarFeedUrl(req, req.companyId),
+    services: services.map(serializeBookingService),
+    bookings: bookings.map(serializeBooking)
+  });
+}));
+
+app.get("/api/bookings/calendar.ics", asyncHandler(async (req, res) => {
+  const companyId = verifyBookingCalendarToken(req.query.token);
+  if (!companyId) return res.status(403).type("text/plain").send("Invalid calendar token");
+
+  const now = new Date();
+  const from = new Date(now);
+  from.setDate(from.getDate() - 30);
+  const to = new Date(now);
+  to.setDate(to.getDate() + 365);
+
+  const [company, setting, bookings] = await Promise.all([
+    prisma.company.findUnique({ where: { id: companyId }, select: { id: true, name: true } }),
+    ensureBookingSetting(companyId),
+    prisma.booking.findMany({
+      where: {
+        company_id: companyId,
+        status: { in: Array.from(BOOKING_CALENDAR_VISIBLE_STATUSES) },
+        start_at: { gte: from, lte: to }
+      },
+      orderBy: { start_at: "asc" },
+      include: { service: true }
+    })
+  ]);
+  if (!company) return res.status(404).type("text/plain").send("Calendar not found");
+
+  res.setHeader("Content-Type", "text/calendar; charset=utf-8");
+  res.setHeader("Cache-Control", "private, max-age=300");
+  res.setHeader("Content-Disposition", `inline; filename="aistaff-${company.id}-bookings.ics"`);
+  res.send(renderBookingCalendarIcs({ company, setting, bookings }));
+}));
+
+app.put("/api/bookings/settings", requireAuth, asyncHandler(async (req, res) => {
+  const body = z.object({
+    enabled: z.boolean().optional(),
+    timezone: z.string().min(1).max(80).optional(),
+    slot_interval_minutes: z.number().int().min(5).max(240).optional(),
+    min_notice_minutes: z.number().int().min(0).max(10080).optional(),
+    max_days_ahead: z.number().int().min(1).max(365).optional(),
+    business_hours: z.any().optional(),
+    booking_type: z.string().min(1).max(80).optional(),
+    field_mode: z.enum(["preset", "custom"]).optional(),
+    required_fields: z.array(z.string().min(1).max(80)).max(80).optional(),
+    instructions: z.string().max(4000).optional().nullable()
+  }).parse(req.body);
+
+  await ensureBookingSetting(req.companyId);
+  const setting = await prisma.bookingSetting.update({
+    where: { company_id: req.companyId },
+    data: body
+  });
+  res.json(setting);
+}));
+
+app.post("/api/bookings/services", requireAuth, asyncHandler(async (req, res) => {
+  const body = z.object({
+    name: z.string().trim().min(1).max(140),
+    description: z.string().max(2000).optional().nullable(),
+    duration_minutes: z.number().int().min(5).max(1440).optional().default(60),
+    price: z.any().optional().nullable(),
+    deposit_amount: z.any().optional().nullable(),
+    location: z.string().max(160).optional().nullable(),
+    active: z.boolean().optional().default(true),
+    display_order: z.number().int().optional().default(0)
+  }).parse(req.body);
+  const service = await prisma.bookingService.create({
+    data: {
+      ...body,
+      price: numberOrNull(body.price),
+      deposit_amount: numberOrNull(body.deposit_amount),
+      company_id: req.companyId
+    }
+  });
+  res.json(serializeBookingService(service));
+}));
+
+app.put("/api/bookings/services/:id", requireAuth, asyncHandler(async (req, res) => {
+  const body = z.object({
+    name: z.string().trim().min(1).max(140).optional(),
+    description: z.string().max(2000).optional().nullable(),
+    duration_minutes: z.number().int().min(5).max(1440).optional(),
+    price: z.any().optional().nullable(),
+    deposit_amount: z.any().optional().nullable(),
+    location: z.string().max(160).optional().nullable(),
+    active: z.boolean().optional(),
+    display_order: z.number().int().optional()
+  }).parse(req.body);
+  const data = { ...body };
+  if ("price" in data) data.price = numberOrNull(data.price);
+  if ("deposit_amount" in data) data.deposit_amount = numberOrNull(data.deposit_amount);
+  const service = await prisma.bookingService.update({
+    where: { id: req.params.id, company_id: req.companyId },
+    data
+  });
+  res.json(serializeBookingService(service));
+}));
+
+app.post("/api/bookings", requireAuth, asyncHandler(async (req, res) => {
+  const body = z.object({
+    service_id: z.string().optional().nullable(),
+    customer_name: z.string().trim().min(1).max(160),
+    mobile_number: z.string().max(60).optional().nullable(),
+    email: z.union([z.string().email(), z.literal(""), z.null()]).optional(),
+    service_name: z.string().trim().max(160).optional().nullable(),
+    start_at: z.string().min(1),
+    status: z.string().optional().default("requested"),
+    field_values: z.record(z.any()).optional().default({}),
+    notes: z.string().max(3000).optional().nullable(),
+    lead_id: z.string().optional().nullable(),
+    conversation_id: z.string().optional().nullable()
+  }).parse(req.body);
+  if (!BOOKING_STATUSES.has(body.status)) return res.status(400).json({ error: "Invalid booking status" });
+
+  const service = body.service_id
+    ? await prisma.bookingService.findFirst({ where: { id: body.service_id, company_id: req.companyId } })
+    : null;
+  if (body.service_id && !service) return res.status(404).json({ error: "Booking service not found" });
+
+  const start = new Date(body.start_at);
+  if (Number.isNaN(start.getTime())) return res.status(400).json({ error: "Choose a valid booking date and time." });
+  const duration = service?.duration_minutes || 60;
+  const end = new Date(start.getTime() + duration * 60 * 1000);
+  const serviceName = body.service_name || service?.name || "Booking";
+
+  if (body.lead_id) {
+    await prisma.lead.findFirstOrThrow({ where: { id: body.lead_id, company_id: req.companyId } });
+  }
+  if (body.conversation_id) {
+    await prisma.conversation.findFirstOrThrow({ where: { id: body.conversation_id, company_id: req.companyId } });
+  }
+
+  const booking = await prisma.booking.create({
+    data: {
+      company_id: req.companyId,
+      service_id: service?.id || null,
+      lead_id: body.lead_id || null,
+      conversation_id: body.conversation_id || null,
+      customer_name: body.customer_name,
+      mobile_number: body.mobile_number || null,
+      email: body.email || null,
+      service_name: serviceName,
+      start_at: start,
+      end_at: end,
+      status: body.status,
+      source: "admin",
+      field_values: body.field_values,
+      notes: body.notes || null
+    },
+    include: { service: true }
+  });
+  res.json(serializeBooking(booking));
+}));
+
+app.put("/api/bookings/:id/status", requireAuth, asyncHandler(async (req, res) => {
+  const body = z.object({ status: z.string() }).parse(req.body);
+  if (!BOOKING_STATUSES.has(body.status)) return res.status(400).json({ error: "Invalid booking status" });
+  const booking = await prisma.booking.update({
+    where: { id: req.params.id, company_id: req.companyId },
+    data: { status: body.status },
+    include: { service: true }
+  });
+  res.json(serializeBooking(booking));
 }));
 
 app.get("/api/follow-ups", requireAuth, asyncHandler(async (req, res) => {
@@ -3391,6 +5472,9 @@ app.use((error, req, res, next) => {
   console.error("[error]", req.method, req.originalUrl, "->", error && error.name, error && error.message);
   if (error && error.stack) console.error(String(error.stack).split("\n").slice(0, 6).join("\n"));
   if (error.name === "ZodError") return res.status(400).json({ error: "Validation failed", details: error.errors });
+  if (error.statusCode && error.statusCode >= 400 && error.statusCode < 500) {
+    return res.status(error.statusCode).json({ error: error.message || "Request failed" });
+  }
   res.status(500).json({ error: error.message || "Server error" });
 });
 

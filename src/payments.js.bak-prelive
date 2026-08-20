@@ -1,0 +1,730 @@
+const crypto = require("crypto");
+
+const PAYMENT_MODE = process.env.PAYMENT_MODE || "test";
+const CURRENCY = "PHP";
+
+const BUSINESS_IDENTITY = {
+  brandName: process.env.BUSINESS_BRAND_NAME || "AIStaff",
+  legalName: process.env.BUSINESS_LEGAL_NAME || "AIStaff Solutions Corporation",
+  registrationNumber: process.env.BUSINESS_REGISTRATION_NUMBER || "To be provided after verification",
+  registeredAddress: process.env.BUSINESS_REGISTERED_ADDRESS || "To be provided after verification",
+  supportEmail: process.env.SUPPORT_EMAIL || "support@aistaff.click",
+  supportMobile: process.env.SUPPORT_MOBILE || "+63 900 000 0000",
+  website: process.env.APP_URL || process.env.APP_PUBLIC_URL || "https://aistaff.click",
+  businessHours: process.env.BUSINESS_HOURS || "Monday to Friday, 9:00 AM to 6:00 PM Philippine Time"
+};
+
+const PRODUCT = {
+  name: "AIChat Sales Agent",
+  slug: "aichat-sales-agent",
+  description: "Your 24/7 AI sales assistant for Facebook Messenger and website inquiries."
+};
+
+/**
+ * Every feature in every tier. Plans differ on CAPACITY, not capability.
+ * Final pricing guide, 2026-08-12.
+ *
+ * Only capabilities that actually exist today are listed. Items still to be
+ * built live in ROADMAP_FEATURES below and are deliberately NOT sold yet
+ * (HANDOFF-CLOSER.md build order items 3 and 4).
+ */
+/**
+ * What every plan includes. Capability never differs by tier — only capacity
+ * and which channels the agent answers on.
+ *
+ * WRITTEN AS OUTCOMES, NOT COMPONENTS. "Lead capture and scoring" is an
+ * engineering word for something the owner experiences as knowing who is
+ * serious. The list a buyer reads should describe what changes for them.
+ *
+ * NO TIME PROMISES. Support says "onboarding assistance" rather than "2-day
+ * onboarding": an unbounded promise you always keep is worth more than a
+ * specific one you might miss, and a missed number is the kind of thing a
+ * customer quotes back at you.
+ *
+ * Everything listed here is BUILT and verified. Booking assistance was removed
+ * on 2026-08-19 — there is no live availability check, so Closer can take a
+ * booking request but cannot confirm one, and selling it as a feature is the
+ * §15 mistake (a customer reaching something that looks live and is not).
+ */
+const SHARED_FEATURES = [
+  "Answers instantly, 24/7, only from what you approve",
+  "Replies in your customer's language — English, Tagalog or Taglish",
+  "Sends your photos, posters and price lists in the chat",
+  "Asks your qualification questions and captures contact details",
+  "Marks who is hot, warm or cold so you know who to call first",
+  "Prepares quotation drafts for your approval",
+  "Hands over to you the moment a customer needs a person",
+  "Tells you every question it could not answer, so it keeps improving",
+  "Guided setup wizard — upload a price list, photo or PDF and it reads it",
+  "Dashboard for inquiries, leads and conversations on any device"
+];
+
+/**
+ * Support and onboarding, listed separately from product features because
+ * buyers weigh them differently — the service is often what decides a sale at
+ * this price point.
+ */
+const SUPPORT_FEATURES = [
+  "Onboarding assistance to get your knowledge base right",
+  "Ongoing tech support to optimise your Closer",
+  "24/7 AI chat assistance",
+  "We review the questions your customers actually asked and help you answer them"
+];
+
+/**
+ * Sold, but not shipped yet as of 2026-08-12. Tracked so the gap stays visible
+ * rather than being discovered by a customer. Remove a line once it ships.
+ */
+const BUILD_DEBT = ["Booking assistance", "Unanswered-question log", "Branch routing"];
+
+/**
+ * Capabilities that are NOT a software toggle — they need Pitch's hardware.
+ * Closer sends SMS through the AIO100 VoLTE gateway's own SIM (SIP MESSAGE ->
+ * SMS Route -> SIM 1), so there is no way to enable this on a Closer-only
+ * account. This is a physical dependency, not an upsell fence.
+ *
+ * Why it matters commercially: Meta closes the Messenger window 24 hours after
+ * the customer's last message. Past that, SMS is the only way to reach them.
+ */
+const PITCH_BUNDLE = {
+  requires: "Pitch — AI voice agent, includes VoLTE gateway and SIM",
+  features: [
+    "SMS follow-up after the 24-hour Messenger window closes",
+    "Follow-up sent from your own mobile number",
+    "Voice calls answered by Pitch on the same number"
+  ],
+  constraints: [
+    "One SMS per conversation",
+    "170 characters per message"
+  ]
+};
+
+/**
+ * SETUP FEE REMOVED 2026-08-17. Set to 0, not deleted — three existing
+ * OrderItem rows carry a "One-time setup" line (AS-20260813-955B98 pending,
+ * AS-20260813-1E9338 paid) and those are price snapshots that must keep
+ * resolving. calculateCart already skips the line when this is 0.
+ *
+ * Why: the knowledge base intake wizard makes setup self-serve, and the §17
+ * Meta fixes (config_id, public_profile Advanced, subscribed_apps) were
+ * platform work that every future customer now gets for free. Charging for
+ * labour that no longer happens is a fee you cannot describe.
+ *
+ * The annual benefit is now purely TWO MONTHS FREE (annualPrice is 10x
+ * monthly, not 12x). That stands on its own without the waiver.
+ */
+const SETUP_FEE = 0;
+
+const PRICING_PLANS = [
+  {
+    name: "Starter",
+    slug: "starter",
+    monthlyPrice: 1499,
+    annualPrice: 14990,
+    setupPrice: SETUP_FEE,
+    setupWaivedOnAnnual: true,
+    available: true,
+    bestFor: "Getting started on Messenger, with everything Closer can do.",
+    conversationLimit: 100,
+    channels: ["messenger"],
+    channelLabel: "Facebook Messenger",
+    facebookPageLimit: 1,
+    staffLoginLimit: 1,
+    onboarding: "Onboarding assistance and ongoing tech support",
+    cta: "Start with Starter",
+    features: SHARED_FEATURES
+  },
+  {
+    name: "Essential",
+    slug: "essential",
+    monthlyPrice: 2999,
+    annualPrice: 29990,
+    setupPrice: SETUP_FEE,
+    setupWaivedOnAnnual: true,
+    available: true,
+    bestFor: "Steady inquiry volume, on whichever channel your customers use.",
+    conversationLimit: 300,
+    channels: ["messenger", "website"],
+    channelChoice: 1,
+    channelLabel: "Messenger or website chat (choose one)",
+    facebookPageLimit: 1,
+    staffLoginLimit: 2,
+    onboarding: "Onboarding assistance and ongoing tech support",
+    cta: "Choose Essential",
+    features: SHARED_FEATURES
+  },
+  {
+    name: "Professional",
+    slug: "professional",
+    monthlyPrice: 4499,
+    annualPrice: 44990,
+    setupPrice: SETUP_FEE,
+    setupWaivedOnAnnual: true,
+    available: true,
+    badge: "Most Popular",
+    bestFor: "Answering everywhere your customers reach you.",
+    conversationLimit: 600,
+    channels: ["messenger", "website"],
+    channelLabel: "Messenger and website chat",
+    facebookPageLimit: 1,
+    staffLoginLimit: 3,
+    onboarding: "Onboarding assistance and ongoing tech support",
+    cta: "Choose Professional",
+    features: SHARED_FEATURES
+  },
+  {
+    name: "Enterprise",
+    slug: "enterprise",
+    monthlyPrice: 6999,
+    annualPrice: 69990,
+    setupPrice: SETUP_FEE,
+    setupWaivedOnAnnual: true,
+    available: true,
+    bestFor: "High inquiry volume across both channels.",
+    conversationLimit: 1200,
+    channels: ["messenger", "website"],
+    channelLabel: "Messenger and website chat",
+    facebookPageLimit: 1,
+    staffLoginLimit: 10,
+    onboarding: "Onboarding assistance, tech support and priority response",
+    cta: "Choose Enterprise",
+    features: [...SHARED_FEATURES, "Priority support response"]
+  }
+];
+
+/**
+ * Plans a customer may actually buy today. PRICING_PLANS stays complete so
+ * existing Subscription/Order rows still resolve their slug; this is what any
+ * customer-facing surface should read. Hiding a card without this filter still
+ * leaves the plan purchasable by POSTing its slug to /api/cart.
+ */
+const AVAILABLE_PLANS = PRICING_PLANS.filter((plan) => plan.available !== false);
+
+const ADD_ONS = [
+  { name: "Additional Facebook Page", slug: "additional-facebook-page", description: "Connect one additional Facebook Page.", price: 2500, billingType: "monthly_recurring" },
+  { name: "Additional 1,000 Conversations", slug: "additional-1000-conversations", description: "Adds 1,000 AI-assisted conversations to the selected plan.", price: 1500, billingType: "monthly_recurring" },
+  { name: "Custom Landing Page", slug: "custom-landing-page", description: "One-time landing page design and build for campaigns.", price: 15000, billingType: "one_time" },
+  // HIDDEN 2026-08-17: the intake wizard does this free. Kept (not deleted)
+  // because order AS-20260727-BA0FAE and one active cart still reference the
+  // slug — deleting it would make those rows unresolvable.
+  { name: "AI Knowledge Base Setup", slug: "ai-knowledge-base-setup", description: "One-time setup for FAQs, product/service knowledge, and qualification content.", price: 10000, billingType: "one_time", available: false },
+  // Price is a RANGE, quoted after technical review — what it costs depends
+  // entirely on what the customer already runs (a Google Calendar connection is
+  // not a POS integration). `price` is the floor and `priceMax` the ceiling;
+  // billingType custom_quotation means neither is charged automatically.
+  //
+  // One integration serves the whole account, not one agent: connecting a
+  // customer's system gives Closer live availability AND gives Pitch the same
+  // data when it is developed. They share the customer platform, so this is
+  // never billed twice.
+  { name: "Custom Integration", slug: "custom-integration", description: "Their API, webhook or n8n workflow, CRM, POS, or booking system. Quoted after technical review. Covers every AIStaff agent on the account — Closer and Pitch share the same connection.", price: 10000, priceMax: 15000, billingType: "custom_quotation", startsAt: true },
+  { name: "Priority Onboarding", slug: "priority-onboarding", description: "One-time priority onboarding scheduling and setup assistance.", price: 7500, billingType: "one_time" }
+];
+
+/** Add-ons still offered. Same reasoning as AVAILABLE_PLANS above. */
+const AVAILABLE_ADD_ONS = ADD_ONS.filter((addon) => addon.available !== false);
+
+function formatMoney(amount, currency = CURRENCY) {
+  return new Intl.NumberFormat("en-PH", { style: "currency", currency }).format(Number(amount || 0));
+}
+
+function billingPrice(plan, billingFrequency) {
+  return billingFrequency === "annual" ? plan.annualPrice : plan.monthlyPrice;
+}
+
+function recurringAddonPrice(addon, billingFrequency) {
+  if (addon.billingType === "monthly_recurring") {
+    return billingFrequency === "annual" ? addon.price * 12 * 0.9 : addon.price;
+  }
+  return addon.price;
+}
+
+function calculateCart({ planSlug, billingFrequency = "monthly", addOnSlugs = [] }) {
+  const plan = PRICING_PLANS.find((item) => item.slug === planSlug);
+  if (!plan) throw new Error("Selected package is not available");
+  // A hidden plan is not a buyable plan. Without this, hiding the card only
+  // hides the button — the slug still works if posted directly.
+  if (plan.available === false) throw new Error("Selected package is not available");
+  const frequency = billingFrequency === "annual" ? "annual" : "monthly";
+  const items = [{
+    itemType: "pricing_plan",
+    itemId: plan.slug,
+    itemName: plan.name,
+    billingFrequency: frequency,
+    unitPrice: billingPrice(plan, frequency),
+    quantity: 1,
+    lineTotal: billingPrice(plan, frequency)
+  }];
+
+  // One-time setup, waived on annual payment. CORRECTION 2026-08-17: the old
+  // comment here said annualPrice was a straight monthly x12 with no discount.
+  // It is not — annualPrice is 10x monthly, i.e. two months free, and the
+  // waived setup is on TOP of that. Starter annual is 49,990 (not 59,988),
+  // which is 4,166/month and a 14,997 total saving. Do not "fix" it back.
+  // If they leave early on a waived annual, the setup is invoiced back; that
+  // clawback belongs in the terms, not here.
+  const setupWaived = frequency === "annual" && plan.setupWaivedOnAnnual;
+  if (plan.setupPrice > 0 && !setupWaived) {
+    items.push({
+      itemType: "setup_fee",
+      itemId: `${plan.slug}-setup`,
+      itemName: "One-time setup",
+      billingFrequency: "one_time",
+      unitPrice: plan.setupPrice,
+      quantity: 1,
+      lineTotal: plan.setupPrice
+    });
+  }
+
+  for (const slug of new Set(addOnSlugs || [])) {
+    const addon = ADD_ONS.find((item) => item.slug === slug);
+    if (!addon) continue;
+    const customQuote = addon.billingType === "custom_quotation";
+    const unitPrice = customQuote ? 0 : recurringAddonPrice(addon, frequency);
+    items.push({
+      itemType: "add_on",
+      itemId: addon.slug,
+      itemName: addon.name,
+      billingFrequency: addon.billingType === "monthly_recurring" ? frequency : addon.billingType,
+      unitPrice,
+      quantity: 1,
+      lineTotal: unitPrice,
+      customQuote
+    });
+  }
+
+  const subtotal = items.reduce((sum, item) => sum + item.lineTotal, 0);
+  const tax = 0;
+  return { currency: CURRENCY, billingFrequency: frequency, subtotal, tax, total: subtotal + tax, items };
+}
+
+function paymentProviderForCountry(country, requestedProvider = "") {
+  if (requestedProvider === "manual_bank_transfer") return "manual_bank_transfer";
+  // PayMongo, not Xendit, for the Philippines since 2026-08-19 — QR Ph was
+  // live on signup. XenditProvider is kept, not deleted, in case a second
+  // acquirer is ever wanted.
+  return String(country || "").toLowerCase().includes("philippines") ? "paymongo" : "stripe";
+}
+
+function providerReady(provider) {
+  // PayMongo needs only the SECRET key: all calls are server-side and the
+  // hosted checkout page handles card entry, so there is no public key in play.
+  if (provider === "paymongo") return Boolean(process.env.PAYMONGO_SECRET_KEY);
+  if (provider === "xendit") return Boolean(process.env.XENDIT_SECRET_KEY && process.env.XENDIT_PUBLIC_KEY);
+  if (provider === "stripe") return Boolean(process.env.STRIPE_SECRET_KEY && process.env.STRIPE_PUBLISHABLE_KEY);
+  if (provider === "manual_bank_transfer") return true;
+  return false;
+}
+
+class PaymentProvider {
+  constructor(name) {
+    this.name = name;
+  }
+  async createCheckoutSession(order) {
+    return this.createInvoice(order);
+  }
+  async createInvoice() {
+    throw new Error(`${this.name} invoice creation is not implemented`);
+  }
+  async retrievePaymentStatus() {
+    return { status: "pending" };
+  }
+  async cancelPayment() {
+    return { status: "cancelled" };
+  }
+  async processRefundRequest() {
+    return { status: "refund_requested" };
+  }
+  async createSubscription() {
+    return { status: "pending" };
+  }
+  async cancelSubscription() {
+    return { status: "cancelled" };
+  }
+  async handleWebhook(payload) {
+    return payload;
+  }
+  verifyWebhookSignature() {
+    return false;
+  }
+  async storeExternalPaymentReference() {
+    return null;
+  }
+  async reconcilePayment() {
+    return { status: "pending" };
+  }
+}
+
+class MockPaymentProvider extends PaymentProvider {
+  constructor(name = "mock") {
+    super(name);
+  }
+  async createInvoice(order) {
+    const base = process.env.APP_URL || process.env.APP_PUBLIC_URL || "http://localhost:3000";
+    return {
+      provider: this.name,
+      providerPaymentId: `${this.name}_test_${order.order_number}`,
+      checkoutUrl: `${base}/checkout/pending?order=${encodeURIComponent(order.order_number)}`,
+      status: "pending",
+      mode: PAYMENT_MODE,
+      message: "Secure online payment integration is currently in test mode."
+    };
+  }
+}
+
+/**
+ * PayMongo — the acquirer AIStaff actually uses (2026-08-19).
+ *
+ * Chosen over Xendit because QR Ph was active on signup with no separate
+ * application. That matters: one QR Ph code reaches GCash, Maya, UnionBank,
+ * BDO, BPI and the rest, which covers most Filipino buyers on day one. Cards
+ * are activated separately and mostly matter for the annual plan, where the
+ * InstaPay ceiling can bite.
+ *
+ * Uses CHECKOUT SESSIONS, not Links. A session carries the customer's email and
+ * our own reference_number, so the webhook says exactly which order was paid.
+ * That is what makes attribution automatic rather than matching payments to
+ * people by hand — the reason a static bank QR was rejected.
+ *
+ * AMOUNTS ARE IN CENTAVOS. ₱4,999 is 499900. Getting this wrong charges someone
+ * 100x, so conversion happens in exactly one place: toCentavos().
+ */
+class PayMongoProvider extends PaymentProvider {
+  constructor() {
+    super("paymongo");
+    this.baseUrl = process.env.PAYMONGO_API_URL || "https://api.paymongo.com";
+  }
+
+  authHeader() {
+    const key = process.env.PAYMONGO_SECRET_KEY || "";
+    return "Basic " + Buffer.from(`${key}:`).toString("base64");
+  }
+
+  toCentavos(amount) {
+    return Math.round(Number(amount) * 100);
+  }
+
+  async request(path, options = {}) {
+    const fetchImpl = (...args) => import("node-fetch").then(({ default: f }) => f(...args));
+    const response = await fetchImpl(`${this.baseUrl}${path}`, {
+      ...options,
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: this.authHeader(),
+        ...(options.headers || {})
+      }
+    });
+    const text = await response.text();
+    let json = {};
+    try { json = text ? JSON.parse(text) : {}; } catch { json = { raw: text }; }
+    if (!response.ok) {
+      // PayMongo returns { errors: [{ detail }] }. Surface the detail —
+      // "paymongo_400" alone is useless when a payment fails at 2am.
+      const detail = json?.errors?.[0]?.detail || json?.errors?.[0]?.code || `paymongo_${response.status}`;
+      const error = new Error(detail);
+      error.status = response.status;
+      error.body = json;
+      throw error;
+    }
+    return json;
+  }
+
+  async createInvoice(order, options = {}) {
+    const base = (process.env.PUBLIC_BASE_URL || "https://aistaff.click").replace(/\/+$/, "");
+    const lineItems = (order.items || []).map((item) => ({
+      name: String(item.itemName || item.item_name || "AIStaff").slice(0, 120),
+      quantity: Number(item.quantity || 1),
+      amount: this.toCentavos(item.unitPrice ?? item.unit_price ?? item.lineTotal ?? item.line_total ?? 0),
+      currency: CURRENCY
+    })).filter((i) => i.amount > 0);
+
+    // Never send an empty basket — PayMongo rejects it, and a single fallback
+    // line is more honest than a failed checkout.
+    const items = lineItems.length ? lineItems : [{
+      name: `AIStaff ${order.plan_name || "subscription"}`,
+      quantity: 1,
+      amount: this.toCentavos(order.total_amount || 0),
+      currency: CURRENCY
+    }];
+
+    const payload = {
+      data: {
+        attributes: {
+          line_items: items,
+          // Only methods actually activated on the account. QR Ph is live now;
+          // cards and wallets appear here as they are approved.
+          payment_method_types: (process.env.PAYMONGO_METHODS || "qrph,card,gcash,paymaya,grab_pay")
+            .split(",").map((m) => m.trim()).filter(Boolean),
+          // The webhook matches on this. It is the ONE link between a PayMongo
+          // payment and an AIStaff order.
+          reference_number: order.order_number,
+          description: `AIStaff ${order.plan_name || "subscription"} — ${order.order_number}`.slice(0, 200),
+          send_email_receipt: true,
+          show_line_items: true,
+          success_url: `${base}/checkout/success?order=${encodeURIComponent(order.order_number)}`,
+          cancel_url: `${base}/checkout/cancelled?order=${encodeURIComponent(order.order_number)}`,
+          ...(options.email || order.customer_email
+            ? { billing: { email: options.email || order.customer_email, name: order.customer_name || undefined } }
+            : {})
+        }
+      }
+    };
+
+    const result = await this.request("/v1/checkout_sessions", {
+      method: "POST",
+      body: JSON.stringify(payload)
+    });
+
+    return {
+      provider: this.name,
+      providerPaymentId: result?.data?.id || null,
+      checkoutUrl: result?.data?.attributes?.checkout_url || null,
+      status: "pending",
+      raw: result?.data || null
+    };
+  }
+}
+
+/**
+ * Xendit, via the Invoice API.
+ *
+ * Was an empty stub extending MockPaymentProvider — so adding API keys did
+ * nothing and checkout silently returned mock invoices. This implements it.
+ *
+ * One hosted invoice covers every channel the customer might want: QR Ph,
+ * GCash, Maya, cards, online banking, over-the-counter. Each invoice carries
+ * the order number as `external_id`, so a payment arrives already matched to
+ * an order — which a static bank QR cannot do.
+ */
+class XenditProvider extends PaymentProvider {
+  constructor() {
+    super("xendit");
+    this.baseUrl = process.env.XENDIT_API_URL || "https://api.xendit.co";
+  }
+
+  /** Basic auth: secret key as username, empty password. */
+  authHeader() {
+    const key = process.env.XENDIT_SECRET_KEY || "";
+    return "Basic " + Buffer.from(`${key}:`).toString("base64");
+  }
+
+  async request(path, options = {}) {
+    const fetchImpl = (...args) => import("node-fetch").then(({ default: f }) => f(...args));
+    const response = await fetchImpl(`${this.baseUrl}${path}`, {
+      ...options,
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: this.authHeader(),
+        ...(options.headers || {})
+      }
+    });
+    const text = await response.text();
+    let json = {};
+    try { json = text ? JSON.parse(text) : {}; } catch { json = { raw: text }; }
+    if (!response.ok) {
+      const message = json.message || json.error_code || `xendit_${response.status}`;
+      const error = new Error(message);
+      error.status = response.status;
+      error.body = json;
+      throw error;
+    }
+    return json;
+  }
+
+  async createInvoice(order) {
+    const appUrl = (process.env.APP_URL || "https://aistaff.click").replace(/\/+$/, "");
+    const customer = order.customer || {};
+    const amount = Number(order.total);
+
+    const payload = {
+      // The order number is the reconciliation key. It comes back on the
+      // webhook, so no payment is ever an orphan.
+      external_id: order.order_number,
+      amount,
+      currency: order.currency || CURRENCY,
+      description: `${BUSINESS_IDENTITY.brandName} — order ${order.order_number}`,
+      payer_email: customer.email || undefined,
+      success_redirect_url: `${appUrl}/checkout/success/?order=${encodeURIComponent(order.order_number)}`,
+      failure_redirect_url: `${appUrl}/checkout/failure/?order=${encodeURIComponent(order.order_number)}`,
+      // Xendit's default is 24h; a Philippine SMB often pays the next morning.
+      invoice_duration: Number(process.env.XENDIT_INVOICE_DURATION_SECONDS || 172800),
+      customer: {
+        given_names: customer.full_name || undefined,
+        email: customer.email || undefined,
+        mobile_number: customer.mobile_number || undefined
+      },
+      items: (order.items || []).map((item) => ({
+        name: String(item.item_name || item.itemName || "Item").slice(0, 120),
+        quantity: Number(item.quantity || 1),
+        price: Number(item.unit_price || item.unitPrice || 0)
+      }))
+    };
+
+    const invoice = await this.request("/v2/invoices", {
+      method: "POST",
+      body: JSON.stringify(payload)
+    });
+
+    return {
+      provider: this.name,
+      providerPaymentId: invoice.id,
+      checkoutUrl: invoice.invoice_url,
+      status: String(invoice.status || "PENDING").toLowerCase(),
+      expiresAt: invoice.expiry_date || null,
+      raw: invoice
+    };
+  }
+
+  async retrievePaymentStatus(providerPaymentId) {
+    const invoice = await this.request(`/v2/invoices/${encodeURIComponent(providerPaymentId)}`);
+    return { status: String(invoice.status || "PENDING").toLowerCase(), raw: invoice };
+  }
+
+  async cancelPayment(providerPaymentId) {
+    const invoice = await this.request(`/invoices/${encodeURIComponent(providerPaymentId)}/expire!`, {
+      method: "POST"
+    });
+    return { status: String(invoice.status || "EXPIRED").toLowerCase(), raw: invoice };
+  }
+
+  /**
+   * Normalise a webhook into the fields the caller needs. Xendit sends
+   * status PAID / EXPIRED / SETTLED, and `external_id` is our order number.
+   */
+  async handleWebhook(payload) {
+    const status = String(payload.status || "").toUpperCase();
+    return {
+      orderNumber: payload.external_id || null,
+      providerPaymentId: payload.id || null,
+      status: status.toLowerCase(),
+      paid: status === "PAID" || status === "SETTLED",
+      amount: payload.paid_amount != null ? Number(payload.paid_amount) : Number(payload.amount || 0),
+      paidAt: payload.paid_at || null,
+      channel: payload.payment_channel || payload.payment_method || null,
+      raw: payload
+    };
+  }
+
+  verifyWebhookSignature(rawBody, signature) {
+    return verifyWebhookSignature("xendit", rawBody, signature);
+  }
+}
+
+class StripeProvider extends MockPaymentProvider {
+  constructor() {
+    super("stripe");
+  }
+}
+
+class ManualBankTransferProvider extends MockPaymentProvider {
+  constructor() {
+    super("manual_bank_transfer");
+  }
+  async createInvoice(order) {
+    return {
+      provider: this.name,
+      providerPaymentId: `manual_${order.order_number}`,
+      checkoutUrl: `/checkout/pending?order=${encodeURIComponent(order.order_number)}`,
+      status: "pending_verification",
+      instructions: {
+        bankName: process.env.MANUAL_BANK_NAME || "Configured by admin before production",
+        accountName: process.env.MANUAL_BANK_ACCOUNT_NAME || BUSINESS_IDENTITY.legalName,
+        accountNumber: process.env.MANUAL_BANK_ACCOUNT_NUMBER || "Development placeholder only",
+        swiftCode: process.env.MANUAL_BANK_SWIFT || "To be configured",
+        currency: CURRENCY,
+        note: "Do not publish personal bank details. Replace placeholders before enabling production manual payments."
+      }
+    };
+  }
+}
+
+function getPaymentProvider(name) {
+  if (name === "paymongo") return providerReady("paymongo") ? new PayMongoProvider() : new MockPaymentProvider("paymongo");
+  if (name === "xendit") return providerReady("xendit") ? new XenditProvider() : new MockPaymentProvider("xendit");
+  if (name === "stripe") return providerReady("stripe") ? new StripeProvider() : new MockPaymentProvider("stripe");
+  if (name === "manual_bank_transfer") return new ManualBankTransferProvider();
+  return new MockPaymentProvider();
+}
+
+function verifyWebhookSignature(provider, rawBody, signature) {
+  /**
+   * PayMongo signs `${timestamp}.${rawBody}` with HMAC-SHA256 and sends it as
+   * `paymongo-signature: t=<ts>,te=<test sig>,li=<live sig>`. Test and live
+   * events are signed with different keys, hence two fields.
+   *
+   * Verified with timingSafeEqual — a plain === leaks information through
+   * comparison time, which is the standard way signature checks get broken.
+   */
+  if (provider === "paymongo") {
+    const secret = process.env.PAYMONGO_WEBHOOK_SECRET || "";
+    // No secret configured means we cannot verify, and an unverified payment
+    // webhook must never be trusted — it would let anyone mark an order paid.
+    if (!secret || !signature) return false;
+
+    const parts = Object.fromEntries(
+      String(signature).split(",").map((p) => p.split("=").map((s) => s.trim()))
+    );
+    const timestamp = parts.t;
+    const provided = parts.te || parts.li;
+    if (!timestamp || !provided) return false;
+
+    const expected = crypto
+      .createHmac("sha256", secret)
+      .update(`${timestamp}.${rawBody.toString("utf8")}`)
+      .digest("hex");
+
+    const a = Buffer.from(expected, "utf8");
+    const b = Buffer.from(provided, "utf8");
+    return a.length === b.length && crypto.timingSafeEqual(a, b);
+  }
+
+  if (provider === "xendit") {
+    const token = process.env.XENDIT_WEBHOOK_TOKEN;
+    if (!token || !signature) return false;
+    const a = Buffer.from(String(signature));
+    const b = Buffer.from(String(token));
+    // Length check FIRST: timingSafeEqual throws on mismatched lengths, so a
+    // wrong-length token would crash the webhook instead of rejecting it.
+    if (a.length !== b.length) return false;
+    return crypto.timingSafeEqual(a, b);
+  }
+  if (provider === "stripe") {
+    return Boolean(process.env.STRIPE_WEBHOOK_SECRET && signature && rawBody);
+  }
+  return false;
+}
+
+function nextBillingDate(billingFrequency, from = new Date()) {
+  const date = new Date(from);
+  if (billingFrequency === "annual") date.setFullYear(date.getFullYear() + 1);
+  else date.setMonth(date.getMonth() + 1);
+  return date;
+}
+
+module.exports = {
+  PAYMENT_MODE,
+  BUSINESS_IDENTITY,
+  PRODUCT,
+  PRICING_PLANS,
+  AVAILABLE_PLANS,
+  SHARED_FEATURES,
+  SUPPORT_FEATURES,
+  BUILD_DEBT,
+  PITCH_BUNDLE,
+  ADD_ONS,
+  AVAILABLE_ADD_ONS,
+  CURRENCY,
+  PaymentProvider,
+  PayMongoProvider,
+  XenditProvider,
+  StripeProvider,
+  ManualBankTransferProvider,
+  MockPaymentProvider,
+  calculateCart,
+  formatMoney,
+  getPaymentProvider,
+  nextBillingDate,
+  paymentProviderForCountry,
+  providerReady,
+  verifyWebhookSignature
+};

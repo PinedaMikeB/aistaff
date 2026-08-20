@@ -20,6 +20,7 @@ async function loadOrder() {
   const paid = order.payment_status === "paid";
   const pending = location.pathname.includes("/pending") || order.payment_status === "pending" || order.payment_status === "processing";
   const failed = location.pathname.includes("/failure") || ["failed", "cancelled", "expired"].includes(order.payment_status);
+  const manualTransfer = order.payment_provider === "manual_bank_transfer";
   const title = paid ? "Payment Successful" : failed ? "Payment Was Not Completed" : "Payment Pending";
   const nextBilling = paid ? new Date(order.paid_at || order.created_at) : null;
   if (nextBilling) {
@@ -29,7 +30,7 @@ async function loadOrder() {
     <div class="status-card ${paid ? "paid" : failed ? "failed" : "pending"}">
       <p class="eyebrow">${safeStatus(order.payment_provider || "checkout")}</p>
       <h1>${title}</h1>
-      <p>${paid ? "We have sent your payment confirmation and onboarding instructions to your email." : pending ? "Do not activate the subscription until the payment webhook or admin verification confirms payment." : safeStatus(params.get("reason") || "The payment was cancelled, expired, or not completed.")}</p>
+      <p>${paid ? "We have sent your payment confirmation and setup instructions to your email. You may reply with your preferred setup day and time, or send us your business details if you want us to help set up Closer for you." : pending ? (manualTransfer ? "Your proof is awaiting admin verification." : "Finish the QRPh payment on PayMongo. Once the payment is confirmed, this order updates automatically.") : safeStatus(params.get("reason") || "The payment was cancelled, expired, or not completed.")}</p>
       <div class="status-grid">
         <div><span>Order number</span><b>${safeStatus(order.order_number)}</b></div>
         <div><span>Package</span><b>${safeStatus(plan.item_name)}</b></div>
@@ -44,7 +45,7 @@ async function loadOrder() {
         <div><span>Subscription status</span><b>${safeStatus(subscription.status || "pending")}</b></div>
         <div><span>Invoice</span><b>${safeStatus(invoice.invoice_number || "Pending")}</b></div>
       </div>
-      ${pending ? `<form id="proofForm" class="manual-proof-form">
+      ${pending && manualTransfer ? `<form id="proofForm" class="manual-proof-form">
         <h2>Manual bank transfer proof</h2>
         <input required name="transaction_reference" placeholder="Transaction reference" />
         <input required type="date" name="payment_date" />
@@ -59,7 +60,7 @@ async function loadOrder() {
         <a class="button button-soft" href="/checkout/pending/?order=${encodeURIComponent(order.order_number)}">View Order</a>
         <a class="button button-soft" href="${safeStatus(invoice.invoice_url || "#")}">Download Invoice</a>
         <a class="button button-soft" href="/admin/dashboard">Go to Dashboard</a>
-        ${failed ? `<a class="button button-primary" href="/pricing/#cart">Retry payment</a><a class="button button-soft" href="/pricing/#packages">Choose another payment method</a>` : ""}
+        ${failed ? `<a class="button button-primary" href="/pricing/#cart">Retry QRPh payment</a><a class="button button-soft" href="/pricing/#packages">Choose another plan</a>` : ""}
         ${pending ? `<button id="refreshStatus" class="button button-soft" type="button">Refresh payment status</button><a class="button button-soft" href="/support/">Contact support</a>` : ""}
       </div>
     </div>

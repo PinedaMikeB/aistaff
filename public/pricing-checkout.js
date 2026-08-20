@@ -5,7 +5,8 @@ const commerceState = {
   addOns: new Set(),
   cart: null,
   guestToken: localStorage.getItem("aistaff_guest_token") || "",
-  selectedProvider: "xendit",
+  selectedProvider: "paymongo",
+  couponCode: "",
   processing: false
 };
 
@@ -35,6 +36,7 @@ function billingLabel() {
 
 function renderPricing() {
   const cards = qs("#pricingCards");
+  if (!cards) return;
   cards.innerHTML = commerceState.pricing.plans.map((plan) => `
     <article class="commerce-price-card ${plan.badge ? "popular" : ""}">
       ${plan.badge ? `<span class="plan-badge">${safe(plan.badge)}</span>` : ""}
@@ -56,16 +58,55 @@ function renderPricing() {
   });
 }
 
+function renderChosenPlan(plan) {
+  const section = document.getElementById("packages");
+  if (!section || !plan) return;
+  section.innerHTML = `
+    <div class="chosen-plan">
+      <div>
+        <p class="chosen-plan-kicker">Selected plan</p>
+        <h2>${safe(plan.name)} · ${peso(planPrice(plan))}</h2>
+        <p class="chosen-plan-detail">${billingLabel()} · ${Number(plan.conversationLimit).toLocaleString("en-PH")} conversations a month · ${safe(plan.channelLabel || "")}</p>
+      </div>
+      <a class="chosen-plan-change" href="/pricing/">Change plan</a>
+    </div>`;
+}
+
+function prepareSelectedPlanCheckoutShell() {
+  document.body.classList.add("selected-plan-checkout");
+  document.getElementById("packages")?.setAttribute("hidden", "");
+  document.getElementById("customPricing")?.setAttribute("hidden", "");
+  const headerCta = document.querySelector(".commerce-header .button-primary");
+  if (headerCta) {
+    headerCta.setAttribute("href", "#cart");
+    headerCta.textContent = "Pay by QRPh";
+  }
+}
+
+function showChoiceSections() {
+  document.body.classList.remove("selected-plan-checkout");
+  document.getElementById("packages")?.removeAttribute("hidden");
+  document.getElementById("customPricing")?.removeAttribute("hidden");
+  const headerCta = document.querySelector(".commerce-header .button-primary");
+  if (headerCta) {
+    headerCta.setAttribute("href", "#packages");
+    headerCta.textContent = "Select Package";
+  }
+}
+
+function removeChoiceSections() {
+  document.getElementById("packages")?.remove();
+  document.getElementById("customPricing")?.remove();
+}
+
 function renderPaymentMethods(country = "Philippines") {
-  const isPH = country.toLowerCase().includes("philippines");
-  const methods = isPH ? [
-    ["xendit", "Xendit local payments", "GCash, Maya, QR Ph, online banking, cards, bank transfer when configured"],
-    ["manual_bank_transfer", "Manual bank transfer", "Available for verification by admin"]
-  ] : [
-    ["stripe", "Stripe international payments", "Visa, Mastercard, American Express, Apple Pay, Google Pay when configured"],
-    ["manual_bank_transfer", "Manual bank transfer", "Available for verification by admin"]
+  // QRPh is the only live payment rail right now. Do not present inactive
+  // wallets/cards as choices: a buyer who is ready to pay should see one clear
+  // next action, matching the PayMongo hosted page.
+  const methods = [
+    ["paymongo", "QRPh payment", "Tap Continue on PayMongo, then download the QR or scan it from another device."]
   ];
-  commerceState.selectedProvider = methods[0][0];
+  commerceState.selectedProvider = "paymongo";
   qs("#paymentMethods").innerHTML = methods.map(([id, label, detail]) => `
     <label class="payment-method ${commerceState.selectedProvider === id ? "selected" : ""}">
       <input type="radio" name="payment_provider" value="${id}" ${commerceState.selectedProvider === id ? "checked" : ""} />
@@ -73,8 +114,8 @@ function renderPaymentMethods(country = "Philippines") {
     </label>
   `).join("");
   qs("#paymentModeNote").textContent = commerceState.pricing.paymentMode === "test"
-    ? "Secure online payment integration is currently in test mode."
-    : "Payment integration is configured for the current environment.";
+    ? "QRPh checkout is currently running in PayMongo test mode."
+    : "Secure QRPh checkout is processed by PayMongo.";
   qs("#paymentMethods").querySelectorAll("input").forEach((input) => {
     input.onchange = () => {
       commerceState.selectedProvider = input.value;
@@ -101,6 +142,7 @@ async function syncCart() {
     planSlug: commerceState.selectedPlan,
     billingFrequency: commerceState.billing,
     addOnSlugs: [...commerceState.addOns],
+    couponCode: commerceState.couponCode || null,
     guestToken: commerceState.guestToken || null
   };
   const result = commerceState.cart
@@ -122,6 +164,10 @@ function renderSummary() {
     return;
   }
   const plan = commerceState.cart.items.find((item) => item.item_type === "pricing_plan");
+  const discounts = commerceState.cart.items.filter((item) => item.item_type === "discount");
+  const packageTotal = commerceState.cart.items
+    .filter((item) => item.item_type !== "discount")
+    .reduce((sum, item) => sum + Number(item.line_total || 0), 0);
   const renewal = new Date();
   if (commerceState.billing === "annual") renewal.setFullYear(renewal.getFullYear() + 1);
   else renewal.setMonth(renewal.getMonth() + 1);
@@ -136,7 +182,8 @@ function renderSummary() {
         </label>
       `).join("")}
     </div>
-    <div class="summary-line"><span>Package and add-ons</span><b>${peso(commerceState.cart.subtotal)}</b></div>
+    <div class="summary-line"><span>Package and add-ons</span><b>${peso(packageTotal)}</b></div>
+    ${discounts.map((item) => `<div class="summary-line"><span>${safe(item.item_name)}</span><b>${peso(item.line_total)}</b></div>`).join("")}
     <div class="summary-line"><span>Applicable tax</span><b>${peso(commerceState.cart.tax)}</b></div>
     <div class="summary-total"><span>Total</span><b>${peso(commerceState.cart.total)}</b></div>
     <div class="summary-line"><span>Billing period</span><b>${commerceState.billing === "annual" ? "Annual" : "Monthly"}</b></div>
@@ -166,8 +213,8 @@ function validateCheckout() {
 
   const incomplete = hasCart && !form.checkValidity();
   btn.textContent = commerceState.processing
-    ? "Preparing checkout..."
-    : (incomplete ? "Complete your details to continue" : "Checkout");
+    ? "Preparing QRPh checkout..."
+    : (incomplete ? "Complete your details to continue" : "Continue to QRPh Payment");
 }
 
 async function submitCheckout() {
@@ -194,6 +241,7 @@ async function submitCheckout() {
         cartId: commerceState.cart.id,
         requestedProvider: commerceState.selectedProvider,
         paymentMethod: data.payment_provider || commerceState.selectedProvider,
+        couponCode: commerceState.couponCode || null,
         customer: {
           full_name: data.full_name,
           company_name: data.company_name || null,
@@ -232,10 +280,49 @@ async function submitCheckout() {
 }
 
 async function init() {
+  /**
+   * Arriving with ?plan=starter means the choice is already made on the
+   * marketing page. Showing the same package selector or custom-pricing form
+   * again asks the buyer to choose twice. Hide those sections before the
+   * pricing API returns, then remove them entirely once the slug is verified.
+   * ?billing=annual carries the toggle across too.
+   */
+  const params = new URLSearchParams(location.search);
+  const requestedPlan = params.get("plan");
+  if (requestedPlan) prepareSelectedPlanCheckoutShell();
+
   commerceState.pricing = await api("/api/pricing");
-  renderPricing();
+
+  const requestedBilling = params.get("billing");
+  if (requestedBilling === "annual" || requestedBilling === "monthly") {
+    commerceState.billing = requestedBilling;
+    document.querySelectorAll("[data-billing]").forEach((item) =>
+      item.classList.toggle("active", item.dataset.billing === requestedBilling));
+  }
+
+  const chosen = (commerceState.pricing.plans || []).find((p) => p.slug === requestedPlan);
+  if (chosen) {
+    removeChoiceSections();
+    await selectPlan(requestedPlan);
+  } else {
+    showChoiceSections();
+    renderPricing();
+  }
+
   renderPaymentMethods();
+
   qs("[name='country']").addEventListener("input", (event) => renderPaymentMethods(event.target.value));
+  qs("#applyCouponBtn")?.addEventListener("click", async () => {
+    commerceState.couponCode = qs("#couponCode")?.value.trim() || "";
+    if (!commerceState.selectedPlan) return toast("Choose a package first");
+    try {
+      await syncCart();
+      toast(commerceState.couponCode ? "Discount code applied" : "Discount code cleared");
+    } catch (error) {
+      commerceState.couponCode = "";
+      toast(error.message || "Discount code was not applied");
+    }
+  });
   document.querySelectorAll("[data-billing]").forEach((button) => {
     button.onclick = async () => {
       commerceState.billing = button.dataset.billing;
@@ -247,17 +334,24 @@ async function init() {
   qs("#checkoutForm").addEventListener("input", validateCheckout);
   qs("#checkoutBtn").onclick = submitCheckout;
   qs("#clearCartBtn").onclick = () => {
+    if (document.body.classList.contains("selected-plan-checkout")) {
+      location.href = "/pricing/";
+      return;
+    }
     if (commerceState.cart && !confirm("Remove the selected package and add-ons from this cart?")) return;
     commerceState.selectedPlan = null;
     commerceState.addOns.clear();
     commerceState.cart = null;
     renderSummary();
   };
-  qs("#enterpriseForm").onsubmit = (event) => {
-    event.preventDefault();
-    event.currentTarget.querySelector(".success-message").hidden = false;
-    event.currentTarget.reset();
-  };
+  const enterpriseForm = qs("#enterpriseForm");
+  if (enterpriseForm) {
+    enterpriseForm.onsubmit = (event) => {
+      event.preventDefault();
+      event.currentTarget.querySelector(".success-message").hidden = false;
+      event.currentTarget.reset();
+    };
+  }
   qs("#mobileSummaryBtn").onclick = () => qs(".order-summary").scrollIntoView({ behavior: "smooth" });
   window.addEventListener("beforeunload", (event) => {
     if (!commerceState.cart || commerceState.processing) return;
@@ -268,5 +362,8 @@ async function init() {
 }
 
 init().catch((error) => {
-  qs("#pricingCards").innerHTML = `<p class="error-message">${safe(error.message)}</p>`;
+  const cards = qs("#pricingCards");
+  const summary = qs("#orderSummary");
+  if (cards) cards.innerHTML = `<p class="error-message">${safe(error.message)}</p>`;
+  else if (summary) summary.innerHTML = `<p class="error-message">${safe(error.message)}</p>`;
 });

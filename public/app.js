@@ -14,10 +14,45 @@ const navItems = [
   ["ai-studio", "AI Studio"],
   ["qualification-questions", "Qualification Questions"],
   ["quotations", "Quotations"],
+  ["bookings", "Bookings"],
   ["payments", "Payments"],
   ["follow-ups", "Follow-ups"],
   ["settings", "Settings"]
 ];
+
+/**
+ * Screens that belong to AIStaff, not to a customer.
+ *
+ * Marketing is GLOBAL state — getMarketingOverview() takes no company id, so
+ * the launch checklist is shared by every tenant and a customer ticking a box
+ * would change it for everyone. Onboarding and AI Studio are internal tooling;
+ * AI Studio exposes the raw system prompt, which no clinic owner should edit.
+ *
+ * Payments removed from tenants 2026-08-19: it shows AIStaff's own order and
+ * pricing internals, which is platform business, not the customer's.
+ */
+const PLATFORM_ONLY_ROUTES = new Set(["marketing", "onboarding", "ai-studio", "payments"]);
+
+/**
+ * Nav visible to this user.
+ *
+ * FAIL-SAFE TOWARD THE REVIEWED STATE (HANDOFF §12): the submission videos show
+ * the main tenant nav in this order, and a mismatch can trigger a re-review
+ * that suspends Messenger for every client. So the full nav is the DEFAULT,
+ * and items are hidden only when the signed-in user is positively identified as
+ * a customer — platform_role null.
+ *
+ * Every internal account, including reviewer@aistaff.click which Meta uses to
+ * log in, carries a platform_role and therefore sees the nav unchanged. Order
+ * is never altered; entries are only omitted.
+ */
+function visibleNavItems() {
+  const isPlatformUser = Boolean(state.user && state.user.platform_role);
+  // Platform is APPENDED, never inserted — staff-only extras must come after
+  // the tenant workspace items shown in the submission videos (§12).
+  if (isPlatformUser) return [...navItems, ["platform", "Platform"]];
+  return navItems.filter(([route]) => !PLATFORM_ONLY_ROUTES.has(route));
+}
 
 const $ = (selector) => document.querySelector(selector);
 
@@ -52,14 +87,30 @@ function renderMessageTranscript(messages) {
   if (!messages?.length) {
     return `<p class="muted">No messages saved yet.</p>`;
   }
-  return messages.map((m) => `
+  return messages.map((m) => {
+    // Attachments shown inline, so the transcript matches what the customer
+    // actually received. Without this the thread reads as if Closer promised a
+    // visual and never sent one — the reply says "here's a quick visual" and
+    // the image is invisible to whoever reviews the conversation.
+    const files = Array.isArray(m.attachments) ? m.attachments : [];
+    const media = files.length
+      ? `<div class="message-media">${files.map((f) => (
+          f.type === "image"
+            ? `<a href="${escapeHtml(f.url)}" target="_blank" rel="noopener"><img src="${escapeHtml(f.url)}" alt="${escapeHtml(f.caption || "")}" loading="lazy" /></a>`
+            : `<a class="message-file" href="${escapeHtml(f.url)}" target="_blank" rel="noopener">${escapeHtml((f.type || "file").toUpperCase())} · ${escapeHtml(f.caption || "open")}</a>`
+        )).join("")}</div>`
+      : "";
+
+    return `
     <article class="message ${m.sender_type}">
       <header>
         <strong>${messageSenderLabel(m.sender_type)}</strong>
         <time>${fmtDate(m.created_at)}</time>
       </header>
       <p>${escapeHtml(m.message_text)}</p>
-    </article>`).join("");
+      ${media}
+    </article>`;
+  }).join("");
 }
 
 function escapeHtml(value) {
@@ -84,6 +135,12 @@ function fmtDate(value) {
 function money(value) {
   if (!value) return "TBD";
   return `PHP ${Number(value).toLocaleString("en-PH")}`;
+}
+
+function localDateTimeValue(value = new Date()) {
+  const date = new Date(value);
+  date.setMinutes(date.getMinutes() - date.getTimezoneOffset());
+  return date.toISOString().slice(0, 16);
 }
 
 function statusPill(value) {
@@ -135,9 +192,37 @@ function setMode(mode, panel = "login") {
 }
 
 function renderAdminNav(active) {
-  $("#adminNav").innerHTML = navItems.map(([key, label]) => (
+  // visibleNavItems(), not navItems — customers do not see Marketing,
+  // Onboarding or AI Studio. Every staff account (including the Meta reviewer
+  // login) carries a platform_role and still sees the full nav, so the
+  // submission videos continue to match (§12).
+  $("#adminNav").innerHTML = visibleNavItems().map(([key, label]) => (
     `<a class="${active === key ? "active" : ""}" href="${adminPath(key)}"><span>${label[0]}</span>${label}</a>`
   )).join("");
+
+  // Signed-in identity, so it is never ambiguous which account you are in.
+  const box = $("#sidebarUser");
+  if (box && state.user) {
+    const name = state.user.name || state.user.email || "Signed in";
+    // Tenant role in plain words. "account_admin" is database shorthand; the
+    // person needs to see what they can do, and a staff member assisting a
+    // customer needs to know whose account and at what level.
+    const TENANT_ROLE = {
+      account_admin: "Account admin",
+      account_user: "Account user",
+      owner: "Account admin",
+      admin: "Account admin"
+    };
+    const tenantRole = TENANT_ROLE[state.user.role] || "Account user";
+    const platform = state.user.platform_role
+      ? ` · Platform ${state.user.platform_role}`
+      : "";
+    $("#sidebarAvatar").textContent = name.trim().charAt(0).toUpperCase();
+    $("#sidebarUserName").textContent = name;
+    $("#sidebarUserCompany").textContent =
+      `${tenantRole}${platform}${state.company?.name ? ` · ${state.company.name}` : ""}`;
+    box.hidden = false;
+  }
 }
 
 async function loadSession() {
@@ -715,6 +800,17 @@ async function conversationDetailView(id) {
       </section>
       <section class="panel review-meta">
         <h2>Inquiry details</h2>
+        <!-- Who this actually is. A PSID is a 17-digit number nobody can act
+             on; the name and photo come from Meta's User Profile API. -->
+        <div class="inquiry-person">
+          ${c.profile_pic_url
+            ? `<img class="inquiry-avatar" src="${escapeHtml(c.profile_pic_url)}" alt="" referrerpolicy="no-referrer" onerror="this.replaceWith(Object.assign(document.createElement('span'),{className:'inquiry-avatar is-initials',textContent:'${escapeHtml((c.customer_name || "?").trim().charAt(0).toUpperCase())}'}))" />`
+            : `<span class="inquiry-avatar is-initials">${escapeHtml((c.customer_name || "?").trim().charAt(0).toUpperCase())}</span>`}
+          <div>
+            <b>${escapeHtml(c.customer_name || "Name not available")}</b>
+            ${c.psid ? `<a class="inquiry-open-chat" href="https://www.facebook.com/messages/t/${encodeURIComponent(c.psid)}" target="_blank" rel="noopener">Reply in Messenger ↗</a>` : ""}
+          </div>
+        </div>
         <dl class="detail-list">
           <div><dt>Customer</dt><dd>${escapeHtml(c.customer_name || c.psid)}</dd></div>
           <div><dt>PSID</dt><dd><code>${escapeHtml(c.psid)}</code></dd></div>
@@ -810,39 +906,16 @@ async function leadDetailView(id) {
 }
 
 function field(name, label, value = "", type = "text") {
-  return `<label>${label}<input type="${type}" name="${name}" value="${value || ""}" /></label>`;
+  return `<label>${label}<input type="${type}" name="${name}" value="${escapeHtml(value || "")}" /></label>`;
 }
 
-async function knowledgeBaseView() {
-  setTitle("Knowledge Base");
-  const rows = await api("/api/knowledge-base");
-  $("#adminContent").innerHTML = `
-    <div class="split">
-      <section class="panel">
-        <h2>Add approved answer</h2>
-        <form id="kbForm" class="form-grid">
-          ${field("category", "Category")}
-          ${field("question", "Question")}
-          <label class="full">Answer<textarea name="answer" required></textarea></label>
-          ${field("tags", "Tags, comma separated")}
-          <button class="button button-primary full" type="submit">Add Knowledge</button>
-        </form>
-      </section>
-      <section class="panel">
-        <h2>Approved knowledge</h2>
-        <div class="table-wrap"><table><thead><tr><th>Category</th><th>Question</th><th>Answer</th><th>Active</th></tr></thead>
-        <tbody>${rows.map((r) => `<tr><td>${r.category}</td><td>${r.question}</td><td>${r.answer}</td><td>${r.active ? "Yes" : "No"}</td></tr>`).join("")}</tbody></table></div>
-      </section>
-    </div>`;
-  $("#kbForm").onsubmit = async (event) => {
-    event.preventDefault();
-    const data = Object.fromEntries(new FormData(event.currentTarget));
-    data.tags = data.tags ? data.tags.split(",").map((tag) => tag.trim()).filter(Boolean) : [];
-    await api("/api/knowledge-base", { method: "POST", body: data });
-    toast("Knowledge base item added");
-    knowledgeBaseView();
-  };
-}
+/**
+ * knowledgeBaseView() now lives in /intake-wizard.js — it became the intake
+ * wizard on 2026-08-17 (HANDOFF-CLOSER.md §18). The old bare add-a-Q&A form
+ * that used to be here is gone: it asked for a "Question" and an "Answer",
+ * which is not the shape of a price list, a promo or a shipping table.
+ * The nav item and route name are unchanged (§12 locks the nav).
+ */
 
 async function questionsView() {
   setTitle("Qualification Questions");
@@ -896,6 +969,419 @@ async function quotationsView() {
           </tr>`).join("")}</tbody>
       </table></div>
     </section>`;
+}
+
+const BOOKING_STATUS_OPTIONS = ["requested", "pending_confirmation", "confirmed", "paid", "cancelled", "completed", "no_show"];
+const BOOKING_FIELD_LIBRARY = [
+  { key: "name", label: "Customer name", type: "text" },
+  { key: "mobile", label: "Mobile number", type: "tel" },
+  { key: "email", label: "Email", type: "email" },
+  { key: "company_name", label: "Company / organization", type: "text" },
+  { key: "website", label: "Website", type: "url" },
+  { key: "purpose", label: "Purpose (repair, meeting, onboarding, reservation)", type: "text" },
+  { key: "service_package", label: "Service / package chosen", type: "text" },
+  { key: "preferred_date", label: "Preferred date", type: "date" },
+  { key: "preferred_time", label: "Preferred time", type: "time" },
+  { key: "preferred_meeting_channel", label: "Preferred meeting channel", type: "text" },
+  { key: "onboarding_topic", label: "Onboarding/setup topic", type: "text" },
+  { key: "branch_location", label: "Branch / location", type: "text" },
+  { key: "party_size", label: "Party size", type: "number" },
+  { key: "guest_count", label: "Number of guests", type: "number" },
+  { key: "check_in_date", label: "Check-in date", type: "date" },
+  { key: "check_out_date", label: "Check-out date", type: "date" },
+  { key: "room_type", label: "Room type", type: "text" },
+  { key: "table_preference", label: "Table preference", type: "text" },
+  { key: "doctor_preference", label: "Doctor / specialist preference", type: "text" },
+  { key: "staff_preference", label: "Staff preference", type: "text" },
+  { key: "therapist_preference", label: "Therapist preference", type: "text" },
+  { key: "vehicle_model", label: "Vehicle / model", type: "text" },
+  { key: "property_unit", label: "Property / unit", type: "text" },
+  { key: "address", label: "Address / service location", type: "text" },
+  { key: "concern", label: "Concern / reason for visit", type: "textarea" },
+  { key: "special_requests", label: "Special requests", type: "textarea" },
+  { key: "notes_remarks", label: "Notes / remarks", type: "textarea" },
+  { key: "deposit_payment", label: "Deposit/payment needed", type: "text" },
+  { key: "staff_confirmation_required", label: "Staff confirmation required", type: "text" }
+];
+const BOOKING_FIELD_BY_KEY = Object.fromEntries(BOOKING_FIELD_LIBRARY.map((field) => [field.key, field]));
+const BOOKING_FIXED_FORM_FIELDS = new Set(["name", "mobile", "email", "service_package", "preferred_date", "preferred_time"]);
+const BOOKING_PRESETS = {
+  general: {
+    label: "General appointment",
+    fields: ["name", "mobile", "purpose", "service_package", "preferred_date", "preferred_time", "notes_remarks", "staff_confirmation_required"]
+  },
+  ai_service_onboarding: {
+    label: "AI service / onboarding meeting",
+    fields: ["name", "mobile", "email", "company_name", "website", "purpose", "onboarding_topic", "preferred_date", "preferred_time", "preferred_meeting_channel", "notes_remarks"]
+  },
+  spa_salon: {
+    label: "Spa / salon",
+    fields: ["name", "mobile", "service_package", "preferred_date", "preferred_time", "branch_location", "therapist_preference", "special_requests", "deposit_payment", "staff_confirmation_required"]
+  },
+  clinic_doctor: {
+    label: "Clinic / doctor",
+    fields: ["name", "mobile", "email", "purpose", "concern", "doctor_preference", "preferred_date", "preferred_time", "branch_location", "staff_confirmation_required"]
+  },
+  restaurant: {
+    label: "Restaurant reservation",
+    fields: ["name", "mobile", "preferred_date", "preferred_time", "party_size", "branch_location", "table_preference", "special_requests", "deposit_payment"]
+  },
+  hotel_lodging: {
+    label: "Hotel / lodging",
+    fields: ["name", "mobile", "email", "guest_count", "check_in_date", "check_out_date", "room_type", "special_requests", "deposit_payment", "staff_confirmation_required"]
+  },
+  repair_home_service: {
+    label: "Repair / home service",
+    fields: ["name", "mobile", "purpose", "concern", "address", "preferred_date", "preferred_time", "vehicle_model", "notes_remarks", "staff_confirmation_required"]
+  },
+  gym_class: {
+    label: "Gym / class",
+    fields: ["name", "mobile", "service_package", "preferred_date", "preferred_time", "branch_location", "guest_count", "notes_remarks"]
+  },
+  school_enrollment: {
+    label: "School / enrollment appointment",
+    fields: ["name", "mobile", "email", "purpose", "preferred_date", "preferred_time", "branch_location", "notes_remarks", "staff_confirmation_required"]
+  },
+  church_ministry: {
+    label: "Church / ministry meeting",
+    fields: ["name", "mobile", "purpose", "preferred_date", "preferred_time", "branch_location", "guest_count", "notes_remarks"]
+  },
+  real_estate: {
+    label: "Real estate viewing",
+    fields: ["name", "mobile", "email", "property_unit", "preferred_date", "preferred_time", "branch_location", "guest_count", "notes_remarks", "staff_confirmation_required"]
+  },
+  car_dealership: {
+    label: "Car dealership / test drive",
+    fields: ["name", "mobile", "email", "vehicle_model", "preferred_date", "preferred_time", "branch_location", "notes_remarks", "staff_confirmation_required"]
+  },
+  personal_service: {
+    label: "Personal service",
+    fields: ["name", "mobile", "purpose", "service_package", "preferred_date", "preferred_time", "address", "notes_remarks"]
+  }
+};
+
+function bookingStatusSelect(booking) {
+  return `<select class="booking-status-select" data-booking-status="${booking.id}">
+    ${BOOKING_STATUS_OPTIONS.map((status) => `<option value="${status}" ${booking.status === status ? "selected" : ""}>${status.replace(/_/g, " ")}</option>`).join("")}
+  </select>`;
+}
+
+function selectedBookingFields(setting) {
+  const saved = Array.isArray(setting?.required_fields) ? setting.required_fields : [];
+  if (saved.length) return saved.filter((key) => BOOKING_FIELD_BY_KEY[key]);
+  const preset = BOOKING_PRESETS[setting?.booking_type || "general"] || BOOKING_PRESETS.general;
+  return preset.fields;
+}
+
+function bookingFieldCheckboxes(setting) {
+  const selected = new Set(selectedBookingFields(setting));
+  return `<div class="booking-field-grid">
+    ${BOOKING_FIELD_LIBRARY.map((field) => `<label class="booking-field-option">
+      <input type="checkbox" name="required_fields" value="${field.key}" ${selected.has(field.key) ? "checked" : ""} />
+      <span>${escapeHtml(field.label)}</span>
+    </label>`).join("")}
+  </div>`;
+}
+
+function bookingDynamicInputs(setting) {
+  const fields = selectedBookingFields(setting)
+    .map((key) => BOOKING_FIELD_BY_KEY[key])
+    .filter((field) => field && !BOOKING_FIXED_FORM_FIELDS.has(field.key));
+  if (!fields.length) return "";
+  return `<div class="booking-extra-fields full">
+    <p class="muted">Extra details for this booking type</p>
+    <div class="form-grid">
+      ${fields.map((bookingField) => {
+        if (bookingField.type === "textarea") {
+          return `<label class="full">${escapeHtml(bookingField.label)}<textarea name="field_${bookingField.key}" rows="2"></textarea></label>`;
+        }
+        return field(`field_${bookingField.key}`, bookingField.label, "", bookingField.type);
+      }).join("")}
+    </div>
+  </div>`;
+}
+
+function bookingDetailsSummary(booking) {
+  const values = booking.field_values && typeof booking.field_values === "object" ? booking.field_values : {};
+  const details = Object.entries(values)
+    .filter(([, value]) => value !== undefined && value !== null && String(value).trim())
+    .map(([key, value]) => `${BOOKING_FIELD_BY_KEY[key]?.label || key}: ${value}`);
+  return [booking.notes || "", ...details].filter(Boolean).join("\n");
+}
+
+function bookingDayKey(value) {
+  const date = new Date(value);
+  return date.toLocaleDateString("en-CA");
+}
+
+function renderBookingCalendar(bookings) {
+  const today = new Date();
+  const start = new Date(today.getFullYear(), today.getMonth(), today.getDate());
+  const days = Array.from({ length: 35 }, (_, index) => {
+    const date = new Date(start);
+    date.setDate(start.getDate() + index);
+    return date;
+  });
+  const grouped = bookings.reduce((acc, booking) => {
+    const key = bookingDayKey(booking.start_at);
+    if (!acc[key]) acc[key] = [];
+    acc[key].push(booking);
+    return acc;
+  }, {});
+
+  return `<div class="booking-calendar">
+    ${days.map((date) => {
+      const key = bookingDayKey(date);
+      const items = grouped[key] || [];
+      return `<article class="booking-day ${key === bookingDayKey(today) ? "is-today" : ""}">
+        <header><b>${date.toLocaleDateString("en-PH", { weekday: "short" })}</b><span>${date.getDate()}</span></header>
+        ${items.slice(0, 3).map((booking) => `<div class="booking-chip ${booking.status}">
+          <time>${new Date(booking.start_at).toLocaleTimeString("en-PH", { hour: "numeric", minute: "2-digit" })}</time>
+          <span>${escapeHtml(booking.service_name)}</span>
+        </div>`).join("")}
+        ${items.length > 3 ? `<small>+${items.length - 3} more</small>` : ""}
+      </article>`;
+    }).join("")}
+  </div>`;
+}
+
+async function bookingsView() {
+  setTitle("Bookings");
+  const data = await api("/api/bookings");
+  const activeServices = data.services.filter((service) => service.active);
+  const serviceOptions = activeServices.map((service) => `<option value="${service.id}">${escapeHtml(service.name)} · ${service.duration_minutes} min</option>`).join("");
+  const bookingType = data.setting.booking_type || "general";
+  const fieldMode = data.setting.field_mode || "preset";
+  const nextHour = new Date(Date.now() + 60 * 60 * 1000);
+  nextHour.setMinutes(0, 0, 0);
+
+  $("#adminContent").innerHTML = `
+    <div class="settings-stack booking-stack">
+      <section class="panel">
+        <div class="panel-header">
+          <div>
+            <h2>Booking calendar</h2>
+            <p class="muted settings-lede">Available in every workspace. Turn it on only when this business wants Closer or staff to collect appointment or reservation details.</p>
+          </div>
+          ${data.setting.enabled ? statusPill("enabled") : statusPill("inactive")}
+        </div>
+        <form id="bookingSettingsForm" class="form-grid">
+          <label>Booking feature
+            <select name="enabled">
+              <option value="false" ${!data.setting.enabled ? "selected" : ""}>Off</option>
+              <option value="true" ${data.setting.enabled ? "selected" : ""}>On</option>
+            </select>
+          </label>
+          ${field("timezone", "Timezone", data.setting.timezone || "Asia/Manila")}
+          ${field("slot_interval_minutes", "Slot interval minutes", data.setting.slot_interval_minutes || 30, "number")}
+          ${field("min_notice_minutes", "Minimum notice minutes", data.setting.min_notice_minutes || 120, "number")}
+          ${field("max_days_ahead", "Max days ahead", data.setting.max_days_ahead || 30, "number")}
+          <label>Booking type
+            <select name="booking_type" id="bookingTypeSelect">
+              ${Object.entries(BOOKING_PRESETS).map(([key, preset]) => `<option value="${key}" ${bookingType === key ? "selected" : ""}>${escapeHtml(preset.label)}</option>`).join("")}
+            </select>
+          </label>
+          <label>Field setup
+            <select name="field_mode">
+              <option value="preset" ${fieldMode === "preset" ? "selected" : ""}>Use preset checklist</option>
+              <option value="custom" ${fieldMode === "custom" ? "selected" : ""}>Customize fields</option>
+            </select>
+          </label>
+          <div class="full booking-fields-panel">
+            <div class="panel-header">
+              <div>
+                <h2>Details Closer or staff should collect</h2>
+                <p class="muted settings-lede">Use the preset, or check the exact fields this tenant needs. Purpose covers repair, meeting, onboarding, reservation, and similar intent.</p>
+              </div>
+            </div>
+            ${bookingFieldCheckboxes(data.setting)}
+          </div>
+          <label class="full">Booking instructions for staff and Closer
+            <textarea name="instructions" rows="4" placeholder="Example: Ask for preferred branch, service, date, time, name and mobile. Confirm only after staff checks availability.">${escapeHtml(data.setting.instructions || "")}</textarea>
+          </label>
+          <button class="button button-primary" type="submit">Save booking settings</button>
+        </form>
+        <div class="booking-calendar-feed">
+          <div>
+            <b>Google Calendar feed</b>
+            <p class="muted">Copy this private URL, then add it in Google Calendar under Other calendars → From URL.</p>
+          </div>
+          <div class="booking-feed-copy">
+            <input id="bookingCalendarFeedUrl" value="${escapeHtml(data.calendar_feed_url || "")}" readonly />
+            <button class="button button-soft" id="copyBookingCalendarFeed" type="button">Copy link</button>
+          </div>
+        </div>
+      </section>
+
+      <div class="split">
+        <section class="panel">
+          <div class="panel-header"><h2>Services</h2><span>${data.services.length} configured</span></div>
+          <form id="bookingServiceForm" class="form-grid">
+            ${field("name", "Service or appointment name")}
+            ${field("duration_minutes", "Duration minutes", "60", "number")}
+            ${field("price", "Price, if fixed", "", "number")}
+            ${field("deposit_amount", "Deposit/reservation fee", "", "number")}
+            ${field("location", "Branch/location")}
+            <label class="full">Description<textarea name="description" rows="3" placeholder="Short description, inclusions, or who this booking is for."></textarea></label>
+            <button class="button button-soft" type="submit">Add service</button>
+          </form>
+          <div class="booking-service-list">
+            ${data.services.map((service) => `<article class="booking-service ${service.active ? "" : "is-inactive"}">
+              <div>
+                <b>${escapeHtml(service.name)}</b>
+                <p>${service.duration_minutes} min${service.price ? ` · ${money(service.price)}` : ""}${service.deposit_amount ? ` · deposit ${money(service.deposit_amount)}` : ""}${service.location ? ` · ${escapeHtml(service.location)}` : ""}</p>
+              </div>
+              <label class="booking-toggle"><input type="checkbox" data-service-active="${service.id}" ${service.active ? "checked" : ""} /> Active</label>
+            </article>`).join("") || `<p class="muted">No services yet. Add one service so bookings have a duration.</p>`}
+          </div>
+        </section>
+
+        <section class="panel">
+          <div class="panel-header"><h2>Add booking</h2><span>${data.bookings.length} upcoming</span></div>
+          <form id="bookingForm" class="form-grid">
+            <label>Service
+              <select name="service_id">
+                <option value="">Custom / not listed</option>
+                ${serviceOptions}
+              </select>
+            </label>
+            ${field("service_name", "Custom service name")}
+            ${field("customer_name", "Customer name")}
+            ${field("mobile_number", "Mobile number", "", "tel")}
+            ${field("email", "Email", "", "email")}
+            ${field("start_at", "Date and time", localDateTimeValue(nextHour), "datetime-local")}
+            <label>Status
+              <select name="status">
+                ${BOOKING_STATUS_OPTIONS.map((status) => `<option value="${status}">${status.replace(/_/g, " ")}</option>`).join("")}
+              </select>
+            </label>
+            <label class="full">Notes<textarea name="notes" rows="3" placeholder="Preferred branch, concern, party size, staff note, or pending confirmation detail."></textarea></label>
+            ${bookingDynamicInputs(data.setting)}
+            <button class="button button-primary" type="submit">Save booking</button>
+          </form>
+        </section>
+      </div>
+
+      <section class="panel">
+        <div class="panel-header"><h2>Next 35 days</h2><span>${data.setting.enabled ? "Active" : "Inactive until enabled"}</span></div>
+        ${renderBookingCalendar(data.bookings)}
+      </section>
+
+      <section class="panel">
+        <div class="panel-header"><h2>Booking requests</h2><span>${data.bookings.length} records</span></div>
+        ${data.bookings.length ? `<div class="table-wrap"><table>
+          <thead><tr><th>When</th><th>Customer</th><th>Service</th><th>Contact</th><th>Status</th><th>Notes</th></tr></thead>
+          <tbody>${data.bookings.map((booking) => `<tr>
+            <td>${fmtDate(booking.start_at)}<br><span class="muted">until ${new Date(booking.end_at).toLocaleTimeString("en-PH", { hour: "numeric", minute: "2-digit" })}</span></td>
+            <td>${escapeHtml(booking.customer_name)}</td>
+            <td>${escapeHtml(booking.service_name)}</td>
+            <td>${escapeHtml([booking.mobile_number, booking.email].filter(Boolean).join(" · ") || "—")}</td>
+            <td>${bookingStatusSelect(booking)}</td>
+            <td>${escapeHtml(bookingDetailsSummary(booking))}</td>
+          </tr>`).join("")}</tbody>
+        </table></div>` : `<p class="muted">No bookings yet. When enabled later for Closer, appointment requests can appear here from Messenger or website chat.</p>`}
+      </section>
+    </div>`;
+
+  $("#bookingTypeSelect")?.addEventListener("change", (event) => {
+    const preset = BOOKING_PRESETS[event.currentTarget.value];
+    if (!preset) return;
+    const selected = new Set(preset.fields);
+    document.querySelectorAll("input[name='required_fields']").forEach((input) => {
+      input.checked = selected.has(input.value);
+    });
+  });
+
+  $("#bookingSettingsForm").onsubmit = async (event) => {
+    event.preventDefault();
+    const formData = new FormData(event.currentTarget);
+    const form = Object.fromEntries(formData);
+    await api("/api/bookings/settings", {
+      method: "PUT",
+      body: {
+        enabled: form.enabled === "true",
+        timezone: form.timezone,
+        slot_interval_minutes: Number(form.slot_interval_minutes || 30),
+        min_notice_minutes: Number(form.min_notice_minutes || 120),
+        max_days_ahead: Number(form.max_days_ahead || 30),
+        booking_type: form.booking_type || "general",
+        field_mode: form.field_mode || "preset",
+        required_fields: formData.getAll("required_fields"),
+        instructions: form.instructions || ""
+      }
+    });
+    toast("Booking settings saved");
+    bookingsView();
+  };
+
+  $("#copyBookingCalendarFeed")?.addEventListener("click", async () => {
+    const input = $("#bookingCalendarFeedUrl");
+    input.select();
+    input.setSelectionRange(0, input.value.length);
+    try {
+      await navigator.clipboard.writeText(input.value);
+      toast("Calendar feed link copied");
+    } catch {
+      document.execCommand("copy");
+      toast("Calendar feed link selected");
+    }
+  });
+
+  $("#bookingServiceForm").onsubmit = async (event) => {
+    event.preventDefault();
+    const form = Object.fromEntries(new FormData(event.currentTarget));
+    await api("/api/bookings/services", {
+      method: "POST",
+      body: {
+        ...form,
+        duration_minutes: Number(form.duration_minutes || 60),
+        price: form.price || null,
+        deposit_amount: form.deposit_amount || null,
+        active: true
+      }
+    });
+    toast("Booking service added");
+    bookingsView();
+  };
+
+  $("#bookingForm").onsubmit = async (event) => {
+    event.preventDefault();
+    const formData = new FormData(event.currentTarget);
+    const form = Object.fromEntries(formData);
+    const fieldValues = {};
+    for (const [key, value] of formData.entries()) {
+      if (key.startsWith("field_") && String(value).trim()) {
+        fieldValues[key.replace(/^field_/, "")] = value;
+      }
+    }
+    await api("/api/bookings", {
+      method: "POST",
+      body: {
+        ...form,
+        service_id: form.service_id || null,
+        service_name: form.service_name || null,
+        field_values: fieldValues
+      }
+    });
+    toast("Booking saved");
+    bookingsView();
+  };
+
+  document.querySelectorAll("[data-service-active]").forEach((input) => {
+    input.onchange = async () => {
+      await api(`/api/bookings/services/${input.dataset.serviceActive}`, { method: "PUT", body: { active: input.checked } });
+      toast(input.checked ? "Service activated" : "Service deactivated");
+      bookingsView();
+    };
+  });
+
+  document.querySelectorAll("[data-booking-status]").forEach((select) => {
+    select.onchange = async () => {
+      await api(`/api/bookings/${select.dataset.bookingStatus}/status`, { method: "PUT", body: { status: select.value } });
+      toast("Booking status updated");
+      bookingsView();
+    };
+  });
 }
 
 async function quotationDetailView(id) {
@@ -955,6 +1441,167 @@ async function followUpsView() {
 }
 
 async function aiStudioView() {
+  setTitle("AI Studio");
+  // REPLACED 2026-08-18. The old screen edited `ai_custom_instructions` via
+  // aistaff-ai-config, which only ever reached the SITE CHAT widget — editing
+  // it did nothing to Messenger replies. This edits the real thing: the
+  // instruction block generateSalesReply() sends on every reply.
+  const data = await api("/api/prompts/closer");
+  const active = data.active;
+  const models = await api("/api/models");
+
+  $("#adminContent").innerHTML = `
+    <div class="settings-stack">
+      <section class="panel">
+        <div class="panel-header">
+          <h2>Closer instructions${active ? ` — v${active.version} live` : ""}</h2>
+          <span class="muted">${active ? `saved ${new Date(active.created_at).toLocaleString()} by ${escapeHtml(active.created_by || "seed")}` : ""}</span>
+        </div>
+        <p class="muted settings-lede">These govern <b>every</b> customer's Closer, on Messenger and on the website widget. They are the highest authority — a customer's own instructions add to these and can never cancel them. Saving creates a new version; nothing is overwritten.</p>
+        <form id="promptForm" class="form-grid">
+          <label class="full">Instructions
+            <textarea name="content" rows="22" spellcheck="false">${escapeHtml(active ? active.content : "")}</textarea>
+          </label>
+          <label class="full">What changed? (shown in the history below)
+            <input type="text" name="note" maxlength="300" placeholder="e.g. Told it to keep replies short and bullet long lists" />
+          </label>
+          <button class="button button-primary" type="submit">Save as new version</button>
+        </form>
+      </section>
+
+      <section class="panel">
+        <h2>Version history (${data.revisions.length})</h2>
+        <p class="muted settings-lede">Every version that has run. Roll back to put an earlier one live immediately.</p>
+        <div class="table-wrap"><table>
+          <thead><tr><th>Version</th><th>Saved</th><th>By</th><th>What changed</th><th>Actions</th></tr></thead>
+          <tbody>${data.revisions.map((r) => `<tr>
+            <td>${r.is_active ? `<b>v${r.version}</b> <span class="prompt-live">LIVE</span>` : `v${r.version}`}</td>
+            <td>${new Date(r.created_at).toLocaleString()}</td>
+            <td class="muted">${escapeHtml(r.created_by || "seed")}</td>
+            <td>${escapeHtml(r.note || "—")}</td>
+            <td class="intake-kb-actions">
+              <button type="button" class="intake-link" data-view-prompt="${r.version}">View</button>
+              ${r.is_active ? "" : `<button type="button" class="intake-link" data-rollback="${r.version}">Roll back</button>`}
+            </td>
+          </tr>`).join("")}</tbody>
+        </table></div>
+      </section>
+
+      <section class="panel">
+        <h2>Models</h2>
+        <p class="muted settings-lede">Which model runs each function. Prices are USD per million tokens and change as you choose — Closer sends a large prompt and a short reply, so <b>input price is what matters</b>.</p>
+        <div class="table-wrap"><table>
+          <thead><tr><th>Function</th><th>Model</th><th>Input / Output</th><th>Est. per 1,000 replies</th></tr></thead>
+          <tbody>${models.settings.map((s) => `
+            <tr>
+              <td><b>${escapeHtml(s.label)}</b><br /><span class="muted">${escapeHtml(s.detail)}</span></td>
+              <td>
+                <select data-model-fn="${s.fn}">
+                  ${models.catalogue.map((c) => `<option value="${c.provider}|${c.model}" ${c.model === s.model ? "selected" : ""}>${escapeHtml(c.label)}</option>`).join("")}
+                </select>
+              </td>
+              <td class="model-price" data-price-for="${s.fn}">—</td>
+              <td class="model-est" data-est-for="${s.fn}">—</td>
+            </tr>`).join("")}</tbody>
+        </table></div>
+        <p class="muted">Gemini 3.x introductory pricing ends 31 December 2026 and doubles on 1 January 2027. Budget on the 2027 rate for anything still running next year.</p>
+      </section>
+    </div>`;
+
+  // Price updates as the dropdown changes, so a choice is never blind.
+  // Estimate assumes the real shape of a Closer call: a large prompt (roughly
+  // 15,000 tokens of instructions plus knowledge base) and a short reply
+  // (~200 tokens). That is why input price dominates.
+  const EST_IN = 15000;
+  const EST_OUT = 200;
+  const priceFor = (value) => {
+    const [, model] = String(value).split("|");
+    return models.catalogue.find((c) => c.model === model) || null;
+  };
+  const paintPrice = (fn, value) => {
+    const c = priceFor(value);
+    const priceCell = document.querySelector(`[data-price-for="${fn}"]`);
+    const estCell = document.querySelector(`[data-est-for="${fn}"]`);
+    if (!c || c.inCents == null) {
+      priceCell.textContent = "price not published";
+      estCell.textContent = "—";
+      return;
+    }
+    priceCell.textContent = `$${(c.inCents / 100).toFixed(2)} / $${(c.outCents / 100).toFixed(2)}`;
+    const usd = (EST_IN / 1e6) * (c.inCents / 100) * 1000 + (EST_OUT / 1e6) * (c.outCents / 100) * 1000;
+    estCell.innerHTML = `$${usd.toFixed(2)} <span class="muted">≈ ₱${Math.round(usd * 58).toLocaleString()}</span>`;
+  };
+
+  document.querySelectorAll("[data-model-fn]").forEach((select) => {
+    select.dataset.current = select.value;
+    paintPrice(select.dataset.modelFn, select.value);
+    select.onchange = async () => {
+      const [provider, model] = select.value.split("|");
+      const previous = select.dataset.current || "";
+      try {
+        await api("/api/models", { method: "POST", body: { fn: select.dataset.modelFn, provider, model } });
+        select.dataset.current = select.value;
+        paintPrice(select.dataset.modelFn, select.value);
+        toast(`${select.dataset.modelFn} now uses ${model}`);
+      } catch (error) {
+        // Revert the dropdown so it never shows a model that was refused.
+        if (previous) select.value = previous;
+        paintPrice(select.dataset.modelFn, select.value);
+        toast(error.message);
+      }
+    };
+  });
+
+  $("#promptForm").onsubmit = async (event) => {
+    event.preventDefault();
+    const form = new FormData(event.currentTarget);
+    try {
+      const result = await api("/api/prompts/closer", {
+        method: "POST",
+        body: { content: form.get("content"), note: form.get("note") || null }
+      });
+      toast(`Saved as v${result.version} — live on the next message`);
+      aiStudioView();
+    } catch (error) {
+      toast(error.message);
+    }
+  };
+
+  document.querySelectorAll("[data-view-prompt]").forEach((btn) => {
+    btn.onclick = () => {
+      const rev = data.revisions.find((r) => String(r.version) === btn.dataset.viewPrompt);
+      if (rev) showPromptRevision(rev);
+    };
+  });
+
+  document.querySelectorAll("[data-rollback]").forEach((btn) => {
+    btn.onclick = async () => {
+      const version = Number(btn.dataset.rollback);
+      if (!window.confirm(`Roll back to v${version}? It becomes live on the next customer message.`)) return;
+      await api("/api/prompts/closer/activate", { method: "POST", body: { version } });
+      toast(`v${version} is live again`);
+      aiStudioView();
+    };
+  });
+}
+
+function showPromptRevision(rev) {
+  const wrap = document.createElement("div");
+  wrap.className = "intake-modal-backdrop";
+  wrap.innerHTML = `
+    <div class="intake-modal is-wide">
+      <h3>Version ${rev.version}${rev.is_active ? " (live)" : ""}</h3>
+      <p class="muted">${new Date(rev.created_at).toLocaleString()} · ${escapeHtml(rev.created_by || "seed")} · ${rev.chars} characters</p>
+      <pre class="intake-entry-view">${escapeHtml(rev.content)}</pre>
+      <div class="intake-modal-actions"><button class="button button-soft" id="promptClose">Close</button></div>
+    </div>`;
+  document.body.appendChild(wrap);
+  const close = () => wrap.remove();
+  wrap.querySelector("#promptClose").onclick = close;
+  wrap.onclick = (e) => { if (e.target === wrap) close(); };
+}
+
+async function legacyAiStudioView() {
   setTitle("AI Studio");
   const studio = await api("/api/ai-studio");
   $("#adminContent").innerHTML = `
@@ -1056,6 +1703,34 @@ async function aiStudioView() {
   };
 }
 
+/**
+ * What Closer is actually running for this company, in precedence order.
+ * The point is that the owner can confirm their extra instructions were
+ * received, and see that they sit UNDER the platform rules rather than
+ * replacing them.
+ */
+async function showCloserPromptPreview() {
+  const data = await api("/api/prompts/closer/preview");
+  const wrap = document.createElement("div");
+  wrap.className = "intake-modal-backdrop";
+  wrap.innerHTML = `
+    <div class="intake-modal is-wide">
+      <h3>What Closer is running</h3>
+      <p class="muted">Instruction set v${data.version} · ${data.knowledgeCount} knowledge entries for ${escapeHtml(data.companyName)}</p>
+      <p class="settings-group">1 · Built-in rules (always apply)</p>
+      <pre class="intake-entry-view">${escapeHtml(data.platformInstructions)}</pre>
+      <p class="settings-group">2 · Your extra instructions</p>
+      <pre class="intake-entry-view">${escapeHtml(data.customInstructions || "(none added)")}</pre>
+      <p class="settings-group">3 · Your knowledge base</p>
+      <p class="muted">${data.knowledgeCount} entries are supplied with every reply. Manage them in Knowledge Base.</p>
+      <div class="intake-modal-actions"><button class="button button-soft" id="previewClose">Close</button></div>
+    </div>`;
+  document.body.appendChild(wrap);
+  const close = () => wrap.remove();
+  wrap.querySelector("#previewClose").onclick = close;
+  wrap.onclick = (e) => { if (e.target === wrap) close(); };
+}
+
 async function facebookPageConnectionView() {
   setTitle("Facebook Page Connection");
   const data = await api("/api/facebook-page-connection");
@@ -1100,6 +1775,13 @@ async function facebookPageConnectionView() {
             <p><b>Connected Page:</b> ${escapeHtml(connectedPage.name)}</p>
             <p><b>Status:</b> Connected</p>
             <p><b>Messenger Replies:</b> Enabled</p>
+          </div>
+          <!-- Disconnect added 2026-08-17 as an ADDITION. The Connect button and
+               the connection-status panel above are §12 evidence for two Meta
+               permissions and must not be altered. -->
+          <div class="connection-disconnect">
+            <button class="button button-soft" id="fbDisconnectBtn" data-page-id="${escapeHtml(connectedPage.pageId || "")}">Disconnect this Page</button>
+            <p class="muted">Closer stops replying on this Page immediately. Your past conversations and knowledge base are kept, and you can reconnect anytime.</p>
           </div>` : `
           <p class="muted">No Facebook Page is connected yet. Start with the authorization button above, then choose the Page AIStaff should manage.</p>`}
       </section>
@@ -1156,6 +1838,23 @@ async function facebookPageConnectionView() {
     };
   });
 
+  const disconnectBtn = $("#fbDisconnectBtn");
+  if (disconnectBtn) {
+    disconnectBtn.onclick = async () => {
+      // Confirm before an action that stops customer replies. Reversible, but
+      // an accidental click silences their Page until they notice.
+      if (!window.confirm("Disconnect this Page? Closer will stop replying to messages on it. Your conversations and knowledge base are kept, and you can reconnect anytime.")) return;
+      const result = await api("/api/facebook-page-connection/disconnect", {
+        method: "POST",
+        body: { pageId: disconnectBtn.dataset.pageId }
+      });
+      toast(result.unsubscribed
+        ? "Page disconnected. Closer has stopped replying."
+        : `Page disconnected here, but Facebook reported: ${result.unsubscribeError || "unknown error"}`);
+      facebookPageConnectionView();
+    };
+  }
+
   if (params.get("meta_auth") === "success") {
     toast("Facebook authorization complete. Select the Page to connect.");
   } else if (params.get("meta_auth") === "empty") {
@@ -1176,14 +1875,25 @@ async function settingsView(tab = "") {
   }
 
   setTitle("Settings");
-  const [company, settings, pages] = await Promise.all([api("/api/company"), api("/api/settings"), api("/api/facebook-pages")]);
+  const [company, settings, pages, promptPreview, customHistory] = await Promise.all([
+    api("/api/company"),
+    api("/api/settings"),
+    api("/api/facebook-pages"),
+    // Read-only view of what Closer is actually running. Shown inline rather
+    // than behind a button: the owner cannot improve their extra instructions
+    // without seeing what is already covered.
+    api("/api/prompts/closer/preview").catch(() => null),
+    api("/api/prompts/custom").catch(() => ({ revisions: [] }))
+  ]);
   $("#adminContent").innerHTML = `
     ${settingsTabs("")}
-    <div class="split">
+    <div class="settings-stack">
       <section class="panel">
         <h2>Company profile</h2>
+        <p class="muted settings-lede">How we identify your business, and who we speak to about the account.</p>
         <form id="companyForm" class="form-grid">
           ${field("name", "Company name", company.name)}
+          ${field("contact_person", "Contact person", company.contact_person)}
           ${field("industry", "Industry", company.industry)}
           ${field("website", "Website", company.website)}
           ${field("contact_email", "Contact email", company.contact_email)}
@@ -1193,20 +1903,79 @@ async function settingsView(tab = "") {
       </section>
       <section class="panel">
         <h2>AI and quotation settings</h2>
+        <p class="muted settings-lede">Grouped by what each control decides: how the agent replies, what it may do with quotations, and where alerts go.</p>
         <form id="settingsForm" class="form-grid">
+          <p class="settings-group full">Replying</p>
           <label>AI enabled<select name="ai_enabled"><option value="true" ${settings.ai_enabled ? "selected" : ""}>Yes</option><option value="false">No</option></select></label>
           <label>Auto reply enabled<select name="auto_reply_enabled"><option value="true" ${settings.auto_reply_enabled ? "selected" : ""}>Yes</option><option value="false">No</option></select></label>
           <label>Business hours only<select name="business_hours_only"><option value="false" ${!settings.business_hours_only ? "selected" : ""}>No</option><option value="true">Yes</option></select></label>
           <label>Human handoff enabled<select name="human_handoff_enabled"><option value="true" ${settings.human_handoff_enabled ? "selected" : ""}>Yes</option><option value="false">No</option></select></label>
           ${field("default_language", "Default language", settings.default_language)}
           ${field("tone", "Tone", settings.tone)}
+
+          <p class="settings-group full">Quotations</p>
           <label>Quotation mode<select name="quotation_mode"><option value="approval_required" ${settings.quotation_mode === "approval_required" ? "selected" : ""}>approval_required</option><option value="auto_send">auto_send</option></select></label>
           <label>Admin approval required<select name="quotation_requires_admin_approval"><option value="true" ${settings.quotation_requires_admin_approval ? "selected" : ""}>Yes</option><option value="false">No</option></select></label>
           <label>Allow AI drafts<select name="allow_ai_quotation_drafts"><option value="true" ${settings.allow_ai_quotation_drafts ? "selected" : ""}>Yes</option><option value="false">No</option></select></label>
           <label>Allow auto-send<select name="allow_auto_send_quotation"><option value="false" ${!settings.allow_auto_send_quotation ? "selected" : ""}>No</option><option value="true">Yes</option></select></label>
+
+          <p class="settings-group full">Notifications</p>
           ${field("notify_email", "Notify email", settings.notify_email)}
           <button class="button button-primary full" type="submit">Save Settings</button>
         </form>
+      </section>
+
+      <section class="panel">
+        <h2>What your Closer knows and does</h2>
+        ${promptPreview ? `
+          <p class="muted settings-lede">Built from your own setup, so it is always current. Read-only — change it by editing your Knowledge Base.</p>
+
+          <p class="settings-group">Answers from</p>
+          ${promptPreview.covers.length
+            ? `<ul class="closer-covers">${promptPreview.covers.map((c) => `<li><b>${c.count}</b> ${escapeHtml(c.label)}</li>`).join("")}</ul>`
+            : `<p class="muted">Nothing yet — start with the Knowledge Base.</p>`}
+
+          <p class="settings-group">How it behaves</p>
+          <ul class="closer-behaviours">${promptPreview.behaviours.map((b) => `<li>${escapeHtml(b)}</li>`).join("")}</ul>
+
+          ${promptPreview.missing.length ? `
+            <p class="settings-group">It does not know yet</p>
+            <ul class="closer-missing">${promptPreview.missing.map((m) => `<li>${escapeHtml(m.label)}${m.skipped ? ' <span class="muted">(you skipped this)</span>' : ""}</li>`).join("")}</ul>
+            <p class="muted">A customer asking about any of these will be told someone will follow up. <a href="${adminPath("knowledge-base")}">Fill these in</a>.</p>` : ""}
+
+          ${promptPreview.openGaps ? `
+            <div class="settings-warning"><b>${promptPreview.openGaps} question${promptPreview.openGaps === 1 ? "" : "s"} your customers actually asked</b> that Closer could not answer. <a href="${adminPath("knowledge-base")}">Answer them</a>.</div>` : ""}
+        ` : `<p class="muted">Could not load this right now.</p>`}
+      </section>
+
+      <section class="panel">
+        <h2>Extra instructions for your Closer</h2>
+        <p class="muted settings-lede">Closer already knows how to sell from your knowledge base. Use this only to add house style — tone, what to emphasise, what to always mention.</p>
+        <div class="settings-warning">
+          <b>For advanced users.</b> These instructions are added to Closer's built-in rules, they do not replace them. Closer will still refuse to invent prices, confirm stock it cannot check, or promise anything outside your knowledge base — even if you ask it to here. Facts belong in the Knowledge Base, not in this box.
+        </div>
+        <form id="closerInstructionsForm" class="form-grid">
+          <label class="full">Your additional instructions
+            <textarea name="ai_custom_instructions" rows="8" placeholder="Halimbawa: Laging banggitin na open kami ng Sunday. Address customers as 'po'. Wag masyadong pushy sa premium package.&#10;&#10;Write in English, Tagalog or Taglish — whichever is easier.">${escapeHtml(settings.ai_custom_instructions || "")}</textarea>
+          </label>
+          <button class="button button-primary" type="submit">Save instructions</button>
+        </form>
+        ${customHistory.revisions.length ? `
+          <h3 class="settings-group">Your changes (${customHistory.revisions.length})</h3>
+          <p class="muted">Every version you have saved. Roll back to put an earlier one live.</p>
+          <div class="table-wrap"><table>
+            <thead><tr><th>Version</th><th>Saved</th><th>By</th><th>Preview</th><th>Actions</th></tr></thead>
+            <tbody>${customHistory.revisions.map((r) => `<tr>
+              <td>${r.is_active ? `<b>v${r.version}</b> <span class="prompt-live">LIVE</span>` : `v${r.version}`}</td>
+              <td>${new Date(r.created_at).toLocaleString()}</td>
+              <td class="muted">${escapeHtml(r.created_by || "—")}</td>
+              <td>${escapeHtml((r.content || "(cleared)").slice(0, 60))}${(r.content || "").length > 60 ? "…" : ""}</td>
+              <td class="intake-kb-actions">
+                <button type="button" class="intake-link" data-view-custom="${r.version}">View</button>
+                ${r.is_active ? "" : `<button type="button" class="intake-link" data-rollback-custom="${r.version}">Roll back</button>`}
+              </td>
+            </tr>`).join("")}</tbody>
+          </table></div>` : ""}
       </section>
       <section class="panel">
         <h2>Facebook Pages</h2>
@@ -1222,6 +1991,38 @@ async function settingsView(tab = "") {
     await api("/api/company", { method: "PUT", body: Object.fromEntries(new FormData(event.currentTarget)) });
     toast("Company saved");
   };
+
+  const instructionsForm = $("#closerInstructionsForm");
+  if (instructionsForm) {
+    instructionsForm.onsubmit = async (event) => {
+      event.preventDefault();
+      const value = new FormData(event.currentTarget).get("ai_custom_instructions") || "";
+      // Versioned save: records a revision AND updates the live value the
+      // reply path reads.
+      const result = await api("/api/prompts/custom", { method: "POST", body: { content: value } });
+      toast(result.unchanged
+        ? "No change to save"
+        : `Saved as v${result.version} — Closer follows this from the next message`);
+      settingsView();
+    };
+
+    document.querySelectorAll("[data-view-custom]").forEach((btn) => {
+      btn.onclick = () => {
+        const rev = customHistory.revisions.find((r) => String(r.version) === btn.dataset.viewCustom);
+        if (rev) showPromptRevision({ ...rev, chars: (rev.content || "").length });
+      };
+    });
+
+    document.querySelectorAll("[data-rollback-custom]").forEach((btn) => {
+      btn.onclick = async () => {
+        const version = Number(btn.dataset.rollbackCustom);
+        if (!window.confirm(`Roll back to v${version}? Closer uses it from the next message.`)) return;
+        await api("/api/prompts/custom/activate", { method: "POST", body: { version } });
+        toast(`v${version} is live again`);
+        settingsView();
+      };
+    });
+  }
   $("#settingsForm").onsubmit = async (event) => {
     event.preventDefault();
     const data = Object.fromEntries(new FormData(event.currentTarget));
@@ -1308,7 +2109,7 @@ async function routeHandler() {
     return;
   }
 
-  const { routeName, id } = parseAdminRoute();
+  let { routeName, id } = parseAdminRoute();
 
   if (routeName === "login") {
     if (state.user || (await loadSession())) {
@@ -1348,11 +2149,21 @@ async function routeHandler() {
   }
 
   setMode("admin");
-  const active = navItems.some(([key]) => key === routeName) ? routeName : "dashboard";
+  // A hidden nav link is not access control — typing /admin/ai-studio directly
+  // still loaded the screen, which then failed on a 403 and rendered blank.
+  // Customers are sent to their dashboard instead.
+  const allowed = visibleNavItems().some(([key]) => key === routeName);
+  if (!allowed && PLATFORM_ONLY_ROUTES.has(routeName)) {
+    history.replaceState(null, "", adminPath("dashboard"));
+    routeName = "dashboard";
+    id = null;
+  }
+  const active = visibleNavItems().some(([key]) => key === routeName) ? routeName : "dashboard";
   renderAdminNav(active);
 
   try {
-    if (routeName === "dashboard") await dashboardView();
+    if (routeName === "platform") await platformView();
+    else if (routeName === "dashboard") await dashboardView();
     else if (routeName === "marketing" && id === "ads") await marketingAdsView();
     else if (routeName === "marketing" && id === "review") await marketingReviewView();
     else if (routeName === "marketing" && id === "process") await marketingProcessView();
@@ -1367,10 +2178,16 @@ async function routeHandler() {
     else if (routeName === "qualification-questions") await questionsView();
     else if (routeName === "quotations" && id) await quotationDetailView(id);
     else if (routeName === "quotations") await quotationsView();
+    else if (routeName === "bookings") await bookingsView();
     else if (routeName === "payments") await paymentsView();
     else if (routeName === "follow-ups") await followUpsView();
     else if (routeName === "settings") await settingsView(id);
     else await dashboardView();
+    // Setup reminder, once per session, on any admin screen while unfinished.
+    if (typeof maybeShowSetupModal === "function") maybeShowSetupModal();
+    // Header status pill — starts once, then polls.
+    if (typeof startCloserStatusPolling === "function") startCloserStatusPolling();
+    if (typeof renderAssistBanner === "function") renderAssistBanner();
   } catch (error) {
     toast(error.message);
   }
