@@ -43,6 +43,7 @@ const AISTAFF_INTERNAL_COMPANY_ID = "00000000-0000-0000-0000-000000000001";
 const { buildPresenceSnapshot, formatSnapshotForMessenger } = require("./page-intelligence");
 const { provisionPaidOrder, issueSetupLink } = require("./provisioning");
 const { extractPriceList, MAX_BYTES } = require("./price-list-extract");
+const { detectCurrency } = require("./rendered-scrape");
 const {
   getMarketingOverview,
   listCreatives,
@@ -86,10 +87,10 @@ const { saveMedia, deleteMedia } = require("./media-store");
 const { getCloserHealth } = require("./closer-health");
 const { normaliseRole, can, requirePermission, ROLES, PERMISSIONS } = require("./platform-roles");
 const { listCustomers } = require("./platform");
-const { getActiveInstructions, saveRevision, activateRevision, listRevisions } = require("./prompt-store");
+const { getActiveInstructions, saveRevision, activateRevision, listRevisions, CLOSER_SYSTEM_KEY, DEMO_PAGE_SYSTEM_KEY } = require("./prompt-store");
 const { listSettings, setModelFor, CATALOGUE: MODEL_CATALOGUE } = require("./model-registry");
 const { generateFaqCheck, generateQualificationQuestions, LEAD_FIELDS } = require("./faq-generator");
-const { notifyHandoff, notifySetupMilestone, notifyGapDigest, notifyConfigured, sendNotification, FROM_ADDRESS } = require("./notify");
+const { notifyHandoff, notifySetupMilestone, notifyGapDigest, notifyConfigured, notifyBookingCreated, sendNotification, FROM_ADDRESS } = require("./notify");
 const { AnalyzeRequestSchema, WebsiteBusinessAnalysisSchema } = require("./brandee/schemas");
 const { WebsiteAnalysisError, normalizeUrlInput } = require("./brandee/websiteAnalyzer");
 const { buildBusinessProfile } = require("./brandee/businessProfileBuilder");
@@ -305,7 +306,7 @@ app.use(express.static(path.join(__dirname, "..", "public"), {
     // intake-wizard.js added 2026-08-17. Without it the file was served with
     // max-age=14400, so wizard fixes did not reach the browser for four hours
     // and looked like they had not been applied.
-    if (filePath.endsWith("app.js") || filePath.endsWith("index.html") || filePath.endsWith("style.css") || filePath.endsWith("pricing-checkout.js") || filePath.endsWith("checkout-status.js") || filePath.endsWith("workforce-motion.js") || filePath.endsWith("site-chat.js") || filePath.endsWith("intake-wizard.js") || filePath.endsWith("closer-status.js") || filePath.endsWith("platform.js")) {
+    if (filePath.endsWith("app.js") || filePath.endsWith("index.html") || filePath.endsWith("style.css") || filePath.endsWith("pricing-checkout.js") || filePath.endsWith("checkout-status.js") || filePath.endsWith("meta-pixel.js") || filePath.endsWith("workforce-motion.js") || filePath.endsWith("site-chat.js") || filePath.endsWith("intake-wizard.js") || filePath.endsWith("closer-status.js") || filePath.endsWith("platform.js")) {
       res.setHeader("Cache-Control", "no-cache");
     }
   }
@@ -319,6 +320,39 @@ function asyncHandler(fn) {
 
 function getAppUrl(req) {
   return (process.env.APP_PUBLIC_URL || process.env.APP_BASE_URL || `${req.protocol}://${req.get("host")}`).replace(/\/$/, "");
+}
+
+function slugForPublicRoom(value) {
+  return String(value || "meeting")
+    .normalize("NFKD")
+    .replace(/[^\w\s-]/g, "")
+    .trim()
+    .replace(/[-\s_]+/g, "-")
+    .replace(/^-+|-+$/g, "")
+    .slice(0, 48)
+    .toLowerCase() || "meeting";
+}
+
+function buildJitsiMeetingLink(companyName, startAt) {
+  const stamp = new Date(startAt).toISOString().replace(/[-:]/g, "").slice(0, 13);
+  const suffix = crypto.randomBytes(3).toString("hex");
+  return `https://meet.jit.si/aistaff-closer-${slugForPublicRoom(companyName)}-${stamp}-${suffix}`;
+}
+
+function formatManilaSchedule(value) {
+  return new Date(value).toLocaleString("en-PH", {
+    dateStyle: "medium",
+    timeStyle: "short",
+    timeZone: "Asia/Manila"
+  });
+}
+
+function parseManilaDateTime(dateValue, timeValue) {
+  const date = String(dateValue || "").trim();
+  const time = String(timeValue || "").trim();
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(date) || !/^\d{2}:\d{2}$/.test(time)) return null;
+  const parsed = new Date(`${date}T${time}:00+08:00`);
+  return Number.isNaN(parsed.getTime()) ? null : parsed;
 }
 
 function getMetaRedirectUri(req) {
@@ -960,16 +994,14 @@ app.post("/api/checkout", asyncHandler(async (req, res) => {
     customer: checkoutCustomerSchema,
     agreements: z.object({
       terms: z.boolean(),
-      privacy: z.boolean(),
-      renewal: z.boolean(),
-      correct: z.boolean()
-    }),
+      privacy: z.boolean()
+    }).passthrough(),
     requestedProvider: z.string().optional().nullable(),
     paymentMethod: z.string().optional().nullable(),
     couponCode: z.string().max(120).optional().nullable()
   }).parse(req.body);
 
-  if (!Object.values(body.agreements).every(Boolean)) {
+  if (!body.agreements.terms || !body.agreements.privacy) {
     return res.status(400).json({ error: "Required checkout agreements must be accepted" });
   }
 
@@ -1087,7 +1119,7 @@ app.post("/api/checkout", asyncHandler(async (req, res) => {
       mode: PAYMENT_MODE,
       status: paymentSession.status,
       checkoutUrl: paymentSession.checkoutUrl,
-      message: paymentSession.message || (providerReady(provider) ? "Payment session prepared." : "Secure online payment integration is currently in test mode."),
+      message: paymentSession.message || "Payment session prepared.",
       instructions: paymentSession.instructions || null
     }
   });
@@ -1929,8 +1961,8 @@ const {
   createDemoSession, runScrape, replyToDemoMessage, extractFacts,
   MAX_MESSAGES_PER_SESSION
 } = require("./demo-agent");
-const demoStartRateLimiter = createRateLimiter({ windowMs: 60 * 60 * 1000, max: 5 });
-const demoChatRateLimiter = createRateLimiter({ windowMs: 60 * 1000, max: 20 });
+const demoStartRateLimiter = createRateLimiter({ windowMs: 60 * 60 * 1000, max: Number(process.env.DEMO_START_RATE_LIMIT_MAX || 120) });
+const demoChatRateLimiter = createRateLimiter({ windowMs: 60 * 1000, max: Number(process.env.DEMO_CHAT_RATE_LIMIT_MAX || 120) });
 
 const { requestReset, resetPassword } = require("./password-reset");
 
@@ -2891,7 +2923,7 @@ app.get("/api/demo-sessions/:id", requireAuth, asyncHandler(async (req, res) => 
     facts: extractFacts(session.snapshot),
     // The exact prompt the agent ran with — so a weak demo can be diagnosed
     // rather than guessed at.
-    prompt: buildDemoPrompt(session)
+    prompt: await buildDemoPrompt(session)
   });
 }));
 
@@ -2901,29 +2933,44 @@ app.get("/api/demo-sessions/:id", requireAuth, asyncHandler(async (req, res) => 
 
 app.post("/api/public/demo/start", asyncHandler(async (req, res) => {
   const body = z.object({
-    name: z.string().min(2),
-    email: z.string().email(),
-    website_url: z.string().optional().nullable(),
+    website_url: z.string().trim().max(1000).optional().nullable(),
     facebook_url: z.string().optional().nullable(),
-    mobile: z.string().optional().nullable()
+    product_description: z.string().trim().max(5000).optional().nullable(),
+    has_price_file: z.boolean().optional().default(false)
   }).parse(req.body);
 
-  if (!body.website_url) {
+  const websiteInput = String(body.website_url || "").trim();
+  const websiteUrl = websiteInput && /^https?:\/\//i.test(websiteInput) ? websiteInput : (websiteInput ? `https://${websiteInput}` : "");
+  const productDescription = String(body.product_description || "").trim();
+  const hasPriceFile = Boolean(body.has_price_file);
+
+  if (!websiteUrl && !productDescription && !hasPriceFile) {
     // Facebook was dropped as an input: logged out it serves a block page
     // (measured at ~1.5KB, <title>Error</title>), and automating a logged-in
     // session would risk the published Meta app (§12).
-    return res.status(400).json({ ok: false, error: "Please give us your website or store link so the agent has something to learn from." });
+    return res.status(400).json({ ok: false, error: "Add a website, product description, or upload a photo or price list so the agent has something to learn from." });
   }
   if (!demoStartRateLimiter.check(clientIp(req)).allowed) {
-    return res.status(429).json({ ok: false, error: "Too many demo requests. Please try again later." });
+    return res.status(429).json({ ok: false, error: "Too many demo starts from this connection. Please try again shortly." });
+  }
+  let demoName = "Demo business";
+  if (websiteUrl) {
+    try {
+      demoName = new URL(websiteUrl).hostname.replace(/^www\./, "");
+    } catch (error) {
+      demoName = "Demo business";
+    }
+  } else if (productDescription) {
+    demoName = productDescription.split(/\s+/).slice(0, 5).join(" ");
   }
 
   const session = await createDemoSession({
-    name: body.name,
-    email: body.email,
-    websiteUrl: body.website_url,
-    facebookUrl: body.facebook_url,
-    mobile: body.mobile,
+    name: demoName,
+    email: `demo-${crypto.randomUUID()}@aistaff.local`,
+    websiteUrl,
+    facebookUrl: null,
+    mobile: null,
+    productDescription,
     ip: clientIp(req)
   });
 
@@ -2980,12 +3027,19 @@ app.post("/api/public/demo/price-list", asyncHandler(async (req, res) => {
     return res.json({ ok: false, error: messages[result.reason] || "We could not read that file." });
   }
 
+  const previousText = String(session.price_list_text || "").trim();
+  const nextBlock = [`Source file: ${body.filename}`, result.text].join("\n").trim();
+  const combinedText = [previousText, nextBlock].filter(Boolean).join("\n\n---\n\n");
+  const previousName = String(session.price_list_name || "").trim();
+  const combinedName = [previousName, body.filename].filter(Boolean).join(", ");
+
   await prisma.demoSession.update({
     where: { id: session.id },
     data: {
-      price_list_text: result.text,
+      price_list_text: combinedText,
       price_list_kind: result.kind,
-      price_list_name: body.filename
+      price_list_name: combinedName,
+      price_currency: detectCurrency(combinedText, session.website_url)
     }
   });
 
@@ -3012,9 +3066,8 @@ app.post("/api/public/demo/chat", asyncHandler(async (req, res) => {
     return res.status(410).json({ ok: false, error: "This demo has expired. Start a new one." });
   }
   if (session.message_count >= MAX_MESSAGES_PER_SESSION) {
-    return res.status(429).json({ ok: false, error: "This demo has reached its message limit." });
+    return res.status(429).json({ ok: false, error: "This demo session reached the testing limit. Start a new demo to continue." });
   }
-
   const result = await replyToDemoMessage({ session, messages: body.messages });
   await prisma.demoSession.update({
     where: { id: session.id },
@@ -3028,6 +3081,258 @@ app.post("/api/public/demo/chat", asyncHandler(async (req, res) => {
     return res.json({ ok: false, error: result.error, retryable: true });
   }
   res.json({ ok: true, reply: result.reply, actions: result.actions });
+}));
+
+app.post("/api/public/demo/decision", asyncHandler(async (req, res) => {
+  const optionalText = (max) => z.preprocess(
+    (value) => String(value || "").trim() || null,
+    z.string().max(max).nullable()
+  );
+  const optionalEmail = z.preprocess(
+    (value) => String(value || "").trim() || null,
+    z.string().email().max(160).nullable()
+  );
+  const body = z.object({
+    sessionId: z.string().uuid(),
+    action: z.enum(["book_consultation", "purchase_now", "not_yet"]),
+    name: optionalText(120),
+    email: optionalEmail,
+    mobile: optionalText(40),
+    preferredDate: optionalText(40),
+    preferredTime: optionalText(40),
+    preferredSchedule: optionalText(200),
+    reasons: z.array(z.string().trim().min(1).max(160)).max(12).optional().default([]),
+    notes: optionalText(3000)
+  }).parse(req.body);
+
+  const session = await prisma.demoSession.findUnique({ where: { id: body.sessionId } });
+  if (!session) return res.status(404).json({ ok: false, error: "Demo session not found." });
+  if (session.expires_at < new Date()) {
+    return res.status(410).json({ ok: false, error: "This demo has expired. Start a new one." });
+  }
+
+  const actionMeta = {
+    purchase_now: {
+      label: "I Want This",
+      score: "hot",
+      service: "AIStaff subscription purchase interest",
+      status: "new",
+      message: "Got it. We received your details and will help you start with the right package."
+    },
+    book_consultation: {
+      label: "Book a Consultation",
+      score: "hot",
+      service: "AIStaff consultation booking",
+      status: "new",
+      message: "Done. Your consultation is booked. We saved it to our calendar and sent the meeting details."
+    },
+    not_yet: {
+      label: "Not Yet",
+      score: "cold",
+      service: "AIStaff demo feedback",
+      status: "new",
+      message: "Feedback saved. Thank you."
+    }
+  }[body.action];
+
+  if (body.action !== "not_yet" && (!body.name || !body.email || !body.mobile)) {
+    return res.status(400).json({ ok: false, error: "Full name, email, and mobile number are required for this next step." });
+  }
+  const consultationStart = body.action === "book_consultation"
+    ? parseManilaDateTime(body.preferredDate, body.preferredTime)
+    : null;
+  if (body.action === "book_consultation" && !consultationStart) {
+    return res.status(400).json({ ok: false, error: "Choose a valid consultation date and time." });
+  }
+
+  const companyId = AISTAFF_INTERNAL_COMPANY_ID;
+  const visitorName = body.name || `Demo visitor ${session.id.slice(0, 6).toUpperCase()}`;
+  const psid = `demo_decision_${Date.now()}_${crypto.randomUUID().slice(0, 8)}`;
+  const sessionFacts = extractFacts(session.snapshot);
+  const businessName = sessionFacts.businessName || session.business_name || session.name || "Demo business";
+  const notes = [
+    `Demo decision: ${actionMeta.label}`,
+    `Lead temperature: ${actionMeta.score}`,
+    `Demo business: ${businessName}`,
+    session.website_url ? `Website: ${session.website_url}` : "",
+    session.price_list_name ? `Uploaded files: ${session.price_list_name}` : "",
+    body.preferredDate ? `Preferred date: ${body.preferredDate}` : "",
+    body.preferredTime ? `Preferred time: ${body.preferredTime}` : "",
+    body.preferredSchedule ? `Preferred schedule: ${body.preferredSchedule}` : "",
+    body.reasons.length ? `Reasons: ${body.reasons.join("; ")}` : "",
+    body.notes ? `Notes: ${body.notes}` : "",
+    `Demo session: ${session.id}`
+  ].filter(Boolean).join("\n");
+
+  let consultationContext = null;
+  if (body.action === "book_consultation") {
+    const [company, companySetting, bookingSetting] = await Promise.all([
+      prisma.company.findUnique({ where: { id: companyId }, select: { id: true, name: true } }),
+      prisma.companySetting.findUnique({ where: { company_id: companyId }, select: { notify_email: true } }),
+      ensureBookingSetting(companyId)
+    ]);
+    const serviceName = "AIStaff consultation";
+    const service = await prisma.bookingService.findFirst({
+      where: { company_id: companyId, name: serviceName, active: true },
+      orderBy: { created_at: "asc" }
+    }) || await prisma.bookingService.create({
+      data: {
+        company_id: companyId,
+        name: serviceName,
+        description: "Consultation call from the public Closer demo.",
+        duration_minutes: 60,
+        location: "Jitsi video call",
+        active: true,
+        display_order: 0
+      }
+    });
+    const end = new Date(consultationStart.getTime() + service.duration_minutes * 60 * 1000);
+    if (bookingNeedsExclusiveTime(bookingSetting, serviceName, { preferred_meeting_channel: "Jitsi video call", purpose: "AIStaff consultation" })) {
+      const conflict = await prisma.booking.findFirst({
+        where: {
+          company_id: companyId,
+          status: { in: ["requested", "pending_confirmation", "confirmed", "paid"] },
+          start_at: { lt: end },
+          end_at: { gt: consultationStart }
+        },
+        orderBy: { start_at: "asc" }
+      });
+      if (conflict) {
+        return res.status(409).json({
+          ok: false,
+          error: "That consultation time is already taken. Please choose another date or time."
+        });
+      }
+    }
+    consultationContext = {
+      company,
+      companySetting,
+      service,
+      serviceName,
+      end,
+      meetingLink: buildJitsiMeetingLink(company?.name || "AIStaff", consultationStart)
+    };
+  }
+
+  const conversation = await prisma.conversation.create({
+    data: {
+      company_id: companyId,
+      psid,
+      customer_name: visitorName,
+      channel: "public_demo",
+      status: "open",
+      intent: `demo_${body.action}`,
+      lead_score: actionMeta.score,
+      last_message_at: new Date()
+    }
+  });
+
+  await prisma.message.create({
+    data: {
+      company_id: companyId,
+      conversation_id: conversation.id,
+      sender_type: "customer",
+      sender_id: psid,
+      message_text: notes
+    }
+  });
+
+  const lead = await prisma.lead.create({
+    data: {
+      company_id: companyId,
+      conversation_id: conversation.id,
+      customer_name: visitorName,
+      mobile_number: body.mobile,
+      email: body.email,
+      company_name: businessName,
+      location: session.website_url,
+      service_needed: actionMeta.service,
+      urgency: body.preferredSchedule,
+      notes,
+      lead_status: actionMeta.status,
+      lead_score: actionMeta.score,
+      quotation_ready: body.action === "purchase_now"
+    }
+  });
+
+  let booking = null;
+  if (body.action === "book_consultation") {
+    const bookingNotes = [
+      `Public demo consultation for ${businessName}.`,
+      session.website_url ? `Website tested: ${session.website_url}` : "",
+      session.price_list_name ? `Uploaded files: ${session.price_list_name}` : "",
+      body.notes ? `Customer notes: ${body.notes}` : ""
+    ].filter(Boolean).join("\n");
+    booking = await prisma.booking.create({
+      data: {
+        company_id: companyId,
+        service_id: consultationContext.service.id,
+        lead_id: lead.id,
+        conversation_id: conversation.id,
+        customer_name: visitorName,
+        mobile_number: body.mobile,
+        email: body.email,
+        service_name: consultationContext.serviceName,
+        start_at: consultationStart,
+        end_at: consultationContext.end,
+        status: "confirmed",
+        source: "public_demo",
+        field_values: {
+          business_name: businessName,
+          preferred_date: body.preferredDate,
+          preferred_time: body.preferredTime,
+          preferred_meeting_channel: "Jitsi video call",
+          purpose: "consultation",
+          meeting_link: consultationContext.meetingLink,
+          reminder_plan: "Email reminders are planned 1 day and 6 hours before the meeting."
+        },
+        notes: bookingNotes
+      },
+      include: { service: true }
+    });
+
+    const reminderRows = [
+      { label: "1 day before", due: new Date(consultationStart.getTime() - 24 * 60 * 60 * 1000) },
+      { label: "6 hours before", due: new Date(consultationStart.getTime() - 6 * 60 * 60 * 1000) }
+    ].filter((item) => item.due > new Date()).map((item) => ({
+      company_id: companyId,
+      lead_id: lead.id,
+      conversation_id: conversation.id,
+      due_date: item.due,
+      status: "pending",
+      note: `${item.label} consultation reminder: ${visitorName} for ${formatManilaSchedule(consultationStart)}. Meeting link: ${consultationContext.meetingLink}`
+    }));
+    if (reminderRows.length) {
+      await prisma.followUp.createMany({ data: reminderRows });
+      await prisma.lead.update({
+        where: { id: lead.id },
+        data: { follow_up_date: reminderRows[0].due }
+      });
+    }
+
+    const recipients = [consultationContext.companySetting?.notify_email, process.env.ADMIN_ALERT_EMAIL || process.env.SEED_ADMIN_EMAIL]
+      .filter(Boolean);
+    await Promise.all([
+      ...recipients.map((to) => notifyBookingCreated({ to, companyName: consultationContext.company?.name || "AIStaff", booking, audience: "staff" })),
+      body.email ? notifyBookingCreated({ to: body.email, companyName: consultationContext.company?.name || "AIStaff", booking, audience: "customer" }) : null
+    ].filter(Boolean)).catch((err) => console.warn("[public demo] booking notification failed", err));
+  }
+
+  if (body.action !== "not_yet" && !session.converted_at) {
+    await prisma.demoSession.update({
+      where: { id: session.id },
+      data: { converted_at: new Date() }
+    }).catch(() => {});
+  }
+
+  res.json({
+    ok: true,
+    message: booking
+      ? `Done. Your consultation is booked for ${formatManilaSchedule(booking.start_at)}. We saved it to our calendar and sent the meeting details.`
+      : actionMeta.message,
+    leadScore: actionMeta.score,
+    booking: booking ? serializeBooking(booking) : null
+  });
 }));
 
 app.post("/api/auth/forgot-password", asyncHandler(async (req, res) => {
@@ -4132,7 +4437,7 @@ app.post("/api/models", requireAuth, requirePermission("platform.behaviour"), as
 
 /** Current instructions plus the full revision history. */
 app.get("/api/prompts/closer", requireAuth, requirePermission("platform.behaviour"), asyncHandler(async (req, res) => {
-  const revisions = await listRevisions();
+  const revisions = await listRevisions(CLOSER_SYSTEM_KEY);
   const active = revisions.find((r) => r.is_active) || revisions[0] || null;
   res.json({
     active,
@@ -4150,14 +4455,46 @@ app.post("/api/prompts/closer", requireAuth, requirePermission("platform.behavio
     content: z.string().min(20),
     note: z.string().max(300).optional().nullable()
   }).parse(req.body);
-  const created = await saveRevision({ content: body.content, note: body.note, createdBy: req.user.email });
+  const created = await saveRevision({ key: CLOSER_SYSTEM_KEY, content: body.content, note: body.note, createdBy: req.user.email });
   res.json({ ok: true, version: created.version });
 }));
 
 /** Roll back to an earlier revision. */
 app.post("/api/prompts/closer/activate", requireAuth, requirePermission("platform.behaviour"), asyncHandler(async (req, res) => {
   const body = z.object({ version: z.number().int().positive() }).parse(req.body);
-  const target = await activateRevision({ version: body.version, createdBy: req.user.email });
+  const target = await activateRevision({ key: CLOSER_SYSTEM_KEY, version: body.version, createdBy: req.user.email });
+  if (!target) return res.status(404).json({ ok: false, error: "That version does not exist." });
+  res.json({ ok: true, version: target.version });
+}));
+
+/** Current public demo instructions plus their revision history. */
+app.get("/api/prompts/demo-page", requireAuth, requirePermission("platform.behaviour"), asyncHandler(async (req, res) => {
+  const revisions = await listRevisions(DEMO_PAGE_SYSTEM_KEY);
+  const active = revisions.find((r) => r.is_active) || revisions[0] || null;
+  res.json({
+    active,
+    revisions: revisions.map((r) => ({
+      id: r.id, version: r.version, note: r.note, created_by: r.created_by,
+      is_active: r.is_active, created_at: r.created_at, chars: r.content.length,
+      content: r.content
+    }))
+  });
+}));
+
+/** Save a new public demo prompt revision and make it live. */
+app.post("/api/prompts/demo-page", requireAuth, requirePermission("platform.behaviour"), asyncHandler(async (req, res) => {
+  const body = z.object({
+    content: z.string().min(20),
+    note: z.string().max(300).optional().nullable()
+  }).parse(req.body);
+  const created = await saveRevision({ key: DEMO_PAGE_SYSTEM_KEY, content: body.content, note: body.note, createdBy: req.user.email });
+  res.json({ ok: true, version: created.version });
+}));
+
+/** Roll the public demo prompt back to an earlier revision. */
+app.post("/api/prompts/demo-page/activate", requireAuth, requirePermission("platform.behaviour"), asyncHandler(async (req, res) => {
+  const body = z.object({ version: z.number().int().positive() }).parse(req.body);
+  const target = await activateRevision({ key: DEMO_PAGE_SYSTEM_KEY, version: body.version, createdBy: req.user.email });
   if (!target) return res.status(404).json({ ok: false, error: "That version does not exist." });
   res.json({ ok: true, version: target.version });
 }));
@@ -4687,6 +5024,10 @@ app.put("/api/platform/users/:id", requireAuth, requirePermission("platform.user
   res.json({ ok: true, user });
 }));
 
+// Pitch voice-agent admin (pipeline switch, Piper voices, previews).
+// Own module so voice settings evolve without touching this file.
+app.use("/api/pitch-admin", require("./routes/pitch-admin").buildRouter({ requireAuth }));
+
 app.get("/api/ai-studio", requireAuth, asyncHandler(async (req, res) => {
   const config = await loadAistaffAiConfig(req.companyId);
   res.json({
@@ -5102,7 +5443,8 @@ function renderBookingCalendarIcs({ company, setting, bookings }) {
       booking.notes || "",
       ...detailValues
     ].filter(Boolean).join("\n");
-    const location = booking.service?.location
+    const location = booking.field_values?.meeting_link
+      || booking.service?.location
       || booking.field_values?.branch_location
       || booking.field_values?.address
       || "";
@@ -5115,6 +5457,7 @@ function renderBookingCalendarIcs({ company, setting, bookings }) {
       icsLine("DTEND", icsDate(booking.end_at)),
       icsLine("SUMMARY", `${booking.service_name} - ${booking.customer_name}`),
       icsLine("DESCRIPTION", description),
+      booking.field_values?.meeting_link ? icsLine("URL", booking.field_values.meeting_link) : "",
       location ? icsLine("LOCATION", location) : "",
       icsLine("STATUS", booking.status === "confirmed" || booking.status === "paid" || booking.status === "completed" ? "CONFIRMED" : "TENTATIVE"),
       "END:VEVENT"
@@ -5123,6 +5466,18 @@ function renderBookingCalendarIcs({ company, setting, bookings }) {
 
   lines.push("END:VCALENDAR");
   return `${lines.filter(Boolean).join("\r\n")}\r\n`;
+}
+
+function bookingNeedsExclusiveTime(setting, serviceName, fieldValues = {}) {
+  const haystack = [
+    setting?.booking_type,
+    serviceName,
+    fieldValues.preferred_meeting_channel,
+    fieldValues.purpose,
+    fieldValues.onboarding_topic
+  ].filter(Boolean).join(" ").toLowerCase();
+  return setting?.booking_type === "ai_service_onboarding"
+    || /online|video|jitsi|zoom|meet|meeting|consult|consultation|onboarding|demo|call/.test(haystack);
 }
 
 app.get("/api/bookings", requireAuth, asyncHandler(async (req, res) => {
@@ -5275,6 +5630,24 @@ app.post("/api/bookings", requireAuth, asyncHandler(async (req, res) => {
   const duration = service?.duration_minutes || 60;
   const end = new Date(start.getTime() + duration * 60 * 1000);
   const serviceName = body.service_name || service?.name || "Booking";
+
+  const setting = await ensureBookingSetting(req.companyId);
+  if (bookingNeedsExclusiveTime(setting, serviceName, body.field_values)) {
+    const conflict = await prisma.booking.findFirst({
+      where: {
+        company_id: req.companyId,
+        status: { in: ["requested", "pending_confirmation", "confirmed", "paid"] },
+        start_at: { lt: end },
+        end_at: { gt: start }
+      },
+      orderBy: { start_at: "asc" }
+    });
+    if (conflict) {
+      return res.status(409).json({
+        error: "That time already has a meeting-style booking. Choose another time or update the existing booking."
+      });
+    }
+  }
 
   if (body.lead_id) {
     await prisma.lead.findFirstOrThrow({ where: { id: body.lead_id, company_id: req.companyId } });

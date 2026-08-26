@@ -25,6 +25,11 @@ const ANONYMOUS_CALLER_IDS = new Set([
   "withheld", "unavailable", "null", "0",
 ]);
 
+function int(value, fallback) {
+  const n = Number.parseInt(value, 10);
+  return Number.isFinite(n) ? n : fallback;
+}
+
 /** The number if we genuinely have one, otherwise null. Never throws. */
 function normalizeCallerId(callerId) {
   const raw = String(callerId ?? "").trim();
@@ -71,31 +76,45 @@ already in front of you is what makes an assistant feel like a form.
   account, or reveal details about an existing customer.`.trim();
 }
 
-function buildInstructions({ businessName, agentName, callerId, smsEnabled }) {
-  const callerGuidance = buildCallerIdGuidance(normalizeCallerId(callerId));
+/**
+ * Language rules differ by ENGINE, not by preference.
+ *
+ * Gemini Live is native speech-to-speech: it can say Taglish, so the prompt
+ * lets it match the caller freely — which is what Filipino callers expect.
+ *
+ * The local pipeline ends in Piper, and Piper phonemizes through espeak-ng,
+ * which has NO Tagalog rules. Telling the brain to reply in Taglish there is
+ * asking for output the voice physically cannot pronounce; it comes out as
+ * mangled English phonemes. Until a Tagalog voice is trained, the local
+ * pipeline must stay in English — this is an engine limit, not a style choice.
+ */
+function buildLanguageSection(pipeline) {
+  if (pipeline === "local") {
+    return `
+## Language — English only on this line
 
-  const smsGuidance = smsEnabled ? `
+Reply in English, always, even when the caller speaks Tagalog or Taglish.
+The voice on this line cannot pronounce Tagalog, so a Taglish reply would
+reach the caller as noise.
 
-## Texting the caller
-
-You can send one short text message during a call, using the send_sms tool.
-
-- Only send after the caller has agreed to receive one. Offer it when it is
-  genuinely useful — a booking detail, an address, something they would
-  otherwise have to write down while driving — and accept no as an answer.
-- Never send a text they did not ask for. An unrequested message from a
-  business is spam, and they did not give you their number, the network did.
-- You write the message yourself, in the language the call is happening in,
-  and short enough to arrive as one text.
-- It goes to the number they are calling from unless they ask for another.
-- Say what you are doing in your own words before or as you send it, and if
-  the tool reports it did not send, tell them plainly rather than pretending.
-- One text per call. Do not offer a second.` : "";
+- Never announce this, apologise for it, or discuss what language you are
+  using. Just speak English.
+- Keep the English simple, warm and Philippine-natural — the plain English a
+  Filipino customer service agent would use, not American idiom.
+- You still UNDERSTAND Tagalog and Taglish perfectly. Answer the substance of
+  what they asked; only your own words are constrained.
+- Say numbers, prices, dates and times the way a Filipino speaker would say
+  them out loud.
+- Do NOT use the word "po" at all on this line. Not "Yes po", not "Sige po",
+  not "Goodbye po", not "Certainly po". A frequency limit was tried and the
+  word still leaked into every closing, so the rule is absolute: zero.
+  Courtesy comes from warmth and from "sir"/"ma'am", not from "po".
+- Address the caller as "sir" or "ma'am" only when you know which. Never say
+  "sir or ma'am" or "ma'am or sir" — if you do not know, use neither.
+- Do not repeat their name in every turn. Once when you learn it is plenty.`;
+  }
 
   return `
-You are ${agentName}, a voice assistant answering the phone for ${businessName}.
-You are speaking on a live telephone call over a cellular network.
-
 ## Language — match the caller, always
 
 Listen to how the caller speaks and reply the same way. Do not announce or
@@ -112,7 +131,28 @@ discuss what language you are using; just use it.
   respectfully or sound older, and drop it if they are casual. Never force it
   into every sentence — over-using "po" sounds robotic.
 - Say numbers, prices, dates and times the way a Filipino speaker would say
-  them out loud, not the way they are written.
+  them out loud, not the way they are written.`;
+}
+
+/**
+ * WHERE THE PROMPT LIVES
+ *
+ * The editable BODY lives in the database under PromptRevision key
+ * "pitch_system", edited in AI Studio -> Pitch. The text below is only the
+ * seed used the first time that key is empty, and the fallback if the database
+ * is unreachable mid-call. Editing this file does NOT change a running agent —
+ * edit it in AI Studio.
+ *
+ * Three sections are NOT editable because they are decided at call time:
+ *   - Language: depends on the ENGINE (Piper cannot pronounce Tagalog).
+ *   - Caller ID: depends on what the INVITE presented for this call.
+ *   - SMS: depends on whether send_sms is wired for this deployment.
+ * Those are appended by assembleInstructions() on top of whatever body is live.
+ */
+function buildBody({ businessName, agentName }) {
+  return `
+You are ${agentName}, a voice assistant answering the phone for ${businessName}.
+You are speaking on a live telephone call over a cellular network.
 
 ## You are on a phone, not in a chat window
 
@@ -127,11 +167,6 @@ discuss what language you are using; just use it.
   repeat. Cellular audio drops; this is normal and not embarrassing.
 - Brief natural acknowledgements while you think are good. Silence is not.
 
-## The caller's number
-
-${callerGuidance}
-${smsGuidance}
-
 ## Gathering details
 
 - Answer what they actually called about first. Someone asking whether there
@@ -144,6 +179,23 @@ ${smsGuidance}
   treating it as right, and expect to fix it once.
 - Collect only what the conversation gives you a reason to collect, and stop
   once you have it. Never work through a list of fields.
+
+## What to call the caller
+
+Filipino business callers expect "Sir" or "Ma'am" in front of a first name —
+"Sir Mike", "Ma'am Anna". Use it once you have both the name and a reasonable
+read on which fits.
+
+- Before you know their name, use no address term at all. Do not fall back on
+  "sir or ma'am" or "sir/ma'am" — naming both is worse than naming neither.
+- Never ask a caller whether they are sir or ma'am. It is an awkward question
+  on a sales call and there is no polite way to phrase it.
+- If the name or the voice does not make it clear, use the bare first name.
+  "Thank you, Mike" is perfectly courteous Philippine business English.
+- If you get it wrong and they correct you, switch immediately, say nothing
+  about the mistake beyond a brief apology, and carry on.
+- Use it sparingly — at the start once you learn the name, and again at the
+  close. Repeating "Sir Mike" in every sentence sounds like a script.
 
 ## Honesty
 
@@ -172,4 +224,201 @@ use the same opening sentence every time.
 `.trim();
 }
 
-module.exports = { buildInstructions, normalizeCallerId };
+/** The SMS rules, included in a pipeline's prompt only when send_sms exists. */
+function buildSmsSection() {
+  return `
+## Texting the caller
+
+You can send one short text message during a call, using the send_sms tool.
+
+- Only send after the caller has agreed to receive one. Offer it when it is
+  genuinely useful — a booking detail, an address, something they would
+  otherwise have to write down while driving — and accept no as an answer.
+- Never send a text they did not ask for. An unrequested message from a
+  business is spam, and they did not give you their number, the network did.
+- You write the message yourself, in the language the call is happening in,
+  and short enough to arrive as one text.
+- Never leave a placeholder in a message. Every date, time, name and amount
+  must be the real value. A text reading "on [Date] at 3PM" is a failure.
+- It goes to the number they are calling from unless they ask for another.
+- Say what you are doing in your own words before or as you send it, and if
+  the tool reports it did not send, tell them plainly rather than pretending.
+- One text per call. Do not offer a second.`;
+}
+
+/**
+ * A COMPLETE prompt for one pipeline. Used ONLY to seed the database on first
+ * run, and as a fallback if the database is unreachable mid-call. Once seeded,
+ * AI Studio -> Pitch is the single source of truth; editing this file changes
+ * nothing on a running agent.
+ */
+function buildSeed({ pipeline, smsEnabled }) {
+  return [
+    buildBody({ businessName: "{{business_name}}", agentName: "{{agent_name}}" }),
+    buildLanguageSection(pipeline),
+    "\n## The caller's number\n",
+    buildCallerIdGuidance("{{caller_number}}"),
+    smsEnabled ? buildSmsSection() : "",
+    `
+## What you know about this business
+
+Everything below comes from the business's own knowledge base — the SAME one
+Closer answers from on Messenger. A caller and a Messenger customer must
+never get different answers.
+
+- Answer from this and nothing else. Never invent a price, a stock level, an
+  opening time, an address or a policy that is not written here.
+- If it does not cover what they asked, say a colleague will confirm and
+  follow up. Never say "that is not in my knowledge base" — the caller does
+  not know one exists and it sounds like a machine making excuses.
+- Say prices and numbers the way a Filipino speaker says them aloud.
+
+{{knowledge_base}}`,
+  ].join("\n").trim();
+}
+
+const PROMPT_KEYS = {
+  "gemini-live": "pitch_system_gemini",
+  local: "pitch_system_local",
+};
+
+/** The only values that cannot live in prompt text — they vary per call. */
+function fillVariables(text, { businessName, agentName, callerId, knowledge }) {
+  const number = normalizeCallerId(callerId);
+  return String(text || "")
+    .replace(/\{\{\s*business_name\s*\}\}/g, businessName || "this business")
+    .replace(/\{\{\s*agent_name\s*\}\}/g, agentName || "Pitch")
+    .replace(/\{\{\s*caller_number\s*\}\}/g, number || "not presented")
+    .replace(/\{\{\s*knowledge_base\s*\}\}/g,
+      knowledge || "(No knowledge base entries yet. Say a colleague will follow up rather than guessing.)");
+}
+
+const PROMPT_CACHE_MS = 30000;
+const TENANT_CACHE_MS = 60000;
+const promptCache = new Map();
+let tenantCache = { data: null, expiresAt: 0 };
+
+function pitchPrisma() {
+  const { PrismaClient } = require("@prisma/client");
+  if (!global.__pitchPrisma) global.__pitchPrisma = new PrismaClient();
+  return global.__pitchPrisma;
+}
+
+/**
+ * NOT prompt-store.js: its ensureSeeded() writes Closer's bootstrap text for
+ * ANY key, and its cache is keyed by nothing — sharing it would seed Pitch
+ * with Closer's Messenger prompt and poison Closer's cache. Pitch owns its
+ * own rows and its own per-key cache.
+ */
+async function loadPromptRow(key) {
+  const now = Date.now();
+  const hit = promptCache.get(key);
+  if (hit && hit.expiresAt > now) return hit.content;
+
+  const prisma = pitchPrisma();
+  const row = await prisma.promptRevision.findFirst({
+    where: { key, is_active: true }, orderBy: { version: "desc" },
+  }) || await prisma.promptRevision.findFirst({
+    where: { key }, orderBy: { version: "desc" },
+  });
+  if (!row) return null;
+  promptCache.set(key, { content: row.content, expiresAt: now + PROMPT_CACHE_MS });
+  return row.content;
+}
+
+/** Seed both pipeline prompts from code the first time only. */
+async function ensurePitchPrompts() {
+  const prisma = pitchPrisma();
+  for (const [pipeline, key] of Object.entries(PROMPT_KEYS)) {
+    if (await prisma.promptRevision.count({ where: { key } })) continue;
+    await prisma.promptRevision.create({
+      data: {
+        key, version: 1, is_active: true, created_by: "seed",
+        content: buildSeed({ pipeline, smsEnabled: pipeline !== "local" }),
+        note: `Seeded for the ${pipeline} pipeline`,
+      },
+    });
+  }
+}
+
+/**
+ * Tenant context for a call: the business name and the SAME knowledge base
+ * Closer answers from.
+ *
+ * The knowledge base is deliberately SHARED. Prices, stock, hours and
+ * policies are facts about the business, not about a channel — a caller and
+ * a Messenger customer must never get different answers, and maintaining two
+ * copies guarantees they eventually would. What stays separate is the PROMPT:
+ * how the agent behaves on a phone is nothing like how it behaves in a chat
+ * window.
+ *
+ * Today the company comes from PITCH_COMPANY_ID because one gateway serves
+ * one business. For multiple tenants this becomes a per-call lookup —
+ * inbound SIM -> device -> company — and nothing downstream changes.
+ */
+async function loadTenantContext() {
+  const now = Date.now();
+  if (tenantCache.data && tenantCache.expiresAt > now) return tenantCache.data;
+
+  const out = { businessName: null, knowledge: "" };
+  try {
+    const { loadAistaffAiConfig, formatKnowledgeBaseForPrompt } = require("../aistaff-ai-config");
+    const cfg = await loadAistaffAiConfig(process.env.PITCH_COMPANY_ID || undefined);
+    out.businessName = cfg.company && cfg.company.name ? cfg.company.name : null;
+
+    // Closer's budget is 60,000 characters. That is fine for Messenger, where
+    // the prompt is sent once per typed reply and latency is invisible. On a
+    // phone call the whole prompt is re-sent EVERY turn, so 60k characters is
+    // roughly 15,000 tokens of extra input per turn — seconds of added
+    // latency and a cost multiple, most of it irrelevant to whoever is on the
+    // line. Voice gets a much smaller slice, newest first.
+    const budget = int(process.env.PITCH_KB_MAX_CHARS, 6000);
+    let kb = formatKnowledgeBaseForPrompt(cfg.knowledgeBase || []);
+    if (kb.length > budget) {
+      kb = kb.slice(0, budget).replace(/\n[^\n]*$/, "")
+        + "\n(Further entries exist. If the caller asks something not covered, say a colleague will confirm.)";
+    }
+    out.knowledge = kb;
+  } catch {
+    // A ringing phone must not fail because the knowledge base is unreachable.
+  }
+  tenantCache = { data: out, expiresAt: now + TENANT_CACHE_MS };
+  return out;
+}
+
+/** The instructions for THIS call — entirely from AI Studio. */
+async function loadInstructions({ businessName, agentName, callerId, smsEnabled, pipeline }) {
+  const key = PROMPT_KEYS[pipeline] || PROMPT_KEYS["gemini-live"];
+  let text = null;
+  try {
+    await ensurePitchPrompts();
+    text = await loadPromptRow(key);
+  } catch {
+    text = null;
+  }
+  if (!text || String(text).trim().length < 20) {
+    text = buildSeed({ pipeline, smsEnabled });
+  }
+
+  const tenant = await loadTenantContext();
+  return fillVariables(text, {
+    // The tenant record wins over the env fallback: the business name belongs
+    // to the company, not to this process's configuration.
+    businessName: tenant.businessName || businessName,
+    agentName,
+    callerId,
+    knowledge: tenant.knowledge,
+  });
+}
+
+function clearPitchPromptCache() { promptCache.clear(); }
+
+module.exports = {
+  PROMPT_KEYS,
+  buildSeed,
+  fillVariables,
+  loadInstructions,
+  ensurePitchPrompts,
+  clearPitchPromptCache,
+  normalizeCallerId,
+};

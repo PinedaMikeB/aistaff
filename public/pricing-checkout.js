@@ -34,6 +34,15 @@ function billingLabel() {
   return commerceState.billing === "annual" ? "Billed annually" : "Billed monthly";
 }
 
+function trackCommerce(eventName, params, options) {
+  if (typeof window.aiStaffTrack !== "function") return;
+  window.aiStaffTrack(eventName, {
+    source_page: "pricing",
+    currency: "PHP",
+    ...params
+  }, options || {});
+}
+
 function renderPricing() {
   const cards = qs("#pricingCards");
   if (!cards) return;
@@ -113,9 +122,6 @@ function renderPaymentMethods(country = "Philippines") {
       <span><b>${label}</b><small>${detail}</small></span>
     </label>
   `).join("");
-  qs("#paymentModeNote").textContent = commerceState.pricing.paymentMode === "test"
-    ? "QRPh checkout is currently running in PayMongo test mode."
-    : "Secure QRPh checkout is processed by PayMongo.";
   qs("#paymentMethods").querySelectorAll("input").forEach((input) => {
     input.onchange = () => {
       commerceState.selectedProvider = input.value;
@@ -133,6 +139,14 @@ function addOnPrice(addon) {
 async function selectPlan(planSlug) {
   commerceState.selectedPlan = planSlug;
   await syncCart();
+  const plan = (commerceState.pricing?.plans || []).find((item) => item.slug === planSlug);
+  trackCommerce("AddToCart", {
+    content_name: plan?.name || planSlug,
+    content_ids: [planSlug],
+    content_type: "product",
+    value: plan ? Number(planPrice(plan) || 0) : Number(commerceState.cart?.total || 0),
+    billing_frequency: commerceState.billing
+  });
   qs("#cart").scrollIntoView({ behavior: "smooth", block: "start" });
 }
 
@@ -234,6 +248,22 @@ async function submitCheckout() {
   qs("#checkoutBtn").textContent = "Preparing checkout...";
   validateCheckout();
   const data = Object.fromEntries(new FormData(form));
+  trackCommerce("AIStaffQRPhCheckoutClick", {
+    content_ids: [commerceState.selectedPlan].filter(Boolean),
+    content_type: "product",
+    value: Number(commerceState.cart?.total || 0),
+    num_items: commerceState.cart?.items?.length || 0,
+    billing_frequency: commerceState.billing,
+    payment_method: data.payment_provider || commerceState.selectedProvider
+  }, { custom: true });
+  trackCommerce("InitiateCheckout", {
+    content_ids: [commerceState.selectedPlan].filter(Boolean),
+    content_type: "product",
+    value: Number(commerceState.cart?.total || 0),
+    num_items: commerceState.cart?.items?.length || 0,
+    billing_frequency: commerceState.billing,
+    payment_method: data.payment_provider || commerceState.selectedProvider
+  });
   try {
     const result = await api("/api/checkout", {
       method: "POST",
@@ -255,26 +285,56 @@ async function submitCheckout() {
           country: data.country,
           tax_id: data.tax_id || null,
           company_registration_number: data.company_registration_number || null,
-          business_website: data.business_website || null,
-          facebook_page_url: data.facebook_page_url || null,
-          industry: data.industry || null,
-          estimated_monthly_inquiries: data.estimated_monthly_inquiries || null,
-          main_products_or_services: data.main_products_or_services || null,
-          preferred_onboarding_date: data.preferred_onboarding_date || null
+          business_website: null,
+          facebook_page_url: null,
+          industry: null,
+          estimated_monthly_inquiries: null,
+          main_products_or_services: null,
+          preferred_onboarding_date: null
         },
         agreements: {
           terms: Boolean(data.terms),
-          privacy: Boolean(data.privacy),
-          renewal: Boolean(data.renewal),
-          correct: Boolean(data.correct)
+          privacy: Boolean(data.privacy)
         }
       }
     });
     localStorage.setItem("aistaff_last_order", result.order.order_number);
-    location.href = result.checkout.status === "paid"
-      ? `/checkout/success/?order=${encodeURIComponent(result.order.order_number)}`
-      : `/checkout/pending/?order=${encodeURIComponent(result.order.order_number)}`;
+    trackCommerce("AddPaymentInfo", {
+      content_ids: [commerceState.selectedPlan].filter(Boolean),
+      content_type: "product",
+      value: Number(result.order.total || commerceState.cart?.total || 0),
+      billing_frequency: commerceState.billing,
+      payment_method: data.payment_provider || commerceState.selectedProvider,
+      order_id: result.order.order_number
+    });
+    trackCommerce("AIStaffQRPhCheckoutPrepared", {
+      content_ids: [commerceState.selectedPlan].filter(Boolean),
+      content_type: "product",
+      value: Number(result.order.total || commerceState.cart?.total || 0),
+      billing_frequency: commerceState.billing,
+      payment_method: data.payment_provider || commerceState.selectedProvider,
+      order_id: result.order.order_number,
+      checkout_provider: result.checkout.provider,
+      has_checkout_url: Boolean(result.checkout.checkoutUrl)
+    }, { custom: true });
+    if (result.checkout.status === "paid") {
+      location.href = `/checkout/success/?order=${encodeURIComponent(result.order.order_number)}`;
+      return;
+    }
+    if (result.checkout.checkoutUrl) {
+      location.href = result.checkout.checkoutUrl;
+      return;
+    }
+    location.href = `/checkout/pending/?order=${encodeURIComponent(result.order.order_number)}`;
   } catch (error) {
+    trackCommerce("AIStaffQRPhCheckoutError", {
+      content_ids: [commerceState.selectedPlan].filter(Boolean),
+      content_type: "product",
+      value: Number(commerceState.cart?.total || 0),
+      billing_frequency: commerceState.billing,
+      payment_method: data.payment_provider || commerceState.selectedProvider,
+      error_message: error.message || "Checkout failed"
+    }, { custom: true });
     location.href = `/checkout/failure/?reason=${encodeURIComponent(error.message)}`;
   }
 }

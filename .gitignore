@@ -37,6 +37,7 @@ backups/
 AIO100-1V-User-Manual.pdf
 output/
 tmp/
+local-runtime/
 
 # Customer-uploaded media. Real files, not source — kept out of git.
 public/media/

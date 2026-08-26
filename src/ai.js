@@ -23,6 +23,7 @@ const BOOKING_FIELD_LABELS = {
   preferred_date: "Preferred date",
   preferred_time: "Preferred time",
   preferred_meeting_channel: "Preferred meeting channel",
+  meeting_link: "Meeting link",
   onboarding_topic: "Onboarding/setup topic",
   branch_location: "Branch / location",
   party_size: "Party size",

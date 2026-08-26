@@ -57,6 +57,81 @@
     follow-up is weak.</p>
 </section>
 
+<section id="demo" class="closer-section closer-narrow closer-demo-cta">
+  <p class="section-kicker">See it for yourself</p>
+  <h2>Watch it sell your products, not ours.</h2>
+  <p class="closer-statement">Give us your website, describe what you sell, or upload product photos, menus, posters, PDFs, or price lists. The demo agent reads the material and answers like a real customer is asking about your own offer.</p>
+
+  <form id="demoStartForm" class="closer-demo-form" novalidate>
+    <input name="website_url" placeholder="Website or online store link" inputmode="url" autocomplete="url" />
+    <textarea name="product_description" rows="4" placeholder="Describe your products, services, prices, booking rules, or anything the demo should know"></textarea>
+    <label class="demo-upload" for="demoPriceFile" tabindex="0">
+      <input type="file" id="demoPriceFile" accept="image/*,.pdf,.xlsx,.xls,.csv,.docx" multiple hidden />
+      <span class="demo-upload-icon" aria-hidden="true">
+        <svg viewBox="0 0 24 24" focusable="false"><path d="M12 4v11m0-11 4 4m-4-4-4 4M5 16v2a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-2"/></svg>
+      </span>
+      <span id="demoUploadLabel">Add more files and photos so you can test how the agent answers for your real business</span>
+      <small>Drop files here or click to choose. Files belong only to this temporary demo session; after it expires, upload them again to repeat the test.</small>
+    </label>
+    <div id="demoUploadList" class="demo-upload-list" hidden></div>
+    <button class="button button-primary glow-button" type="submit" id="demoStartBtn">Build my demo agent</button>
+    <p class="closer-demo-error" id="demoError" hidden></p>
+  </form>
+
+  <div class="closer-demo-chat" id="demoChat" hidden>
+    <div class="demo-chat-head">
+      <span class="demo-avatar" id="demoAvatar">AI</span>
+      <span class="demo-chat-who"><b id="demoBizName">Your business</b><em id="demoStatus">Active now</em></span>
+      <button type="button" id="demoReset">Start over</button>
+    </div>
+    <div class="demo-chat-log" id="demoLog"></div>
+    <form class="demo-chat-input" id="demoChatForm">
+      <input id="demoInput" placeholder="Type like one of your customers would&hellip;" autocomplete="off" />
+      <button type="submit" aria-label="Send">&uarr;</button>
+    </form>
+    <div class="demo-next-actions" id="demoNextActions" hidden>
+      <p>What do you want to do next?</p>
+      <div class="demo-action-row">
+        <button type="button" class="demo-action-btn" data-demo-action="book_consultation">Book a Consultation</button>
+        <button type="button" class="demo-action-btn is-hot" data-demo-action="purchase_now">I Want This</button>
+        <button type="button" class="demo-action-btn" data-demo-action="not_yet">Not Yet</button>
+      </div>
+      <form class="demo-decision-form" id="demoDecisionForm" hidden>
+        <input type="hidden" name="action" id="demoDecisionAction" />
+        <div class="demo-decision-copy" id="demoDecisionCopy"></div>
+        <div class="demo-contact-fields" id="demoContactFields">
+          <input name="name" placeholder="Full name *" autocomplete="name" required />
+          <input name="email" placeholder="Email *" autocomplete="email" inputmode="email" required />
+          <input name="mobile" placeholder="Mobile number *" autocomplete="tel" required />
+        </div>
+        <div class="demo-schedule-fields" id="demoScheduleFields" hidden>
+          <input name="preferred_date" type="date" aria-label="Preferred consultation date" disabled required />
+          <input name="preferred_time" type="time" aria-label="Preferred consultation time" disabled required />
+        </div>
+        <div class="demo-feedback-fields" id="demoFeedbackFields" hidden>
+          <span>What would help you decide?</span>
+          <label><input type="checkbox" name="reason" value="I need to see pricing" /> I need to see pricing</label>
+          <label><input type="checkbox" name="reason" value="I need to test more questions" /> I need to test more questions</label>
+          <label><input type="checkbox" name="reason" value="The answer was not accurate enough" /> The answer was not accurate enough</label>
+          <label><input type="checkbox" name="reason" value="I need Messenger integration" /> I need Messenger integration</label>
+          <label><input type="checkbox" name="reason" value="I need website chat integration" /> I need website chat integration</label>
+          <label><input type="checkbox" name="reason" value="I need booking or payment automation" /> I need booking or payment automation</label>
+          <label><input type="checkbox" name="reason" value="I need to talk to someone" /> I need to talk to someone</label>
+          <label><input type="checkbox" name="reason" value="I am just browsing" /> I am just browsing</label>
+          <textarea name="notes" rows="3" placeholder="Tell us what you expected or what was missing."></textarea>
+        </div>
+        <div class="demo-decision-footer">
+          <button type="submit" class="demo-action-submit" id="demoDecisionSubmit">Submit</button>
+          <button type="button" class="demo-action-cancel" id="demoDecisionCancel">Cancel</button>
+        </div>
+        <p class="demo-decision-status" id="demoDecisionStatus" hidden></p>
+      </form>
+    </div>
+  </div>
+
+  <p class="closer-bundle-cta"><a class="text-link" href="https://m.me/1164341106754995" target="_blank" rel="noopener noreferrer">Or talk to our own AI agent on Messenger <span>&#8599;</span></a></p>
+</section>
+
 <section class="closer-section closer-solution">
   <div>
     <p class="section-kicker">The focused fix</p>
@@ -308,43 +383,6 @@
   <p class="closer-bundle-cta"><a class="button button-primary glow-button" href="/agents/pitch/#pricing">See Pitch pricing <span>↗</span></a></p>
 </section>
 
-<section id="demo" class="closer-section closer-narrow closer-demo-cta">
-  <p class="section-kicker">See it for yourself</p>
-  <h2>Watch it sell your products, not ours.</h2>
-  <p class="closer-statement">Give us your website or store link. The agent opens the page like a customer would, reads your products and prices &mdash; even the ones inside images &mdash; then answers anything a real customer would ask, in English, Tagalog, or both in the same sentence.</p>
-
-  <form id="demoStartForm" class="closer-demo-form" novalidate>
-    <div class="demo-field-row">
-      <input required name="name" placeholder="Your name" autocomplete="name" />
-      <input required type="email" name="email" placeholder="Email" autocomplete="email" />
-    </div>
-    <input required name="website_url" placeholder="Your website or online store link (https://&hellip;)" inputmode="url" autocomplete="url" />
-    <input name="mobile" placeholder="Mobile number &mdash; optional, so the agent can text you" inputmode="tel" autocomplete="tel" />
-    <label class="demo-upload" for="demoPriceFile">
-      <input type="file" id="demoPriceFile" accept="image/*,.pdf,.xlsx,.xls,.csv,.docx" hidden />
-      <span id="demoUploadLabel">Upload your price list &mdash; photo, PDF, Excel or Word (optional, but it makes the agent far more accurate)</span>
-    </label>
-    <button class="button button-primary glow-button" type="submit" id="demoStartBtn">Build my demo agent</button>
-    <p class="closer-demo-note">Works with your own site or a store link such as Lazada or Shopee. We read only what is already public, and demo data is deleted after 48 hours. No price list online? Upload one above and the agent will quote from it exactly.</p>
-    <p class="closer-demo-error" id="demoError" hidden></p>
-  </form>
-
-  <div class="closer-demo-chat" id="demoChat" hidden>
-    <div class="demo-chat-head">
-      <span class="demo-avatar" id="demoAvatar">AI</span>
-      <span class="demo-chat-who"><b id="demoBizName">Your business</b><em id="demoStatus">Active now</em></span>
-      <button type="button" id="demoReset">Start over</button>
-    </div>
-    <div class="demo-chat-log" id="demoLog"></div>
-    <form class="demo-chat-input" id="demoChatForm">
-      <input id="demoInput" placeholder="Type like one of your customers would&hellip;" autocomplete="off" />
-      <button type="submit" aria-label="Send">&uarr;</button>
-    </form>
-  </div>
-
-  <p class="closer-bundle-cta"><a class="text-link" href="https://m.me/1164341106754995" target="_blank" rel="noopener noreferrer">Or talk to our own AI agent on Messenger <span>&#8599;</span></a></p>
-</section>
-
 <section id="faq" class="closer-section closer-narrow">
   <p class="section-kicker">FAQ</p>
   <h2>Questions owners usually ask.</h2>
@@ -413,14 +451,31 @@
 <style>
   .closer-demo-form { display: grid; gap: 12px; max-width: 640px; margin: 30px 0 0; }
   .demo-field-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
-  .closer-demo-form input[type="text"], .closer-demo-form input:not([type="file"]) { padding: 14px 16px; border: 1px solid rgba(117,161,188,.22); border-radius: 4px; background: rgba(7,24,37,.7); color: #e8f4ff; font: 15px "Manrope"; }
-  .closer-demo-form input::placeholder { color: rgba(232,244,255,.38); }
-  .closer-demo-form input:focus { outline: none; border-color: rgba(91,190,241,.55); box-shadow: 0 0 0 3px rgba(36,169,255,.12); }
+  .closer-demo-form input[type="text"], .closer-demo-form input:not([type="file"]), .closer-demo-form textarea { padding: 14px 16px; border: 1px solid rgba(117,161,188,.22); border-radius: 4px; background: rgba(7,24,37,.7); color: #e8f4ff; font: 15px "Manrope"; }
+  .closer-demo-form textarea { min-height: 116px; resize: vertical; }
+  .closer-demo-form input::placeholder, .closer-demo-form textarea::placeholder { color: rgba(232,244,255,.38); }
+  .closer-demo-form input:focus, .closer-demo-form textarea:focus { outline: none; border-color: rgba(91,190,241,.55); box-shadow: 0 0 0 3px rgba(36,169,255,.12); }
   .closer-demo-form button[type="submit"] { justify-self: start; margin-top: 4px; }
-  .demo-upload { display: block; padding: 14px 16px; border: 1px dashed rgba(117,161,188,.32); border-radius: 4px; background: rgba(7,24,37,.4); color: rgba(232,244,255,.6); font: 14px/1.5 "Manrope"; cursor: pointer; transition: border-color .2s ease, color .2s ease; }
-  .demo-upload:hover { border-color: rgba(91,190,241,.5); color: #d9f1ff; }
-  .demo-upload.has-file { border-style: solid; border-color: rgba(127,230,182,.45); color: #7fe6b6; }
-  .closer-demo-note { margin: 2px 0 0; color: rgba(232,244,255,.5); font: 13px/1.6 "Manrope"; }
+  .demo-upload { min-height: 116px; display: grid; place-items: center; gap: 7px; padding: 18px; border: 1px dashed rgba(117,161,188,.32); border-radius: 4px; background: rgba(7,24,37,.4); color: rgba(232,244,255,.64); text-align: center; font: 14px/1.5 "Manrope"; cursor: pointer; transition: transform .18s ease, border-color .2s ease, color .2s ease, background .2s ease, box-shadow .2s ease; }
+  .demo-upload svg { width: 30px; height: 30px; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; opacity: .82; }
+  .demo-upload small { color: rgba(232,244,255,.38); font: 12px "Manrope"; }
+  .demo-upload:hover, .demo-upload:focus { border-color: rgba(91,190,241,.5); color: #d9f1ff; outline: none; }
+  .demo-upload.is-dragging { transform: scale(1.015); border-color: rgba(91,190,241,.9); background: rgba(36,169,255,.12); box-shadow: 0 0 0 3px rgba(36,169,255,.12), 0 18px 50px rgba(36,169,255,.12); color: #d9f1ff; }
+  .demo-upload.just-dropped { animation: demoDropPulse .48s ease; }
+  .demo-upload.has-file { border-style: solid; border-color: rgba(127,230,182,.55); color: #7fe6b6; background: rgba(44,191,126,.08); }
+  @keyframes demoDropPulse { 0% { transform: scale(.985); } 58% { transform: scale(1.02); } 100% { transform: scale(1); } }
+  .closer-demo-status { margin: 0; color: #9fe5ff; font: 700 12px/1.5 "Manrope"; }
+  .closer-demo-status.is-loading { display: flex; align-items: center; gap: 8px; }
+  .closer-demo-status.is-loading::before { content: ""; width: 12px; height: 12px; border-radius: 50%; border: 2px solid rgba(159,229,255,.24); border-top-color: #9fe5ff; animation: demoSpin .75s linear infinite; }
+  .demo-upload-list { display: grid; gap: 8px; margin-top: -4px; }
+  .demo-upload-item { display: flex; align-items: center; gap: 10px; min-height: 42px; padding: 9px 10px 9px 12px; border: 1px solid rgba(117,161,188,.18); border-radius: 4px; background: rgba(7,24,37,.46); color: rgba(232,244,255,.82); animation: demoFileIn .2s ease-out; }
+  .demo-upload-item svg { width: 18px; height: 18px; flex: 0 0 auto; fill: none; stroke: #7fe6b6; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+  .demo-upload-file-text { min-width: 0; flex: 1; display: grid; gap: 2px; }
+  .demo-upload-file-text b { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: #d9f1ff; font: 600 13px "Manrope"; }
+  .demo-upload-file-text small { color: rgba(232,244,255,.42); font: 11px "DM Mono"; letter-spacing: .08em; text-transform: uppercase; }
+  .demo-upload-remove { width: 28px; height: 28px; flex: 0 0 auto; border: 1px solid rgba(117,161,188,.2); border-radius: 50%; background: rgba(3,8,16,.5); color: rgba(232,244,255,.7); font: 700 14px "Manrope"; line-height: 1; cursor: pointer; transition: border-color .18s ease, color .18s ease, background .18s ease, transform .18s ease; }
+  .demo-upload-remove:hover, .demo-upload-remove:focus { border-color: rgba(255,157,157,.55); color: #ffb8b8; background: rgba(255,99,99,.1); outline: none; transform: scale(1.05); }
+  @keyframes demoFileIn { 0% { opacity: 0; transform: translateY(-5px); } 100% { opacity: 1; transform: translateY(0); } }
   .closer-demo-error { margin: 0; color: #ff9d9d; font: 600 13px/1.6 "Manrope"; }
   .closer-demo-chat { max-width: 640px; margin: 30px 0 0; border: 1px solid rgba(117,161,188,.2); border-radius: 6px; background: linear-gradient(160deg,rgba(19,39,54,.6),rgba(5,13,21,.9)); overflow: hidden; }
   .demo-chat-head { display: flex; align-items: center; gap: 12px; padding: 14px 16px; border-bottom: 1px solid rgba(117,161,188,.16); background: rgba(7,24,37,.7); }
@@ -430,7 +485,7 @@
   .demo-chat-who em { color: #7fe6b6; font: 500 12px "Manrope"; font-style: normal; }
   .demo-chat-head button { border: 1px solid rgba(117,161,188,.25); border-radius: 999px; padding: 7px 13px; background: transparent; color: #8aa7b9; font: 600 12px "Manrope"; cursor: pointer; }
   .demo-chat-log { min-height: 220px; max-height: 420px; overflow-y: auto; padding: 18px 16px; display: grid; gap: 10px; align-content: start; }
-  .demo-bubble { max-width: 82%; padding: 11px 15px; border-radius: 18px; font: 15px/1.5 "Manrope"; white-space: pre-wrap; }
+  .demo-bubble { max-width: 82%; padding: 11px 15px; border-radius: 18px; font: 15px/1.5 "Manrope"; white-space: pre-wrap; animation: demoBubbleIn .22s ease-out; }
   .demo-bubble.them { justify-self: start; border-bottom-left-radius: 5px; background: rgba(255,255,255,.09); color: #e8f4ff; }
   .demo-bubble.me { justify-self: end; border-bottom-right-radius: 5px; background: linear-gradient(120deg,#39b8ff,#0f8ede); color: #00131f; font-weight: 600; }
   .demo-bubble.sys { justify-self: center; background: transparent; color: rgba(232,244,255,.45); font: 12px "Manrope"; text-align: center; }
@@ -438,9 +493,38 @@
   .demo-typing span:nth-child(2) { animation-delay: .18s; }
   .demo-typing span:nth-child(3) { animation-delay: .36s; }
   @keyframes demoBlink { 0%,60%,100% { opacity:.25 } 30% { opacity:1 } }
+  @keyframes demoBubbleIn { 0% { opacity: 0; transform: translateY(7px) scale(.985); } 100% { opacity: 1; transform: translateY(0) scale(1); } }
   .demo-chat-input { display: flex; gap: 10px; padding: 12px 14px; border-top: 1px solid rgba(117,161,188,.16); background: rgba(7,24,37,.55); }
   .demo-chat-input input { flex: 1; padding: 12px 15px; border: 1px solid rgba(117,161,188,.22); border-radius: 999px; background: rgba(5,13,21,.8); color: #e8f4ff; font: 15px "Manrope"; }
   .demo-chat-input button { width: 44px; border: 0; border-radius: 50%; background: linear-gradient(120deg,#b8e9ff,#39b8ff); color: #00131f; font: 700 17px "Manrope"; cursor: pointer; }
+  .demo-next-actions { padding: 12px 14px 14px; border-top: 1px solid rgba(117,161,188,.16); background: rgba(3,8,16,.54); }
+  .demo-next-actions[hidden], .demo-decision-form[hidden], .demo-contact-fields[hidden], .demo-schedule-fields[hidden], .demo-feedback-fields[hidden] { display: none !important; }
+  .demo-next-actions p { margin: 0 0 10px; color: rgba(232,244,255,.68); font: 700 12px "DM Mono"; letter-spacing: .12em; text-transform: uppercase; }
+  .demo-action-row { display: grid; grid-template-columns: repeat(3,minmax(0,1fr)); gap: 8px; }
+  .demo-action-btn, .demo-action-submit, .demo-action-cancel { min-height: 42px; border: 1px solid rgba(117,161,188,.22); border-radius: 6px; background: rgba(7,24,37,.72); color: #d9f1ff; font: 800 12px/1.2 "Manrope"; cursor: pointer; transition: border-color .18s ease, color .18s ease, background .18s ease, transform .18s ease, box-shadow .18s ease; }
+  .demo-action-btn:hover, .demo-action-btn:focus, .demo-action-cancel:hover, .demo-action-cancel:focus { border-color: rgba(91,190,241,.55); color: #f4f8ff; outline: none; transform: translateY(-1px); }
+  .demo-action-btn.is-hot { border-color: rgba(91,190,241,.45); background: linear-gradient(120deg,#b8e9ff,#39b8ff); color: #00131f; box-shadow: 0 12px 30px rgba(36,169,255,.18); }
+  .demo-action-btn.is-selected { border-color: rgba(127,230,182,.7); box-shadow: 0 0 0 2px rgba(127,230,182,.12); }
+  .demo-decision-form { display: grid; gap: 10px; margin-top: 12px; padding: 12px; border: 1px solid rgba(117,161,188,.18); border-radius: 6px; background: rgba(7,24,37,.55); animation: demoFileIn .2s ease-out; }
+  .demo-decision-copy { color: #9fc9dd; font: 13px/1.45 "Manrope"; }
+  .demo-contact-fields, .demo-schedule-fields { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 8px; }
+  .demo-contact-fields input, .demo-schedule-fields input, .demo-feedback-fields textarea { width: 100%; min-height: 40px; padding: 10px 12px; border: 1px solid rgba(117,161,188,.22); border-radius: 4px; background: rgba(5,13,21,.78); color: #e8f4ff; font: 13px "Manrope"; }
+  .demo-contact-fields input::placeholder, .demo-schedule-fields input::placeholder, .demo-feedback-fields textarea::placeholder { color: rgba(232,244,255,.38); }
+  .demo-contact-fields input:focus, .demo-schedule-fields input:focus, .demo-feedback-fields textarea:focus { outline: none; border-color: rgba(91,190,241,.55); box-shadow: 0 0 0 3px rgba(36,169,255,.12); }
+  .demo-feedback-fields { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 8px; }
+  .demo-feedback-fields span, .demo-feedback-fields textarea { grid-column: 1 / -1; }
+  .demo-feedback-fields span { color: #d9f1ff; font: 700 13px "Manrope"; }
+  .demo-feedback-fields label { display: flex; align-items: center; gap: 8px; min-height: 38px; padding: 9px 10px; border: 1px solid rgba(117,161,188,.16); border-radius: 4px; background: rgba(5,13,21,.55); color: rgba(232,244,255,.76); font: 600 12px/1.35 "Manrope"; }
+  .demo-feedback-fields input { width: 16px; height: 16px; flex: 0 0 auto; accent-color: #39b8ff; }
+  .demo-feedback-fields textarea { min-height: 74px; resize: vertical; }
+  .demo-decision-footer { display: flex; gap: 8px; align-items: center; }
+  .demo-action-submit { min-width: 120px; border: 0; background: linear-gradient(120deg,#b8e9ff,#39b8ff); color: #00131f; }
+  .demo-action-submit:disabled { cursor: wait; opacity: .7; }
+  .demo-action-cancel { min-width: 90px; color: rgba(232,244,255,.66); }
+  .demo-decision-status { margin: 0; color: #7fe6b6; font: 700 12px/1.5 "Manrope"; }
+  .demo-decision-status.is-loading { display: flex; align-items: center; gap: 8px; color: #9fe5ff; }
+  .demo-decision-status.is-loading::before { content: ""; width: 12px; height: 12px; border-radius: 50%; border: 2px solid rgba(159,229,255,.24); border-top-color: #9fe5ff; animation: demoSpin .75s linear infinite; }
+  @keyframes demoSpin { to { transform: rotate(360deg); } }
   .closer-promo-note { margin: 16px 0 0; color: rgba(232,244,255,.55); font: 13px/1.6 "Manrope"; }
   .closer-demo-cta .closer-bundle-cta { margin-top: 26px; }
   .closer-bundle-copy { max-width: 720px; color: #86a3b7; font: 16px/1.65 "Manrope"; }
@@ -499,11 +583,26 @@
   @media (max-width: 600px) {
     .closer-pain-grid, .closer-feature-grid, .closer-steps { grid-template-columns: 1fr; }
     .site-nav { display: none; }
+    .closer-demo-chat { width: 100%; }
+    .demo-chat-head { padding: 12px; gap: 9px; }
+    .demo-chat-who b { font-size: 13px; }
+    .demo-chat-log { min-height: 190px; max-height: 48vh; padding: 14px 12px; }
+    .demo-bubble { max-width: 90%; font-size: 14px; }
+    .demo-chat-input { padding: 10px; gap: 8px; }
+    .demo-chat-input input { min-width: 0; font-size: 14px; }
+    .demo-chat-input button { width: 42px; flex: 0 0 42px; }
+    .demo-next-actions { padding: 10px; }
+    .demo-action-row { grid-template-columns: 1fr; }
+    .demo-action-btn { min-height: 40px; }
+    .demo-contact-fields, .demo-schedule-fields, .demo-feedback-fields { grid-template-columns: 1fr; }
+    .demo-decision-footer { display: grid; grid-template-columns: 1fr 1fr; }
+    .demo-action-submit, .demo-action-cancel { width: 100%; min-width: 0; }
   }
 </style>
 
 
 
+<script src="/meta-pixel.js?v=20260826-test-events"></script>
 <script>
   (function () {
     var grid = document.getElementById('closerPricingGrid');
@@ -520,8 +619,22 @@
       grid.querySelectorAll('[data-plan-link]').forEach(function (link) {
         var url = new URL(link.getAttribute('href'), window.location.origin);
         url.searchParams.set('billing', annual ? 'annual' : 'monthly');
+        if (typeof window.aiStaffMetaTestEventCode === 'function') {
+          var testEventCode = window.aiStaffMetaTestEventCode();
+          if (testEventCode) url.searchParams.set('test_event_code', testEventCode);
+        }
         link.setAttribute('href', url.pathname + url.search + url.hash);
       });
+    }
+
+    function planValue(plan, billing) {
+      var prices = {
+        starter: { monthly: 1499, annual: 14990 },
+        essential: { monthly: 2999, annual: 29990 },
+        professional: { monthly: 4499, annual: 44990 },
+        enterprise: { monthly: 6999, annual: 69990 }
+      };
+      return prices[plan] ? prices[plan][billing] : undefined;
     }
 
     function applyBillingMode(mode) {
@@ -548,6 +661,40 @@
       if (!btn) return;
       applyBillingMode(btn.dataset.billing === 'annual' ? 'annual' : 'monthly');
     });
+
+    grid.querySelectorAll('[data-plan-link]').forEach(function (link) {
+      link.addEventListener('click', function (event) {
+        if (event.metaKey || event.ctrlKey || event.shiftKey || event.altKey || link.target === '_blank') return;
+        var url = new URL(link.getAttribute('href'), window.location.origin);
+        if (typeof window.aiStaffTrack !== 'function') return;
+        event.preventDefault();
+        var plan = url.searchParams.get('plan') || '';
+        var billing = url.searchParams.get('billing') || 'monthly';
+        var name = link.textContent.trim();
+        var value = planValue(plan, billing);
+        window.aiStaffTrack('AIStaffPricingPlanClick', {
+          source_page: 'agents_closer',
+          content_name: name,
+          content_category: 'pricing',
+          selected_plan: plan,
+          billing_frequency: billing,
+          value: value,
+          currency: 'PHP'
+        }, { custom: true });
+        window.aiStaffTrack('AIStaffPricingAddToCartIntent', {
+          source_page: 'agents_closer',
+          content_name: name,
+          content_ids: [plan],
+          content_type: 'product',
+          billing_frequency: billing,
+          value: value,
+          currency: 'PHP'
+        }, { custom: true });
+        window.setTimeout(function () {
+          window.location.href = url.pathname + url.search + url.hash;
+        }, 280);
+      });
+    });
   })();
 </script>
 <script>
@@ -572,11 +719,50 @@
   var errorEl = document.getElementById('demoError');
   var startBtn = document.getElementById('demoStartBtn');
   var priceFile = document.getElementById('demoPriceFile');
+  var uploadList = document.getElementById('demoUploadList');
+  var nextActions = document.getElementById('demoNextActions');
+  var decisionForm = document.getElementById('demoDecisionForm');
+  var decisionAction = document.getElementById('demoDecisionAction');
+  var decisionCopy = document.getElementById('demoDecisionCopy');
+  var contactFields = document.getElementById('demoContactFields');
+  var scheduleFields = document.getElementById('demoScheduleFields');
+  var feedbackFields = document.getElementById('demoFeedbackFields');
+  var decisionSubmit = document.getElementById('demoDecisionSubmit');
+  var decisionStatus = document.getElementById('demoDecisionStatus');
+  var decisionCancel = document.getElementById('demoDecisionCancel');
   if (!startForm || !chat) return;
 
   var sessionId = null;
   var history = [];
   var busy = false;
+  var queuedPriceFiles = [];
+  var hasTestedDemo = false;
+  var MIN_DEMO_TYPING_MS = 950;
+  var MAX_DEMO_TYPING_MS = 2600;
+  var demoTrackingContext = {};
+
+  function trackDemo(name, params, options) {
+    if (typeof window.aiStaffTrack !== 'function') return;
+    window.aiStaffTrack(name, Object.assign({
+      content_name: 'Closer public demo',
+      source_page: 'agents_closer'
+    }, params || {}), options || { custom: true });
+  }
+
+  function wait(ms) {
+    return new Promise(function (resolve) { window.setTimeout(resolve, ms); });
+  }
+
+  function typingTimeFor(text) {
+    var length = String(text || '').length;
+    return Math.max(MIN_DEMO_TYPING_MS, Math.min(MAX_DEMO_TYPING_MS, 650 + length * 14));
+  }
+
+  async function finishTyping(dots, startedAt, replyText) {
+    var remaining = typingTimeFor(replyText) - (Date.now() - startedAt);
+    if (remaining > 0) await wait(remaining);
+    dots.remove();
+  }
 
   function bubble(text, cls) {
     var el = document.createElement('div');
@@ -590,6 +776,7 @@
   function typing() {
     var el = document.createElement('div');
     el.className = 'demo-bubble them demo-typing';
+    el.setAttribute('aria-label', 'Closer is typing');
     el.innerHTML = '<span></span><span></span><span></span>';
     log.appendChild(el);
     log.scrollTop = log.scrollHeight;
@@ -597,55 +784,364 @@
   }
 
   function showError(message) {
+    errorEl.classList.remove('closer-demo-status', 'is-loading');
+    errorEl.style.color = '';
     errorEl.textContent = message;
     errorEl.hidden = false;
   }
 
+  function showProgress(message) {
+    errorEl.classList.add('closer-demo-status', 'is-loading');
+    errorEl.style.color = '#9fe5ff';
+    errorEl.textContent = message;
+    errorEl.hidden = false;
+  }
+
+  function showNextActions() {
+    if (!nextActions || nextActions.hidden === false) return;
+    nextActions.hidden = false;
+    if (typeof window.Motion !== 'undefined') {
+      window.Motion.animate(nextActions, { opacity: [0, 1], y: [10, 0] }, { duration: 0.24, easing: 'ease-out' });
+    }
+  }
+
+  function setDecisionMode(action) {
+    if (!decisionForm || !decisionAction || !contactFields || !feedbackFields || !decisionCopy || !decisionSubmit) return;
+    var leadTemperature = action === 'purchase_now' || action === 'book_consultation' ? 'hot' : 'cold';
+    trackDemo('AIStaffDemoDecisionClick', {
+      decision_action: action,
+      lead_temperature: leadTemperature,
+      business_name: demoTrackingContext.businessName || 'Your business'
+    }, { custom: true });
+    decisionAction.value = action;
+    decisionStatus.hidden = true;
+    decisionStatus.textContent = '';
+    decisionStatus.style.color = '#7fe6b6';
+    decisionStatus.classList.remove('is-loading');
+    decisionSubmit.disabled = false;
+    decisionForm.hidden = false;
+    document.querySelectorAll('[data-demo-action]').forEach(function (button) {
+      button.classList.toggle('is-selected', button.dataset.demoAction === action);
+    });
+
+    if (action === 'purchase_now') {
+      decisionForm.hidden = true;
+      trackDemo('AIStaffDemoPricingIntent', {
+        decision_action: action,
+        lead_temperature: 'hot',
+        business_name: demoTrackingContext.businessName || 'Your business'
+      }, { custom: true });
+      if (typeof window.aiStaffTrack === 'function') {
+        window.aiStaffTrack('ViewContent', {
+          source_page: 'agents_closer',
+          content_name: 'AIStaff Closer pricing',
+          content_category: 'pricing',
+          business_name: demoTrackingContext.businessName || 'Your business'
+        });
+      }
+      var pricingSection = document.getElementById('pricing');
+      if (pricingSection) {
+        window.history.replaceState(null, '', '#pricing');
+        pricingSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      } else {
+        location.href = '/pricing/';
+      }
+      return;
+    }
+
+    contactFields.hidden = action === 'not_yet';
+    if (scheduleFields) {
+      var wantsSchedule = action === 'book_consultation';
+      scheduleFields.hidden = !wantsSchedule;
+      scheduleFields.querySelectorAll('input').forEach(function (field) {
+        field.disabled = !wantsSchedule;
+        field.required = wantsSchedule;
+      });
+    }
+    feedbackFields.hidden = action !== 'not_yet';
+
+    if (action === 'book_consultation') {
+      decisionCopy.textContent = 'Send your details and preferred schedule. We will save the meeting, email the details, and send reminders before the call.';
+      decisionSubmit.textContent = 'Request Consultation';
+    } else {
+      decisionCopy.textContent = 'No pressure. Tell us what would help you decide so we can improve the demo.';
+      decisionSubmit.textContent = 'Send Feedback';
+    }
+  }
+
+  async function submitDecision(event) {
+    event.preventDefault();
+    if (!sessionId || !decisionForm || !decisionAction || !decisionSubmit || !decisionStatus) return;
+    var action = decisionAction.value;
+    var formData = new FormData(decisionForm);
+    var reasons = formData.getAll('reason').map(function (value) { return String(value || '').trim(); }).filter(Boolean);
+    var preferredDate = String(formData.get('preferred_date') || '').trim();
+    var preferredTime = String(formData.get('preferred_time') || '').trim();
+    var payload = {
+      sessionId: sessionId,
+      action: action,
+      name: String(formData.get('name') || '').trim(),
+      email: String(formData.get('email') || '').trim(),
+      mobile: String(formData.get('mobile') || '').trim(),
+      preferredDate: preferredDate,
+      preferredTime: preferredTime,
+      preferredSchedule: [preferredDate, preferredTime].filter(Boolean).join(' '),
+      reasons: reasons,
+      notes: String(formData.get('notes') || '').trim()
+    };
+    if (action !== 'not_yet' && (!payload.name || !payload.email || !payload.mobile)) {
+      decisionStatus.textContent = 'Please add your full name, email, and mobile number.';
+      decisionStatus.hidden = false;
+      decisionStatus.style.color = '#ffb8b8';
+      decisionStatus.classList.remove('is-loading');
+      return;
+    }
+    if (action === 'book_consultation' && (!payload.preferredDate || !payload.preferredTime)) {
+      decisionStatus.textContent = 'Please choose your preferred consultation date and time.';
+      decisionStatus.hidden = false;
+      decisionStatus.style.color = '#ffb8b8';
+      decisionStatus.classList.remove('is-loading');
+      return;
+    }
+
+    decisionSubmit.disabled = true;
+    decisionSubmit.textContent = action === 'book_consultation' ? 'Booking...' : 'Sending...';
+    decisionStatus.style.color = '#9fe5ff';
+    decisionStatus.textContent = action === 'book_consultation'
+      ? 'Saving your consultation to the calendar and sending confirmations...'
+      : 'Saving your response...';
+    decisionStatus.classList.add('is-loading');
+    decisionStatus.hidden = false;
+    try {
+      var res = await fetch('/api/public/demo/decision', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+      });
+      var json = await res.json();
+      if (!res.ok || !json.ok) throw new Error(json.error || 'Could not save your response.');
+      if (action === 'purchase_now' || action === 'book_consultation') {
+        window.aiStaffTrack && window.aiStaffTrack('Lead', {
+          content_name: action === 'purchase_now' ? 'AIStaff demo purchase intent' : 'AIStaff demo consultation request',
+          content_category: 'hot',
+          lead_type: action,
+          source_page: 'agents_closer',
+          business_name: demoTrackingContext.businessName || 'Your business'
+        });
+      } else {
+        trackDemo('AIStaffDemoFeedback', {
+          decision_action: action,
+          lead_temperature: 'cold',
+          feedback_count: reasons.length,
+          business_name: demoTrackingContext.businessName || 'Your business'
+        }, { custom: true });
+      }
+      decisionStatus.style.color = '#7fe6b6';
+      decisionStatus.classList.remove('is-loading');
+      decisionStatus.textContent = json.message || 'Saved. Thank you.';
+      decisionStatus.hidden = false;
+      decisionSubmit.disabled = true;
+    } catch (err) {
+      decisionSubmit.disabled = false;
+      decisionSubmit.textContent = action === 'not_yet'
+        ? 'Send Feedback'
+        : (action === 'book_consultation' ? 'Request Consultation' : 'Send Purchase Interest');
+      decisionStatus.style.color = '#ffb8b8';
+      decisionStatus.classList.remove('is-loading');
+      decisionStatus.textContent = err.message || 'Could not save your response.';
+      decisionStatus.hidden = false;
+    }
+  }
+
+  function formatFileSize(bytes) {
+    if (!bytes) return '0 KB';
+    if (bytes < 1024 * 1024) return Math.max(1, Math.round(bytes / 1024)) + ' KB';
+    return (bytes / (1024 * 1024)).toFixed(bytes < 10 * 1024 * 1024 ? 1 : 0) + ' MB';
+  }
+
+  function syncPriceInputFiles() {
+    if (!priceFile) return;
+    try {
+      var transfer = new DataTransfer();
+      queuedPriceFiles.forEach(function (file) { transfer.items.add(file); });
+      priceFile.files = transfer.files;
+    } catch (err) {
+      // The queued array is the source of truth if a browser will not let us
+      // write input.files. Upload still works from queuedPriceFiles.
+    }
+  }
+
+  function fileKey(file) {
+    return [file.name, file.size, file.lastModified].join(':');
+  }
+
+  function escapeHtml(value) {
+    return String(value || '').replace(/[&<>"']/g, function (ch) {
+      return ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[ch];
+    });
+  }
+
+  function addUploadFiles(files, dropped) {
+    var existing = new Set(queuedPriceFiles.map(fileKey));
+    Array.from(files || []).forEach(function (file) {
+      if (!existing.has(fileKey(file))) {
+        queuedPriceFiles.push(file);
+        existing.add(fileKey(file));
+      }
+    });
+    syncPriceInputFiles();
+    paintUploadFiles(dropped);
+  }
+
+  function paintUploadFiles(dropped) {
+    var label = document.getElementById('demoUploadLabel');
+    var wrap = label && label.closest('.demo-upload');
+    if (!label || !wrap) return;
+    label.textContent = queuedPriceFiles.length
+      ? 'Attached: ' + queuedPriceFiles.length + (queuedPriceFiles.length === 1 ? ' file/photo' : ' files/photos') + '. Add more anytime.'
+      : 'Add more files and photos so you can test how the agent answers for your real business';
+    wrap.classList.toggle('has-file', queuedPriceFiles.length > 0);
+    wrap.classList.remove('is-dragging');
+    if (dropped) {
+      wrap.classList.add('just-dropped');
+      window.setTimeout(function () { wrap.classList.remove('just-dropped'); }, 520);
+    }
+    renderUploadList();
+  }
+
+  function renderUploadList() {
+    if (!uploadList) return;
+    uploadList.hidden = queuedPriceFiles.length === 0;
+    uploadList.innerHTML = queuedPriceFiles.map(function (file, index) {
+      return [
+        '<div class="demo-upload-item">',
+          '<svg viewBox="0 0 24 24" focusable="false" aria-hidden="true"><path d="M14 2H7a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7z"/><path d="M14 2v5h5"/><path d="M9 15h6M9 18h4"/></svg>',
+          '<span class="demo-upload-file-text"><b>', escapeHtml(file.name), '</b><small>', escapeHtml(formatFileSize(file.size)), '</small></span>',
+          '<button type="button" class="demo-upload-remove" data-remove-upload="', index, '" aria-label="Remove ', escapeHtml(file.name), '">x</button>',
+        '</div>'
+      ].join('');
+    }).join('');
+  }
+
   if (priceFile) {
     priceFile.addEventListener('change', function () {
-      var file = priceFile.files && priceFile.files[0];
-      if (!file) return;
-      var label = document.getElementById('demoUploadLabel');
-      label.textContent = 'Attached: ' + file.name;
-      label.parentElement.classList.add('has-file');
+      addUploadFiles(priceFile.files || [], false);
+    });
+  }
+
+  if (uploadList) {
+    uploadList.addEventListener('click', function (event) {
+      var btn = event.target.closest('[data-remove-upload]');
+      if (!btn) return;
+      var index = Number(btn.dataset.removeUpload);
+      if (!Number.isInteger(index)) return;
+      queuedPriceFiles.splice(index, 1);
+      syncPriceInputFiles();
+      paintUploadFiles(false);
+    });
+  }
+
+  var dropZone = document.querySelector('.demo-upload');
+  if (dropZone && priceFile) {
+    ['dragenter', 'dragover'].forEach(function (eventName) {
+      dropZone.addEventListener(eventName, function (event) {
+        event.preventDefault();
+        dropZone.classList.add('is-dragging');
+      });
+    });
+    ['dragleave', 'drop'].forEach(function (eventName) {
+      dropZone.addEventListener(eventName, function (event) {
+        event.preventDefault();
+        dropZone.classList.remove('is-dragging');
+      });
+    });
+    dropZone.addEventListener('drop', function (event) {
+      var files = event.dataTransfer && event.dataTransfer.files;
+      if (!files || !files[0]) return;
+      addUploadFiles(files, true);
+    });
+    dropZone.addEventListener('keydown', function (event) {
+      if (event.key === 'Enter' || event.key === ' ') {
+        event.preventDefault();
+        priceFile.click();
+      }
     });
   }
 
   async function uploadPriceList() {
-    if (!priceFile || !priceFile.files || !priceFile.files[0]) return 0;
-    var file = priceFile.files[0];
-    startBtn.textContent = 'Reading your price list...';
+    var files = queuedPriceFiles.length ? queuedPriceFiles : Array.from((priceFile && priceFile.files) || []);
+    if (!files.length) return 0;
+    var totalLines = 0;
+    startBtn.textContent = files.length === 1 ? 'Reading your file...' : 'Reading your files...';
     try {
-      var b64 = await new Promise(function (resolve, reject) {
-        var reader = new FileReader();
-        reader.onload = function () { resolve(String(reader.result).split(',').pop()); };
-        reader.onerror = reject;
-        reader.readAsDataURL(file);
-      });
-      var res = await fetch('/api/public/demo/price-list', {
+      for (var i = 0; i < files.length; i++) {
+        var file = files[i];
+        startBtn.textContent = 'Reading file ' + (i + 1) + ' of ' + files.length + '...';
+        var b64 = await new Promise(function (resolve, reject) {
+          var reader = new FileReader();
+          reader.onload = function () { resolve(String(reader.result).split(',').pop()); };
+          reader.onerror = reject;
+          reader.readAsDataURL(file);
+        });
+        var res = await fetch('/api/public/demo/price-list', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ sessionId: sessionId, filename: file.name, mimeType: file.type || '', data: b64 })
+        });
+        var json = await res.json();
+        if (json.ok) totalLines += json.lines || 0;
+      }
+      return totalLines;
+    } catch (err) {
+      return totalLines;
+    }
+  }
+
+  async function requestOpeningGreeting() {
+    var dots = typing();
+    var typingStartedAt = Date.now();
+    try {
+      var res = await fetch('/api/public/demo/chat', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ sessionId: sessionId, filename: file.name, mimeType: file.type || '', data: b64 })
+        body: JSON.stringify({
+          sessionId: sessionId,
+          messages: [{ role: 'user', content: 'The demo chat has opened. Greet the customer now.' }]
+        })
       });
       var json = await res.json();
-      return json.ok ? (json.lines || 0) : 0;
+      if (!json.ok || !json.reply) throw new Error(json.error || 'The agent could not greet yet.');
+      await finishTyping(dots, typingStartedAt, json.reply);
+      bubble(json.reply, 'them');
+      history.push({ role: 'assistant', content: json.reply });
     } catch (err) {
-      return 0;
+      dots.remove();
+      bubble('Agent ready. Ask it anything a customer would.', 'sys');
     }
   }
 
   startForm.addEventListener('submit', async function (event) {
     event.preventDefault();
     errorEl.hidden = true;
+    errorEl.classList.remove('closer-demo-status', 'is-loading');
+    errorEl.style.color = '';
     var data = Object.fromEntries(new FormData(startForm));
     delete data.price_file;
-    if (!data.name || !data.email) return showError('Please add your name and email.');
-    if (!data.website_url) {
-      return showError('Add your website or store link so the agent has something to read.');
+    var fileReady = Boolean(queuedPriceFiles.length || (priceFile && priceFile.files && priceFile.files[0]));
+    data.has_price_file = fileReady;
+    if (!String(data.website_url || '').trim() && !String(data.product_description || '').trim() && !fileReady) {
+      return showError('Add a website, describe your offer, or upload a photo or price list.');
     }
+    trackDemo('AIStaffDemoBuildClick', {
+      has_website: Boolean(String(data.website_url || '').trim()),
+      has_description: Boolean(String(data.product_description || '').trim()),
+      has_files: fileReady,
+      file_count: queuedPriceFiles.length || ((priceFile && priceFile.files) ? priceFile.files.length : 0)
+    }, { custom: true });
 
     startBtn.disabled = true;
     startBtn.textContent = 'Reading your pages...';
+    showProgress('Building your demo agent. This can take a few seconds while we read the page and files.');
     try {
       var res = await fetch('/api/public/demo/start', {
         method: 'POST',
@@ -656,21 +1152,35 @@
       if (!res.ok || !json.ok) throw new Error(json.error || 'Could not start the demo.');
 
       sessionId = json.sessionId;
+      showProgress('Demo session created. Uploading and reading your files...');
       var priceLines = await uploadPriceList();
+      demoTrackingContext = {
+        businessName: json.businessName || 'Your business',
+        factCount: json.factCount || 0,
+        priceLines: priceLines || 0
+      };
+      trackDemo('AIStaffDemoBuilt', {
+        business_name: demoTrackingContext.businessName,
+        fact_count: demoTrackingContext.factCount,
+        price_list_lines: demoTrackingContext.priceLines,
+        demo_status: json.status || 'ready'
+      }, { custom: true });
 
       startForm.hidden = true;
       chat.hidden = false;
-      document.getElementById('demoBizName').textContent = json.businessName || data.name;
+      errorEl.hidden = true;
+      errorEl.classList.remove('closer-demo-status', 'is-loading');
+      errorEl.style.color = '';
+      document.getElementById('demoBizName').textContent = json.businessName || 'Your business';
       document.getElementById('demoAvatar').textContent =
-        (json.businessName || data.name || 'AI').trim().slice(0, 2).toUpperCase();
+        (json.businessName || 'AI').trim().slice(0, 2).toUpperCase();
 
       var learned = json.factCount + ' things about your business';
       if (priceLines) learned += ', plus ' + priceLines + ' lines from your price list';
       if (json.status === 'thin' && !priceLines) {
         bubble('The agent could not read much from those pages, so it will ask you about your business instead.', 'sys');
-      } else {
-        bubble('Agent ready. It read ' + learned + '. Ask it anything a customer would.', 'sys');
       }
+      requestOpeningGreeting();
       input.focus();
     } catch (err) {
       showError(err.message || 'Could not start the demo.');
@@ -690,6 +1200,7 @@
     bubble(text, 'me');
     history.push({ role: 'user', content: text });
     var dots = typing();
+    var typingStartedAt = Date.now();
 
     try {
       var res = await fetch('/api/public/demo/chat', {
@@ -698,10 +1209,14 @@
         body: JSON.stringify({ sessionId: sessionId, messages: history.slice(-20) })
       });
       var json = await res.json();
-      dots.remove();
       if (!json.ok) throw new Error(json.error || 'The agent could not reply.');
+      await finishTyping(dots, typingStartedAt, json.reply);
       bubble(json.reply, 'them');
       history.push({ role: 'assistant', content: json.reply });
+      if (!hasTestedDemo) {
+        hasTestedDemo = true;
+        showNextActions();
+      }
       (json.actions || []).forEach(function (a) {
         if (a.tool === 'send_sms' && a.result && a.result.sent) {
           bubble('Text sent to ' + a.result.to, 'sys');
@@ -723,11 +1238,46 @@
     chat.hidden = true;
     startForm.hidden = false;
     startForm.reset();
+    queuedPriceFiles = [];
+    hasTestedDemo = false;
+    demoTrackingContext = {};
+    if (nextActions) nextActions.hidden = true;
+    if (decisionForm) {
+      decisionForm.hidden = true;
+      decisionForm.reset();
+    }
+    document.querySelectorAll('[data-demo-action]').forEach(function (button) {
+      button.classList.remove('is-selected');
+    });
+    if (decisionStatus) {
+      decisionStatus.hidden = true;
+      decisionStatus.textContent = '';
+      decisionStatus.style.color = '#7fe6b6';
+      decisionStatus.classList.remove('is-loading');
+    }
+    if (decisionSubmit) decisionSubmit.disabled = false;
     var label = document.getElementById('demoUploadLabel');
     if (label) {
-      label.textContent = 'Upload your price list - photo, PDF, Excel or Word (optional, but it makes the agent far more accurate)';
-      label.parentElement.classList.remove('has-file');
+      label.textContent = 'Add more files and photos so you can test how the agent answers for your real business';
+      label.parentElement.classList.remove('has-file', 'is-dragging', 'just-dropped');
     }
+    renderUploadList();
+  });
+
+  document.querySelectorAll('[data-demo-action]').forEach(function (button) {
+    button.addEventListener('click', function () {
+      setDecisionMode(button.dataset.demoAction);
+    });
+  });
+  decisionForm?.addEventListener('submit', submitDecision);
+  decisionCancel?.addEventListener('click', function () {
+    if (decisionForm) {
+      decisionForm.hidden = true;
+      decisionForm.reset();
+    }
+    document.querySelectorAll('[data-demo-action]').forEach(function (button) {
+      button.classList.remove('is-selected');
+    });
   });
 })();
 </script>

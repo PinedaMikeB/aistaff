@@ -82,7 +82,7 @@ async function main() {
     {
       category: "Pricing",
       question: "What are the managed setup packages?",
-      answer: "Starter: PHP 15,000 setup + PHP 3,000/month — instant AI replies, lead capture, qualification questions, quotation drafts with admin approval. Growth: PHP 25,000 setup + PHP 6,000/month — everything in Starter plus higher inquiry volume capacity, more customized qualification questions, and managed onboarding support. Pro: PHP 50,000 setup + PHP 12,000/month — everything in Growth plus highest inquiry volume capacity, full managed onboarding and tuning, and priority onboarding support.",
+      answer: "Lead with Starter first: ₱1,499/month, Facebook Messenger, 100 inquiries/conversations per month, 1 Facebook Page, 1 staff login, no setup fee, onboarding assistance and ongoing support. Emphasize benefits before higher tiers: instant 24/7 replies from approved knowledge, customer-language matching, lead capture, qualification questions, quotation drafts for approval, unanswered-question tracking, and fewer missed inquiries. Do not mention annual pricing, annual savings, yearly billing, or all packages in the first pricing reply unless the customer asks to compare or needs a higher-capacity/channel plan.",
       tags: ["pricing"]
     },
     {

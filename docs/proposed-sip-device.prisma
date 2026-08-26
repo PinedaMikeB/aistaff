@@ -1,0 +1,74 @@
+// PROPOSED — append to prisma/schema.prisma, then:
+//   npx prisma migrate dev --name add_sip_device
+//
+// Reviewed by Mike before applying. Nothing here touches existing models
+// except adding one back-relation to Company.
+
+/// One physical AIO100 (or, later, one SIP trunk) belonging to a tenant.
+///
+/// This is OUR source of truth. Asterisk's own PJSIP realtime tables
+/// (ps_endpoints / ps_auths / ps_aors) are written from this row by the
+/// provisioning service — never edited by hand, and never used to store
+/// business data, because Asterisk migrates its own schema on upgrade.
+///
+/// Identity is `auth_username`, not the SIM and not the serial:
+///   - SIMs change on carrier switch, damage or replacement
+///   - serials die with an RMA
+///   - source IPs change whenever the client's ISP feels like it
+/// The credential is the one key we issue and control, and it survives a
+/// client moving from a gateway to a SIP trunk without any migration.
+model SipDevice {
+  id            String   @id @default(uuid())
+  company_id    String
+
+  /// The SIP identity. Issued by us, opaque, no PII. Format: t{short}-{seq}.
+  /// This is what Asterisk authenticates and what resolves the tenant on an
+  /// inbound call, so it is the real primary key of the whole design.
+  auth_username String   @unique
+  /// Stored so the provisioning sheet can be reprinted and the Asterisk row
+  /// rebuilt. Rotatable; rotation rewrites ps_auths and forces re-register.
+  auth_password String
+
+  /// Hardware facts. Nullable because a SIP-trunk tenant has no box.
+  /// Serial is on the AIO100 status page (e.g. DD18-0515-5004-1296) and is
+  /// what support asks for over the phone.
+  device_serial String?  @unique
+  sim_number    String?
+  carrier       String?
+
+  /// What the client calls this line — "Main store", "Cebu branch". Shown in
+  /// their workspace, not to callers.
+  label         String?
+
+  /// provisioned | shipped | active | suspended | returned
+  /// Suspended is deliberate: non-payment must kill the line without
+  /// destroying the row and its call history.
+  status        String   @default("provisioned")
+
+  /// Concurrency cap for THIS device, enforced server-side. One box is one
+  /// line, but a trunk tenant may buy more, and the plan must be enforced
+  /// where it cannot be edited by the customer.
+  max_channels  Int      @default(1)
+
+  /// Registration health. Written by the Asterisk event hook, read by
+  /// monitoring. A line that silently stops registering is the worst failure
+  /// mode we have — it went unnoticed for two weeks once.
+  last_seen_at    DateTime?
+  last_register_ip String?
+  registered      Boolean  @default(false)
+
+  shipped_at    DateTime?
+  activated_at  DateTime?
+  created_at    DateTime @default(now())
+  updated_at    DateTime @updatedAt
+
+  company       Company  @relation(fields: [company_id], references: [id], onDelete: Cascade)
+
+  @@index([company_id, status])
+  @@index([registered, last_seen_at])
+  @@map("sip_device")
+}
+
+// And inside model Company, add the back-relation:
+//
+//   sip_devices        SipDevice[]

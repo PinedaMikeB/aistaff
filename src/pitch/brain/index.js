@@ -2,6 +2,7 @@
 
 const { OpenAiRealtimeBrain } = require("./openai-realtime");
 const { GeminiLiveBrain } = require("./gemini-live");
+const { LocalPipelineBrain } = require("./local-pipeline");
 const { config } = require("../config");
 
 /**
@@ -42,6 +43,16 @@ function createBrain({ callerId, tools } = {}) {
         model: config.gemini.liveModel,
         voice: config.gemini.voice,
         ...shared,
+      });
+
+    case "local":
+    case "local-pipeline":
+      return new LocalPipelineBrain({
+        geminiApiKey: config.gemini.apiKey,
+        localConfig: config.localPipeline,
+        businessName: shared.businessName,
+        agentName: shared.agentName,
+        callerId: shared.callerId,
       });
 
     default:

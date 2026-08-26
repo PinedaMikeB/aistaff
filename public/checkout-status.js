@@ -4,6 +4,33 @@ const orderNumber = params.get("order") || localStorage.getItem("aistaff_last_or
 const pesoStatus = (value) => new Intl.NumberFormat("en-PH", { style: "currency", currency: "PHP" }).format(Number(value || 0));
 const safeStatus = (value) => String(value || "").replace(/[&<>"']/g, (char) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[char]));
 
+function trackOrderStatus(order, plan, paid, pending, failed) {
+  if (typeof window.aiStaffTrack !== "function" || !order?.order_number) return;
+  const base = {
+    source_page: "checkout_status",
+    order_id: order.order_number,
+    content_name: plan?.item_name || "AIStaff subscription",
+    content_ids: [plan?.item_slug || plan?.item_name || order.order_number],
+    content_type: "product",
+    value: Number(order.total || 0),
+    currency: "PHP",
+    billing_frequency: order.billing_frequency || "",
+    payment_method: order.payment_provider || ""
+  };
+  if (paid) {
+    const purchaseKey = "aistaff_pixel_purchase_" + order.order_number;
+    if (localStorage.getItem(purchaseKey)) return;
+    window.aiStaffTrack("Purchase", base);
+    localStorage.setItem(purchaseKey, "1");
+    return;
+  }
+  const statusName = failed ? "AIStaffCheckoutFailed" : (pending ? "AIStaffCheckoutPending" : "AIStaffCheckoutViewed");
+  const statusKey = "aistaff_pixel_status_" + statusName + "_" + order.order_number;
+  if (localStorage.getItem(statusKey)) return;
+  window.aiStaffTrack(statusName, { ...base, checkout_status: order.payment_status || "" }, { custom: true });
+  localStorage.setItem(statusKey, "1");
+}
+
 async function loadOrder() {
   if (!orderNumber) {
     out.innerHTML = `<div class="status-card"><h1>Order Not Found</h1><p>No order number was provided.</p><a class="button button-primary" href="/pricing/">Return to Pricing</a></div>`;
@@ -26,6 +53,17 @@ async function loadOrder() {
   if (nextBilling) {
     order.billing_frequency === "annual" ? nextBilling.setFullYear(nextBilling.getFullYear() + 1) : nextBilling.setMonth(nextBilling.getMonth() + 1);
   }
+  const canResumeCheckout = pending && !manualTransfer && order.external_checkout_url;
+  const statusActions = [
+    paid ? `<a class="button button-primary" href="/admin/onboarding">Continue to Onboarding</a>` : "",
+    canResumeCheckout ? `<a class="button button-primary" data-resume-checkout href="${safeStatus(order.external_checkout_url)}">Continue QRPh Payment</a>` : "",
+    `<a class="button button-soft" href="/checkout/pending/?order=${encodeURIComponent(order.order_number)}">View Order</a>`,
+    `<a class="button button-soft" href="${safeStatus(invoice.invoice_url || "#")}">Download Invoice</a>`,
+    `<a class="button button-soft" href="/admin/dashboard">Go to Dashboard</a>`,
+    failed ? `<a class="button button-primary" href="/pricing/#cart">Retry QRPh payment</a><a class="button button-soft" href="/pricing/#packages">Choose another plan</a>` : "",
+    pending ? `<button id="refreshStatus" class="button button-soft" type="button">Refresh payment status</button><a class="button button-soft" href="/support/">Contact support</a>` : ""
+  ].filter(Boolean).join("");
+  trackOrderStatus(order, plan, paid, pending, failed);
   out.innerHTML = `
     <div class="status-card ${paid ? "paid" : failed ? "failed" : "pending"}">
       <p class="eyebrow">${safeStatus(order.payment_provider || "checkout")}</p>
@@ -56,15 +94,27 @@ async function loadOrder() {
         <p class="success-message" hidden>Payment proof submitted. Awaiting Payment Verification.</p>
       </form>` : ""}
       <div class="status-actions">
-        <a class="button button-primary" href="/admin/onboarding">Continue to Onboarding</a>
-        <a class="button button-soft" href="/checkout/pending/?order=${encodeURIComponent(order.order_number)}">View Order</a>
-        <a class="button button-soft" href="${safeStatus(invoice.invoice_url || "#")}">Download Invoice</a>
-        <a class="button button-soft" href="/admin/dashboard">Go to Dashboard</a>
-        ${failed ? `<a class="button button-primary" href="/pricing/#cart">Retry QRPh payment</a><a class="button button-soft" href="/pricing/#packages">Choose another plan</a>` : ""}
-        ${pending ? `<button id="refreshStatus" class="button button-soft" type="button">Refresh payment status</button><a class="button button-soft" href="/support/">Contact support</a>` : ""}
+        ${statusActions}
       </div>
     </div>
   `;
+  const resumeCheckout = document.querySelector("[data-resume-checkout]");
+  if (resumeCheckout) {
+    resumeCheckout.addEventListener("click", () => {
+      if (typeof window.aiStaffTrack !== "function") return;
+      window.aiStaffTrack("AIStaffQRPhCheckoutResume", {
+        source_page: "checkout_status",
+        order_id: order.order_number,
+        content_name: plan?.item_name || "AIStaff subscription",
+        content_ids: [plan?.item_slug || plan?.item_name || order.order_number],
+        content_type: "product",
+        value: Number(order.total || 0),
+        currency: "PHP",
+        billing_frequency: order.billing_frequency || "",
+        payment_method: order.payment_provider || ""
+      }, { custom: true });
+    });
+  }
   const refresh = document.querySelector("#refreshStatus");
   if (refresh) refresh.onclick = () => location.reload();
   const proofForm = document.querySelector("#proofForm");

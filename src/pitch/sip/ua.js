@@ -81,6 +81,24 @@ class SipUa extends EventEmitter {
   }
 
   register() {
+    return this._doRegister(this.cfg.registerExpires);
+  }
+
+  /**
+   * Tell the gateway to drop our binding (REGISTER with expires 0).
+   *
+   * Without this, every restart leaves the AIO100 holding a contact that
+   * points at a dead socket. It then delivers INVITEs there and the caller
+   * hears one ring and a busy tone until the binding times out. Restarting
+   * often — as happens while tuning — stacks several dead contacts up.
+   */
+  unregister() {
+    clearTimeout(this.registerTimer);
+    this.registered = false;
+    return this._doRegister(0);
+  }
+
+  _doRegister(expires) {
     const callId = this.callId || (this.callId = `pitch-reg-${crypto.randomBytes(8).toString("hex")}`);
     const send = (authHeaders) => {
       this.cseq += 1;
@@ -93,7 +111,7 @@ class SipUa extends EventEmitter {
           "call-id": callId,
           cseq: { method: "REGISTER", seq: this.cseq },
           contact: [{ uri: `sip:${this.cfg.username}@${this.cfg.localHost}:${this.cfg.localPort}` }],
-          expires: this.cfg.registerExpires,
+          expires,
           ...authHeaders,
         },
       };
@@ -130,6 +148,13 @@ class SipUa extends EventEmitter {
         }
 
         if (res.status >= 200 && res.status < 300) {
+          // expires 0 is a de-registration — nothing to refresh, and marking
+          // ourselves registered would be a lie.
+          if (expires === 0) {
+            this.registered = false;
+            this.emit("unregistered");
+            return;
+          }
           const wasRegistered = this.registered;
           this.registered = true;
           if (!wasRegistered) this.emit("registered");
@@ -138,6 +163,7 @@ class SipUa extends EventEmitter {
           this.registerTimer = setTimeout(() => this.register(), refresh);
         } else {
           this.registered = false;
+          if (expires === 0) return;   // failing to de-register is not retryable
           this.emit("register_failed", res.status, res.reason);
           clearTimeout(this.registerTimer);
           this.registerTimer = setTimeout(() => this.register(), 15000);

@@ -1,7 +1,8 @@
 const state = {
   user: null,
   company: null,
-  currentRoute: "public"
+  currentRoute: "public",
+  bookingCalendarMonth: null
 };
 
 const navItems = [
@@ -983,6 +984,7 @@ const BOOKING_FIELD_LIBRARY = [
   { key: "preferred_date", label: "Preferred date", type: "date" },
   { key: "preferred_time", label: "Preferred time", type: "time" },
   { key: "preferred_meeting_channel", label: "Preferred meeting channel", type: "text" },
+  { key: "meeting_link", label: "Meeting link", type: "url" },
   { key: "onboarding_topic", label: "Onboarding/setup topic", type: "text" },
   { key: "branch_location", label: "Branch / location", type: "text" },
   { key: "party_size", label: "Party size", type: "number" },
@@ -1012,7 +1014,7 @@ const BOOKING_PRESETS = {
   },
   ai_service_onboarding: {
     label: "AI service / onboarding meeting",
-    fields: ["name", "mobile", "email", "company_name", "website", "purpose", "onboarding_topic", "preferred_date", "preferred_time", "preferred_meeting_channel", "notes_remarks"]
+    fields: ["name", "mobile", "email", "preferred_date", "preferred_time"]
   },
   spa_salon: {
     label: "Spa / salon",
@@ -1114,12 +1116,32 @@ function bookingDayKey(value) {
   return date.toLocaleDateString("en-CA");
 }
 
+function monthKey(value) {
+  const date = new Date(value);
+  return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}`;
+}
+
+function monthStartFromKey(key) {
+  const [year, month] = String(key || "").split("-").map(Number);
+  if (!year || !month) {
+    const now = new Date();
+    return new Date(now.getFullYear(), now.getMonth(), 1);
+  }
+  return new Date(year, month - 1, 1);
+}
+
+function formatBookingTime(value) {
+  return new Date(value).toLocaleTimeString("en-PH", { hour: "numeric", minute: "2-digit" });
+}
+
 function renderBookingCalendar(bookings) {
   const today = new Date();
-  const start = new Date(today.getFullYear(), today.getMonth(), today.getDate());
-  const days = Array.from({ length: 35 }, (_, index) => {
-    const date = new Date(start);
-    date.setDate(start.getDate() + index);
+  const currentMonth = monthStartFromKey(state.bookingCalendarMonth || monthKey(today));
+  const calendarStart = new Date(currentMonth);
+  calendarStart.setDate(currentMonth.getDate() - currentMonth.getDay());
+  const days = Array.from({ length: 42 }, (_, index) => {
+    const date = new Date(calendarStart);
+    date.setDate(calendarStart.getDate() + index);
     return date;
   });
   const grouped = bookings.reduce((acc, booking) => {
@@ -1129,20 +1151,89 @@ function renderBookingCalendar(bookings) {
     return acc;
   }, {});
 
-  return `<div class="booking-calendar">
+  const monthTitle = currentMonth.toLocaleDateString("en-PH", { month: "long", year: "numeric" });
+
+  return `<div class="booking-calendar-shell">
+    <div class="booking-calendar-toolbar">
+      <div>
+        <h2>${escapeHtml(monthTitle)}</h2>
+        <p class="muted">Click any booking to view customer, contact, meeting link, and notes.</p>
+      </div>
+      <div class="booking-calendar-nav" aria-label="Calendar navigation">
+        <button class="button button-soft" type="button" data-booking-month-nav="-1" aria-label="Previous month">&lsaquo;</button>
+        <button class="button button-soft" type="button" data-booking-month-today>Today</button>
+        <button class="button button-soft" type="button" data-booking-month-nav="1" aria-label="Next month">&rsaquo;</button>
+      </div>
+    </div>
+    <div class="booking-calendar-weekdays" aria-hidden="true">
+      ${["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"].map((day) => `<span>${day}</span>`).join("")}
+    </div>
+    <div class="booking-calendar">
     ${days.map((date) => {
       const key = bookingDayKey(date);
-      const items = grouped[key] || [];
-      return `<article class="booking-day ${key === bookingDayKey(today) ? "is-today" : ""}">
+      const items = [...(grouped[key] || [])].sort((a, b) => new Date(a.start_at) - new Date(b.start_at));
+      const dayClass = [
+        "booking-day",
+        key === bookingDayKey(today) ? "is-today" : "",
+        date.getMonth() !== currentMonth.getMonth() ? "is-outside-month" : ""
+      ].filter(Boolean).join(" ");
+      return `<article class="${dayClass}">
         <header><b>${date.toLocaleDateString("en-PH", { weekday: "short" })}</b><span>${date.getDate()}</span></header>
-        ${items.slice(0, 3).map((booking) => `<div class="booking-chip ${booking.status}">
-          <time>${new Date(booking.start_at).toLocaleTimeString("en-PH", { hour: "numeric", minute: "2-digit" })}</time>
+        ${items.slice(0, 3).map((booking) => `<button class="booking-chip ${booking.status}" type="button" data-booking-detail="${escapeHtml(booking.id)}" aria-label="View ${escapeHtml(booking.service_name)} booking at ${formatBookingTime(booking.start_at)}">
+          <time>${formatBookingTime(booking.start_at)}</time>
           <span>${escapeHtml(booking.service_name)}</span>
-        </div>`).join("")}
+        </button>`).join("")}
         ${items.length > 3 ? `<small>+${items.length - 3} more</small>` : ""}
       </article>`;
     }).join("")}
+    </div>
   </div>`;
+}
+
+function showBookingDetails(booking) {
+  if (!booking) return;
+  const values = booking.field_values && typeof booking.field_values === "object" ? booking.field_values : {};
+  const detailRows = Object.entries(values)
+    .filter(([, value]) => value !== undefined && value !== null && String(value).trim())
+    .map(([key, value]) => `<div><dt>${escapeHtml(BOOKING_FIELD_BY_KEY[key]?.label || key.replace(/_/g, " "))}</dt><dd>${escapeHtml(value)}</dd></div>`)
+    .join("");
+  const contact = [booking.mobile_number, booking.email].filter(Boolean).join(" · ") || "—";
+  const meetingLink = values.meeting_link || "";
+  const wrap = document.createElement("div");
+  wrap.className = "intake-modal-backdrop";
+  wrap.innerHTML = `
+    <div class="intake-modal booking-detail-modal">
+      <div class="booking-detail-header">
+        <div>
+          <p class="settings-group">Booking details</p>
+          <h3>${escapeHtml(booking.service_name)}</h3>
+        </div>
+        ${statusPill(booking.status)}
+      </div>
+      <dl class="booking-detail-list">
+        <div><dt>Schedule</dt><dd>${fmtDate(booking.start_at)} to ${formatBookingTime(booking.end_at)}</dd></div>
+        <div><dt>Customer</dt><dd>${escapeHtml(booking.customer_name || "—")}</dd></div>
+        <div><dt>Contact</dt><dd>${escapeHtml(contact)}</dd></div>
+        ${booking.source ? `<div><dt>Source</dt><dd>${escapeHtml(booking.source.replace(/_/g, " "))}</dd></div>` : ""}
+        ${detailRows}
+        ${booking.notes ? `<div class="full"><dt>Notes</dt><dd>${escapeHtml(booking.notes)}</dd></div>` : ""}
+      </dl>
+      <div class="intake-modal-actions">
+        ${meetingLink ? `<a class="button button-green" href="${escapeHtml(meetingLink)}" target="_blank" rel="noopener">Open meeting link</a>` : ""}
+        <button class="button button-soft" id="bookingDetailClose" type="button">Close</button>
+      </div>
+    </div>`;
+  document.body.appendChild(wrap);
+  const close = () => {
+    wrap.remove();
+    window.removeEventListener("keydown", handleEscape);
+  };
+  function handleEscape(event) {
+    if (event.key === "Escape") close();
+  }
+  wrap.querySelector("#bookingDetailClose").onclick = close;
+  wrap.onclick = (event) => { if (event.target === wrap) close(); };
+  window.addEventListener("keydown", handleEscape);
 }
 
 async function bookingsView() {
@@ -1263,7 +1354,7 @@ async function bookingsView() {
       </div>
 
       <section class="panel">
-        <div class="panel-header"><h2>Next 35 days</h2><span>${data.setting.enabled ? "Active" : "Inactive until enabled"}</span></div>
+        <div class="panel-header"><h2>Calendar</h2><span>${data.setting.enabled ? "Active" : "Inactive until enabled"}</span></div>
         ${renderBookingCalendar(data.bookings)}
       </section>
 
@@ -1382,6 +1473,27 @@ async function bookingsView() {
       bookingsView();
     };
   });
+
+  document.querySelectorAll("[data-booking-month-nav]").forEach((button) => {
+    button.onclick = () => {
+      const base = monthStartFromKey(state.bookingCalendarMonth || monthKey(new Date()));
+      base.setMonth(base.getMonth() + Number(button.dataset.bookingMonthNav || 0));
+      state.bookingCalendarMonth = monthKey(base);
+      bookingsView();
+    };
+  });
+
+  $("[data-booking-month-today]")?.addEventListener("click", () => {
+    state.bookingCalendarMonth = monthKey(new Date());
+    bookingsView();
+  });
+
+  document.querySelectorAll("[data-booking-detail]").forEach((button) => {
+    button.onclick = () => {
+      const booking = data.bookings.find((item) => String(item.id) === String(button.dataset.bookingDetail));
+      showBookingDetails(booking);
+    };
+  });
 }
 
 async function quotationDetailView(id) {
@@ -1452,6 +1564,11 @@ async function aiStudioView() {
 
   $("#adminContent").innerHTML = `
     <div class="settings-stack">
+      <div class="panel" style="padding:0;display:flex;gap:0;overflow:hidden">
+        <button class="button button-primary" id="tabCloser" style="flex:1;border-radius:0;margin:0">Closer</button>
+        <button class="button button-soft" id="tabDemoPage" style="flex:1;border-radius:0;margin:0">Demo Page</button>
+        <button class="button button-soft" id="tabPitch" style="flex:1;border-radius:0;margin:0">Pitch (voice)</button>
+      </div>
       <section class="panel">
         <div class="panel-header">
           <h2>Closer instructions${active ? ` — v${active.version} live` : ""}</h2>
@@ -1492,7 +1609,7 @@ async function aiStudioView() {
         <p class="muted settings-lede">Which model runs each function. Prices are USD per million tokens and change as you choose — Closer sends a large prompt and a short reply, so <b>input price is what matters</b>.</p>
         <div class="table-wrap"><table>
           <thead><tr><th>Function</th><th>Model</th><th>Input / Output</th><th>Est. per 1,000 replies</th></tr></thead>
-          <tbody>${models.settings.map((s) => `
+          <tbody>${models.settings.filter((s) => s.fn !== "demo_agent").map((s) => `
             <tr>
               <td><b>${escapeHtml(s.label)}</b><br /><span class="muted">${escapeHtml(s.detail)}</span></td>
               <td>
@@ -1531,6 +1648,10 @@ async function aiStudioView() {
     const usd = (EST_IN / 1e6) * (c.inCents / 100) * 1000 + (EST_OUT / 1e6) * (c.outCents / 100) * 1000;
     estCell.innerHTML = `$${usd.toFixed(2)} <span class="muted">≈ ₱${Math.round(usd * 58).toLocaleString()}</span>`;
   };
+
+  $("#tabPitch").onclick = () => pitchStudioView();
+  $("#tabCloser").onclick = () => aiStudioView();
+  $("#tabDemoPage").onclick = () => demoPageStudioView();
 
   document.querySelectorAll("[data-model-fn]").forEach((select) => {
     select.dataset.current = select.value;
@@ -1581,6 +1702,157 @@ async function aiStudioView() {
       await api("/api/prompts/closer/activate", { method: "POST", body: { version } });
       toast(`v${version} is live again`);
       aiStudioView();
+    };
+  });
+}
+
+async function demoPageStudioView() {
+  setTitle("AI Studio");
+  const data = await api("/api/prompts/demo-page");
+  const active = data.active;
+  const models = await api("/api/models");
+  const demoSetting = models.settings.find((s) => s.fn === "demo_agent") || {
+    fn: "demo_agent",
+    label: "Demo agent",
+    detail: "The public demo page conversation.",
+    provider: "gemini",
+    model: "gemini-3.5-flash-lite"
+  };
+
+  $("#adminContent").innerHTML = `
+    <div class="settings-stack">
+      <div class="panel" style="padding:0;display:flex;gap:0;overflow:hidden">
+        <button class="button button-soft" id="tabCloser" style="flex:1;border-radius:0;margin:0">Closer</button>
+        <button class="button button-primary" id="tabDemoPage" style="flex:1;border-radius:0;margin:0">Demo Page</button>
+        <button class="button button-soft" id="tabPitch" style="flex:1;border-radius:0;margin:0">Pitch (voice)</button>
+      </div>
+      <section class="panel">
+        <div class="panel-header">
+          <h2>Demo Page instructions${active ? ` — v${active.version} live` : ""}</h2>
+          <span class="muted">${active ? `saved ${new Date(active.created_at).toLocaleString()} by ${escapeHtml(active.created_by || "seed")}` : ""}</span>
+        </div>
+        <p class="muted settings-lede">These govern the public demo on the Closer landing page. The demo should act as the prospect's own business assistant, using the website, product description, and uploaded files they provide. Saving creates a new version; rollback is immediate.</p>
+        <form id="demoPromptForm" class="form-grid">
+          <label class="full">Instructions
+            <textarea name="content" rows="18" spellcheck="false">${escapeHtml(active ? active.content : "")}</textarea>
+          </label>
+          <label class="full">What changed? (shown in the history below)
+            <input type="text" name="note" maxlength="300" placeholder="e.g. Told the demo to ask one sales question when details are missing" />
+          </label>
+          <button class="button button-primary" type="submit">Save as new version</button>
+        </form>
+      </section>
+
+      <section class="panel">
+        <h2>Demo Page model</h2>
+        <p class="muted settings-lede">This model answers customers who try the public demo. It is separate from the real Closer model used for tenant Messenger conversations.</p>
+        <div class="table-wrap"><table>
+          <thead><tr><th>Function</th><th>Model</th><th>Input / Output</th><th>Est. per 1,000 demo replies</th></tr></thead>
+          <tbody><tr>
+            <td><b>${escapeHtml(demoSetting.label)}</b><br /><span class="muted">${escapeHtml(demoSetting.detail)}</span></td>
+            <td>
+              <select data-demo-model-fn="${demoSetting.fn}">
+                ${models.catalogue.map((c) => `<option value="${c.provider}|${c.model}" ${c.provider === demoSetting.provider && c.model === demoSetting.model ? "selected" : ""}>${escapeHtml(c.label)}</option>`).join("")}
+              </select>
+            </td>
+            <td class="model-price" data-demo-price-for="${demoSetting.fn}">—</td>
+            <td class="model-est" data-demo-est-for="${demoSetting.fn}">—</td>
+          </tr></tbody>
+        </table></div>
+      </section>
+
+      <section class="panel">
+        <h2>Version history (${data.revisions.length})</h2>
+        <p class="muted settings-lede">Every demo prompt version that has run. Roll back to put an earlier one live immediately.</p>
+        <div class="table-wrap"><table>
+          <thead><tr><th>Version</th><th>Saved</th><th>By</th><th>What changed</th><th>Actions</th></tr></thead>
+          <tbody>${data.revisions.map((r) => `<tr>
+            <td>${r.is_active ? `<b>v${r.version}</b> <span class="prompt-live">LIVE</span>` : `v${r.version}`}</td>
+            <td>${new Date(r.created_at).toLocaleString()}</td>
+            <td class="muted">${escapeHtml(r.created_by || "seed")}</td>
+            <td>${escapeHtml(r.note || "—")}</td>
+            <td class="intake-kb-actions">
+              <button type="button" class="intake-link" data-view-demo-prompt="${r.version}">View</button>
+              ${r.is_active ? "" : `<button type="button" class="intake-link" data-demo-rollback="${r.version}">Roll back</button>`}
+            </td>
+          </tr>`).join("")}</tbody>
+        </table></div>
+      </section>
+    </div>`;
+
+  const EST_IN = 6000;
+  const EST_OUT = 240;
+  const priceFor = (value) => {
+    const [, model] = String(value).split("|");
+    return models.catalogue.find((c) => c.model === model) || null;
+  };
+  const paintDemoPrice = (fn, value) => {
+    const c = priceFor(value);
+    const priceCell = document.querySelector(`[data-demo-price-for="${fn}"]`);
+    const estCell = document.querySelector(`[data-demo-est-for="${fn}"]`);
+    if (!priceCell || !estCell) return;
+    if (!c || c.inCents == null) {
+      priceCell.textContent = "price not published";
+      estCell.textContent = "—";
+      return;
+    }
+    priceCell.textContent = `$${(c.inCents / 100).toFixed(2)} / $${(c.outCents / 100).toFixed(2)}`;
+    const usd = (EST_IN / 1e6) * (c.inCents / 100) * 1000 + (EST_OUT / 1e6) * (c.outCents / 100) * 1000;
+    estCell.innerHTML = `$${usd.toFixed(2)} <span class="muted">≈ ₱${Math.round(usd * 58).toLocaleString()}</span>`;
+  };
+
+  $("#tabCloser").onclick = () => aiStudioView();
+  $("#tabDemoPage").onclick = () => demoPageStudioView();
+  $("#tabPitch").onclick = () => pitchStudioView();
+
+  document.querySelectorAll("[data-demo-model-fn]").forEach((select) => {
+    select.dataset.current = select.value;
+    paintDemoPrice(select.dataset.demoModelFn, select.value);
+    select.onchange = async () => {
+      const [provider, model] = select.value.split("|");
+      const previous = select.dataset.current || "";
+      try {
+        await api("/api/models", { method: "POST", body: { fn: select.dataset.demoModelFn, provider, model } });
+        select.dataset.current = select.value;
+        paintDemoPrice(select.dataset.demoModelFn, select.value);
+        toast(`${select.dataset.demoModelFn} now uses ${model}`);
+      } catch (error) {
+        if (previous) select.value = previous;
+        paintDemoPrice(select.dataset.demoModelFn, select.value);
+        toast(error.message);
+      }
+    };
+  });
+
+  $("#demoPromptForm").onsubmit = async (event) => {
+    event.preventDefault();
+    const form = new FormData(event.currentTarget);
+    try {
+      const result = await api("/api/prompts/demo-page", {
+        method: "POST",
+        body: { content: form.get("content"), note: form.get("note") || null }
+      });
+      toast(`Saved demo prompt as v${result.version}`);
+      demoPageStudioView();
+    } catch (error) {
+      toast(error.message);
+    }
+  };
+
+  document.querySelectorAll("[data-view-demo-prompt]").forEach((btn) => {
+    btn.onclick = () => {
+      const rev = data.revisions.find((r) => String(r.version) === btn.dataset.viewDemoPrompt);
+      if (rev) showPromptRevision(rev);
+    };
+  });
+
+  document.querySelectorAll("[data-demo-rollback]").forEach((btn) => {
+    btn.onclick = async () => {
+      const version = Number(btn.dataset.demoRollback);
+      if (!window.confirm(`Roll the demo page prompt back to v${version}? It becomes live immediately.`)) return;
+      await api("/api/prompts/demo-page/activate", { method: "POST", body: { version } });
+      toast(`Demo page v${version} is live again`);
+      demoPageStudioView();
     };
   });
 }
@@ -2326,3 +2598,372 @@ window.addEventListener("popstate", routeHandler);
 window.addEventListener("hashchange", routeHandler);
 loadPublicConfig();
 loadSession().finally(routeHandler);
+
+
+// ---------------------------------------------------------------------------
+// Pitch (voice agent) settings — pipeline switch, Piper voice picker, preview.
+// ---------------------------------------------------------------------------
+async function pitchStudioView() {
+  setTitle("AI Studio — Pitch");
+  const state = await api("/api/pitch-admin/");
+  const cfg = state.config;
+  const prompt = await api(`/api/pitch-admin/prompt?pipeline=${cfg.pipeline}`);
+  const svc = state.services;
+
+  const dot = (ok) => `<span style="color:${ok ? "#3ecf8e" : "#e05252"}">●</span>`;
+  const langOpts = state.languages.map((l) =>
+    `<option value="${l.code}"${l.code === "en_US" ? " selected" : ""}>${escapeHtml(l.name)} — ${l.code} (${l.voices})</option>`).join("");
+  const whisperOpts = state.whisperModels.map((m) =>
+    `<option value="${m.name}"${m.name === cfg.local.whisperModel ? " selected" : ""}>${m.name} (${m.sizeMB} MB)</option>`).join("");
+
+  const PIPE_LABEL = { "gemini-live": "Gemini Live", local: "Local (Piper)" };
+  const drifted = state.runningPipeline && state.runningPipeline !== cfg.pipeline;
+  const driftBanner = drifted ? `
+      <section class="panel" style="border-left:4px solid #e0a33e;background:#fffaf0">
+        <b>Saved settings are not live yet.</b>
+        <p class="muted" style="margin:6px 0 0">
+          You saved <b>${PIPE_LABEL[cfg.pipeline]}</b>, but calls are currently answered by
+          <b>${PIPE_LABEL[state.runningPipeline]}</b>. Pitch reads its pipeline once at startup —
+          use <b>Save &amp; restart voice stack</b> at the bottom to apply.
+        </p>
+      </section>` : "";
+
+  $("#adminContent").innerHTML = `
+    <div class="settings-stack">
+      <div class="panel" style="padding:0;display:flex;gap:0;overflow:hidden">
+        <button class="button button-soft" id="tabCloser" style="flex:1;border-radius:0;margin:0">Closer</button>
+        <button class="button button-primary" id="tabPitch" style="flex:1;border-radius:0;margin:0">Pitch (voice)</button>
+      </div>
+      ${driftBanner}
+
+      <section class="panel">
+        <div class="panel-header">
+          <h2>Service status</h2>
+          <button class="button button-soft" id="pitchRefresh">Refresh</button>
+        </div>
+        <p class="muted">
+          ${dot(!!svc.pitchPid)} Pitch ${svc.pitchPid ? `(pid ${svc.pitchPid})` : "not running"}${state.runningPipeline ? ` — answering with <b>${PIPE_LABEL[state.runningPipeline]}</b>` : ""} &nbsp;·&nbsp;
+          ${dot(svc.whisper)} whisper.cpp :8080 &nbsp;·&nbsp;
+          ${dot(svc.piper)} Piper :9891
+        </p>
+        <p class="muted" style="font-size:12px">Settings file: <code>${escapeHtml(state.configPath)}</code>${cfg.updatedAt ? ` · saved ${new Date(cfg.updatedAt).toLocaleString()}` : ""}</p>
+      </section>
+
+      <section class="panel">
+        <div class="panel-header"><h2>Pipeline</h2></div>
+        <p class="muted settings-lede">Which engine answers calls. Gemini Live is speech-to-speech with native Taglish and emotion. Local runs whisper &rarr; text brain &rarr; Piper on this machine — far cheaper, slightly slower, English only until the Taglish voice is trained.</p>
+        <table class="data-table">
+          <thead><tr><th></th><th>Pipeline</th><th>TTS cost / call</th><th>Latency</th><th>Taglish</th><th>Emotion</th></tr></thead>
+          <tbody>
+            <tr>
+              <td><input type="radio" name="pipeline" value="gemini-live" id="pipeGemini"${cfg.pipeline === "gemini-live" ? " checked" : ""}></td>
+              <td><label for="pipeGemini"><b>1 — Gemini Live</b><br><span class="muted">premium tier</span></label></td>
+              <td>≈ ₱1.30</td><td>~500 ms</td><td>Native</td><td>Native affect</td>
+            </tr>
+            <tr>
+              <td><input type="radio" name="pipeline" value="local" id="pipeLocal"${cfg.pipeline === "local" ? " checked" : ""}></td>
+              <td><label for="pipeLocal"><b>2 — Local (Piper)</b><br><span class="muted">standard tier</span></label></td>
+              <td>≈ ₱0.02</td><td>~1.3 s</td><td>After training</td><td>Speaker slots</td>
+            </tr>
+          </tbody>
+        </table>
+        <label class="full" style="margin-top:14px">
+          <input type="checkbox" id="bargeIn"${cfg.bargeInEnabled ? " checked" : ""}>
+          Barge-in — let the caller interrupt the agent mid-sentence
+        </label>
+        <p class="muted" style="font-size:12px">Turning this off stops mid-sentence cut-offs. Endpoint detection stays on either way; the local pipeline cannot work without it.</p>
+      </section>
+
+      <section class="panel" id="geminiPanel">
+        <div class="panel-header"><h2>Gemini Live voice</h2></div>
+        <p class="muted settings-lede">Google's prebuilt voices. There is no custom voice and no language setting — the model matches whatever the caller speaks, including mid-sentence Taglish. Changing this needs a restart.</p>
+        <div class="form-grid">
+          <label>Voice<select id="geminiVoice">${(state.geminiVoices || []).map((v) =>
+            `<option value="${v.name}"${v.name === (cfg.geminiLive && cfg.geminiLive.voice) ? " selected" : ""}>${v.name} — ${v.gender}, ${v.note}</option>`).join("")}</select></label>
+        </div>
+        <p class="muted" style="font-size:12px;margin-top:10px">No preview available — Gemini voices are only produced during a live call. Change it, restart, and ring the number to hear it.</p>
+      </section>
+
+      <section class="panel" id="piperPanel">
+        <div class="panel-header"><h2>Piper voice</h2></div>
+        <div class="form-grid">
+          <label>Language<select id="voiceLang">${langOpts}</select></label>
+          <label>Gender<select id="voiceGender">
+            <option value="">All</option>
+            <option value="female" selected>Female</option>
+            <option value="male">Male</option>
+          </select></label>
+          <label>Whisper model<select id="whisperModel">${whisperOpts}</select></label>
+          <label>Speech rate <span class="muted" id="lsVal">${cfg.local.piperLengthScale}</span>
+            <input type="range" id="lengthScale" min="0.6" max="1.6" step="0.05" value="${cfg.local.piperLengthScale}">
+          </label>
+        </div>
+        <div id="voiceList" class="muted" style="margin-top:14px">Loading voices…</div>
+      </section>
+
+      <section class="panel" id="previewPanel">
+        <div class="panel-header"><h2>Preview</h2></div>
+        <label class="full">Test line
+          <input type="text" id="previewText" value="Good afternoon! Thank you for calling. How can I help you today?" maxlength="300">
+        </label>
+        <div style="display:flex;gap:10px;align-items:center;margin-top:10px;flex-wrap:wrap">
+          <button class="button button-soft" id="previewBtn">Play preview</button>
+          <span class="muted" id="previewMeta"></span>
+        </div>
+        <audio id="previewAudio" controls style="width:100%;margin-top:12px" hidden></audio>
+      </section>
+
+      <section class="panel">
+        <div class="panel-header">
+          <h2>Pitch instructions — ${PIPE_LABEL[prompt.pipeline]}${prompt.active ? ` · v${prompt.active.version} live` : ""}</h2>
+          <span class="muted">${prompt.active ? `saved ${new Date(prompt.active.created_at).toLocaleString()} by ${escapeHtml(prompt.active.created_by || "seed")}` : ""}</span>
+        </div>
+        <p class="muted settings-lede">The <b>complete</b> prompt for this pipeline — nothing is added from code. Each pipeline has its own, because the language rules differ: Gemini Live can speak Taglish, Piper cannot. Switch the pipeline above to edit the other one. Three variables are filled at call time: <code>{{business_name}}</code>, <code>{{agent_name}}</code>, <code>{{caller_number}}</code>.</p>
+        <form id="pitchPromptForm" class="form-grid">
+          <label class="full">Instructions
+            <textarea name="content" rows="22" spellcheck="false">${escapeHtml(prompt.active ? prompt.active.content : "")}</textarea>
+          </label>
+          <label class="full">What changed? (shown in the history below)
+            <input type="text" name="note" maxlength="300" placeholder="e.g. Told it to confirm the delivery address before closing" />
+          </label>
+          <div style="display:flex;gap:10px;align-items:center">
+            <button class="button button-primary" type="submit">Save as new version</button>
+            <button class="button button-soft" type="button" id="promptReset">Reset to default</button>
+          </div>
+        </form>
+      </section>
+
+      <section class="panel">
+        <div class="panel-header">
+          <h2>What Pitch actually sends</h2>
+          <button class="button button-soft" id="promptPreviewBtn">Show assembled prompt</button>
+        </div>
+        <p class="muted">The same text with <code>{{business_name}}</code>, <code>{{agent_name}}</code> and <code>{{caller_number}}</code> filled in — exactly what the model receives.</p>
+        <pre id="promptPreview" style="white-space:pre-wrap;font-size:12px;max-height:420px;overflow:auto;background:#f6f7f9;padding:14px;border-radius:8px" hidden></pre>
+      </section>
+
+      <section class="panel">
+        <div class="panel-header">
+          <h2>Version history (${prompt.revisions.length})</h2>
+        </div>
+        <p class="muted">Every version that has run. Roll back to put an earlier one live immediately.</p>
+        <table class="data-table">
+          <thead><tr><th>Version</th><th>Saved</th><th>By</th><th>What changed</th><th>Actions</th></tr></thead>
+          <tbody>${prompt.revisions.map((v) => `
+            <tr>
+              <td><b>v${v.version}</b>${v.is_active ? ` <span style="background:#d9f7e8;color:#1a7a4f;padding:1px 7px;border-radius:10px;font-size:11px">LIVE</span>` : ""}</td>
+              <td>${new Date(v.created_at).toLocaleString()}</td>
+              <td>${escapeHtml(v.created_by || "seed")}</td>
+              <td>${escapeHtml(v.note || "")}</td>
+              <td>${v.is_active ? "" : `<button class="button button-soft" data-rollback="${v.version}">Roll back</button>`}</td>
+            </tr>`).join("")}
+          </tbody>
+        </table>
+      </section>
+
+      <section class="panel">
+        <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap">
+          <button class="button button-primary" id="pitchSave">Save settings</button>
+          <button class="button" id="pitchApply">Save &amp; restart voice stack</button>
+          <span class="muted" id="pitchStatus"></span>
+        </div>
+        <p class="muted" style="font-size:12px;margin-top:10px">Restarting takes about 30 seconds and drops any call in progress. Save alone takes effect on the next restart.</p>
+      </section>
+    </div>`;
+
+  let selectedVoice = cfg.local.piperVoice;
+
+  async function loadVoices() {
+    const lang = $("#voiceLang").value;
+    const gender = $("#voiceGender").value;
+    const q = new URLSearchParams({ language: lang });
+    if (gender) q.set("gender", gender);
+    const { voices } = await api(`/api/pitch-admin/voices?${q}`);
+    if (!voices.length) {
+      $("#voiceList").innerHTML = `<p class="muted">No voices for this filter.</p>`;
+      return;
+    }
+    $("#voiceList").innerHTML = `
+      <table class="data-table">
+        <thead><tr><th></th><th>Voice</th><th>Quality</th><th>Gender</th><th>Speakers</th><th></th></tr></thead>
+        <tbody>${voices.map((v) => `
+          <tr>
+            <td><input type="radio" name="voice" value="${v.key}"${v.key === selectedVoice ? " checked" : ""}${v.installed ? "" : " disabled"}></td>
+            <td>${escapeHtml(v.name)}<br><span class="muted" style="font-size:11px">${v.key}</span></td>
+            <td>${v.quality}</td>
+            <td>${v.gender}</td>
+            <td>${v.numSpeakers > 1 ? v.numSpeakers : "—"}</td>
+            <td>${v.installed
+              ? `<button class="button button-soft" data-play="${v.key}">Listen</button>`
+              : `<button class="button button-soft" data-install="${v.key}">Download</button>`}</td>
+          </tr>`).join("")}
+        </tbody>
+      </table>`;
+
+    $("#voiceList").querySelectorAll('input[name="voice"]').forEach((el) => {
+      el.onchange = () => { selectedVoice = el.value; };
+    });
+    $("#voiceList").querySelectorAll("[data-play]").forEach((b) => {
+      b.onclick = () => playPreview(b.dataset.play);
+    });
+    $("#voiceList").querySelectorAll("[data-install]").forEach((b) => {
+      b.onclick = async () => {
+        b.disabled = true; b.textContent = "Downloading…";
+        try {
+          await api(`/api/pitch-admin/voices/${b.dataset.install}/install`, { method: "POST" });
+          toast(`${b.dataset.install} installed`);
+          await loadVoices();
+        } catch (e) { toast(`Download failed: ${e.message}`); b.disabled = false; b.textContent = "Download"; }
+      };
+    });
+  }
+
+  async function playPreview(voice) {
+    const meta = $("#previewMeta");
+    meta.textContent = "synthesizing…";
+    try {
+      const r = await api("/api/pitch-admin/preview", {
+        method: "POST",
+        body: {
+          voice: voice || selectedVoice,
+          text: $("#previewText").value,
+          lengthScale: Number($("#lengthScale").value),
+        },
+      });
+      const audio = $("#previewAudio");
+      audio.hidden = false;
+      audio.src = r.url;
+      audio.play();
+      meta.textContent = `${r.voice} · ${r.ms} ms`;
+    } catch (e) { meta.textContent = `failed: ${e.message}`; }
+  }
+
+  // Only show the panel that belongs to the selected pipeline — Piper voices
+  // are meaningless on Gemini Live and vice versa.
+  function syncPanels() {
+    const isLocal = document.querySelector('input[name="pipeline"]:checked').value === "local";
+    $("#piperPanel").hidden = !isLocal;
+    $("#geminiPanel").hidden = isLocal;
+    $("#previewPanel").hidden = !isLocal;
+  }
+  document.querySelectorAll('input[name="pipeline"]').forEach((el) => {
+    el.onchange = async () => {
+      syncPanels();
+      // Each pipeline has its own prompt — save the setting so the reload
+      // shows the right one, then re-render.
+      try {
+        await api("/api/pitch-admin/config", { method: "PUT", body: collect() });
+        pitchStudioView();
+      } catch { syncPanels(); }
+    };
+  });
+  syncPanels();
+
+  $("#pitchPromptForm").onsubmit = async (event) => {
+    event.preventDefault();
+    const f = new FormData(event.target);
+    try {
+      const r = await api("/api/pitch-admin/prompt", {
+        method: "POST",
+        body: {
+          pipeline: prompt.pipeline,
+          content: f.get("content"),
+          note: f.get("note") || null,
+        },
+      });
+      toast(`Saved as v${r.version} — restart to apply`);
+      pitchStudioView();
+    } catch (e) { toast(`Save failed: ${e.message}`); }
+  };
+
+  $("#promptReset").onclick = async () => {
+    if (!confirm(`Reset the ${PIPE_LABEL[prompt.pipeline]} prompt to the built-in default? Your current version stays in history.`)) return;
+    try {
+      const r = await api("/api/pitch-admin/prompt/reset", {
+        method: "POST", body: { pipeline: prompt.pipeline },
+      });
+      toast(`Reset — now v${r.version}`);
+      pitchStudioView();
+    } catch (e) { toast(`Reset failed: ${e.message}`); }
+  };
+
+  $("#promptPreviewBtn").onclick = async () => {
+    const pre = $("#promptPreview");
+    try {
+      const r = await api(`/api/pitch-admin/prompt/preview?pipeline=${prompt.pipeline}`);
+      pre.textContent = r.content;
+      pre.hidden = false;
+    } catch (e) { pre.textContent = `failed: ${e.message}`; pre.hidden = false; }
+  };
+
+  document.querySelectorAll("[data-rollback]").forEach((b) => {
+    b.onclick = async () => {
+      if (!confirm(`Roll back to v${b.dataset.rollback}? It goes live on the next restart.`)) return;
+      try {
+        await api("/api/pitch-admin/prompt/activate", {
+          method: "POST",
+          body: { pipeline: prompt.pipeline, version: Number(b.dataset.rollback) },
+        });
+        toast(`v${b.dataset.rollback} is now live`);
+        pitchStudioView();
+      } catch (e) { toast(`Rollback failed: ${e.message}`); }
+    };
+  });
+
+  function collect() {
+    return {
+      pipeline: document.querySelector('input[name="pipeline"]:checked').value,
+      bargeInEnabled: $("#bargeIn").checked,
+      geminiLive: { voice: $("#geminiVoice").value },
+      local: {
+        ttsEngine: "piper",
+        piperVoice: selectedVoice,
+        whisperModel: $("#whisperModel").value,
+        piperLengthScale: Number($("#lengthScale").value),
+      },
+    };
+  }
+
+  async function save() {
+    await api("/api/pitch-admin/config", { method: "PUT", body: collect() });
+  }
+
+  $("#voiceLang").onchange = loadVoices;
+  $("#voiceGender").onchange = loadVoices;
+  $("#lengthScale").oninput = () => { $("#lsVal").textContent = $("#lengthScale").value; };
+  $("#previewBtn").onclick = () => playPreview(selectedVoice);
+  $("#pitchRefresh").onclick = () => pitchStudioView();
+  $("#tabCloser").onclick = () => aiStudioView();
+  $("#tabPitch").onclick = () => pitchStudioView();
+
+  $("#pitchSave").onclick = async () => {
+    try { await save(); toast("Pitch settings saved"); }
+    catch (e) { toast(`Save failed: ${e.message}`); }
+  };
+
+  $("#pitchApply").onclick = async () => {
+    const status = $("#pitchStatus");
+    try {
+      await save();
+      status.textContent = "restarting…";
+      await api("/api/pitch-admin/restart", { method: "POST" });
+      let waited = 0;
+      const poll = setInterval(async () => {
+        waited += 5;
+        const s = await api("/api/pitch-admin/");
+        if (s.services.pitchPid && (s.config.pipeline === "gemini-live" || (s.services.piper && s.services.whisper))) {
+          clearInterval(poll);
+          status.textContent = `ready (pid ${s.services.pitchPid})`;
+          setTimeout(() => pitchStudioView(), 1200);
+        } else if (waited > 75) {
+          clearInterval(poll);
+          status.textContent = "still starting — hit Refresh in a moment";
+        } else {
+          status.textContent = `restarting… ${waited}s`;
+        }
+      }, 5000);
+    } catch (e) { status.textContent = `failed: ${e.message}`; }
+  };
+
+  await loadVoices();
+}

@@ -22,7 +22,7 @@
         <h1>AI sales support packages built for real customer inquiries.</h1>
         <p>Your 24/7 AI sales assistant for Facebook Messenger and website inquiries. It replies, qualifies leads, captures contact details, prepares follow-ups, and keeps your sales team in control.</p>
         <div class="merchant-strip">
-          <span>Digital subscription service</span><span>PHP pricing</span><span>Monthly or annual billing</span><span>Demo checkout until payment credentials are configured</span>
+          <span>Digital subscription service</span><span>PHP pricing</span><span>Monthly or annual billing</span><span>Secure QRPh checkout via PayMongo</span>
         </div>
       </section>
 
@@ -85,28 +85,13 @@
           </div>
 
           <div class="checkout-block">
-            <p class="eyebrow">Business Information</p>
-            <div class="checkout-grid">
-              <label>Business website<input name="business_website" /></label>
-              <label>Facebook Page URL<input name="facebook_page_url" /></label>
-              <label>Industry<input name="industry" /></label>
-              <label>Estimated monthly inquiries<input name="estimated_monthly_inquiries" /></label>
-              <label>Main products or services<textarea name="main_products_or_services"></textarea></label>
-              <label>Preferred onboarding date<input type="date" name="preferred_onboarding_date" /></label>
-            </div>
-          </div>
-
-          <div class="checkout-block">
             <p class="eyebrow">QRPh Payment</p>
             <div id="paymentMethods" class="payment-methods"></div>
-            <p id="paymentModeNote" class="note"></p>
           </div>
 
           <div class="checkout-block agreement-block">
             <label><input required type="checkbox" name="terms" /> I agree to the <a href="/terms/" target="_blank">Terms and Conditions</a></label>
             <label><input required type="checkbox" name="privacy" /> I acknowledge the <a href="/privacy/" target="_blank">Privacy Policy</a></label>
-            <label><input required type="checkbox" name="renewal" /> I understand that subscription charges renew automatically unless cancelled</label>
-            <label><input required type="checkbox" name="correct" /> I confirm that the information provided is correct</label>
           </div>
         </form>
         <aside class="order-summary">
@@ -117,7 +102,6 @@
           <div id="orderSummary" class="summary-lines empty-state"><p>Select a package to begin checkout.</p></div>
           <div class="coupon-row"><input id="couponCode" name="coupon_code" placeholder="Discount code" autocomplete="off" /><button id="applyCouponBtn" class="button button-soft" type="button">Apply</button></div>
           <button id="checkoutBtn" class="button button-primary full" type="button" disabled>Continue to QRPh Payment</button>
-          <p class="note">AIStaff never asks for OTPs, passwords, card numbers, or private payment screenshots.</p>
         </aside>
       </section>
     </main>
@@ -125,6 +109,7 @@
     <footer class="commerce-footer">
       <span>AIStaff Solutions Corporation</span><span>Registration details pending verified business profile</span><a href="/about/">About Us</a><a href="/contact/">Contact Us</a><a href="/support/">Support</a><a href="/refund-policy/">Refund Policy</a><a href="/cancellation-policy/">Cancellation Policy</a><a href="/service-fulfillment-policy/">Service Fulfillment Policy</a><a href="/terms/">Terms</a><a href="/privacy/">Privacy</a>
     </footer>
-    <script src="/pricing-checkout.js?v=20260820-selected-plan"></script>
+    <script src="/meta-pixel.js?v=20260826-test-events"></script>
+    <script src="/pricing-checkout.js?v=20260826-payment"></script>
   </body>
 </html>

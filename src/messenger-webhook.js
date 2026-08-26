@@ -24,7 +24,7 @@ function messengerEventKey(event, psid) {
 const { prisma } = require("./db");
 const { decryptSecret, encryptSecret } = require("./crypto");
 const { generateSalesReply } = require("./ai");
-const { notifyHandoff, notifySecurityAlert } = require("./notify");
+const { notifyBookingCreated, notifyHandoff, notifySecurityAlert } = require("./notify");
 const { createCheckoutLink } = require("./checkout-link");
 const { maybeAddWebsiteResearchToLead } = require("./closer-web-research");
 const {
@@ -391,6 +391,39 @@ function bookingFieldValuesFromRequest(request = {}) {
   return out;
 }
 
+function jitsiRoomUrl({ companyId, serviceName, start }) {
+  const serviceSlug = normaliseComparable(serviceName).slice(0, 32) || "booking";
+  const when = start.toISOString().replace(/[-:]/g, "").slice(0, 13);
+  const suffix = crypto.randomBytes(3).toString("hex");
+  return `https://meet.jit.si/aistaff-${companyId.slice(0, 8)}-${serviceSlug}-${when}-${suffix}`;
+}
+
+function shouldCreateJitsiLink(setting, request, fieldValues, serviceName) {
+  const channel = cleanText(request.preferred_meeting_channel || fieldValues.preferred_meeting_channel, 120).toLowerCase();
+  if (/in.?person|branch|store|onsite|on site|walk.?in/.test(channel)) return false;
+  const haystack = [
+    setting?.booking_type,
+    serviceName,
+    channel,
+    fieldValues.purpose,
+    fieldValues.onboarding_topic
+  ].filter(Boolean).join(" ").toLowerCase();
+  return setting?.booking_type === "ai_service_onboarding"
+    || /online|video|jitsi|zoom|meet|consult|consultation|onboarding|demo|call/.test(haystack);
+}
+
+function bookingNeedsExclusiveTime(setting, serviceName, fieldValues = {}) {
+  const haystack = [
+    setting?.booking_type,
+    serviceName,
+    fieldValues.preferred_meeting_channel,
+    fieldValues.purpose,
+    fieldValues.onboarding_topic
+  ].filter(Boolean).join(" ").toLowerCase();
+  return setting?.booking_type === "ai_service_onboarding"
+    || /online|video|jitsi|zoom|meet|meeting|consult|consultation|onboarding|demo|call/.test(haystack);
+}
+
 async function createMessengerBooking({ companyId, conversationId, lead, request }) {
   const setting = await prisma.bookingSetting.findUnique({ where: { company_id: companyId } });
   if (!setting?.enabled) return { ok: false, reason: "booking_disabled" };
@@ -419,6 +452,9 @@ async function createMessengerBooking({ companyId, conversationId, lead, request
     || null;
   const duration = service?.duration_minutes || Number(request.duration_minutes) || 60;
   const end = new Date(start.getTime() + Math.max(5, Math.min(1440, duration)) * 60 * 1000);
+  if (shouldCreateJitsiLink(setting, request, fieldValues, service?.name || serviceName) && !fieldValues.meeting_link) {
+    fieldValues.meeting_link = jitsiRoomUrl({ companyId, serviceName: service?.name || serviceName, start });
+  }
 
   const existing = await prisma.booking.findFirst({
     where: {
@@ -431,6 +467,19 @@ async function createMessengerBooking({ companyId, conversationId, lead, request
     orderBy: { created_at: "desc" }
   });
   if (existing) return { ok: true, reused: true, booking: existing };
+
+  if (bookingNeedsExclusiveTime(setting, service?.name || serviceName, fieldValues)) {
+    const conflict = await prisma.booking.findFirst({
+      where: {
+        company_id: companyId,
+        status: { in: ["requested", "pending_confirmation", "confirmed", "paid"] },
+        start_at: { lt: end },
+        end_at: { gt: start }
+      },
+      orderBy: { start_at: "asc" }
+    });
+    if (conflict) return { ok: false, reason: "time_conflict", conflict };
+  }
 
   const booking = await prisma.booking.create({
     data: {
@@ -760,6 +809,8 @@ async function handleClientMessengerEvent({ page, psid, text, maybeCreateQuotati
           page.company_id, conversation.id, result.reason);
         const retryText = result.reason === "missing_exact_datetime"
           ? "I still need the exact date and time before I can create the booking request."
+          : result.reason === "time_conflict"
+            ? "That time already has a booking on our calendar. Please send another preferred date and time."
           : "I still need one more booking detail before I can create the request.";
         await wait(600);
         await sendMessengerText(page, psid, retryText);
@@ -778,6 +829,7 @@ async function handleClientMessengerEvent({ page, psid, text, maybeCreateQuotati
 
       const booking = result.booking;
       const ref = `BK-${String(booking.id).slice(0, 8).toUpperCase()}`;
+      const details = booking.field_values && typeof booking.field_values === "object" ? booking.field_values : {};
       const when = new Date(booking.start_at).toLocaleString("en-PH", {
         dateStyle: "medium",
         timeStyle: "short",
@@ -788,8 +840,9 @@ async function handleClientMessengerEvent({ page, psid, text, maybeCreateQuotati
         `Reference: ${ref}`,
         `For: ${booking.service_name}`,
         `When: ${when}`,
+        details.meeting_link ? `Meeting link: ${details.meeting_link}` : "",
         "Status: pending confirmation"
-      ];
+      ].filter(Boolean);
       await wait(600);
       await sendMessengerText(page, psid, lines.join("\n"));
       await prisma.message.create({
@@ -801,6 +854,26 @@ async function handleClientMessengerEvent({ page, psid, text, maybeCreateQuotati
           message_text: lines.join("\n"),
           ai_generated: true
         }
+      });
+      await bestEffort("booking customer email", `booking=${booking.id}`, async () => {
+        if (!booking.email) return;
+        const company = await prisma.company.findUnique({ where: { id: page.company_id }, select: { name: true } });
+        await notifyBookingCreated({
+          to: booking.email,
+          companyName: company?.name || "your booking",
+          booking,
+          audience: "customer"
+        });
+      });
+      await bestEffort("booking staff email", `booking=${booking.id}`, async () => {
+        if (!settings?.notify_email) return;
+        const company = await prisma.company.findUnique({ where: { id: page.company_id }, select: { name: true } });
+        await notifyBookingCreated({
+          to: settings.notify_email,
+          companyName: company?.name || "your business",
+          booking,
+          audience: "staff"
+        });
       });
       console.log("[booking] %s booking=%s conversation=%s reused=%s", ref, booking.id, conversation.id, result.reused);
     });

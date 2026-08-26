@@ -808,6 +808,15 @@ function formatOfficialPackagesBlock() {
   )).join("\n");
 }
 
+function formatEntryPricingBlock() {
+  return [
+    `${MINIMUM_OFFER.name}: ${MINIMUM_OFFER.price}`,
+    `Channel: ${MINIMUM_OFFER.channel}`,
+    `Capacity: ${MINIMUM_OFFER.conversationLimit.toLocaleString()} AI-assisted conversations per month`,
+    `Benefits: ${MINIMUM_OFFER.includes.join("; ")}`
+  ].join("\n");
+}
+
 function getDefaultCompanyId() {
   return prisma.company.findFirst({ where: { status: "active" }, orderBy: { created_at: "asc" } }).then((company) => {
     if (!company) throw new Error("No active company found. Run npm run seed first.");
@@ -1412,8 +1421,8 @@ function buildWebsiteRequestReply(isTagalog = false) {
 function buildMinimumQuotationReply(session, isTagalog = false) {
   session.quotationOffered = true;
   const offer = isTagalog
-    ? `${MINIMUM_OFFER.name} (chat lang sa Messenger, walang voice call): sumagot sa Messenger, mag-qualify ng inquiries, at maghanda ng quotation drafts. ${MINIMUM_OFFER.price}.`
-    : `${MINIMUM_OFFER.name} (${MINIMUM_OFFER.channel}): replies in Messenger chat, qualifies inquiries, and prepares quotation drafts for your approval. ${MINIMUM_OFFER.price}.`;
+    ? `${MINIMUM_OFFER.name}: ${MINIMUM_OFFER.price}. Kasama na ang Messenger replies, lead qualification, customer details capture, at quotation drafts para sa approval ninyo.`
+    : `${MINIMUM_OFFER.name}: ${MINIMUM_OFFER.price}. It includes Messenger replies, lead qualification, customer detail capture, and quotation drafts for your approval.`;
 
   if (!hasEmail(session)) {
     return `${offer} ${isTagalog
@@ -1704,15 +1713,12 @@ function stripForbiddenPlanClaims(text) {
 
 function pricingGateReply(session, isTagalog = false) {
   const solution = isTagalog
-    ? "Ang packages namin ay managed setup para sa AI Messenger sales assistant — instant reply, lead capture, qualification, at quotation drafts na ia-approve ng admin."
-    : "Our packages are managed setup for an AI Messenger sales assistant — instant replies, lead capture, qualification, and admin-approved quotation drafts.";
-  const range = isTagalog
-    ? `Nagsisimula ang packages sa ${MINIMUM_OFFER.price} depende sa inquiry volume.`
-    : `Packages start at ${MINIMUM_OFFER.price} depending on inquiry volume.`;
+    ? `Ang entry plan namin ay ${MINIMUM_OFFER.name}: ${MINIMUM_OFFER.price}. Para ito sa instant Messenger replies, lead capture, qualification, at quotation drafts na ia-approve ng admin.`
+    : `Our entry plan is ${MINIMUM_OFFER.name}: ${MINIMUM_OFFER.price}. It covers instant Messenger replies, lead capture, qualification, and admin-approved quotation drafts.`;
   const question = isTagalog
-    ? "Pahingi muna ng contact person, mobile number, at email para ma-send ko ang exact package fit?"
-    : "May I get contact person, mobile number, and email so I can send the exact package fit?";
-  return `${solution} ${range} ${question}`;
+    ? "Pahingi muna ng contact person, mobile number, at email para ma-send ko ang quotation?"
+    : "May I get the contact person, mobile number, and email so I can send the quotation?";
+  return `${solution} ${question}`;
 }
 
 function sanitizeAistaffReply(reply, session, context = {}) {
@@ -2617,7 +2623,12 @@ function buildAistaffSystemPrompt(session, backend = {}, messageText = "", aiCon
     "",
     `Official service: ${OFFICIAL_SERVICE_PROMISE}`,
     showPricing
-      ? `Pricing (share only now): ${MINIMUM_OFFER.name} — ${MINIMUM_OFFER.price}. Packages:\n${formatOfficialPackagesBlock()}`
+      ? [
+        "Pricing (share only now): lead with the entry offer only.",
+        formatEntryPricingBlock(),
+        "Do not mention annual pricing, annual savings, yearly billing, or the full package table unless the customer explicitly asks.",
+        "Mention higher plans only when the customer asks to compare or clearly needs website chat, both channels, higher conversation capacity, or more staff logins."
+      ].join("\n")
       : "Pricing: withhold until after assess_ai_fit unless customer explicitly asks.",
     "",
     "SESSION STATE (update via tools):",

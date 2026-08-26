@@ -3,7 +3,7 @@
 const WebSocket = require("ws");
 const { EventEmitter } = require("events");
 const { resample, int16ToBuffer, bufferToInt16 } = require("../audio/resample");
-const { buildInstructions } = require("../prompt");
+const { loadInstructions } = require("../prompt");
 const { log } = require("../log");
 
 /**
@@ -73,6 +73,17 @@ class GeminiLiveBrain extends EventEmitter {
   }
 
   async connect() {
+    // Loaded here, not in the constructor, because the live body comes from
+    // the database (AI Studio -> Pitch). Falls back to the code seed if the
+    // lookup fails, so a ringing call never dies over a prompt read.
+    this.systemInstructions = await loadInstructions({
+      businessName: this.businessName,
+      agentName: this.agentName,
+      callerId: this.callerId,
+      smsEnabled: (this.tools || []).some((t) => t.name === "send_sms"),
+      pipeline: "gemini-live",
+    });
+
     const url = `${WS_BASE}?key=${encodeURIComponent(this.apiKey)}`;
 
     await new Promise((resolve, reject) => {
@@ -105,12 +116,7 @@ class GeminiLiveBrain extends EventEmitter {
         },
         systemInstruction: {
           parts: [{
-            text: buildInstructions({
-              businessName: this.businessName,
-              agentName: this.agentName,
-              callerId: this.callerId,
-              smsEnabled: (this.tools || []).some((t) => t.name === "send_sms"),
-            }),
+            text: this.systemInstructions,
           }],
         },
         // Transcripts are for our call log only. They never drive the reply

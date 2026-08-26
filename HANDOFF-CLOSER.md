@@ -1454,7 +1454,7 @@ email. Code creates the order and sends the link as its own message.
 - Email is asked for first and read back: it becomes their login, so a typo
   locks someone out of what they just paid for.
 
-### 21.3 Prompt versions v11–v25
+### 21.3 Prompt versions v11–v31
 
 - **v11 selling behaviour**: sell the pain not the feature; give them their time
   back; handle doubt without pressure; ask for the sale; know when to stop.
@@ -1527,6 +1527,41 @@ email. Code creates the order and sends the link as its own message.
   configured handoff). Handoff is a last resort unless the customer asks for a
   human, raises a complaint/safety/security issue, the tenant chose handoff, or
   the system truly cannot proceed.
+- **v27 tenant booking setup**: Closer reads the tenant Bookings settings when
+  enabled, asks only the configured appointment/reservation fields, and treats
+  unconfirmed slots as pending unless live/system/staff confirmation exists.
+- **v28 booking action**: Closer can set `create_booking` after the configured
+  booking details are complete and confirmed. Messenger creates a pending
+  booking request and returns a booking reference.
+- **v29 entry-price close**: replaces the old "always give the complete money
+  picture" instruction. Closer now leads with the simplest relevant entry offer
+  or single recommendation first. Annual totals/savings, higher tiers, and full
+  package tables are mentioned only when the customer asks, is comparing,
+  objects to price, or tenant knowledge says they are relevant.
+- **v30 entry-offer first reply**: strengthens v29. The first pricing/how-to-
+  avail reply must give one entry/recommended plan, the monthly/common entry
+  price, and strong features/benefits/outcomes. It must not mention annual
+  pricing, yearly billing, annual savings, annual packages, all tiers, or the
+  full price table until the customer explicitly asks or has already selected a
+  plan and is discussing billing/payment options.
+- **v31 demo-before-subscription**: for AIStaff/Closer's own sales
+  conversations, Closer no longer pushes immediately to subscription, cart,
+  checkout, QRPh, or payment. It presents up to five relevant pain points with
+  matching benefits/solutions, then offers the live demo first:
+  `https://aistaff.click/agents/closer/#demo`. Second offer is a video-call
+  consultation with the AIStaff team; collect preferred date/time, name, email,
+  and mobile, then say the team will send the video link after scheduling.
+
+AIStaff tenant KB also has a HOUSE RULE row titled `AIStaff pricing close rule`.
+It says to lead pricing/how-to-avail conversations with Starter at ₱1,499/month,
+Facebook Messenger, 100 inquiries/conversations, 1 Page, 1 staff login, no setup
+fee, onboarding assistance and ongoing support, then emphasize benefits such as
+24/7 replies, language matching, media/file sending, qualification questions,
+customer detail capture, lead temperature, quotation drafts, unanswered-question
+tracking, and fewer missed inquiries. Do not list all four packages or annual
+pricing in the first reply. Mention higher tiers only when the prospect asks,
+needs website chat/both channels/more capacity/more staff logins, or asks to
+compare.
 
 ### 21.3.1 Intake setup records
 

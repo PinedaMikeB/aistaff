@@ -105,7 +105,16 @@ const PLAN_PRICE_PATTERN = new RegExp(
  * It previously hardcoded a retired ladder in src/server.js.
  */
 function closerPricingFacts() {
-  const plans = PRICING_PLANS.map((plan) => {
+  const entryFacts = [
+    `${ENTRY_PLAN.name}: ${peso(ENTRY_PLAN.monthlyPrice)}/month`,
+    `${ENTRY_PLAN.conversationLimit.toLocaleString()} conversations/mo`,
+    `up to ${ENTRY_PLAN.facebookPageLimit} Facebook Page${ENTRY_PLAN.facebookPageLimit > 1 ? "s" : ""}`,
+    `${ENTRY_PLAN.staffLoginLimit} staff login${ENTRY_PLAN.staffLoginLimit > 1 ? "s" : ""}`
+  ].join(", ");
+
+  const upgradePlans = PRICING_PLANS
+    .filter((plan) => plan.slug !== ENTRY_PLAN.slug)
+    .map((plan) => {
     const bits = [
       `${peso(plan.monthlyPrice)}/month`,
       `${plan.conversationLimit.toLocaleString()} conversations/mo`,
@@ -115,14 +124,12 @@ function closerPricingFacts() {
     return `${plan.name}: ${bits.join(", ")}`;
   }).join(". ");
 
-  const entry = PRICING_PLANS[0];
-  const annualSaving = entry.monthlyPrice * 12 - entry.annualPrice;
-
   return [
-    `Pricing. Every plan includes every feature; plans differ on capacity, not capability. ${plans}.`,
+    `Pricing entry offer. ${entryFacts}.`,
+    `Included features and benefits on every plan: ${ENTRY_PLAN.features.join("; ")}.`,
+    upgradePlans ? `Higher monthly packages for fit or comparison only: ${upgradePlans}.` : "",
     "There is no setup fee and no activation fee. The plan price is the whole price.",
     "Onboarding is self-serve: a guided setup wizard in the dashboard collects products, prices, promos, photos, shipping, policies and qualification rules, and the agent starts answering from it.",
-    `Annual billing is ten months at the monthly rate, so two months are free: ${peso(entry.annualPrice)} for twelve months on ${entry.name}, a saving of ${peso(annualSaving)}.`,
     "Past the conversation limit Closer keeps replying — the limit is a soft cap, never a cut-off.",
     // Derived from the add-on, never retyped — a hardcoded number here is how
     // §9's phantom pricing happened. One connection covers every agent on the
@@ -142,7 +149,7 @@ function closerPricingFacts() {
     // §9 phantom-pricing shape again, from the opposite direction.
     "Channels differ by plan: Starter answers on Facebook Messenger. Essential answers on Messenger OR the website chat widget — the customer chooses one. Professional and Enterprise answer on both, sharing one conversation allowance rather than two separate pools.",
     "Full details and checkout: /pricing/"
-  ].join(" ");
+  ].filter(Boolean).join(" ");
 }
 
 module.exports = {

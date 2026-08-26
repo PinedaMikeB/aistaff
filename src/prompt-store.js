@@ -22,6 +22,7 @@
 const { prisma } = require("./db");
 
 const CLOSER_SYSTEM_KEY = "closer_system";
+const DEMO_PAGE_SYSTEM_KEY = "demo_page_system";
 
 /** Bootstrap only — see the note above. Not read once the table has a row. */
 const BOOTSTRAP_CLOSER_INSTRUCTIONS = [
@@ -50,14 +51,40 @@ const BOOTSTRAP_CLOSER_INSTRUCTIONS = [
   "If the customer asks for a human, stop and request human handoff."
 ].join("\n");
 
+/** Bootstrap only — see the note above. Not read once the table has a row. */
+const BOOTSTRAP_DEMO_PAGE_INSTRUCTIONS = [
+  "You are the public demo agent for a prospect's own business.",
+  "You are not selling AIStaff. You are role-playing as the prospect's business assistant so the prospect can experience how Closer would sell their products or services.",
+  "",
+  "Use only the scraped website, product description, uploaded product photo, and uploaded price list shown below.",
+  "If a detail is missing, ask one useful sales question instead of inventing facts.",
+  "Sell helpfully: identify what the customer wants, recommend the closest known product or service, explain benefits, and move toward booking, inquiry, order, or confirmation depending on the facts available.",
+  "",
+  "Keep replies short like Messenger. Match the customer's language naturally.",
+  "If the customer writes in English, reply in English. If they write in Tagalog, reply in natural Tagalog. If they write real Taglish, use light natural Taglish only — do not force awkward code-switching or mix English and Tagalog in the same sentence unless the customer did.",
+  "Never ask for OTP, passwords, card numbers, private payment screenshots, or login credentials.",
+  "Never claim payment, booking, stock, availability, or price details are confirmed unless those facts are explicitly shown."
+].join("\n");
+
+function bootstrapForKey(key) {
+  if (key === DEMO_PAGE_SYSTEM_KEY) return BOOTSTRAP_DEMO_PAGE_INSTRUCTIONS;
+  return BOOTSTRAP_CLOSER_INSTRUCTIONS;
+}
+
+function bootstrapNoteForKey(key) {
+  if (key === DEMO_PAGE_SYSTEM_KEY) return "Initial demo page prompt, separated from the main Closer prompt.";
+  return "Initial version, migrated out of src/ai.js where it was hardcoded.";
+}
+
 // Cached so a reply does not wait on a database round trip. Short TTL, and
 // cleared immediately on save/rollback so an edit is live on the next message
 // rather than up to a minute later.
-let cache = { content: null, version: null, expiresAt: 0 };
+const cacheByKey = new Map();
 const CACHE_MS = 60000;
 
-function clearPromptCache() {
-  cache = { content: null, version: null, expiresAt: 0 };
+function clearPromptCache(key) {
+  if (key) cacheByKey.delete(key);
+  else cacheByKey.clear();
 }
 
 /** Seed version 1 from the bootstrap text. Idempotent. */
@@ -68,19 +95,20 @@ async function ensureSeeded(key = CLOSER_SYSTEM_KEY) {
     data: {
       key,
       version: 1,
-      content: BOOTSTRAP_CLOSER_INSTRUCTIONS,
-      note: "Initial version, migrated out of src/ai.js where it was hardcoded.",
+      content: bootstrapForKey(key),
+      note: bootstrapNoteForKey(key),
       is_active: true
     }
   });
-  clearPromptCache();
+  clearPromptCache(key);
   return true;
 }
 
 /** The instruction text Closer is running right now. */
 async function getActiveInstructions(key = CLOSER_SYSTEM_KEY) {
   const now = Date.now();
-  if (cache.content && cache.expiresAt > now) return cache;
+  const cached = cacheByKey.get(key);
+  if (cached && cached.content && cached.expiresAt > now) return cached;
 
   await ensureSeeded(key);
   const active = await prisma.promptRevision.findFirst({
@@ -91,12 +119,13 @@ async function getActiveInstructions(key = CLOSER_SYSTEM_KEY) {
   // No active row (someone deactivated everything) — fall back to the newest
   // rather than sending Closer out with no instructions at all.
   const chosen = active || await prisma.promptRevision.findFirst({ where: { key }, orderBy: { version: "desc" } });
-  cache = {
-    content: chosen ? chosen.content : BOOTSTRAP_CLOSER_INSTRUCTIONS,
+  const next = {
+    content: chosen ? chosen.content : bootstrapForKey(key),
     version: chosen ? chosen.version : 0,
     expiresAt: now + CACHE_MS
   };
-  return cache;
+  cacheByKey.set(key, next);
+  return next;
 }
 
 /** Save a new revision and make it live. Never overwrites history. */
@@ -112,7 +141,7 @@ async function saveRevision({ key = CLOSER_SYSTEM_KEY, content, note, createdBy 
     })
   ]);
 
-  clearPromptCache();
+  clearPromptCache(key);
   console.log("[prompt-store] %s v%d saved by %s", key, nextVersion, createdBy || "unknown");
   return created;
 }
@@ -133,7 +162,7 @@ async function activateRevision({ key = CLOSER_SYSTEM_KEY, version, createdBy })
     prisma.promptRevision.update({ where: { id: target.id }, data: { is_active: true } })
   ]);
 
-  clearPromptCache();
+  clearPromptCache(key);
   console.log("[prompt-store] %s rolled back to v%d by %s", key, version, createdBy || "unknown");
   return target;
 }
@@ -149,7 +178,9 @@ async function listRevisions(key = CLOSER_SYSTEM_KEY) {
 
 module.exports = {
   CLOSER_SYSTEM_KEY,
+  DEMO_PAGE_SYSTEM_KEY,
   BOOTSTRAP_CLOSER_INSTRUCTIONS,
+  BOOTSTRAP_DEMO_PAGE_INSTRUCTIONS,
   getActiveInstructions,
   saveRevision,
   activateRevision,

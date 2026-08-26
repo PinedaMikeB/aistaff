@@ -14,17 +14,20 @@ const { renderAndExtract, detectCurrency } = require("./rendered-scrape");
 const { extractPriceList } = require("./price-list-extract");
 const { toGemini, parseToolCalls, execute } = require("./tools/adapters");
 const { SCOPES } = require("./tools/registry");
+const { getModelFor } = require("./model-registry");
+const { getActiveInstructions, DEMO_PAGE_SYSTEM_KEY } = require("./prompt-store");
 require("./tools/sms");
 
 const SESSION_TTL_HOURS = 48;
-const MAX_MESSAGES_PER_SESSION = 40;
+const MAX_MESSAGES_PER_SESSION = Number(process.env.DEMO_MAX_MESSAGES_PER_SESSION || 300);
 
-function demoModel() {
-  return process.env.DEMO_GEMINI_MODEL || "gemini-3.5-flash-lite";
+async function demoModel() {
+  return getModelFor("demo_agent");
 }
 
 /** Create the session first, scrape after, so a slow site never blocks the UI. */
-async function createDemoSession({ name, email, websiteUrl, facebookUrl, mobile, ip }) {
+async function createDemoSession({ name, email, websiteUrl, facebookUrl, mobile, productDescription, ip }) {
+  const description = String(productDescription || "").trim();
   return prisma.demoSession.create({
     data: {
       name: String(name).trim(),
@@ -32,6 +35,7 @@ async function createDemoSession({ name, email, websiteUrl, facebookUrl, mobile,
       website_url: websiteUrl || null,
       facebook_url: facebookUrl || null,
       mobile_number: normalizePhone(mobile),
+      snapshot: description ? { manual: { productDescription: description } } : undefined,
       requested_ip: ip || null,
       scrape_status: "pending",
       expires_at: new Date(Date.now() + SESSION_TTL_HOURS * 60 * 60 * 1000)
@@ -51,12 +55,30 @@ async function runScrape(sessionId) {
   if (!session) return null;
 
   try {
-    const snapshot = await buildPresenceSnapshot({
+    const existingSnapshot = session.snapshot && typeof session.snapshot === "object" ? session.snapshot : {};
+    const manual = existingSnapshot.manual && typeof existingSnapshot.manual === "object" ? existingSnapshot.manual : null;
+
+    if (!session.website_url && !session.facebook_url) {
+      const facts = extractFacts(existingSnapshot);
+      return prisma.demoSession.update({
+        where: { id: sessionId },
+        data: {
+          snapshot: existingSnapshot,
+          business_name: facts.businessName || session.business_name || session.name,
+          price_currency: detectCurrency(session.price_list_text || "", session.website_url),
+          scrape_status: (facts.factCount > 0 || session.price_list_text) ? "ready" : "thin",
+          scrape_error: null
+        }
+      });
+    }
+
+    let snapshot = await buildPresenceSnapshot({
       websiteInput: session.website_url || "",
       facebookInput: session.facebook_url || "",
       requestedPageName: session.business_name || session.name || "",
       websiteStatus: session.website_url ? "has_website" : "unknown"
     });
+    if (manual) snapshot = Object.assign({}, snapshot, { manual });
 
     const facts = extractFacts(snapshot);
 
@@ -100,6 +122,20 @@ async function runScrape(sessionId) {
       }
     });
   } catch (error) {
+    const fallbackSnapshot = session.snapshot && typeof session.snapshot === "object" ? session.snapshot : {};
+    const facts = extractFacts(fallbackSnapshot);
+    if (facts.factCount > 0 || session.price_list_text) {
+      return prisma.demoSession.update({
+        where: { id: sessionId },
+        data: {
+          snapshot: fallbackSnapshot,
+          business_name: facts.businessName || session.business_name || session.name,
+          price_currency: detectCurrency(session.price_list_text || "", session.website_url),
+          scrape_status: "thin",
+          scrape_error: String(error.message).slice(0, 400)
+        }
+      });
+    }
     return prisma.demoSession.update({
       where: { id: sessionId },
       data: { scrape_status: "failed", scrape_error: String(error.message).slice(0, 400) }
@@ -111,6 +147,10 @@ async function runScrape(sessionId) {
 function extractFacts(snapshot) {
   const website = (snapshot && snapshot.website) || {};
   const facebook = (snapshot && snapshot.facebook) || {};
+  const manual = (snapshot && snapshot.manual) || {};
+  const productDescription = typeof manual.productDescription === "string"
+    ? manual.productDescription.replace(/\s+/g, " ").trim()
+    : "";
 
   // serviceHints is the richest thing the crawler produces — the actual copy
   // describing what they sell. Ignoring it was leaving the knowledge base
@@ -123,13 +163,14 @@ function extractFacts(snapshot) {
     .slice(0, 8);
 
   const values = [
-    website.title, website.description, facebook.name,
+    productDescription, website.title, website.description, facebook.name,
     facebook.description, facebook.category
   ].filter((v) => typeof v === "string" && v.trim().length > 2);
 
   return {
-    businessName: facebook.name || website.title || "",
+    businessName: facebook.name || website.title || manual.businessName || "",
     factCount: values.length + cleanHints.length,
+    productDescription,
     serviceHints: cleanHints,
     hasContactSignals: Boolean(website.hasContactSignals),
     assessment: (snapshot && snapshot.assessment) || null,
@@ -185,17 +226,17 @@ async function sendSmsViaPitch(to, message) {
  *      prospect's business. The model writes every word itself. A canned
  *      demo would be a lie about the product they are buying.
  */
-function buildDemoPrompt(session) {
+async function buildDemoPrompt(session) {
+  const active = await getActiveInstructions(DEMO_PAGE_SYSTEM_KEY);
   const facts = extractFacts(session.snapshot);
   const lines = [];
 
-  lines.push(
-    "You are an AI sales assistant answering messages for the business described below. " +
-    "You are not selling AIStaff. You ARE that business's assistant, talking to one of its customers."
-  );
+  lines.push("=== DEMO PAGE INSTRUCTIONS v" + active.version + " ===");
+  lines.push(active.content);
 
   lines.push("");
   lines.push("WHAT YOU KNOW ABOUT THIS BUSINESS:");
+  if (facts.productDescription) lines.push(`- Owner/product description: ${facts.productDescription}`);
   if (facts.businessName) lines.push(`- Name: ${facts.businessName}`);
   if (facts.website.title) lines.push(`- Website title: ${facts.website.title}`);
   if (facts.website.description) lines.push(`- Website says: ${facts.website.description}`);
@@ -232,8 +273,7 @@ function buildDemoPrompt(session) {
   }
 
   lines.push("");
-  lines.push("HOW TO BEHAVE:");
-  lines.push("- Answer as that business would: helpful, specific, trying to win the sale.");
+  lines.push("FACT GUARDRAILS:");
   lines.push(
     session.price_list_text
       ? "- Quote prices ONLY from the price list above, exactly as written. For anything not on it, say you will confirm."
@@ -246,7 +286,6 @@ function buildDemoPrompt(session) {
     "offer to confirm — never guess, even when guessing sounds helpful."
   );
   lines.push("- Ask one qualifying question at a time when it moves the sale forward.");
-  lines.push("- Keep replies short, the length a real person types on a phone.");
   lines.push("- If they ask something you have no fact for, say so plainly and offer to check.");
 
   if (session.mobile_number) {
@@ -261,12 +300,49 @@ function buildDemoPrompt(session) {
   return lines.join("\n");
 }
 
+async function requestOpenAiDemo({ systemPrompt, messages, model }) {
+  if (!process.env.OPENAI_API_KEY) return { ok: false, error: "demo_not_configured" };
+  const fetchImpl = (...args) => import("node-fetch").then(({ default: f }) => f(...args));
+  const response = await fetchImpl("https://api.openai.com/v1/chat/completions", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${process.env.OPENAI_API_KEY}`
+    },
+    body: JSON.stringify({
+      model,
+      messages: [
+        { role: "system", content: systemPrompt },
+        ...messages.map((m) => ({
+          role: m.role === "assistant" ? "assistant" : "user",
+          content: String(m.content).slice(0, 2000)
+        }))
+      ],
+      temperature: 0.6,
+      max_tokens: 500
+    })
+  });
+  if (!response.ok) {
+    const detail = await response.text().catch(() => "");
+    return { ok: false, error: "model_unavailable", detail: detail.slice(0, 300) };
+  }
+  const json = await response.json();
+  const reply = String(json.choices?.[0]?.message?.content || "").trim();
+  return reply ? { ok: true, reply, actions: [], model } : { ok: false, error: "empty_reply", actions: [] };
+}
+
 /** One turn. Handles a tool call, then asks the model for the reply. */
 async function replyToDemoMessage({ session, messages }) {
+  const selected = await demoModel();
+  const model = selected.model;
+  const systemPrompt = await buildDemoPrompt(session);
+
+  if (selected.provider === "openai") {
+    return requestOpenAiDemo({ systemPrompt, messages, model });
+  }
+
   const apiKey = process.env.GEMINI_API_KEY;
   if (!apiKey) return { ok: false, error: "demo_not_configured" };
-
-  const model = demoModel();
   const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`;
   const fetchImpl = (...args) => import("node-fetch").then(({ default: f }) => f(...args));
 
@@ -276,7 +352,7 @@ async function replyToDemoMessage({ session, messages }) {
   }));
 
   const body = {
-    systemInstruction: { parts: [{ text: buildDemoPrompt(session) }] },
+    systemInstruction: { parts: [{ text: systemPrompt }] },
     contents,
     generationConfig: { temperature: 0.6, maxOutputTokens: 500 }
   };

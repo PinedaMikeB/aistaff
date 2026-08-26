@@ -50,10 +50,14 @@ function writeWav(file, chunks, rate = 8000) {
  * deep, which is the single most irritating failure mode on a phone call.
  */
 class Call {
-  constructor({ dialog, controls, rtpPort, ua }) {
+  constructor({ dialog, controls, rtpPort, ua, tenant }) {
     this.dialog = dialog;
     this.controls = controls;
     this.rtpPort = rtpPort;
+    // Which company this call is answering for. Resolved from the SIP account
+    // before the call was admitted, so the brain and the prompt can be that
+    // tenant's without any lookup on the hot path.
+    this.tenant = tenant || { companyId: null, deviceId: null, source: "none" };
     // Needed for tools that send SIP requests (SMS via MESSAGE).
     this.ua = ua;
     this.toolState = {};

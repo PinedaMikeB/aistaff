@@ -3,7 +3,7 @@
 const WebSocket = require("ws");
 const { EventEmitter } = require("events");
 const { resample, int16ToBuffer, bufferToInt16 } = require("../audio/resample");
-const { buildInstructions } = require("../prompt");
+const { loadInstructions } = require("../prompt");
 const { log } = require("../log");
 
 /**
@@ -40,6 +40,15 @@ class OpenAiRealtimeBrain extends EventEmitter {
   }
 
   async connect() {
+    // Live body from AI Studio -> Pitch, same as the other brains.
+    this.systemInstructions = await loadInstructions({
+      businessName: this.businessName,
+      agentName: this.agentName,
+      callerId: this.callerId,
+      smsEnabled: (this.tools || []).some((t) => t.name === "send_sms"),
+      pipeline: "gemini-live",
+    });
+
     const url = `wss://api.openai.com/v1/realtime?model=${encodeURIComponent(this.model)}`;
 
     await new Promise((resolve, reject) => {
@@ -80,12 +89,7 @@ class OpenAiRealtimeBrain extends EventEmitter {
         type: "realtime",
         model: this.model,
         output_modalities: ["audio"],
-        instructions: buildInstructions({
-          businessName: this.businessName,
-          agentName: this.agentName,
-          callerId: this.callerId,
-          smsEnabled: (this.tools || []).some((t) => t.name === "send_sms"),
-        }),
+        instructions: this.systemInstructions,
         audio: {
           input: {
             format: { type: "audio/pcm", rate: REALTIME_RATE },

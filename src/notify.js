@@ -277,6 +277,77 @@ async function notifySecurityAlert({ to, companyName, alert, lastMessage, conver
   return sendNotification({ to, subject: `Security: ${headline.toLowerCase()} — ${companyName}`, text, html });
 }
 
+async function notifyBookingCreated({ to, companyName, booking, audience = "customer" }) {
+  if (!booking) return { ok: false, reason: "missing_booking" };
+  const ref = `BK-${String(booking.id).slice(0, 8).toUpperCase()}`;
+  const when = new Date(booking.start_at).toLocaleString("en-PH", {
+    dateStyle: "medium",
+    timeStyle: "short",
+    timeZone: "Asia/Manila"
+  });
+  const details = booking.field_values && typeof booking.field_values === "object" ? booking.field_values : {};
+  const meetingLink = details.meeting_link || "";
+  const contact = [booking.mobile_number, booking.email].filter(Boolean).join(" · ");
+  const confirmed = ["confirmed", "paid", "completed"].includes(String(booking.status || ""));
+  const statusLabel = String(booking.status || "").replace(/_/g, " ") || "requested";
+  const subject = audience === "staff"
+    ? `${confirmed ? "New confirmed booking" : "New booking request"}: ${booking.service_name} — ${when}`
+    : `${confirmed ? "Your booking is confirmed" : "Your booking request"}: ${booking.service_name} — ${when}`;
+
+  const text = audience === "staff"
+    ? [
+        `${confirmed ? "New confirmed booking" : "New booking request"} for ${companyName}.`,
+        "",
+        `Reference : ${ref}`,
+        `Customer  : ${booking.customer_name}`,
+        contact ? `Contact   : ${contact}` : "",
+        `Service   : ${booking.service_name}`,
+        `When      : ${when}`,
+        `Status    : ${statusLabel}`,
+        meetingLink ? `Meeting   : ${meetingLink}` : "",
+        booking.notes ? `Notes     : ${booking.notes}` : "",
+        "",
+        "Open bookings: https://aistaff.click/admin/bookings"
+      ].filter(Boolean).join("\n")
+    : [
+        `Hi ${booking.customer_name},`,
+        "",
+        confirmed
+          ? `Your booking for ${booking.service_name} is confirmed.`
+          : `Your booking request for ${booking.service_name} has been received.`,
+        `Reference: ${ref}`,
+        `Schedule : ${when}`,
+        meetingLink ? `Meeting link: ${meetingLink}` : "",
+        "",
+        confirmed
+          ? "We will send reminders before the meeting."
+          : "Status: pending confirmation. We will contact you if anything needs to be adjusted.",
+        "",
+        companyName
+      ].filter(Boolean).join("\n");
+
+  const html = wrap(
+    audience === "staff"
+      ? (confirmed ? "New confirmed booking" : "New booking request")
+      : (confirmed ? "Booking confirmed" : "Booking request received"),
+    `
+    <p style="margin:0 0 16px;color:#6a7382;font-size:13px">${companyName}</p>
+    <table style="width:100%;font-size:14px;border-collapse:collapse">
+      <tr><td style="padding:6px 0;color:#6a7382;width:120px">Reference</td><td style="padding:6px 0"><b>${ref}</b></td></tr>
+      <tr><td style="padding:6px 0;color:#6a7382">Customer</td><td style="padding:6px 0">${booking.customer_name}</td></tr>
+      <tr><td style="padding:6px 0;color:#6a7382">Service</td><td style="padding:6px 0">${booking.service_name}</td></tr>
+      <tr><td style="padding:6px 0;color:#6a7382">When</td><td style="padding:6px 0">${when}</td></tr>
+      <tr><td style="padding:6px 0;color:#6a7382">Status</td><td style="padding:6px 0">${statusLabel}</td></tr>
+      ${contact ? `<tr><td style="padding:6px 0;color:#6a7382">Contact</td><td style="padding:6px 0">${contact}</td></tr>` : ""}
+      ${meetingLink ? `<tr><td style="padding:6px 0;color:#6a7382">Meeting</td><td style="padding:6px 0"><a href="${meetingLink}" style="color:#4b3ecf">${meetingLink}</a></td></tr>` : ""}
+    </table>
+    ${booking.notes ? `<blockquote style="margin:16px 0;padding:12px 14px;background:#f7f8fb;border-left:3px solid #6b4dff;border-radius:0 8px 8px 0;font-size:14px">${booking.notes}</blockquote>` : ""}
+    ${audience === "staff" ? `<p style="margin:20px 0 0"><a href="https://aistaff.click/admin/bookings" style="display:inline-block;padding:10px 18px;background:#1a2233;color:#fff;text-decoration:none;border-radius:8px;font-size:14px">Open bookings</a></p>` : `<p style="font-size:13px;color:#6a7382">${confirmed ? "We will send reminders before the meeting." : "Status: pending confirmation."}</p>`}
+  `);
+
+  return sendNotification({ to, subject, text, html });
+}
+
 module.exports = {
   sendNotification,
   notifyHandoff,
@@ -284,6 +355,7 @@ module.exports = {
   notifyGapDigest,
   notifyNewSale,
   notifySecurityAlert,
+  notifyBookingCreated,
   notifyConfigured,
   FROM_ADDRESS
 };

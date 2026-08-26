@@ -8,6 +8,7 @@ const { resample, int16ToBuffer, bufferToInt16 } = require("../src/pitch/audio/r
 const { parseSdp, buildSdp } = require("../src/pitch/sip/sdp");
 const { RtpSession, SAMPLES_PER_FRAME } = require("../src/pitch/rtp/session");
 const { buildInstructions, normalizeCallerId } = require("../src/pitch/prompt");
+const { LocalPipelineBrain, pcmRms, writeWavBuffer, readWavPcm16 } = require("../src/pitch/brain/local-pipeline");
 
 function tone(n = 160, freq = 440, amp = 12000, rate = 8000) {
   const out = new Int16Array(n);
@@ -43,6 +44,55 @@ test("resampling preserves length ratios and PCM buffer round-trip", () => {
 
   const back = bufferToInt16(int16ToBuffer(pcm));
   assert.deepStrictEqual(Array.from(back), Array.from(pcm), "PCM16 LE round-trip must be lossless");
+});
+
+test("local pipeline VAD energy helper distinguishes silence from speech", () => {
+  assert.strictEqual(pcmRms(new Int16Array(160)), 0);
+  assert.ok(pcmRms(tone(160, 440, 12000)) > 5000);
+});
+
+test("local pipeline WAV writer/reader preserves PCM and sample rate", () => {
+  const pcm = tone(160, 440, 12000, 16000);
+  const wav = writeWavBuffer(pcm, 16000);
+  const parsed = readWavPcm16(wav);
+
+  assert.ok(parsed, "generated WAV must parse");
+  assert.strictEqual(parsed.sampleRate, 16000);
+  assert.deepStrictEqual(Array.from(parsed.pcm), Array.from(pcm));
+});
+
+test("local pipeline prompt keeps only the configured recent history turns", () => {
+  const brain = new LocalPipelineBrain({
+    openaiApiKey: "test-openai",
+    geminiApiKey: "test-gemini",
+    localConfig: {
+      historyTurns: 3,
+      maxOutputTokens: 120,
+      temperature: 0.75,
+      whisperModel: "whisper-1",
+      geminiTextModel: "gemini-3.5-flash-lite",
+      voxcpmUrl: "http://127.0.0.1:9880/tts",
+      requestTimeoutMs: 1000,
+    },
+    businessName: "Marga",
+    agentName: "Pitch",
+    callerId: "+639171234567",
+  });
+  brain.history = [
+    { role: "caller", text: "old caller turn" },
+    { role: "pitch", text: "old pitch turn" },
+    { role: "caller", text: "recent caller one" },
+    { role: "pitch", text: "recent pitch two" },
+    { role: "caller", text: "recent caller three" },
+  ];
+
+  const prompt = brain._buildReplyPrompt("latest question");
+  assert.ok(!prompt.includes("old caller turn"));
+  assert.ok(!prompt.includes("old pitch turn"));
+  assert.ok(prompt.includes("recent caller one"));
+  assert.ok(prompt.includes("recent pitch two"));
+  assert.ok(prompt.includes("recent caller three"));
+  assert.ok(prompt.includes("Prefer 15 to 30 spoken words"));
 });
 
 test("SDP parses an AIO100-style offer and prefers G.711", () => {

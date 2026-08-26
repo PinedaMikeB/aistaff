@@ -23,13 +23,20 @@ function int(value, fallback) {
   return Number.isFinite(n) ? n : fallback;
 }
 
+const { resolveBrainProvider, readConfig } = require("./runtime-config");
+
 const config = {
   // Master feature flag. Pitch never affects Closer or Brandee when off.
   enabled: bool(process.env.PITCH_ENABLED, false),
 
-  // Which speech-to-speech brain to use. "openai" today; "gemini" once a
-  // GEMINI_API_KEY exists. Adapter selected in brain/index.js.
-  brainProvider: process.env.PITCH_BRAIN_PROVIDER || "openai",
+  // Which voice pipeline to use. `gemini` is the proven live fallback.
+  // `local` is whisper.cpp/VAD -> Gemini text -> local TTS (Piper).
+  //
+  // The AI Studio "Pitch" tab writes local-runtime/pitch-config.json, which
+  // takes priority over the env var so the toggle actually reroutes calls.
+  // When no config file exists the env var wins, so behaviour is unchanged
+  // until someone uses the UI. Read at startup — a restart applies a change.
+  brainProvider: resolveBrainProvider(process.env.PITCH_BRAIN_PROVIDER || "openai"),
 
   sip: {
     // The AIO100 gateway acts as the SIP server (built-in IPPBX).
@@ -107,7 +114,9 @@ const config = {
     // 2.5-flash-native-audio. On a phone call that gap is the whole product.
     liveModel: process.env.PITCH_GEMINI_LIVE_MODEL || "gemini-3.1-flash-live-preview",
     // Prebuilt voice name only. There is deliberately no language setting.
-    voice: process.env.PITCH_GEMINI_VOICE || "Aoede",
+    // The AI Studio Pitch tab overrides this; env is the fallback.
+    voice: (readConfig().geminiLive || {}).voice
+      || process.env.PITCH_GEMINI_VOICE || "Aoede",
     // Plain text model for SMS. Live/native-audio models bill at audio rates,
     // which would be absurd for typed messages.
     // gemini-3.5-flash-lite: ~940ms, clean Taglish, and it does NOT burn the
@@ -115,6 +124,46 @@ const config = {
     // do — both returned truncated fragments on a 200-token cap.
     // Do not pin 2.5-flash: it is closed to new accounts and fails at runtime.
     textModel: process.env.PITCH_GEMINI_TEXT_MODEL || "gemini-3.5-flash-lite",
+  },
+
+  localPipeline: {
+    // Speech-to-text is local whisper.cpp by default. It must not set a
+    // language; Taglish/Tagalog/English are inferred from the audio.
+    whisperUrl: process.env.PITCH_LOCAL_WHISPER_URL || "http://127.0.0.1:8080/inference",
+    whisperModel: process.env.PITCH_LOCAL_WHISPER_MODEL || "whisper-1",
+    // Text reasoning model. Separate from Live because this path already has
+    // audio handled by Whisper/VoxCPM2.
+    geminiTextModel: process.env.PITCH_LOCAL_GEMINI_TEXT_MODEL ||
+      process.env.PITCH_GEMINI_TEXT_MODEL || "gemini-3.5-flash-lite",
+
+    // Local TTS endpoint. The name is historical — this now points at Piper
+    // (port 9891) by default, not VoxCPM2, which never fit on this hardware.
+    // The endpoint stays configurable because local TTS wrappers differ. We
+    // accept WAV/PCM bytes or JSON with a base64 audio field; see
+    // brain/local-pipeline.js.
+    voxcpmUrl: process.env.PITCH_VOXCPM2_URL || "http://127.0.0.1:9891/",
+    voxcpmVoice: process.env.PITCH_VOXCPM2_VOICE || "",
+    voxcpmSampleRate: int(process.env.PITCH_VOXCPM2_SAMPLE_RATE, 24000),
+    requestTimeoutMs: int(process.env.PITCH_LOCAL_REQUEST_TIMEOUT_MS, 20000),
+    temperature: Number.isFinite(Number(process.env.PITCH_LOCAL_TEMPERATURE))
+      ? Number(process.env.PITCH_LOCAL_TEMPERATURE) : 0.75,
+    maxOutputTokens: int(process.env.PITCH_LOCAL_MAX_OUTPUT_TOKENS, 120),
+    historyTurns: int(process.env.PITCH_LOCAL_HISTORY_TURNS, 6),
+    logMetrics: bool(process.env.PITCH_LOCAL_LOG_METRICS, true),
+
+    // Simple energy VAD over phone audio. These are intentionally env-tunable:
+    // the real threshold depends on gateway gain, room noise, and handset.
+    vadThreshold: int(process.env.PITCH_LOCAL_VAD_THRESHOLD, 650),
+    vadSilenceMs: int(process.env.PITCH_LOCAL_VAD_SILENCE_MS, 700),
+    vadMinSpeechMs: int(process.env.PITCH_LOCAL_VAD_MIN_SPEECH_MS, 260),
+    vadMaxSpeechMs: int(process.env.PITCH_LOCAL_VAD_MAX_SPEECH_MS, 12000),
+
+    // How long the caller must speak CONTINUOUSLY before we cut the agent off.
+    // A single frame over the threshold is a click, a breath, or the agent's
+    // own voice echoing back through the gateway — flushing on that truncated
+    // the greeting after two words. 300 ms is long enough to be a real word
+    // and short enough that interrupting still feels immediate.
+    bargeInMinMs: int(process.env.PITCH_LOCAL_BARGE_IN_MIN_MS, 300),
   },
 
   // Business identity spoken on answer. Falls back to brand vars already
