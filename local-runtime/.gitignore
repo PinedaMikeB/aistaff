@@ -1,0 +1,25 @@
+# Voice-lab: keep the SCRIPTS, never the audio or the models.
+#
+# The phrase sets are the durable asset — they took real work to build and
+# they train every future voice. Recordings are large binaries tied to one
+# actor, and models are re-downloadable.
+
+# recordings and their metadata (back these up separately, not in git)
+local-runtime/voice-lab/dataset/
+local-runtime/voice-lab/previews/
+
+# downloaded model weights and virtualenvs
+local-runtime/models/
+local-runtime/venvs/
+local-runtime/piper/voices/
+local-runtime/piper/samples/
+local-runtime/piper/previews/
+local-runtime/whisper.cpp/
+*.onnx
+*.bin
+*.wav
+*.pt
+*.safetensors
+
+# runtime state
+local-runtime/pitch-config.json

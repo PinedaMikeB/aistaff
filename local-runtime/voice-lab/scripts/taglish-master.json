@@ -1,0 +1,6667 @@
+{
+  "name": "Taglish Master — AIStaff Pitch voice",
+  "generated": "2026-08-27T07:44:41.306Z",
+  "totalLines": 1110,
+  "lines": [
+    {
+      "id": "grt001",
+      "text": "Good morning there! How can I help you today?",
+      "tag": "greeting_opening",
+      "mode": "bright"
+    },
+    {
+      "id": "grt002",
+      "text": "Hello, thank you for calling our shop this afternoon.",
+      "tag": "greeting_opening",
+      "mode": "bright"
+    },
+    {
+      "id": "grt003",
+      "text": "Thank you for reaching out, my name is Anna.",
+      "tag": "greeting_opening",
+      "mode": "bright"
+    },
+    {
+      "id": "grt004",
+      "text": "Hi there, what can I do for you right now?",
+      "tag": "greeting_opening",
+      "mode": "bright"
+    },
+    {
+      "id": "grt005",
+      "text": "Welcome back, ma'am — it is great to hear from you again.",
+      "tag": "greeting_opening",
+      "mode": "bright"
+    },
+    {
+      "id": "grt006",
+      "text": "Good afternoon! Is this your first time ordering with us?",
+      "tag": "greeting_opening",
+      "mode": "bright"
+    },
+    {
+      "id": "grt007",
+      "text": "Hi there! How can I help you with your inquiries?",
+      "tag": "greeting_opening",
+      "mode": "bright"
+    },
+    {
+      "id": "grt008",
+      "text": "Good day! What can I assist you with right now?",
+      "tag": "greeting_opening",
+      "mode": "bright"
+    },
+    {
+      "id": "grt009",
+      "text": "Hi sir, thanks for calling — how may I help you?",
+      "tag": "greeting_opening",
+      "mode": "bright"
+    },
+    {
+      "id": "grt010",
+      "text": "I am glad you called, how can we help?",
+      "tag": "greeting_opening",
+      "mode": "bright"
+    },
+    {
+      "id": "grt011",
+      "text": "Good evening, thank you for contacting customer service!",
+      "tag": "greeting_opening",
+      "mode": "bright"
+    },
+    {
+      "id": "grt012",
+      "text": "Hello there, ma'am! Are you looking for a specific item?",
+      "tag": "greeting_opening",
+      "mode": "bright"
+    },
+    {
+      "id": "grt013",
+      "text": "Please hold the line for just a moment.",
+      "tag": "greeting_opening",
+      "mode": "neutral"
+    },
+    {
+      "id": "grt014",
+      "text": "May I have your full name, please?",
+      "tag": "greeting_opening",
+      "mode": "neutral"
+    },
+    {
+      "id": "grt015",
+      "text": "Just checking if you can still hear me clearly?",
+      "tag": "greeting_opening",
+      "mode": "neutral"
+    },
+    {
+      "id": "grt016",
+      "text": "Let me pull up your account details right now.",
+      "tag": "greeting_opening",
+      "mode": "neutral"
+    },
+    {
+      "id": "grt017",
+      "text": "Can I get your registered phone number, sir?",
+      "tag": "greeting_opening",
+      "mode": "neutral"
+    },
+    {
+      "id": "grt018",
+      "text": "Kindly hold on while I check that for you.",
+      "tag": "greeting_opening",
+      "mode": "neutral"
+    },
+    {
+      "id": "grt019",
+      "text": "Do not worry, I will figure this out for you.",
+      "tag": "greeting_opening",
+      "mode": "reassuring"
+    },
+    {
+      "id": "grt020",
+      "text": "Rest assured, we are looking into your previous inquiry.",
+      "tag": "greeting_opening",
+      "mode": "reassuring"
+    },
+    {
+      "id": "grt021",
+      "text": "Magandang araw po! Ano pong maipaglilingkod ko sa inyo?",
+      "tag": "greeting_opening",
+      "mode": "bright"
+    },
+    {
+      "id": "grt022",
+      "text": "Maligayang bati po, ako pala si Grace.",
+      "tag": "greeting_opening",
+      "mode": "bright"
+    },
+    {
+      "id": "grt023",
+      "text": "Salamat sa pagtawag, tulungan ko na kayo diyan.",
+      "tag": "greeting_opening",
+      "mode": "bright"
+    },
+    {
+      "id": "grt024",
+      "text": "Kumusta po kayo ngayong umaga? Ano pong kailangan ninyo?",
+      "tag": "greeting_opening",
+      "mode": "bright"
+    },
+    {
+      "id": "grt025",
+      "text": "Tuloy po kayo sa aming linya, ano pong kailangan ninyo?",
+      "tag": "greeting_opening",
+      "mode": "bright"
+    },
+    {
+      "id": "grt026",
+      "text": "Heto na po ako, handang sumagot sa inyong katanungan.",
+      "tag": "greeting_opening",
+      "mode": "bright"
+    },
+    {
+      "id": "grt027",
+      "text": "Sandali lamang po, kukunin ko ang inyong impormasyon.",
+      "tag": "greeting_opening",
+      "mode": "neutral"
+    },
+    {
+      "id": "grt028",
+      "text": "Maaari ko bang malaman ang buong pangalan ninyo?",
+      "tag": "greeting_opening",
+      "mode": "neutral"
+    },
+    {
+      "id": "grt029",
+      "text": "Huwag kayong mag-alala, gagawan natin ito ng paraan.",
+      "tag": "greeting_opening",
+      "mode": "reassuring"
+    },
+    {
+      "id": "grt030",
+      "text": "Paumanhin po, sarado na ang aming tindahan ngayon.",
+      "tag": "greeting_opening",
+      "mode": "apologetic"
+    },
+    {
+      "id": "grt031",
+      "text": "Hello po! Paano ko po kayo matutulungan today?",
+      "tag": "greeting_opening",
+      "mode": "bright"
+    },
+    {
+      "id": "grt032",
+      "text": "Good morning po, welcome sa aming shop!",
+      "tag": "greeting_opening",
+      "mode": "bright"
+    },
+    {
+      "id": "grt033",
+      "text": "Hi po sir, ako po si Liza — ano pong kailangan natin?",
+      "tag": "greeting_opening",
+      "mode": "bright"
+    },
+    {
+      "id": "grt034",
+      "text": "Yes ma'am, nakuha ko na po yung inquiry ninyo.",
+      "tag": "greeting_opening",
+      "mode": "bright"
+    },
+    {
+      "id": "grt035",
+      "text": "Salamat po sa pag-message sa aming Facebook page!",
+      "tag": "greeting_opening",
+      "mode": "bright"
+    },
+    {
+      "id": "grt036",
+      "text": "Ayun sir, clear na po ang boses ninyo.",
+      "tag": "greeting_opening",
+      "mode": "bright"
+    },
+    {
+      "id": "grt037",
+      "text": "Aba, buti tumawag kayo — paano ko po kayo matutulungan?",
+      "tag": "greeting_opening",
+      "mode": "bright"
+    },
+    {
+      "id": "grt038",
+      "text": "Opo, may tsansa pa po tayong mag-place ng order today.",
+      "tag": "greeting_opening",
+      "mode": "bright"
+    },
+    {
+      "id": "grt039",
+      "text": "Good afternoon po! Kayo po ba si Sir Mark?",
+      "tag": "greeting_opening",
+      "mode": "bright"
+    },
+    {
+      "id": "grt040",
+      "text": "Tama po kayo, ako nga po si Joy na ka-chat ninyo kahapon.",
+      "tag": "greeting_opening",
+      "mode": "bright"
+    },
+    {
+      "id": "grt041",
+      "text": "Ayon ma'am, nakita ko na yung chat ninyo sa Viber.",
+      "tag": "greeting_opening",
+      "mode": "bright"
+    },
+    {
+      "id": "grt042",
+      "text": "Ay, hello po! Kamusta po ang araw natin?",
+      "tag": "greeting_opening",
+      "mode": "bright"
+    },
+    {
+      "id": "grt043",
+      "text": "Nakuha ko na po, ready na for checking.",
+      "tag": "greeting_opening",
+      "mode": "bright"
+    },
+    {
+      "id": "grt044",
+      "text": "Ayos po ang pagtawag ninyo, ano po ang hanap natin?",
+      "tag": "greeting_opening",
+      "mode": "bright"
+    },
+    {
+      "id": "grt045",
+      "text": "Kumusta po, ma'am? Ano pong maipaglilingkod ko sa inyo ngayon?",
+      "tag": "greeting_opening",
+      "mode": "bright"
+    },
+    {
+      "id": "grt046",
+      "text": "Magandang hapon po! Paano ko po kayo matutulungan?",
+      "tag": "greeting_opening",
+      "mode": "bright"
+    },
+    {
+      "id": "grt047",
+      "text": "Balik po kayo sa linya natin, welcome back ma'am!",
+      "tag": "greeting_opening",
+      "mode": "bright"
+    },
+    {
+      "id": "grt048",
+      "text": "Nice to hear your voice po uli, sir.",
+      "tag": "greeting_opening",
+      "mode": "bright"
+    },
+    {
+      "id": "grt049",
+      "text": "Magandang gabi po, open pa naman kami for inquiries.",
+      "tag": "greeting_opening",
+      "mode": "bright"
+    },
+    {
+      "id": "grt050",
+      "text": "Saktong-sakto po ang tawag ninyo sa aming hotline ngayon.",
+      "tag": "greeting_opening",
+      "mode": "bright"
+    },
+    {
+      "id": "grt051",
+      "text": "Pasok po kayo, ano po ang maari kong tulong sa inyo?",
+      "tag": "greeting_opening",
+      "mode": "bright"
+    },
+    {
+      "id": "grt052",
+      "text": "Go ahead lang po, nakikinig ako sa inyo.",
+      "tag": "greeting_opening",
+      "mode": "bright"
+    },
+    {
+      "id": "grt053",
+      "text": "Welcome po sa aming shop, paano po kayo matutulungan?",
+      "tag": "greeting_opening",
+      "mode": "bright"
+    },
+    {
+      "id": "grt054",
+      "text": "Noted po yan, ita-type ko lang dito sa system.",
+      "tag": "greeting_opening",
+      "mode": "bright"
+    },
+    {
+      "id": "grt055",
+      "text": "Okay na okay po, simulan na natin ang pag-uusap.",
+      "tag": "greeting_opening",
+      "mode": "bright"
+    },
+    {
+      "id": "grt056",
+      "text": "Hello po, Faith po ito — ano po ang sadya ninyo?",
+      "tag": "greeting_opening",
+      "mode": "bright"
+    },
+    {
+      "id": "grt057",
+      "text": "Mabuhay po! Thank you for calling, paano ko kayo maa-assist today?",
+      "tag": "greeting_opening",
+      "mode": "bright"
+    },
+    {
+      "id": "grt058",
+      "text": "Hello again ma'am! Nawala po yata tayo sa line kanina.",
+      "tag": "greeting_opening",
+      "mode": "bright"
+    },
+    {
+      "id": "grt059",
+      "text": "Maraming salamat sa pagtawag, ano po ang maipaglilingkod ko?",
+      "tag": "greeting_opening",
+      "mode": "bright"
+    },
+    {
+      "id": "grt060",
+      "text": "Andito na po ako para sumagot sa mga tanong ninyo.",
+      "tag": "greeting_opening",
+      "mode": "bright"
+    },
+    {
+      "id": "grt061",
+      "text": "Ready to assist po ako ngayon, ano pong inquiry natin?",
+      "tag": "greeting_opening",
+      "mode": "bright"
+    },
+    {
+      "id": "grt062",
+      "text": "Pakiusap po, sabihin niyo lang kung ano ang kailangan ninyo.",
+      "tag": "greeting_opening",
+      "mode": "bright"
+    },
+    {
+      "id": "grt063",
+      "text": "Happy to help po talaga! Kukunin ko lang yung details.",
+      "tag": "greeting_opening",
+      "mode": "bright"
+    },
+    {
+      "id": "grt064",
+      "text": "Para po masimulan natin, pwede ko bang mahingi ang pangalan?",
+      "tag": "greeting_opening",
+      "mode": "bright"
+    },
+    {
+      "id": "grt065",
+      "text": "Sige sir, paki-spell na lang po ng pangalan natin.",
+      "tag": "greeting_opening",
+      "mode": "bright"
+    },
+    {
+      "id": "grt066",
+      "text": "I am back on the line po, salamat sa paghihintay.",
+      "tag": "greeting_opening",
+      "mode": "bright"
+    },
+    {
+      "id": "grt067",
+      "text": "Siyempre naman po, ipapaliwanag ko lahat in detail.",
+      "tag": "greeting_opening",
+      "mode": "bright"
+    },
+    {
+      "id": "grt068",
+      "text": "Narito na po ako para umasikaso sa inyo, ma'am.",
+      "tag": "greeting_opening",
+      "mode": "bright"
+    },
+    {
+      "id": "grt069",
+      "text": "Yes po, tama po yung tinawagan ninyo.",
+      "tag": "greeting_opening",
+      "mode": "bright"
+    },
+    {
+      "id": "grt070",
+      "text": "Nako, salamat po sa pag-callback sa akin ngayon!",
+      "tag": "greeting_opening",
+      "mode": "bright"
+    },
+    {
+      "id": "grt071",
+      "text": "Ay opo, ako yung naka-chat ninyo sa Shopee.",
+      "tag": "greeting_opening",
+      "mode": "bright"
+    },
+    {
+      "id": "grt072",
+      "text": "Sige nga po, silipin ko yung complete record natin.",
+      "tag": "greeting_opening",
+      "mode": "bright"
+    },
+    {
+      "id": "grt073",
+      "text": "Paki-hold lang po ng ilang sandali, iche-check ko.",
+      "tag": "greeting_opening",
+      "mode": "neutral"
+    },
+    {
+      "id": "grt074",
+      "text": "Pwede po bang mahingi ang inyong cellphone number?",
+      "tag": "greeting_opening",
+      "mode": "neutral"
+    },
+    {
+      "id": "grt075",
+      "text": "Sandali lang po, balikan ko kayo pagkatapos i-check.",
+      "tag": "greeting_opening",
+      "mode": "neutral"
+    },
+    {
+      "id": "grt076",
+      "text": "Ano po yung napag-usapan natin sa last call ninyo?",
+      "tag": "greeting_opening",
+      "mode": "neutral"
+    },
+    {
+      "id": "grt077",
+      "text": "Teka sandali lang po ha, naglo-load lang yung computer ko.",
+      "tag": "greeting_opening",
+      "mode": "neutral"
+    },
+    {
+      "id": "grt078",
+      "text": "Kukunin ko lang po muna ang basic details ninyo.",
+      "tag": "greeting_opening",
+      "mode": "neutral"
+    },
+    {
+      "id": "grt079",
+      "text": "Paki-ulit nga po ng exact details na sinabi ninyo kanina?",
+      "tag": "greeting_opening",
+      "mode": "neutral"
+    },
+    {
+      "id": "grt080",
+      "text": "Ma'am, nandiyan pa po ba kayo sa kabilang linya?",
+      "tag": "greeting_opening",
+      "mode": "neutral"
+    },
+    {
+      "id": "grt081",
+      "text": "Paki-bigay na lang po yung reference code kanina.",
+      "tag": "greeting_opening",
+      "mode": "neutral"
+    },
+    {
+      "id": "grt082",
+      "text": "Hahanapin ko lang po yung previous chat history ninyo.",
+      "tag": "greeting_opening",
+      "mode": "neutral"
+    },
+    {
+      "id": "grt083",
+      "text": "Para po sa record natin, Rica po itong kausap ninyo.",
+      "tag": "greeting_opening",
+      "mode": "neutral"
+    },
+    {
+      "id": "grt084",
+      "text": "Medyo sandali lang po, hahanapin ko lang yung record niyo.",
+      "tag": "greeting_opening",
+      "mode": "neutral"
+    },
+    {
+      "id": "grt085",
+      "text": "Babalikan ko po kayo within five minutes, promise.",
+      "tag": "greeting_opening",
+      "mode": "neutral"
+    },
+    {
+      "id": "grt086",
+      "text": "I-double check ko lang ha, para sure tayo.",
+      "tag": "greeting_opening",
+      "mode": "neutral"
+    },
+    {
+      "id": "grt087",
+      "text": "Ilalagay ko po kayo on hold sandali, sir.",
+      "tag": "greeting_opening",
+      "mode": "neutral"
+    },
+    {
+      "id": "grt088",
+      "text": "Ano po uli yung last name na binigay ninyo kanina?",
+      "tag": "greeting_opening",
+      "mode": "neutral"
+    },
+    {
+      "id": "grt089",
+      "text": "Wait lang po, nagha-hang ata ang aking screen.",
+      "tag": "greeting_opening",
+      "mode": "neutral"
+    },
+    {
+      "id": "grt090",
+      "text": "Huwag po kayong magmadali, sasagutin ko po isa-isa ang tanong ninyo.",
+      "tag": "greeting_opening",
+      "mode": "reassuring"
+    },
+    {
+      "id": "grt091",
+      "text": "Malinaw po ang boses ninyo, huwag po kayong mag-alala.",
+      "tag": "greeting_opening",
+      "mode": "reassuring"
+    },
+    {
+      "id": "grt092",
+      "text": "Nauunawaan ko po na nagmamadali kayo, aayusin natin ito nang mabilis.",
+      "tag": "greeting_opening",
+      "mode": "reassuring"
+    },
+    {
+      "id": "grt093",
+      "text": "Mag-relax lang po kayo, tutulungan ko kayong makapili.",
+      "tag": "greeting_opening",
+      "mode": "reassuring"
+    },
+    {
+      "id": "grt094",
+      "text": "Bata pa po ang araw, mahahabol natin ang gusto ninyo.",
+      "tag": "greeting_opening",
+      "mode": "reassuring"
+    },
+    {
+      "id": "grt095",
+      "text": "Mabuti at tumawag kayo muli, sasamahan ko kayo.",
+      "tag": "greeting_opening",
+      "mode": "reassuring"
+    },
+    {
+      "id": "grt096",
+      "text": "Take your time po sa paghanap ng details, maghihintay ako.",
+      "tag": "greeting_opening",
+      "mode": "reassuring"
+    },
+    {
+      "id": "grt097",
+      "text": "Pasensya na po kung naputol ang tawag natin kanina.",
+      "tag": "greeting_opening",
+      "mode": "apologetic"
+    },
+    {
+      "id": "grt098",
+      "text": "Naku sorry po, closed na pala yung system namin ngayon.",
+      "tag": "greeting_opening",
+      "mode": "apologetic"
+    },
+    {
+      "id": "grt099",
+      "text": "Sorry talaga sa paghihintay, medyo madami lang pong calls.",
+      "tag": "greeting_opening",
+      "mode": "apologetic"
+    },
+    {
+      "id": "grt100",
+      "text": "Hala pasensya na po, hindi ko masyadong narinig yung sinabi ninyo.",
+      "tag": "greeting_opening",
+      "mode": "apologetic"
+    },
+    {
+      "id": "prd001",
+      "text": "We have that item in stock right now.",
+      "tag": "product_availability",
+      "mode": "bright"
+    },
+    {
+      "id": "prd002",
+      "text": "Yes, the medium size is available today.",
+      "tag": "product_availability",
+      "mode": "bright"
+    },
+    {
+      "id": "prd003",
+      "text": "I am sorry, that colour is sold out at the moment.",
+      "tag": "product_availability",
+      "mode": "apologetic"
+    },
+    {
+      "id": "prd004",
+      "text": "We expect a new delivery by Friday morning.",
+      "tag": "product_availability",
+      "mode": "neutral"
+    },
+    {
+      "id": "prd005",
+      "text": "Which size are you looking for, ma'am?",
+      "tag": "product_availability",
+      "mode": "neutral"
+    },
+    {
+      "id": "prd006",
+      "text": "We carry it in red, blue and black.",
+      "tag": "product_availability",
+      "mode": "neutral"
+    },
+    {
+      "id": "prd007",
+      "text": "Only three pieces are left of that one.",
+      "tag": "product_availability",
+      "mode": "neutral"
+    },
+    {
+      "id": "prd008",
+      "text": "Let me check the stockroom for you.",
+      "tag": "product_availability",
+      "mode": "neutral"
+    },
+    {
+      "id": "prd009",
+      "text": "That model was discontinued, but we have a similar one.",
+      "tag": "product_availability",
+      "mode": "apologetic"
+    },
+    {
+      "id": "prd010",
+      "text": "The larger version is more popular with our customers.",
+      "tag": "product_availability",
+      "mode": "neutral"
+    },
+    {
+      "id": "prd011",
+      "text": "Both work well, but the second one lasts longer.",
+      "tag": "product_availability",
+      "mode": "neutral"
+    },
+    {
+      "id": "prd012",
+      "text": "I can reserve one for you until tomorrow.",
+      "tag": "product_availability",
+      "mode": "bright"
+    },
+    {
+      "id": "prd013",
+      "text": "Unfortunately we are out of that until next week.",
+      "tag": "product_availability",
+      "mode": "apologetic"
+    },
+    {
+      "id": "prd014",
+      "text": "Would you like me to suggest an alternative?",
+      "tag": "product_availability",
+      "mode": "reassuring"
+    },
+    {
+      "id": "prd015",
+      "text": "That one comes with a one year warranty.",
+      "tag": "product_availability",
+      "mode": "neutral"
+    },
+    {
+      "id": "prd016",
+      "text": "We just restocked it this morning.",
+      "tag": "product_availability",
+      "mode": "bright"
+    },
+    {
+      "id": "prd017",
+      "text": "The small and the large are both available.",
+      "tag": "product_availability",
+      "mode": "neutral"
+    },
+    {
+      "id": "prd018",
+      "text": "It comes in a set of two.",
+      "tag": "product_availability",
+      "mode": "neutral"
+    },
+    {
+      "id": "prd019",
+      "text": "Let me confirm the exact quantity for you.",
+      "tag": "product_availability",
+      "mode": "neutral"
+    },
+    {
+      "id": "prd020",
+      "text": "Do not worry, we can order it in for you.",
+      "tag": "product_availability",
+      "mode": "reassuring"
+    },
+    {
+      "id": "prd021",
+      "text": "Meron pa po kaming stock niyan ngayon.",
+      "tag": "product_availability",
+      "mode": "bright"
+    },
+    {
+      "id": "prd022",
+      "text": "Naubos na po ang pula, pero may asul pa kami.",
+      "tag": "product_availability",
+      "mode": "apologetic"
+    },
+    {
+      "id": "prd023",
+      "text": "Tatlong piraso na lang po ang natitira.",
+      "tag": "product_availability",
+      "mode": "neutral"
+    },
+    {
+      "id": "prd024",
+      "text": "Anong laki po ang hinahanap ninyo?",
+      "tag": "product_availability",
+      "mode": "neutral"
+    },
+    {
+      "id": "prd025",
+      "text": "Titingnan ko po sa bodega kung mayroon pa.",
+      "tag": "product_availability",
+      "mode": "neutral"
+    },
+    {
+      "id": "prd026",
+      "text": "Darating po ang bagong padala sa Biyernes.",
+      "tag": "product_availability",
+      "mode": "neutral"
+    },
+    {
+      "id": "prd027",
+      "text": "Matibay po talaga ang gawa niyan.",
+      "tag": "product_availability",
+      "mode": "bright"
+    },
+    {
+      "id": "prd028",
+      "text": "Huwag po kayong mag-alala, ipagpapareserba ko kayo.",
+      "tag": "product_availability",
+      "mode": "reassuring"
+    },
+    {
+      "id": "prd029",
+      "text": "May kasama pong garantiya ng isang taon.",
+      "tag": "product_availability",
+      "mode": "neutral"
+    },
+    {
+      "id": "prd030",
+      "text": "Paumanhin po, wala na kaming natitira niyan.",
+      "tag": "product_availability",
+      "mode": "apologetic"
+    },
+    {
+      "id": "prd031",
+      "text": "Meron po kaming stock niyan, sir — available in medium and large.",
+      "tag": "product_availability",
+      "mode": "bright"
+    },
+    {
+      "id": "prd032",
+      "text": "Available po yung blue at yung black ngayon.",
+      "tag": "product_availability",
+      "mode": "bright"
+    },
+    {
+      "id": "prd033",
+      "text": "Sorry po, out of stock na po yung small size.",
+      "tag": "product_availability",
+      "mode": "apologetic"
+    },
+    {
+      "id": "prd034",
+      "text": "Yung large po, meron pa kaming tatlong piraso.",
+      "tag": "product_availability",
+      "mode": "neutral"
+    },
+    {
+      "id": "prd035",
+      "text": "I-check ko lang po yung inventory namin, sandali.",
+      "tag": "product_availability",
+      "mode": "neutral"
+    },
+    {
+      "id": "prd036",
+      "text": "Restock po kami ng bagong batch by Friday.",
+      "tag": "product_availability",
+      "mode": "neutral"
+    },
+    {
+      "id": "prd037",
+      "text": "Ano pong size ang kailangan ninyo, ma'am?",
+      "tag": "product_availability",
+      "mode": "neutral"
+    },
+    {
+      "id": "prd038",
+      "text": "Bestseller po talaga yan, mabilis maubos.",
+      "tag": "product_availability",
+      "mode": "bright"
+    },
+    {
+      "id": "prd039",
+      "text": "May warranty po yan, isang taon, sir.",
+      "tag": "product_availability",
+      "mode": "neutral"
+    },
+    {
+      "id": "prd040",
+      "text": "Pwede po kayong pumili sa tatlong kulay na available.",
+      "tag": "product_availability",
+      "mode": "neutral"
+    },
+    {
+      "id": "prd041",
+      "text": "Yung item po na tinatanong ninyo ay nasa display pa.",
+      "tag": "product_availability",
+      "mode": "neutral"
+    },
+    {
+      "id": "prd042",
+      "text": "Ay, kakaubos lang po nun kaninang umaga.",
+      "tag": "product_availability",
+      "mode": "apologetic"
+    },
+    {
+      "id": "prd043",
+      "text": "Meron po kaming similar item na mas matibay pa.",
+      "tag": "product_availability",
+      "mode": "reassuring"
+    },
+    {
+      "id": "prd044",
+      "text": "I-reserve ko po muna para sa inyo hanggang bukas.",
+      "tag": "product_availability",
+      "mode": "bright"
+    },
+    {
+      "id": "prd045",
+      "text": "Nasa stock list po namin yan, hintay lang po.",
+      "tag": "product_availability",
+      "mode": "neutral"
+    },
+    {
+      "id": "prd046",
+      "text": "Pareho pong maganda, pero mas matagal yung una.",
+      "tag": "product_availability",
+      "mode": "neutral"
+    },
+    {
+      "id": "prd047",
+      "text": "Yung bagong model po, mas okay ang quality.",
+      "tag": "product_availability",
+      "mode": "bright"
+    },
+    {
+      "id": "prd048",
+      "text": "Discontinued na po yun, pero may kapalit kami.",
+      "tag": "product_availability",
+      "mode": "apologetic"
+    },
+    {
+      "id": "prd049",
+      "text": "Limited stock na lang po, sir — dalawa na lang.",
+      "tag": "product_availability",
+      "mode": "neutral"
+    },
+    {
+      "id": "prd050",
+      "text": "Kumpleto po ang sizes namin from small to extra large.",
+      "tag": "product_availability",
+      "mode": "bright"
+    },
+    {
+      "id": "prd051",
+      "text": "Set po yan ng dalawa, hindi po tinitingi.",
+      "tag": "product_availability",
+      "mode": "neutral"
+    },
+    {
+      "id": "prd052",
+      "text": "Gusto niyo po bang i-compare natin yung dalawa?",
+      "tag": "product_availability",
+      "mode": "neutral"
+    },
+    {
+      "id": "prd053",
+      "text": "Ang ganda po ng napili ninyo, yan po ang top seller.",
+      "tag": "product_availability",
+      "mode": "bright"
+    },
+    {
+      "id": "prd054",
+      "text": "Kakarating lang po ng bagong shipment kanina.",
+      "tag": "product_availability",
+      "mode": "bright"
+    },
+    {
+      "id": "prd055",
+      "text": "Wala po kaming stock nun sa branch na ito.",
+      "tag": "product_availability",
+      "mode": "apologetic"
+    },
+    {
+      "id": "prd056",
+      "text": "Pero pwede ko pong i-check sa kabilang store.",
+      "tag": "product_availability",
+      "mode": "reassuring"
+    },
+    {
+      "id": "prd057",
+      "text": "Original po yan, may resibo at warranty card.",
+      "tag": "product_availability",
+      "mode": "neutral"
+    },
+    {
+      "id": "prd058",
+      "text": "Yung stock po namin ngayon ay limited edition.",
+      "tag": "product_availability",
+      "mode": "bright"
+    },
+    {
+      "id": "prd059",
+      "text": "Naka-display po yan sa aming Facebook page.",
+      "tag": "product_availability",
+      "mode": "neutral"
+    },
+    {
+      "id": "prd060",
+      "text": "Sandali lang po, tatanungin ko lang yung supervisor.",
+      "tag": "product_availability",
+      "mode": "neutral"
+    },
+    {
+      "id": "prd061",
+      "text": "Meron pa po tayong dalawang kulay na pwedeng pagpilian.",
+      "tag": "product_availability",
+      "mode": "neutral"
+    },
+    {
+      "id": "prd062",
+      "text": "Yung mas mura po, medyo manipis lang ang material.",
+      "tag": "product_availability",
+      "mode": "neutral"
+    },
+    {
+      "id": "prd063",
+      "text": "Recommended ko po yung mas malaki, mas sulit.",
+      "tag": "product_availability",
+      "mode": "bright"
+    },
+    {
+      "id": "prd064",
+      "text": "Naku, isang piraso na lang po ang natitira niyan.",
+      "tag": "product_availability",
+      "mode": "neutral"
+    },
+    {
+      "id": "prd065",
+      "text": "Bukas po siguradong meron na kaming bagong stock.",
+      "tag": "product_availability",
+      "mode": "reassuring"
+    },
+    {
+      "id": "prd066",
+      "text": "Hindi po namin binebenta yun nang hiwalay.",
+      "tag": "product_availability",
+      "mode": "neutral"
+    },
+    {
+      "id": "prd067",
+      "text": "Same po ang quality, iba lang po ang packaging.",
+      "tag": "product_availability",
+      "mode": "neutral"
+    },
+    {
+      "id": "prd068",
+      "text": "Yung item po na yun ay for pre-order pa lang.",
+      "tag": "product_availability",
+      "mode": "neutral"
+    },
+    {
+      "id": "prd069",
+      "text": "Marami pa po kaming variant na hindi naka-post.",
+      "tag": "product_availability",
+      "mode": "bright"
+    },
+    {
+      "id": "prd070",
+      "text": "Kaya ko pong i-hold yan para sa inyo ngayong araw.",
+      "tag": "product_availability",
+      "mode": "reassuring"
+    },
+    {
+      "id": "prd071",
+      "text": "Tuloy-tuloy po ang supply namin niyan buwan-buwan.",
+      "tag": "product_availability",
+      "mode": "bright"
+    },
+    {
+      "id": "prd072",
+      "text": "Sorry po talaga, hindi ko po masagot yan agad.",
+      "tag": "product_availability",
+      "mode": "apologetic"
+    },
+    {
+      "id": "prd073",
+      "text": "Pwede po kayong pumunta sa store para makita.",
+      "tag": "product_availability",
+      "mode": "neutral"
+    },
+    {
+      "id": "prd074",
+      "text": "May sample po kami dito, gusto niyo pong picturan?",
+      "tag": "product_availability",
+      "mode": "bright"
+    },
+    {
+      "id": "prd075",
+      "text": "Ang laman po ng isang box ay labindalawang piraso.",
+      "tag": "product_availability",
+      "mode": "neutral"
+    },
+    {
+      "id": "prd076",
+      "text": "Konti na lang po ang natitira, baka maubos mamaya.",
+      "tag": "product_availability",
+      "mode": "neutral"
+    },
+    {
+      "id": "prd077",
+      "text": "Bagong labas po yan, kakadating lang last week.",
+      "tag": "product_availability",
+      "mode": "bright"
+    },
+    {
+      "id": "prd078",
+      "text": "Yung heavy duty po, mas mabigat pero mas matibay.",
+      "tag": "product_availability",
+      "mode": "neutral"
+    },
+    {
+      "id": "prd079",
+      "text": "Hanapin ko lang po sa system, sandali lang po.",
+      "tag": "product_availability",
+      "mode": "neutral"
+    },
+    {
+      "id": "prd080",
+      "text": "Naiintindihan ko po, hahanapan ko kayo ng pwede.",
+      "tag": "product_availability",
+      "mode": "reassuring"
+    },
+    {
+      "id": "prd081",
+      "text": "Yung supplier po namin ay nag-deliver kanina.",
+      "tag": "product_availability",
+      "mode": "neutral"
+    },
+    {
+      "id": "prd082",
+      "text": "Available po lahat ng size maliban sa extra small.",
+      "tag": "product_availability",
+      "mode": "neutral"
+    },
+    {
+      "id": "prd083",
+      "text": "Pasensya na po, delayed po yung shipment namin.",
+      "tag": "product_availability",
+      "mode": "apologetic"
+    },
+    {
+      "id": "prd084",
+      "text": "Perfect po yan sa hinahanap ninyo, sir.",
+      "tag": "product_availability",
+      "mode": "bright"
+    },
+    {
+      "id": "prd085",
+      "text": "Ipapakita ko po sa inyo yung available colors.",
+      "tag": "product_availability",
+      "mode": "bright"
+    },
+    {
+      "id": "prd086",
+      "text": "May stock po kami pero nasa ibang branch pa.",
+      "tag": "product_availability",
+      "mode": "neutral"
+    },
+    {
+      "id": "prd087",
+      "text": "Kailangan po ba ninyo ito ngayong araw din?",
+      "tag": "product_availability",
+      "mode": "neutral"
+    },
+    {
+      "id": "prd088",
+      "text": "Sigurado po ako na magugustuhan ninyo yan.",
+      "tag": "product_availability",
+      "mode": "reassuring"
+    },
+    {
+      "id": "prd089",
+      "text": "Ang haba po ng buhay niyan, taon bago masira.",
+      "tag": "product_availability",
+      "mode": "bright"
+    },
+    {
+      "id": "prd090",
+      "text": "I-update ko na lang po kayo pag dumating na.",
+      "tag": "product_availability",
+      "mode": "reassuring"
+    },
+    {
+      "id": "prd091",
+      "text": "Dalawang klase po ang meron kami niyan.",
+      "tag": "product_availability",
+      "mode": "neutral"
+    },
+    {
+      "id": "prd092",
+      "text": "Yung premium po at yung regular, iba ang presyo.",
+      "tag": "product_availability",
+      "mode": "neutral"
+    },
+    {
+      "id": "prd093",
+      "text": "Ubos na po talaga, sorry po sa abala.",
+      "tag": "product_availability",
+      "mode": "apologetic"
+    },
+    {
+      "id": "prd094",
+      "text": "Meron po kaming bagong dating na mas maganda.",
+      "tag": "product_availability",
+      "mode": "bright"
+    },
+    {
+      "id": "prd095",
+      "text": "Nasa listahan ko na po ang order ninyo.",
+      "tag": "product_availability",
+      "mode": "bright"
+    },
+    {
+      "id": "prd096",
+      "text": "Kumpirmahin ko lang po kung ilan ang kailangan.",
+      "tag": "product_availability",
+      "mode": "neutral"
+    },
+    {
+      "id": "prd097",
+      "text": "Mas mabenta po yung kulay itim sa mga customer.",
+      "tag": "product_availability",
+      "mode": "neutral"
+    },
+    {
+      "id": "prd098",
+      "text": "Tatawagan ko po kayo pagdating ng stock.",
+      "tag": "product_availability",
+      "mode": "reassuring"
+    },
+    {
+      "id": "prd099",
+      "text": "Sulit po talaga yan sa presyo, sir.",
+      "tag": "product_availability",
+      "mode": "bright"
+    },
+    {
+      "id": "prd100",
+      "text": "Kompleto po ang parts at accessories na kasama.",
+      "tag": "product_availability",
+      "mode": "neutral"
+    },
+    {
+      "id": "prc001",
+      "text": "The price is three hundred fifty pesos.",
+      "tag": "pricing_quotation",
+      "mode": "neutral"
+    },
+    {
+      "id": "prc002",
+      "text": "That comes to one thousand two hundred, all in.",
+      "tag": "pricing_quotation",
+      "mode": "neutral"
+    },
+    {
+      "id": "prc003",
+      "text": "There is a discount if you take three or more.",
+      "tag": "pricing_quotation",
+      "mode": "bright"
+    },
+    {
+      "id": "prc004",
+      "text": "Your total is two thousand nine hundred pesos.",
+      "tag": "pricing_quotation",
+      "mode": "neutral"
+    },
+    {
+      "id": "prc005",
+      "text": "Shipping is free above one thousand pesos.",
+      "tag": "pricing_quotation",
+      "mode": "bright"
+    },
+    {
+      "id": "prc006",
+      "text": "It is fifty pesos extra for express handling.",
+      "tag": "pricing_quotation",
+      "mode": "neutral"
+    },
+    {
+      "id": "prc007",
+      "text": "I understand it is a bit more than you expected.",
+      "tag": "pricing_quotation",
+      "mode": "reassuring"
+    },
+    {
+      "id": "prc008",
+      "text": "The promotion runs until the end of the month.",
+      "tag": "pricing_quotation",
+      "mode": "neutral"
+    },
+    {
+      "id": "prc009",
+      "text": "Let me break down the cost for you.",
+      "tag": "pricing_quotation",
+      "mode": "neutral"
+    },
+    {
+      "id": "prc010",
+      "text": "That price already includes the delivery fee.",
+      "tag": "pricing_quotation",
+      "mode": "neutral"
+    },
+    {
+      "id": "prc011",
+      "text": "I am sorry, we cannot go lower than that.",
+      "tag": "pricing_quotation",
+      "mode": "apologetic"
+    },
+    {
+      "id": "prc012",
+      "text": "For bulk orders we can offer a better rate.",
+      "tag": "pricing_quotation",
+      "mode": "bright"
+    },
+    {
+      "id": "prc013",
+      "text": "The unit price drops to two hundred at ten pieces.",
+      "tag": "pricing_quotation",
+      "mode": "neutral"
+    },
+    {
+      "id": "prc014",
+      "text": "Rest assured, that is our best price today.",
+      "tag": "pricing_quotation",
+      "mode": "reassuring"
+    },
+    {
+      "id": "prc015",
+      "text": "Would you like me to send a written quotation?",
+      "tag": "pricing_quotation",
+      "mode": "neutral"
+    },
+    {
+      "id": "prc016",
+      "text": "The price went up slightly last month.",
+      "tag": "pricing_quotation",
+      "mode": "apologetic"
+    },
+    {
+      "id": "prc017",
+      "text": "Everything included, it is one thousand five hundred.",
+      "tag": "pricing_quotation",
+      "mode": "neutral"
+    },
+    {
+      "id": "prc018",
+      "text": "There is no hidden charge on top of that.",
+      "tag": "pricing_quotation",
+      "mode": "reassuring"
+    },
+    {
+      "id": "prc019",
+      "text": "We can match a lower price if you show us.",
+      "tag": "pricing_quotation",
+      "mode": "bright"
+    },
+    {
+      "id": "prc020",
+      "text": "That works out to about eighty pesos each.",
+      "tag": "pricing_quotation",
+      "mode": "neutral"
+    },
+    {
+      "id": "prc021",
+      "text": "Ang presyo po niyan ay tatlong daan at limampung piso.",
+      "tag": "pricing_quotation",
+      "mode": "neutral"
+    },
+    {
+      "id": "prc022",
+      "text": "Isang libo dalawang daan po ang kabuuan.",
+      "tag": "pricing_quotation",
+      "mode": "neutral"
+    },
+    {
+      "id": "prc023",
+      "text": "May bawas po kayo kung kukuha ng tatlo pataas.",
+      "tag": "pricing_quotation",
+      "mode": "bright"
+    },
+    {
+      "id": "prc024",
+      "text": "Libre po ang padala kung aabot sa isang libo.",
+      "tag": "pricing_quotation",
+      "mode": "bright"
+    },
+    {
+      "id": "prc025",
+      "text": "Pasensya na po, hindi na po pwedeng babaan.",
+      "tag": "pricing_quotation",
+      "mode": "apologetic"
+    },
+    {
+      "id": "prc026",
+      "text": "Kasama na po ang bayad sa padala diyan.",
+      "tag": "pricing_quotation",
+      "mode": "neutral"
+    },
+    {
+      "id": "prc027",
+      "text": "Naiintindihan ko po, medyo mahal nga po.",
+      "tag": "pricing_quotation",
+      "mode": "reassuring"
+    },
+    {
+      "id": "prc028",
+      "text": "Hanggang katapusan po ng buwan ang alok na ito.",
+      "tag": "pricing_quotation",
+      "mode": "neutral"
+    },
+    {
+      "id": "prc029",
+      "text": "Walang po kaming dagdag na singil sa labas nun.",
+      "tag": "pricing_quotation",
+      "mode": "reassuring"
+    },
+    {
+      "id": "prc030",
+      "text": "Siyamnapung piso po ang bawat isa kapag marami.",
+      "tag": "pricing_quotation",
+      "mode": "neutral"
+    },
+    {
+      "id": "prc031",
+      "text": "Tatlong daan limampu po ang presyo, sir.",
+      "tag": "pricing_quotation",
+      "mode": "neutral"
+    },
+    {
+      "id": "prc032",
+      "text": "Yung total po ninyo ay isang libo walong daan.",
+      "tag": "pricing_quotation",
+      "mode": "neutral"
+    },
+    {
+      "id": "prc033",
+      "text": "May discount po kayo kung bulk order.",
+      "tag": "pricing_quotation",
+      "mode": "bright"
+    },
+    {
+      "id": "prc034",
+      "text": "Free shipping po pag umabot sa isang libo.",
+      "tag": "pricing_quotation",
+      "mode": "bright"
+    },
+    {
+      "id": "prc035",
+      "text": "Fifty pesos lang po ang dagdag para sa express.",
+      "tag": "pricing_quotation",
+      "mode": "neutral"
+    },
+    {
+      "id": "prc036",
+      "text": "I-compute ko lang po yung total ninyo.",
+      "tag": "pricing_quotation",
+      "mode": "neutral"
+    },
+    {
+      "id": "prc037",
+      "text": "Kasama na po ang delivery fee sa presyong yun.",
+      "tag": "pricing_quotation",
+      "mode": "neutral"
+    },
+    {
+      "id": "prc038",
+      "text": "Sorry po, fixed price na po talaga yan.",
+      "tag": "pricing_quotation",
+      "mode": "apologetic"
+    },
+    {
+      "id": "prc039",
+      "text": "Naiintindihan ko po kayo, pero sulit naman po.",
+      "tag": "pricing_quotation",
+      "mode": "reassuring"
+    },
+    {
+      "id": "prc040",
+      "text": "Valid po ang promo hanggang katapusan ng buwan.",
+      "tag": "pricing_quotation",
+      "mode": "neutral"
+    },
+    {
+      "id": "prc041",
+      "text": "Wholesale price po yan kung sampu pataas.",
+      "tag": "pricing_quotation",
+      "mode": "bright"
+    },
+    {
+      "id": "prc042",
+      "text": "Walang hidden charges po, promise.",
+      "tag": "pricing_quotation",
+      "mode": "reassuring"
+    },
+    {
+      "id": "prc043",
+      "text": "Dalawang daan po per piece kung marami.",
+      "tag": "pricing_quotation",
+      "mode": "neutral"
+    },
+    {
+      "id": "prc044",
+      "text": "Gusto niyo po bang i-send ko yung quotation?",
+      "tag": "pricing_quotation",
+      "mode": "neutral"
+    },
+    {
+      "id": "prc045",
+      "text": "Tumaas po kaunti ang presyo nung nakaraang buwan.",
+      "tag": "pricing_quotation",
+      "mode": "apologetic"
+    },
+    {
+      "id": "prc046",
+      "text": "Best price na po talaga yan ngayon, ma'am.",
+      "tag": "pricing_quotation",
+      "mode": "reassuring"
+    },
+    {
+      "id": "prc047",
+      "text": "Pwede po naming i-match kung may mas mura kayong nakita.",
+      "tag": "pricing_quotation",
+      "mode": "bright"
+    },
+    {
+      "id": "prc048",
+      "text": "Ang breakdown po: isang libo sa item, dalawang daan sa shipping.",
+      "tag": "pricing_quotation",
+      "mode": "neutral"
+    },
+    {
+      "id": "prc049",
+      "text": "Sale po kami ngayon, twenty percent off.",
+      "tag": "pricing_quotation",
+      "mode": "bright"
+    },
+    {
+      "id": "prc050",
+      "text": "Yung presyo po na yan ay para sa isang piraso lang.",
+      "tag": "pricing_quotation",
+      "mode": "neutral"
+    },
+    {
+      "id": "prc051",
+      "text": "Kung dalawa po kayo kukuha, may bawas na limampu.",
+      "tag": "pricing_quotation",
+      "mode": "bright"
+    },
+    {
+      "id": "prc052",
+      "text": "Sobrang sulit po talaga sa quality na ganyan.",
+      "tag": "pricing_quotation",
+      "mode": "bright"
+    },
+    {
+      "id": "prc053",
+      "text": "Naku sorry po, tapos na po yung promo na yun.",
+      "tag": "pricing_quotation",
+      "mode": "apologetic"
+    },
+    {
+      "id": "prc054",
+      "text": "Konting dagdag lang po para sa mas malaki.",
+      "tag": "pricing_quotation",
+      "mode": "neutral"
+    },
+    {
+      "id": "prc055",
+      "text": "Ang presyo po ay depende sa dami ng oorderin ninyo.",
+      "tag": "pricing_quotation",
+      "mode": "neutral"
+    },
+    {
+      "id": "prc056",
+      "text": "Huwag po kayong mag-alala, abot-kaya po yan.",
+      "tag": "pricing_quotation",
+      "mode": "reassuring"
+    },
+    {
+      "id": "prc057",
+      "text": "Kasama na po ang buwis sa halagang binanggit ko.",
+      "tag": "pricing_quotation",
+      "mode": "neutral"
+    },
+    {
+      "id": "prc058",
+      "text": "Pwede po tayong mag-usap kung malaking order.",
+      "tag": "pricing_quotation",
+      "mode": "bright"
+    },
+    {
+      "id": "prc059",
+      "text": "Anim na raan po lahat-lahat, sir.",
+      "tag": "pricing_quotation",
+      "mode": "neutral"
+    },
+    {
+      "id": "prc060",
+      "text": "Mas mura po kung susunduin ninyo mismo sa store.",
+      "tag": "pricing_quotation",
+      "mode": "neutral"
+    },
+    {
+      "id": "prc061",
+      "text": "Ang presyo po ngayon ay apat na raan pitumpu.",
+      "tag": "pricing_quotation",
+      "mode": "neutral"
+    },
+    {
+      "id": "prc062",
+      "text": "Nasa dalawang libo po ang budget na kailangan.",
+      "tag": "pricing_quotation",
+      "mode": "neutral"
+    },
+    {
+      "id": "prc063",
+      "text": "Mura na po yan kumpara sa ibang tindahan.",
+      "tag": "pricing_quotation",
+      "mode": "bright"
+    },
+    {
+      "id": "prc064",
+      "text": "Nagsisimula po sa isang daan ang pinakamura.",
+      "tag": "pricing_quotation",
+      "mode": "neutral"
+    },
+    {
+      "id": "prc065",
+      "text": "Pasensya na po kung tumaas ang halaga.",
+      "tag": "pricing_quotation",
+      "mode": "apologetic"
+    },
+    {
+      "id": "prc066",
+      "text": "Wala na pong dagdag pa diyan, yan na po lahat.",
+      "tag": "pricing_quotation",
+      "mode": "reassuring"
+    },
+    {
+      "id": "prc067",
+      "text": "Limang daan po para sa dalawang piraso.",
+      "tag": "pricing_quotation",
+      "mode": "neutral"
+    },
+    {
+      "id": "prc068",
+      "text": "Bibigyan ko po kayo ng espesyal na presyo.",
+      "tag": "pricing_quotation",
+      "mode": "bright"
+    },
+    {
+      "id": "prc069",
+      "text": "Ang halaga po ay walong daan at siyamnapu.",
+      "tag": "pricing_quotation",
+      "mode": "neutral"
+    },
+    {
+      "id": "prc070",
+      "text": "Sulit na sulit po ang bawat piso diyan.",
+      "tag": "pricing_quotation",
+      "mode": "bright"
+    },
+    {
+      "id": "prc071",
+      "text": "Yung price po namin ay all-in na, walang dagdag.",
+      "tag": "pricing_quotation",
+      "mode": "reassuring"
+    },
+    {
+      "id": "prc072",
+      "text": "Kung tatlo po kukunin ninyo, isang libo na lang.",
+      "tag": "pricing_quotation",
+      "mode": "bright"
+    },
+    {
+      "id": "prc073",
+      "text": "Sandali po, i-check ko lang ang updated price list.",
+      "tag": "pricing_quotation",
+      "mode": "neutral"
+    },
+    {
+      "id": "prc074",
+      "text": "Anim na raan limampu po ang presyo per box.",
+      "tag": "pricing_quotation",
+      "mode": "neutral"
+    },
+    {
+      "id": "prc075",
+      "text": "May seasonal discount po kami ngayong buwan.",
+      "tag": "pricing_quotation",
+      "mode": "bright"
+    },
+    {
+      "id": "prc076",
+      "text": "Hindi po kasama ang shipping sa presyong yun.",
+      "tag": "pricing_quotation",
+      "mode": "neutral"
+    },
+    {
+      "id": "prc077",
+      "text": "Naiintindihan ko po na malaki, pero long-term investment po yan.",
+      "tag": "pricing_quotation",
+      "mode": "reassuring"
+    },
+    {
+      "id": "prc078",
+      "text": "Pwede po kayong maghulog kung malaki ang halaga.",
+      "tag": "pricing_quotation",
+      "mode": "bright"
+    },
+    {
+      "id": "prc079",
+      "text": "Tatlong libo po para sa buong set.",
+      "tag": "pricing_quotation",
+      "mode": "neutral"
+    },
+    {
+      "id": "prc080",
+      "text": "Sorry po, hindi po kami tumatawad sa presyo.",
+      "tag": "pricing_quotation",
+      "mode": "apologetic"
+    },
+    {
+      "id": "prc081",
+      "text": "Yung regular price po ay siyam na raan.",
+      "tag": "pricing_quotation",
+      "mode": "neutral"
+    },
+    {
+      "id": "prc082",
+      "text": "Pero ngayon lang po, pitong daan na lang.",
+      "tag": "pricing_quotation",
+      "mode": "bright"
+    },
+    {
+      "id": "prc083",
+      "text": "I-total ko lang po lahat ng nasa order ninyo.",
+      "tag": "pricing_quotation",
+      "mode": "neutral"
+    },
+    {
+      "id": "prc084",
+      "text": "Ang dagdag po sa mas malaking size ay isang daan.",
+      "tag": "pricing_quotation",
+      "mode": "neutral"
+    },
+    {
+      "id": "prc085",
+      "text": "Sigurado po kayong makakatipid diyan.",
+      "tag": "pricing_quotation",
+      "mode": "reassuring"
+    },
+    {
+      "id": "prc086",
+      "text": "Dalawang daan pitumpung piso po ang kada piraso.",
+      "tag": "pricing_quotation",
+      "mode": "neutral"
+    },
+    {
+      "id": "prc087",
+      "text": "Kasama na po ang installation sa halagang yun.",
+      "tag": "pricing_quotation",
+      "mode": "bright"
+    },
+    {
+      "id": "prc088",
+      "text": "Hiwalay pong bayad ang service fee, sir.",
+      "tag": "pricing_quotation",
+      "mode": "neutral"
+    },
+    {
+      "id": "prc089",
+      "text": "Ipapadala ko po sa inyo ang detalyadong presyo.",
+      "tag": "pricing_quotation",
+      "mode": "neutral"
+    },
+    {
+      "id": "prc090",
+      "text": "Isang libo limang daan po lahat, ma'am.",
+      "tag": "pricing_quotation",
+      "mode": "neutral"
+    },
+    {
+      "id": "prc091",
+      "text": "Yung promo price po ay hanggang Linggo lang.",
+      "tag": "pricing_quotation",
+      "mode": "neutral"
+    },
+    {
+      "id": "prc092",
+      "text": "May libre pong kasama kapag umabot sa dalawang libo.",
+      "tag": "pricing_quotation",
+      "mode": "bright"
+    },
+    {
+      "id": "prc093",
+      "text": "Ang murang-mura na po niyan, sir, kumpara sa iba.",
+      "tag": "pricing_quotation",
+      "mode": "bright"
+    },
+    {
+      "id": "prc094",
+      "text": "Konti lang po ang tubo namin diyan, promise.",
+      "tag": "pricing_quotation",
+      "mode": "reassuring"
+    },
+    {
+      "id": "prc095",
+      "text": "Apat na libo po ang buong package.",
+      "tag": "pricing_quotation",
+      "mode": "neutral"
+    },
+    {
+      "id": "prc096",
+      "text": "Naku, pasensya na po at nagbago ang presyo.",
+      "tag": "pricing_quotation",
+      "mode": "apologetic"
+    },
+    {
+      "id": "prc097",
+      "text": "Kung isang dosena po, may bawas na dalawang daan.",
+      "tag": "pricing_quotation",
+      "mode": "bright"
+    },
+    {
+      "id": "prc098",
+      "text": "Ang huling presyo po ninyo ay tatlong libo dalawang daan.",
+      "tag": "pricing_quotation",
+      "mode": "neutral"
+    },
+    {
+      "id": "prc099",
+      "text": "Same price po sa online at sa physical store.",
+      "tag": "pricing_quotation",
+      "mode": "neutral"
+    },
+    {
+      "id": "prc100",
+      "text": "Sige po, ilagay ko na sa quotation ninyo.",
+      "tag": "pricing_quotation",
+      "mode": "bright"
+    },
+    {
+      "id": "prc101",
+      "text": "Ang presyo per meter po ay isang daan animnapu.",
+      "tag": "pricing_quotation",
+      "mode": "neutral"
+    },
+    {
+      "id": "prc102",
+      "text": "Depende po sa kulay, may dagdag na limampu.",
+      "tag": "pricing_quotation",
+      "mode": "neutral"
+    },
+    {
+      "id": "prc103",
+      "text": "Hindi po namin sinisingil ang consultation.",
+      "tag": "pricing_quotation",
+      "mode": "reassuring"
+    },
+    {
+      "id": "prc104",
+      "text": "Libre po ang delivery dito sa Metro Manila.",
+      "tag": "pricing_quotation",
+      "mode": "bright"
+    },
+    {
+      "id": "prc105",
+      "text": "Sa probinsya po may dagdag na tatlong daan.",
+      "tag": "pricing_quotation",
+      "mode": "neutral"
+    },
+    {
+      "id": "prc106",
+      "text": "Nagbabago po ang presyo depende sa supplier.",
+      "tag": "pricing_quotation",
+      "mode": "neutral"
+    },
+    {
+      "id": "prc107",
+      "text": "Ito na po ang pinakamababa naming maiaalok.",
+      "tag": "pricing_quotation",
+      "mode": "reassuring"
+    },
+    {
+      "id": "prc108",
+      "text": "Limang libo po para sa buong taon na serbisyo.",
+      "tag": "pricing_quotation",
+      "mode": "neutral"
+    },
+    {
+      "id": "prc109",
+      "text": "Bawat buwan po ay apat na raan lamang.",
+      "tag": "pricing_quotation",
+      "mode": "bright"
+    },
+    {
+      "id": "prc110",
+      "text": "Sorry po, hindi po kasali yun sa promo.",
+      "tag": "pricing_quotation",
+      "mode": "apologetic"
+    },
+    {
+      "id": "prc111",
+      "text": "Kung cash po, may bawas pa kayong singkwenta.",
+      "tag": "pricing_quotation",
+      "mode": "bright"
+    },
+    {
+      "id": "prc112",
+      "text": "Ang presyo po ay hindi kasama ang buwis.",
+      "tag": "pricing_quotation",
+      "mode": "neutral"
+    },
+    {
+      "id": "prc113",
+      "text": "Isang daan dalawampu po ang bawat kilo.",
+      "tag": "pricing_quotation",
+      "mode": "neutral"
+    },
+    {
+      "id": "prc114",
+      "text": "Makakatipid po kayo ng halos isang libo.",
+      "tag": "pricing_quotation",
+      "mode": "bright"
+    },
+    {
+      "id": "prc115",
+      "text": "Aayusin ko po ang presyo para sa inyo.",
+      "tag": "pricing_quotation",
+      "mode": "reassuring"
+    },
+    {
+      "id": "prc116",
+      "text": "Pitong daan po ang starting price niyan.",
+      "tag": "pricing_quotation",
+      "mode": "neutral"
+    },
+    {
+      "id": "prc117",
+      "text": "Hanggang saan po ang budget ninyo, ma'am?",
+      "tag": "pricing_quotation",
+      "mode": "neutral"
+    },
+    {
+      "id": "prc118",
+      "text": "May mas mura po kami kung yun ang kailangan.",
+      "tag": "pricing_quotation",
+      "mode": "reassuring"
+    },
+    {
+      "id": "prc119",
+      "text": "Dagdag na dalawampung porsyento po sa rush order.",
+      "tag": "pricing_quotation",
+      "mode": "neutral"
+    },
+    {
+      "id": "prc120",
+      "text": "Ang presyo po ay para sa buong package na.",
+      "tag": "pricing_quotation",
+      "mode": "neutral"
+    },
+    {
+      "id": "prc121",
+      "text": "Nasa siyam na raan po ang karaniwang halaga.",
+      "tag": "pricing_quotation",
+      "mode": "neutral"
+    },
+    {
+      "id": "prc122",
+      "text": "Kapag umabot po ng lima, libre na ang isa.",
+      "tag": "pricing_quotation",
+      "mode": "bright"
+    },
+    {
+      "id": "prc123",
+      "text": "Ipapaliwanag ko po kung saan napunta ang halaga.",
+      "tag": "pricing_quotation",
+      "mode": "neutral"
+    },
+    {
+      "id": "prc124",
+      "text": "Walang dagdag po sa presyo kahit gabi na.",
+      "tag": "pricing_quotation",
+      "mode": "reassuring"
+    },
+    {
+      "id": "prc125",
+      "text": "Tatlong daan po ang deposit, ang natira sa delivery.",
+      "tag": "pricing_quotation",
+      "mode": "neutral"
+    },
+    {
+      "id": "prc126",
+      "text": "Bumaba po ang presyo mula noong nakaraang linggo.",
+      "tag": "pricing_quotation",
+      "mode": "bright"
+    },
+    {
+      "id": "prc127",
+      "text": "Pasensya na po, may kaunting dagdag sa laki na yan.",
+      "tag": "pricing_quotation",
+      "mode": "apologetic"
+    },
+    {
+      "id": "prc128",
+      "text": "Isang libo isang daan po lahat, walang tawad.",
+      "tag": "pricing_quotation",
+      "mode": "neutral"
+    },
+    {
+      "id": "prc129",
+      "text": "Sigurado po akong mas mura kami kaysa sa iba.",
+      "tag": "pricing_quotation",
+      "mode": "reassuring"
+    },
+    {
+      "id": "prc130",
+      "text": "Yung tax po ay kasama na sa quotation.",
+      "tag": "pricing_quotation",
+      "mode": "neutral"
+    },
+    {
+      "id": "prc131",
+      "text": "Special rate po para sa mga suki namin.",
+      "tag": "pricing_quotation",
+      "mode": "bright"
+    },
+    {
+      "id": "prc132",
+      "text": "Dalawang daan po ang kada araw ng rental.",
+      "tag": "pricing_quotation",
+      "mode": "neutral"
+    },
+    {
+      "id": "prc133",
+      "text": "Kung buwanan po, mas mura ng tatlumpung porsyento.",
+      "tag": "pricing_quotation",
+      "mode": "bright"
+    },
+    {
+      "id": "prc134",
+      "text": "Wala pong maintenance fee sa unang taon.",
+      "tag": "pricing_quotation",
+      "mode": "reassuring"
+    },
+    {
+      "id": "prc135",
+      "text": "Anim na libo po ang buong halaga, sir.",
+      "tag": "pricing_quotation",
+      "mode": "neutral"
+    },
+    {
+      "id": "prc136",
+      "text": "Ang presyo po ay mababago pagkatapos ng buwan.",
+      "tag": "pricing_quotation",
+      "mode": "neutral"
+    },
+    {
+      "id": "prc137",
+      "text": "Kunin niyo na po habang mura pa.",
+      "tag": "pricing_quotation",
+      "mode": "bright"
+    },
+    {
+      "id": "prc138",
+      "text": "Naiintindihan ko po, pag-isipan niyo muna.",
+      "tag": "pricing_quotation",
+      "mode": "reassuring"
+    },
+    {
+      "id": "prc139",
+      "text": "Apat na raan limampu po per unit.",
+      "tag": "pricing_quotation",
+      "mode": "neutral"
+    },
+    {
+      "id": "prc140",
+      "text": "Walang bayad po ang pagkuha ng presyo.",
+      "tag": "pricing_quotation",
+      "mode": "reassuring"
+    },
+    {
+      "id": "prc141",
+      "text": "Ang minimum order po ay limang daang piso.",
+      "tag": "pricing_quotation",
+      "mode": "neutral"
+    },
+    {
+      "id": "prc142",
+      "text": "Sorry po, wala po kaming ganyang budget na option.",
+      "tag": "pricing_quotation",
+      "mode": "apologetic"
+    },
+    {
+      "id": "prc143",
+      "text": "Tatlumpung porsyento po ang tinipid ninyo diyan.",
+      "tag": "pricing_quotation",
+      "mode": "bright"
+    },
+    {
+      "id": "prc144",
+      "text": "Kasama na po ang lahat, walang itatago.",
+      "tag": "pricing_quotation",
+      "mode": "reassuring"
+    },
+    {
+      "id": "prc145",
+      "text": "Isang daan po kada piraso kung isang kahon.",
+      "tag": "pricing_quotation",
+      "mode": "neutral"
+    },
+    {
+      "id": "prc146",
+      "text": "Bibigyan ko po kayo ng kaunting bawas.",
+      "tag": "pricing_quotation",
+      "mode": "bright"
+    },
+    {
+      "id": "prc147",
+      "text": "Ang kabuuan po ay dalawang libo apat na raan.",
+      "tag": "pricing_quotation",
+      "mode": "neutral"
+    },
+    {
+      "id": "prc148",
+      "text": "Hindi po nagbabago ang presyo kahit magkano ang kunin.",
+      "tag": "pricing_quotation",
+      "mode": "neutral"
+    },
+    {
+      "id": "prc149",
+      "text": "Sige po, ito na po ang final na halaga.",
+      "tag": "pricing_quotation",
+      "mode": "neutral"
+    },
+    {
+      "id": "prc150",
+      "text": "Salamat po, i-lock ko na ang presyong ito para sa inyo.",
+      "tag": "pricing_quotation",
+      "mode": "bright"
+    },
+    {
+      "id": "dlv001",
+      "text": "Delivery takes two to three days within Metro Manila.",
+      "tag": "delivery_logistics",
+      "mode": "neutral"
+    },
+    {
+      "id": "dlv002",
+      "text": "May I have your complete address, please?",
+      "tag": "delivery_logistics",
+      "mode": "neutral"
+    },
+    {
+      "id": "dlv003",
+      "text": "The rider will call you before he arrives.",
+      "tag": "delivery_logistics",
+      "mode": "reassuring"
+    },
+    {
+      "id": "dlv004",
+      "text": "We can deliver tomorrow morning around eight.",
+      "tag": "delivery_logistics",
+      "mode": "bright"
+    },
+    {
+      "id": "dlv005",
+      "text": "Shipping to the province takes about five days.",
+      "tag": "delivery_logistics",
+      "mode": "neutral"
+    },
+    {
+      "id": "dlv006",
+      "text": "I am sorry, your parcel has been delayed.",
+      "tag": "delivery_logistics",
+      "mode": "apologetic"
+    },
+    {
+      "id": "dlv007",
+      "text": "You can also pick it up at our store.",
+      "tag": "delivery_logistics",
+      "mode": "neutral"
+    },
+    {
+      "id": "dlv008",
+      "text": "Let me give you the tracking number now.",
+      "tag": "delivery_logistics",
+      "mode": "neutral"
+    },
+    {
+      "id": "dlv009",
+      "text": "Rest assured, it is already out for delivery.",
+      "tag": "delivery_logistics",
+      "mode": "reassuring"
+    },
+    {
+      "id": "dlv010",
+      "text": "Which courier would you prefer for this order?",
+      "tag": "delivery_logistics",
+      "mode": "neutral"
+    },
+    {
+      "id": "dlv011",
+      "text": "The shipping fee is one hundred fifty pesos.",
+      "tag": "delivery_logistics",
+      "mode": "neutral"
+    },
+    {
+      "id": "dlv012",
+      "text": "Someone needs to receive it at that address.",
+      "tag": "delivery_logistics",
+      "mode": "neutral"
+    },
+    {
+      "id": "dlv013",
+      "text": "Your order was picked up this afternoon.",
+      "tag": "delivery_logistics",
+      "mode": "bright"
+    },
+    {
+      "id": "dlv014",
+      "text": "Please confirm the barangay and street name.",
+      "tag": "delivery_logistics",
+      "mode": "neutral"
+    },
+    {
+      "id": "dlv015",
+      "text": "We do not deliver on Sundays, I am afraid.",
+      "tag": "delivery_logistics",
+      "mode": "apologetic"
+    },
+    {
+      "id": "dlv016",
+      "text": "Same day delivery is possible if you order before noon.",
+      "tag": "delivery_logistics",
+      "mode": "bright"
+    },
+    {
+      "id": "dlv017",
+      "text": "The package is now at the sorting facility.",
+      "tag": "delivery_logistics",
+      "mode": "neutral"
+    },
+    {
+      "id": "dlv018",
+      "text": "Do not worry, we will follow it up for you.",
+      "tag": "delivery_logistics",
+      "mode": "reassuring"
+    },
+    {
+      "id": "dlv019",
+      "text": "Is there a landmark near your address?",
+      "tag": "delivery_logistics",
+      "mode": "neutral"
+    },
+    {
+      "id": "dlv020",
+      "text": "It should arrive by Thursday at the latest.",
+      "tag": "delivery_logistics",
+      "mode": "neutral"
+    },
+    {
+      "id": "dlv021",
+      "text": "Dalawa hanggang tatlong araw po ang delivery.",
+      "tag": "delivery_logistics",
+      "mode": "neutral"
+    },
+    {
+      "id": "dlv022",
+      "text": "Saan po ang kumpletong tirahan ninyo?",
+      "tag": "delivery_logistics",
+      "mode": "neutral"
+    },
+    {
+      "id": "dlv023",
+      "text": "Tatawag po muna ang rider bago dumating.",
+      "tag": "delivery_logistics",
+      "mode": "reassuring"
+    },
+    {
+      "id": "dlv024",
+      "text": "Bukas po ng umaga ipapadala namin.",
+      "tag": "delivery_logistics",
+      "mode": "bright"
+    },
+    {
+      "id": "dlv025",
+      "text": "Paumanhin po, naantala ang inyong padala.",
+      "tag": "delivery_logistics",
+      "mode": "apologetic"
+    },
+    {
+      "id": "dlv026",
+      "text": "Pwede rin po ninyong sunduin sa aming tindahan.",
+      "tag": "delivery_logistics",
+      "mode": "neutral"
+    },
+    {
+      "id": "dlv027",
+      "text": "Ibibigay ko po ang numero ng pagsubaybay.",
+      "tag": "delivery_logistics",
+      "mode": "neutral"
+    },
+    {
+      "id": "dlv028",
+      "text": "Huwag po kayong mag-alala, susundan namin ito.",
+      "tag": "delivery_logistics",
+      "mode": "reassuring"
+    },
+    {
+      "id": "dlv029",
+      "text": "May tao po bang tatanggap sa inyong bahay?",
+      "tag": "delivery_logistics",
+      "mode": "neutral"
+    },
+    {
+      "id": "dlv030",
+      "text": "Limang araw po ang bilis papuntang probinsya.",
+      "tag": "delivery_logistics",
+      "mode": "neutral"
+    },
+    {
+      "id": "dlv031",
+      "text": "Dalawa hanggang tatlong araw po ang delivery sa Metro Manila.",
+      "tag": "delivery_logistics",
+      "mode": "neutral"
+    },
+    {
+      "id": "dlv032",
+      "text": "Saan po ang exact address ninyo, sir?",
+      "tag": "delivery_logistics",
+      "mode": "neutral"
+    },
+    {
+      "id": "dlv033",
+      "text": "Yung rider po namin ay tatawag bago dumating.",
+      "tag": "delivery_logistics",
+      "mode": "reassuring"
+    },
+    {
+      "id": "dlv034",
+      "text": "Ide-deliver po namin bukas ng umaga, mga alas-otso.",
+      "tag": "delivery_logistics",
+      "mode": "bright"
+    },
+    {
+      "id": "dlv035",
+      "text": "Sorry po, delayed po yung shipment ninyo.",
+      "tag": "delivery_logistics",
+      "mode": "apologetic"
+    },
+    {
+      "id": "dlv036",
+      "text": "Pwede po kayong mag-pickup na lang sa store.",
+      "tag": "delivery_logistics",
+      "mode": "neutral"
+    },
+    {
+      "id": "dlv037",
+      "text": "I-send ko po sa inyo yung tracking number.",
+      "tag": "delivery_logistics",
+      "mode": "neutral"
+    },
+    {
+      "id": "dlv038",
+      "text": "Naka-out for delivery na po yung order ninyo.",
+      "tag": "delivery_logistics",
+      "mode": "bright"
+    },
+    {
+      "id": "dlv039",
+      "text": "Anong courier po ang gusto ninyong gamitin?",
+      "tag": "delivery_logistics",
+      "mode": "neutral"
+    },
+    {
+      "id": "dlv040",
+      "text": "Isang daan limampu po ang shipping fee.",
+      "tag": "delivery_logistics",
+      "mode": "neutral"
+    },
+    {
+      "id": "dlv041",
+      "text": "Paki-confirm na lang po ng barangay at street.",
+      "tag": "delivery_logistics",
+      "mode": "neutral"
+    },
+    {
+      "id": "dlv042",
+      "text": "Wala pong delivery tuwing Linggo, pasensya na.",
+      "tag": "delivery_logistics",
+      "mode": "apologetic"
+    },
+    {
+      "id": "dlv043",
+      "text": "Same day delivery po kung mag-order bago mag-tanghali.",
+      "tag": "delivery_logistics",
+      "mode": "bright"
+    },
+    {
+      "id": "dlv044",
+      "text": "Nasa sorting facility pa po yung package.",
+      "tag": "delivery_logistics",
+      "mode": "neutral"
+    },
+    {
+      "id": "dlv045",
+      "text": "Huwag po kayong mag-alala, i-follow up ko po.",
+      "tag": "delivery_logistics",
+      "mode": "reassuring"
+    },
+    {
+      "id": "dlv046",
+      "text": "May landmark po ba malapit sa inyo?",
+      "tag": "delivery_logistics",
+      "mode": "neutral"
+    },
+    {
+      "id": "dlv047",
+      "text": "Darating po yan by Thursday, pinakamatagal.",
+      "tag": "delivery_logistics",
+      "mode": "neutral"
+    },
+    {
+      "id": "dlv048",
+      "text": "Free delivery po kayo dito sa Metro Manila.",
+      "tag": "delivery_logistics",
+      "mode": "bright"
+    },
+    {
+      "id": "dlv049",
+      "text": "Sa probinsya po, mga limang araw ang biyahe.",
+      "tag": "delivery_logistics",
+      "mode": "neutral"
+    },
+    {
+      "id": "dlv050",
+      "text": "Gamit po namin ay LBC at J and T.",
+      "tag": "delivery_logistics",
+      "mode": "neutral"
+    },
+    {
+      "id": "dlv051",
+      "text": "Pwede rin po ang Lalamove kung rush kayo.",
+      "tag": "delivery_logistics",
+      "mode": "bright"
+    },
+    {
+      "id": "dlv052",
+      "text": "May tatanggap po ba sa address na binigay ninyo?",
+      "tag": "delivery_logistics",
+      "mode": "neutral"
+    },
+    {
+      "id": "dlv053",
+      "text": "Na-pickup na po ng courier kaninang hapon.",
+      "tag": "delivery_logistics",
+      "mode": "bright"
+    },
+    {
+      "id": "dlv054",
+      "text": "I-text ko po sa inyo ang tracking mamaya.",
+      "tag": "delivery_logistics",
+      "mode": "neutral"
+    },
+    {
+      "id": "dlv055",
+      "text": "Naku pasensya na po, may problema sa courier.",
+      "tag": "delivery_logistics",
+      "mode": "apologetic"
+    },
+    {
+      "id": "dlv056",
+      "text": "Aayusin po namin agad yan para sa inyo.",
+      "tag": "delivery_logistics",
+      "mode": "reassuring"
+    },
+    {
+      "id": "dlv057",
+      "text": "Anong oras po kayo nasa bahay bukas?",
+      "tag": "delivery_logistics",
+      "mode": "neutral"
+    },
+    {
+      "id": "dlv058",
+      "text": "Sa gate po ba o may guard na tatanggap?",
+      "tag": "delivery_logistics",
+      "mode": "neutral"
+    },
+    {
+      "id": "dlv059",
+      "text": "Naka-schedule na po yung delivery ninyo bukas.",
+      "tag": "delivery_logistics",
+      "mode": "bright"
+    },
+    {
+      "id": "dlv060",
+      "text": "Mabilis lang po yan, hintayin niyo lang.",
+      "tag": "delivery_logistics",
+      "mode": "reassuring"
+    },
+    {
+      "id": "dlv061",
+      "text": "Ilagay ko po sa notes yung special instructions ninyo.",
+      "tag": "delivery_logistics",
+      "mode": "neutral"
+    },
+    {
+      "id": "dlv062",
+      "text": "Nasa Cebu po kayo? Mga apat na araw po yun.",
+      "tag": "delivery_logistics",
+      "mode": "neutral"
+    },
+    {
+      "id": "dlv063",
+      "text": "Kasama na po ang shipping sa binayaran ninyo.",
+      "tag": "delivery_logistics",
+      "mode": "bright"
+    },
+    {
+      "id": "dlv064",
+      "text": "Sorry po, hindi po kami nagde-deliver sa area na yun.",
+      "tag": "delivery_logistics",
+      "mode": "apologetic"
+    },
+    {
+      "id": "dlv065",
+      "text": "Pwede po kayong magpadala ng representative.",
+      "tag": "delivery_logistics",
+      "mode": "neutral"
+    },
+    {
+      "id": "dlv066",
+      "text": "Naipadala na po yung parcel kahapon ng hapon.",
+      "tag": "delivery_logistics",
+      "mode": "bright"
+    },
+    {
+      "id": "dlv067",
+      "text": "Ilang araw pa po bago dumating, sir.",
+      "tag": "delivery_logistics",
+      "mode": "neutral"
+    },
+    {
+      "id": "dlv068",
+      "text": "Titingnan ko po kung saan na yung package.",
+      "tag": "delivery_logistics",
+      "mode": "neutral"
+    },
+    {
+      "id": "dlv069",
+      "text": "Nandiyan na po ang rider sa inyong lugar.",
+      "tag": "delivery_logistics",
+      "mode": "bright"
+    },
+    {
+      "id": "dlv070",
+      "text": "Kalma lang po, darating din yan mamaya.",
+      "tag": "delivery_logistics",
+      "mode": "reassuring"
+    },
+    {
+      "id": "dlv071",
+      "text": "Ang unit number po ninyo, paki-ulit nga.",
+      "tag": "delivery_logistics",
+      "mode": "neutral"
+    },
+    {
+      "id": "dlv072",
+      "text": "Malapit po ba kayo sa simbahan o sa palengke?",
+      "tag": "delivery_logistics",
+      "mode": "neutral"
+    },
+    {
+      "id": "dlv073",
+      "text": "Bukas na po ang pinakamaaga naming pwede.",
+      "tag": "delivery_logistics",
+      "mode": "neutral"
+    },
+    {
+      "id": "dlv074",
+      "text": "Libre po ang padala kung malaking order.",
+      "tag": "delivery_logistics",
+      "mode": "bright"
+    },
+    {
+      "id": "dlv075",
+      "text": "Tatlong daan po ang bayad sa malayong lugar.",
+      "tag": "delivery_logistics",
+      "mode": "neutral"
+    },
+    {
+      "id": "dlv076",
+      "text": "Naiintindihan ko po ang pagmamadali ninyo.",
+      "tag": "delivery_logistics",
+      "mode": "reassuring"
+    },
+    {
+      "id": "dlv077",
+      "text": "Ipa-prioritize ko po ang order ninyo.",
+      "tag": "delivery_logistics",
+      "mode": "reassuring"
+    },
+    {
+      "id": "dlv078",
+      "text": "Sa umaga po o sa hapon ninyo gusto?",
+      "tag": "delivery_logistics",
+      "mode": "neutral"
+    },
+    {
+      "id": "dlv079",
+      "text": "Nagbago po ba ang address ninyo?",
+      "tag": "delivery_logistics",
+      "mode": "neutral"
+    },
+    {
+      "id": "dlv080",
+      "text": "Nasa daan na po ang inyong padala ngayon.",
+      "tag": "delivery_logistics",
+      "mode": "bright"
+    },
+    {
+      "id": "dlv081",
+      "text": "Paumanhin po kung natagalan ang paghihintay.",
+      "tag": "delivery_logistics",
+      "mode": "apologetic"
+    },
+    {
+      "id": "dlv082",
+      "text": "Ang aming tindahan po ay bukas hanggang alas-sais.",
+      "tag": "delivery_logistics",
+      "mode": "neutral"
+    },
+    {
+      "id": "dlv083",
+      "text": "Pwede po kayong pumunta anumang oras bukas.",
+      "tag": "delivery_logistics",
+      "mode": "neutral"
+    },
+    {
+      "id": "dlv084",
+      "text": "Dadalhin po namin sa mismong pintuan ninyo.",
+      "tag": "delivery_logistics",
+      "mode": "bright"
+    },
+    {
+      "id": "dlv085",
+      "text": "Sisiguraduhin ko pong maayos ang pagkakabalot.",
+      "tag": "delivery_logistics",
+      "mode": "reassuring"
+    },
+    {
+      "id": "dlv086",
+      "text": "Nasa branch po namin sa Pasig ang stock.",
+      "tag": "delivery_logistics",
+      "mode": "neutral"
+    },
+    {
+      "id": "dlv087",
+      "text": "Isang araw lang po ang hihintayin ninyo.",
+      "tag": "delivery_logistics",
+      "mode": "bright"
+    },
+    {
+      "id": "dlv088",
+      "text": "Kailangan po ninyong pumirma pagdating nito.",
+      "tag": "delivery_logistics",
+      "mode": "neutral"
+    },
+    {
+      "id": "dlv089",
+      "text": "Ipapakita ko po sa inyo ang resibo ng padala.",
+      "tag": "delivery_logistics",
+      "mode": "neutral"
+    },
+    {
+      "id": "dlv090",
+      "text": "Sorry po talaga, may bagyo kaya naantala.",
+      "tag": "delivery_logistics",
+      "mode": "apologetic"
+    },
+    {
+      "id": "dlv091",
+      "text": "Susubaybayan ko po ang padala araw-araw.",
+      "tag": "delivery_logistics",
+      "mode": "reassuring"
+    },
+    {
+      "id": "dlv092",
+      "text": "Ang tracking number po ninyo ay nasa text ko.",
+      "tag": "delivery_logistics",
+      "mode": "neutral"
+    },
+    {
+      "id": "dlv093",
+      "text": "Nakuha na po ba ninyo ang inyong parcel?",
+      "tag": "delivery_logistics",
+      "mode": "neutral"
+    },
+    {
+      "id": "dlv094",
+      "text": "Salamat po at natanggap ninyo agad!",
+      "tag": "delivery_logistics",
+      "mode": "bright"
+    },
+    {
+      "id": "dlv095",
+      "text": "Kung wala po kayo, iiwan ba sa kapitbahay?",
+      "tag": "delivery_logistics",
+      "mode": "neutral"
+    },
+    {
+      "id": "dlv096",
+      "text": "Hindi po namin iniiwan kung walang tatanggap.",
+      "tag": "delivery_logistics",
+      "mode": "neutral"
+    },
+    {
+      "id": "dlv097",
+      "text": "Babalik po ang rider bukas ng umaga.",
+      "tag": "delivery_logistics",
+      "mode": "reassuring"
+    },
+    {
+      "id": "dlv098",
+      "text": "Ang oras po ng delivery ay alas-nuwebe hanggang alas-singko.",
+      "tag": "delivery_logistics",
+      "mode": "neutral"
+    },
+    {
+      "id": "dlv099",
+      "text": "Maaga po kaming magpadala tuwing Lunes.",
+      "tag": "delivery_logistics",
+      "mode": "neutral"
+    },
+    {
+      "id": "dlv100",
+      "text": "Sige po, i-book ko na ang delivery ninyo.",
+      "tag": "delivery_logistics",
+      "mode": "bright"
+    },
+    {
+      "id": "dlv101",
+      "text": "Yung courier po ay may sariling tracking app.",
+      "tag": "delivery_logistics",
+      "mode": "neutral"
+    },
+    {
+      "id": "dlv102",
+      "text": "Naka-insure po ang lahat ng padala namin.",
+      "tag": "delivery_logistics",
+      "mode": "reassuring"
+    },
+    {
+      "id": "dlv103",
+      "text": "Kung masira po, palitan namin agad.",
+      "tag": "delivery_logistics",
+      "mode": "reassuring"
+    },
+    {
+      "id": "dlv104",
+      "text": "Bubble wrap po ang gamit namin sa pagbabalot.",
+      "tag": "delivery_logistics",
+      "mode": "neutral"
+    },
+    {
+      "id": "dlv105",
+      "text": "Malaki po ang item, kailangan ng truck.",
+      "tag": "delivery_logistics",
+      "mode": "neutral"
+    },
+    {
+      "id": "dlv106",
+      "text": "Dalawang tao po ang magdadala nito.",
+      "tag": "delivery_logistics",
+      "mode": "neutral"
+    },
+    {
+      "id": "dlv107",
+      "text": "May dagdag pong bayad sa pag-akyat ng hagdan.",
+      "tag": "delivery_logistics",
+      "mode": "neutral"
+    },
+    {
+      "id": "dlv108",
+      "text": "Sorry po, wala kaming makuhang rider ngayon.",
+      "tag": "delivery_logistics",
+      "mode": "apologetic"
+    },
+    {
+      "id": "dlv109",
+      "text": "Bukas na lang po siguro, mas maaga.",
+      "tag": "delivery_logistics",
+      "mode": "neutral"
+    },
+    {
+      "id": "dlv110",
+      "text": "Naiintindihan ko po, kailangan ninyo ngayon talaga.",
+      "tag": "delivery_logistics",
+      "mode": "reassuring"
+    },
+    {
+      "id": "dlv111",
+      "text": "Hahanap po ako ng paraan para maipadala agad.",
+      "tag": "delivery_logistics",
+      "mode": "reassuring"
+    },
+    {
+      "id": "dlv112",
+      "text": "Nasa Quezon City po ang aming warehouse.",
+      "tag": "delivery_logistics",
+      "mode": "neutral"
+    },
+    {
+      "id": "dlv113",
+      "text": "Malapit lang po yun sa inyo, mabilis lang.",
+      "tag": "delivery_logistics",
+      "mode": "bright"
+    },
+    {
+      "id": "dlv114",
+      "text": "Ang cut-off po namin ay alas-tres ng hapon.",
+      "tag": "delivery_logistics",
+      "mode": "neutral"
+    },
+    {
+      "id": "dlv115",
+      "text": "Pagkatapos po nun, bukas na ang padala.",
+      "tag": "delivery_logistics",
+      "mode": "neutral"
+    },
+    {
+      "id": "dlv116",
+      "text": "Grab express po ay pwede kung sobrang rush.",
+      "tag": "delivery_logistics",
+      "mode": "bright"
+    },
+    {
+      "id": "dlv117",
+      "text": "Mas mahal po yun pero dumadating agad.",
+      "tag": "delivery_logistics",
+      "mode": "neutral"
+    },
+    {
+      "id": "dlv118",
+      "text": "Anong barangay po kayo sa Taytay?",
+      "tag": "delivery_logistics",
+      "mode": "neutral"
+    },
+    {
+      "id": "dlv119",
+      "text": "Alam po namin yang lugar na yan.",
+      "tag": "delivery_logistics",
+      "mode": "reassuring"
+    },
+    {
+      "id": "dlv120",
+      "text": "Wala pong problema sa address na binigay ninyo.",
+      "tag": "delivery_logistics",
+      "mode": "reassuring"
+    },
+    {
+      "id": "dlv121",
+      "text": "Kokontakin po namin kayo bago mag-alas-otso.",
+      "tag": "delivery_logistics",
+      "mode": "neutral"
+    },
+    {
+      "id": "dlv122",
+      "text": "Nakalagay na po sa system ang inyong address.",
+      "tag": "delivery_logistics",
+      "mode": "neutral"
+    },
+    {
+      "id": "dlv123",
+      "text": "Paki-check po ang inyong cellphone mamaya.",
+      "tag": "delivery_logistics",
+      "mode": "neutral"
+    },
+    {
+      "id": "dlv124",
+      "text": "Ipapadala po namin sa opisina ninyo, tama po?",
+      "tag": "delivery_logistics",
+      "mode": "neutral"
+    },
+    {
+      "id": "dlv125",
+      "text": "Sa bahay po o sa trabaho ninyo?",
+      "tag": "delivery_logistics",
+      "mode": "neutral"
+    },
+    {
+      "id": "dlv126",
+      "text": "Naisulat ko na po ang lahat ng kailangan.",
+      "tag": "delivery_logistics",
+      "mode": "bright"
+    },
+    {
+      "id": "dlv127",
+      "text": "Salamat po sa inyong pasensya sa paghihintay.",
+      "tag": "delivery_logistics",
+      "mode": "apologetic"
+    },
+    {
+      "id": "dlv128",
+      "text": "Dumating na po ba ang inyong order kahapon?",
+      "tag": "delivery_logistics",
+      "mode": "neutral"
+    },
+    {
+      "id": "dlv129",
+      "text": "Kung hindi po, tawagan ninyo agad kami.",
+      "tag": "delivery_logistics",
+      "mode": "reassuring"
+    },
+    {
+      "id": "dlv130",
+      "text": "Handa na po ang inyong pakete para kunin.",
+      "tag": "delivery_logistics",
+      "mode": "bright"
+    },
+    {
+      "id": "dlv131",
+      "text": "Dalhin niyo lang po ang inyong resibo.",
+      "tag": "delivery_logistics",
+      "mode": "neutral"
+    },
+    {
+      "id": "dlv132",
+      "text": "Bukas po kami mula Lunes hanggang Sabado.",
+      "tag": "delivery_logistics",
+      "mode": "neutral"
+    },
+    {
+      "id": "dlv133",
+      "text": "Sarado po kami tuwing Linggo at holiday.",
+      "tag": "delivery_logistics",
+      "mode": "neutral"
+    },
+    {
+      "id": "dlv134",
+      "text": "Ang address po namin ay nasa Ortigas Avenue.",
+      "tag": "delivery_logistics",
+      "mode": "neutral"
+    },
+    {
+      "id": "dlv135",
+      "text": "May parking po kayo sa harap ng tindahan.",
+      "tag": "delivery_logistics",
+      "mode": "bright"
+    },
+    {
+      "id": "dlv136",
+      "text": "Sorry po, nawala yata ang padala ninyo.",
+      "tag": "delivery_logistics",
+      "mode": "apologetic"
+    },
+    {
+      "id": "dlv137",
+      "text": "Iimbestigahan po namin agad ito, sir.",
+      "tag": "delivery_logistics",
+      "mode": "reassuring"
+    },
+    {
+      "id": "dlv138",
+      "text": "Papalitan po namin kung talagang nawala.",
+      "tag": "delivery_logistics",
+      "mode": "reassuring"
+    },
+    {
+      "id": "dlv139",
+      "text": "Ilang piraso po ang ipapadala natin?",
+      "tag": "delivery_logistics",
+      "mode": "neutral"
+    },
+    {
+      "id": "dlv140",
+      "text": "Isang kahon lang po ba o marami?",
+      "tag": "delivery_logistics",
+      "mode": "neutral"
+    },
+    {
+      "id": "dlv141",
+      "text": "Mabigat po ito, mga sampung kilo.",
+      "tag": "delivery_logistics",
+      "mode": "neutral"
+    },
+    {
+      "id": "dlv142",
+      "text": "Sisiguraduhin po naming maayos ang pagdating.",
+      "tag": "delivery_logistics",
+      "mode": "reassuring"
+    },
+    {
+      "id": "dlv143",
+      "text": "Dalawang araw pa po ang natitira sa biyahe.",
+      "tag": "delivery_logistics",
+      "mode": "neutral"
+    },
+    {
+      "id": "dlv144",
+      "text": "Nasa Batangas na po ang inyong padala.",
+      "tag": "delivery_logistics",
+      "mode": "bright"
+    },
+    {
+      "id": "dlv145",
+      "text": "Bukas po ito dapat nasa inyo na.",
+      "tag": "delivery_logistics",
+      "mode": "bright"
+    },
+    {
+      "id": "dlv146",
+      "text": "Kung may problema po, nandito lang ako.",
+      "tag": "delivery_logistics",
+      "mode": "reassuring"
+    },
+    {
+      "id": "dlv147",
+      "text": "I-update ko po kayo pagkatapos ng isang oras.",
+      "tag": "delivery_logistics",
+      "mode": "neutral"
+    },
+    {
+      "id": "dlv148",
+      "text": "Salamat po sa pag-antay, na-book na natin.",
+      "tag": "delivery_logistics",
+      "mode": "bright"
+    },
+    {
+      "id": "dlv149",
+      "text": "Ang delivery po ninyo ay sa ika-labinlima.",
+      "tag": "delivery_logistics",
+      "mode": "neutral"
+    },
+    {
+      "id": "dlv150",
+      "text": "Tapos na po ang lahat, hintayin niyo na lang.",
+      "tag": "delivery_logistics",
+      "mode": "bright"
+    },
+    {
+      "id": "pay001",
+      "text": "You can pay through GCash, bank transfer or cash on delivery.",
+      "tag": "payment_methods",
+      "mode": "neutral"
+    },
+    {
+      "id": "pay002",
+      "text": "I will send you the QR code for GCash.",
+      "tag": "payment_methods",
+      "mode": "neutral"
+    },
+    {
+      "id": "pay003",
+      "text": "Please send a screenshot once you have paid.",
+      "tag": "payment_methods",
+      "mode": "neutral"
+    },
+    {
+      "id": "pay004",
+      "text": "Your payment is confirmed, thank you!",
+      "tag": "payment_methods",
+      "mode": "bright"
+    },
+    {
+      "id": "pay005",
+      "text": "Cash on delivery is available for this order.",
+      "tag": "payment_methods",
+      "mode": "bright"
+    },
+    {
+      "id": "pay006",
+      "text": "We ask for a fifty percent downpayment first.",
+      "tag": "payment_methods",
+      "mode": "neutral"
+    },
+    {
+      "id": "pay007",
+      "text": "The balance is due when the item arrives.",
+      "tag": "payment_methods",
+      "mode": "neutral"
+    },
+    {
+      "id": "pay008",
+      "text": "I am sorry, we have not received your payment yet.",
+      "tag": "payment_methods",
+      "mode": "apologetic"
+    },
+    {
+      "id": "pay009",
+      "text": "Rest assured, your money is safe with us.",
+      "tag": "payment_methods",
+      "mode": "reassuring"
+    },
+    {
+      "id": "pay010",
+      "text": "Refunds usually take three to five working days.",
+      "tag": "payment_methods",
+      "mode": "neutral"
+    },
+    {
+      "id": "pay011",
+      "text": "Which payment method do you prefer, ma'am?",
+      "tag": "payment_methods",
+      "mode": "neutral"
+    },
+    {
+      "id": "pay012",
+      "text": "We also accept Maya and bank deposits.",
+      "tag": "payment_methods",
+      "mode": "neutral"
+    },
+    {
+      "id": "pay013",
+      "text": "There is no extra charge for cash on delivery.",
+      "tag": "payment_methods",
+      "mode": "reassuring"
+    },
+    {
+      "id": "pay014",
+      "text": "Let me check if your transfer has cleared.",
+      "tag": "payment_methods",
+      "mode": "neutral"
+    },
+    {
+      "id": "pay015",
+      "text": "Please prepare the exact amount for the rider.",
+      "tag": "payment_methods",
+      "mode": "neutral"
+    },
+    {
+      "id": "pay016",
+      "text": "Thank you, I can see your payment now.",
+      "tag": "payment_methods",
+      "mode": "bright"
+    },
+    {
+      "id": "pay017",
+      "text": "Do not worry, we will sort this out today.",
+      "tag": "payment_methods",
+      "mode": "reassuring"
+    },
+    {
+      "id": "pay018",
+      "text": "The reference number did not match, unfortunately.",
+      "tag": "payment_methods",
+      "mode": "apologetic"
+    },
+    {
+      "id": "pay019",
+      "text": "You may pay in two instalments if you prefer.",
+      "tag": "payment_methods",
+      "mode": "bright"
+    },
+    {
+      "id": "pay020",
+      "text": "Our account name is under the business name.",
+      "tag": "payment_methods",
+      "mode": "neutral"
+    },
+    {
+      "id": "pay021",
+      "text": "Pwede po kayong magbayad sa GCash o sa banko.",
+      "tag": "payment_methods",
+      "mode": "neutral"
+    },
+    {
+      "id": "pay022",
+      "text": "Ipapadala ko po ang QR code sa inyo.",
+      "tag": "payment_methods",
+      "mode": "neutral"
+    },
+    {
+      "id": "pay023",
+      "text": "Pakisend na lang po ng larawan ng bayad.",
+      "tag": "payment_methods",
+      "mode": "neutral"
+    },
+    {
+      "id": "pay024",
+      "text": "Natanggap na po namin ang inyong bayad, salamat!",
+      "tag": "payment_methods",
+      "mode": "bright"
+    },
+    {
+      "id": "pay025",
+      "text": "Kalahati po muna ang bayad bago ipadala.",
+      "tag": "payment_methods",
+      "mode": "neutral"
+    },
+    {
+      "id": "pay026",
+      "text": "Ang natitira po ay babayaran pagdating ng item.",
+      "tag": "payment_methods",
+      "mode": "neutral"
+    },
+    {
+      "id": "pay027",
+      "text": "Paumanhin po, wala pa pong pumapasok na bayad.",
+      "tag": "payment_methods",
+      "mode": "apologetic"
+    },
+    {
+      "id": "pay028",
+      "text": "Huwag po kayong mag-alala, ligtas ang pera ninyo.",
+      "tag": "payment_methods",
+      "mode": "reassuring"
+    },
+    {
+      "id": "pay029",
+      "text": "Tatlo hanggang limang araw po ang refund.",
+      "tag": "payment_methods",
+      "mode": "neutral"
+    },
+    {
+      "id": "pay030",
+      "text": "Anong paraan po ng bayad ang gusto ninyo?",
+      "tag": "payment_methods",
+      "mode": "neutral"
+    },
+    {
+      "id": "pay031",
+      "text": "Pwede po sa GCash, bank transfer, o cash on delivery.",
+      "tag": "payment_methods",
+      "mode": "neutral"
+    },
+    {
+      "id": "pay032",
+      "text": "Isesend ko po sa inyo yung QR code para sa GCash.",
+      "tag": "payment_methods",
+      "mode": "neutral"
+    },
+    {
+      "id": "pay033",
+      "text": "Pakisend na lang po yung screenshot ng payment.",
+      "tag": "payment_methods",
+      "mode": "neutral"
+    },
+    {
+      "id": "pay034",
+      "text": "Confirmed na po ang bayad ninyo, salamat po!",
+      "tag": "payment_methods",
+      "mode": "bright"
+    },
+    {
+      "id": "pay035",
+      "text": "COD po ay available para sa order ninyo.",
+      "tag": "payment_methods",
+      "mode": "bright"
+    },
+    {
+      "id": "pay036",
+      "text": "Fifty percent downpayment po muna bago i-process.",
+      "tag": "payment_methods",
+      "mode": "neutral"
+    },
+    {
+      "id": "pay037",
+      "text": "Yung balance po ay bayad pagdating ng item.",
+      "tag": "payment_methods",
+      "mode": "neutral"
+    },
+    {
+      "id": "pay038",
+      "text": "Sorry po, wala pa pong reflect na payment.",
+      "tag": "payment_methods",
+      "mode": "apologetic"
+    },
+    {
+      "id": "pay039",
+      "text": "Safe po ang transaction ninyo sa amin.",
+      "tag": "payment_methods",
+      "mode": "reassuring"
+    },
+    {
+      "id": "pay040",
+      "text": "Yung refund po ay tatlo hanggang limang working days.",
+      "tag": "payment_methods",
+      "mode": "neutral"
+    },
+    {
+      "id": "pay041",
+      "text": "Tumatanggap din po kami ng Maya at bank deposit.",
+      "tag": "payment_methods",
+      "mode": "neutral"
+    },
+    {
+      "id": "pay042",
+      "text": "Walang dagdag na bayad po sa COD.",
+      "tag": "payment_methods",
+      "mode": "reassuring"
+    },
+    {
+      "id": "pay043",
+      "text": "I-check ko lang po kung na-clear na ang transfer.",
+      "tag": "payment_methods",
+      "mode": "neutral"
+    },
+    {
+      "id": "pay044",
+      "text": "Paki-handa po ng exact amount para sa rider.",
+      "tag": "payment_methods",
+      "mode": "neutral"
+    },
+    {
+      "id": "pay045",
+      "text": "Nakita ko na po ang bayad ninyo, salamat!",
+      "tag": "payment_methods",
+      "mode": "bright"
+    },
+    {
+      "id": "pay046",
+      "text": "Huwag po kayong mag-alala, aayusin natin ngayon.",
+      "tag": "payment_methods",
+      "mode": "reassuring"
+    },
+    {
+      "id": "pay047",
+      "text": "Hindi po tugma yung reference number, pasensya na.",
+      "tag": "payment_methods",
+      "mode": "apologetic"
+    },
+    {
+      "id": "pay048",
+      "text": "Pwede po kayong maghulog ng dalawang beses.",
+      "tag": "payment_methods",
+      "mode": "bright"
+    },
+    {
+      "id": "pay049",
+      "text": "Ang account name po ay nasa business name namin.",
+      "tag": "payment_methods",
+      "mode": "neutral"
+    },
+    {
+      "id": "pay050",
+      "text": "Paki-verify po ng inyong GCash number.",
+      "tag": "payment_methods",
+      "mode": "neutral"
+    },
+    {
+      "id": "pay051",
+      "text": "Nakalagay po sa resibo ang lahat ng bayad.",
+      "tag": "payment_methods",
+      "mode": "neutral"
+    },
+    {
+      "id": "pay052",
+      "text": "Cash lang po ba o card ang gagamitin ninyo?",
+      "tag": "payment_methods",
+      "mode": "neutral"
+    },
+    {
+      "id": "pay053",
+      "text": "May card terminal po kami sa tindahan.",
+      "tag": "payment_methods",
+      "mode": "bright"
+    },
+    {
+      "id": "pay054",
+      "text": "Sorry po, hindi po kami tumatanggap ng cheke.",
+      "tag": "payment_methods",
+      "mode": "apologetic"
+    },
+    {
+      "id": "pay055",
+      "text": "Salamat po sa mabilis na pagbabayad!",
+      "tag": "payment_methods",
+      "mode": "bright"
+    },
+    {
+      "id": "pay056",
+      "text": "Ipapadala ko po ang official receipt ninyo.",
+      "tag": "payment_methods",
+      "mode": "neutral"
+    },
+    {
+      "id": "pay057",
+      "text": "Naiintindihan ko po kung nag-aalala kayo sa bayad.",
+      "tag": "payment_methods",
+      "mode": "reassuring"
+    },
+    {
+      "id": "pay058",
+      "text": "Marami na pong customer ang nag-COD sa amin.",
+      "tag": "payment_methods",
+      "mode": "reassuring"
+    },
+    {
+      "id": "pay059",
+      "text": "Bayad na po lahat, wala nang natitira.",
+      "tag": "payment_methods",
+      "mode": "bright"
+    },
+    {
+      "id": "pay060",
+      "text": "May natitira pa po kayong limang daan.",
+      "tag": "payment_methods",
+      "mode": "neutral"
+    },
+    {
+      "id": "pay061",
+      "text": "Ang deposito po ay isang libo lamang.",
+      "tag": "payment_methods",
+      "mode": "neutral"
+    },
+    {
+      "id": "pay062",
+      "text": "Bayaran po ninyo sa loob ng dalawampu't apat na oras.",
+      "tag": "payment_methods",
+      "mode": "neutral"
+    },
+    {
+      "id": "pay063",
+      "text": "Kung hindi po mabayaran, mawawala ang reserba.",
+      "tag": "payment_methods",
+      "mode": "neutral"
+    },
+    {
+      "id": "pay064",
+      "text": "Salamat po, kumpleto na ang inyong bayad.",
+      "tag": "payment_methods",
+      "mode": "bright"
+    },
+    {
+      "id": "pay065",
+      "text": "Ipapasok ko po sa aming talaan ang bayad.",
+      "tag": "payment_methods",
+      "mode": "neutral"
+    },
+    {
+      "id": "pay066",
+      "text": "Paumanhin po kung nalito kayo sa singil.",
+      "tag": "payment_methods",
+      "mode": "apologetic"
+    },
+    {
+      "id": "pay067",
+      "text": "Ibabalik po namin ang sobrang nabayaran ninyo.",
+      "tag": "payment_methods",
+      "mode": "reassuring"
+    },
+    {
+      "id": "pay068",
+      "text": "Walang po kaming itinatagong bayarin.",
+      "tag": "payment_methods",
+      "mode": "reassuring"
+    },
+    {
+      "id": "pay069",
+      "text": "Anong bangko po ang gamit ninyo?",
+      "tag": "payment_methods",
+      "mode": "neutral"
+    },
+    {
+      "id": "pay070",
+      "text": "Ibibigay ko po ang aming numero ng kuwenta.",
+      "tag": "payment_methods",
+      "mode": "neutral"
+    },
+    {
+      "id": "pay071",
+      "text": "Pakisulat po ang inyong pangalan sa deposit slip.",
+      "tag": "payment_methods",
+      "mode": "neutral"
+    },
+    {
+      "id": "pay072",
+      "text": "Kapag nabayaran po, ipoproseso na namin agad.",
+      "tag": "payment_methods",
+      "mode": "bright"
+    },
+    {
+      "id": "pay073",
+      "text": "Handa na po ang inyong resibo dito.",
+      "tag": "payment_methods",
+      "mode": "bright"
+    },
+    {
+      "id": "pay074",
+      "text": "Sorry po, may problema sa aming sistema kanina.",
+      "tag": "payment_methods",
+      "mode": "apologetic"
+    },
+    {
+      "id": "pay075",
+      "text": "Subukan po ninyong ulit ngayon, ayos na.",
+      "tag": "payment_methods",
+      "mode": "reassuring"
+    },
+    {
+      "id": "pay076",
+      "text": "Ang huling bayad po ninyo ay noong Lunes.",
+      "tag": "payment_methods",
+      "mode": "neutral"
+    },
+    {
+      "id": "pay077",
+      "text": "Buwanan po ba o isahang bayad ang gusto ninyo?",
+      "tag": "payment_methods",
+      "mode": "neutral"
+    },
+    {
+      "id": "pay078",
+      "text": "Mas mura po kung isahang bayad kayo.",
+      "tag": "payment_methods",
+      "mode": "bright"
+    },
+    {
+      "id": "pay079",
+      "text": "Tatanggapin po namin ang bayad hanggang alas-singko.",
+      "tag": "payment_methods",
+      "mode": "neutral"
+    },
+    {
+      "id": "pay080",
+      "text": "Kailangan po ng valid ID pagkuha ng refund.",
+      "tag": "payment_methods",
+      "mode": "neutral"
+    },
+    {
+      "id": "pay081",
+      "text": "Naiintindihan ko po, kakaunti lang ang budget.",
+      "tag": "payment_methods",
+      "mode": "reassuring"
+    },
+    {
+      "id": "pay082",
+      "text": "Hahanapan po kita ng paraan para mas madali.",
+      "tag": "payment_methods",
+      "mode": "reassuring"
+    },
+    {
+      "id": "pay083",
+      "text": "Ang bayad po sa rider ay dapat eksakto.",
+      "tag": "payment_methods",
+      "mode": "neutral"
+    },
+    {
+      "id": "pay084",
+      "text": "Walang sukli po ang aming rider, pasensya na.",
+      "tag": "payment_methods",
+      "mode": "apologetic"
+    },
+    {
+      "id": "pay085",
+      "text": "Salamat po at kumpleto ang inyong bayad!",
+      "tag": "payment_methods",
+      "mode": "bright"
+    },
+    {
+      "id": "pay086",
+      "text": "Ipapaalam ko po sa inyo kapag na-refund na.",
+      "tag": "payment_methods",
+      "mode": "reassuring"
+    },
+    {
+      "id": "pay087",
+      "text": "Ang buong halaga po ay dalawang libo tatlong daan.",
+      "tag": "payment_methods",
+      "mode": "neutral"
+    },
+    {
+      "id": "pay088",
+      "text": "Nabayaran na po ninyo ang isang libo.",
+      "tag": "payment_methods",
+      "mode": "neutral"
+    },
+    {
+      "id": "pay089",
+      "text": "Puwede po kayong magbayad online o personal.",
+      "tag": "payment_methods",
+      "mode": "neutral"
+    },
+    {
+      "id": "pay090",
+      "text": "Sige po, hihintayin ko ang inyong bayad.",
+      "tag": "payment_methods",
+      "mode": "neutral"
+    },
+    {
+      "id": "pay091",
+      "text": "Nakumpirma na po, salamat sa inyong tiwala!",
+      "tag": "payment_methods",
+      "mode": "bright"
+    },
+    {
+      "id": "pay092",
+      "text": "Ipapadala ko po ang detalye ng bayad sa text.",
+      "tag": "payment_methods",
+      "mode": "neutral"
+    },
+    {
+      "id": "pay093",
+      "text": "Kung may tanong po sa singil, sabihin lang ninyo.",
+      "tag": "payment_methods",
+      "mode": "reassuring"
+    },
+    {
+      "id": "pay094",
+      "text": "Wala pong dagdag na bayad sa GCash.",
+      "tag": "payment_methods",
+      "mode": "reassuring"
+    },
+    {
+      "id": "pay095",
+      "text": "Ang aming numero po ay nasa Facebook page.",
+      "tag": "payment_methods",
+      "mode": "neutral"
+    },
+    {
+      "id": "pay096",
+      "text": "Paumanhin po, hindi po tumatanggap ng installment.",
+      "tag": "payment_methods",
+      "mode": "apologetic"
+    },
+    {
+      "id": "pay097",
+      "text": "Bayaran po ninyo pagdating ng padala, ayos lang.",
+      "tag": "payment_methods",
+      "mode": "bright"
+    },
+    {
+      "id": "pay098",
+      "text": "Nasa inyo na po ang resibo, itago ninyo.",
+      "tag": "payment_methods",
+      "mode": "neutral"
+    },
+    {
+      "id": "pay099",
+      "text": "Salamat po sa maagang pagbabayad ninyo.",
+      "tag": "payment_methods",
+      "mode": "bright"
+    },
+    {
+      "id": "pay100",
+      "text": "Tapos na po ang lahat, salamat po ulit!",
+      "tag": "payment_methods",
+      "mode": "bright"
+    },
+    {
+      "id": "obj001",
+      "text": "I understand, it is a real amount of money.",
+      "tag": "objection_handling",
+      "mode": "reassuring"
+    },
+    {
+      "id": "obj002",
+      "text": "Take your time to think it over.",
+      "tag": "objection_handling",
+      "mode": "reassuring"
+    },
+    {
+      "id": "obj003",
+      "text": "Of course, please discuss it with your husband first.",
+      "tag": "objection_handling",
+      "mode": "reassuring"
+    },
+    {
+      "id": "obj004",
+      "text": "The quality is genuinely better than the cheaper ones.",
+      "tag": "objection_handling",
+      "mode": "reassuring"
+    },
+    {
+      "id": "obj005",
+      "text": "We have been in business for eight years now.",
+      "tag": "objection_handling",
+      "mode": "reassuring"
+    },
+    {
+      "id": "obj006",
+      "text": "I am sorry you had a bad experience before.",
+      "tag": "objection_handling",
+      "mode": "apologetic"
+    },
+    {
+      "id": "obj007",
+      "text": "You can inspect the item before you pay.",
+      "tag": "objection_handling",
+      "mode": "reassuring"
+    },
+    {
+      "id": "obj008",
+      "text": "Many of our customers were hesitant at first too.",
+      "tag": "objection_handling",
+      "mode": "reassuring"
+    },
+    {
+      "id": "obj009",
+      "text": "There is a one year warranty on every unit.",
+      "tag": "objection_handling",
+      "mode": "neutral"
+    },
+    {
+      "id": "obj010",
+      "text": "I can send you photos of previous orders.",
+      "tag": "objection_handling",
+      "mode": "bright"
+    },
+    {
+      "id": "obj011",
+      "text": "That is completely fine, no pressure at all.",
+      "tag": "objection_handling",
+      "mode": "reassuring"
+    },
+    {
+      "id": "obj012",
+      "text": "The other shop may not include delivery in that price.",
+      "tag": "objection_handling",
+      "mode": "neutral"
+    },
+    {
+      "id": "obj013",
+      "text": "We can hold it for you until payday.",
+      "tag": "objection_handling",
+      "mode": "bright"
+    },
+    {
+      "id": "obj014",
+      "text": "Cash on delivery means you pay only when it arrives.",
+      "tag": "objection_handling",
+      "mode": "reassuring"
+    },
+    {
+      "id": "obj015",
+      "text": "I hear that concern often, and it is fair.",
+      "tag": "objection_handling",
+      "mode": "reassuring"
+    },
+    {
+      "id": "obj016",
+      "text": "Let me explain what makes ours different.",
+      "tag": "objection_handling",
+      "mode": "neutral"
+    },
+    {
+      "id": "obj017",
+      "text": "You are not obliged to decide today.",
+      "tag": "objection_handling",
+      "mode": "reassuring"
+    },
+    {
+      "id": "obj018",
+      "text": "We can give a small discount for your first order.",
+      "tag": "objection_handling",
+      "mode": "bright"
+    },
+    {
+      "id": "obj019",
+      "text": "Our reviews are on our Facebook page if you want to check.",
+      "tag": "objection_handling",
+      "mode": "reassuring"
+    },
+    {
+      "id": "obj020",
+      "text": "I am sorry, I cannot lower it further than that.",
+      "tag": "objection_handling",
+      "mode": "apologetic"
+    },
+    {
+      "id": "obj021",
+      "text": "Naiintindihan ko po, malaki nga pong halaga yan.",
+      "tag": "objection_handling",
+      "mode": "reassuring"
+    },
+    {
+      "id": "obj022",
+      "text": "Walang problema po kung gusto niyo munang mag-isip.",
+      "tag": "objection_handling",
+      "mode": "reassuring"
+    },
+    {
+      "id": "obj023",
+      "text": "Sige po, kausapin niyo muna ang asawa ninyo.",
+      "tag": "objection_handling",
+      "mode": "reassuring"
+    },
+    {
+      "id": "obj024",
+      "text": "Mas matibay po talaga ito kaysa sa mura.",
+      "tag": "objection_handling",
+      "mode": "reassuring"
+    },
+    {
+      "id": "obj025",
+      "text": "Walong taon na po kaming nagtitinda dito.",
+      "tag": "objection_handling",
+      "mode": "reassuring"
+    },
+    {
+      "id": "obj026",
+      "text": "Paumanhin po sa masamang karanasan ninyo noon.",
+      "tag": "objection_handling",
+      "mode": "apologetic"
+    },
+    {
+      "id": "obj027",
+      "text": "Pwede po ninyong tingnan bago magbayad.",
+      "tag": "objection_handling",
+      "mode": "reassuring"
+    },
+    {
+      "id": "obj028",
+      "text": "Marami rin pong nag-alinlangan noong una.",
+      "tag": "objection_handling",
+      "mode": "reassuring"
+    },
+    {
+      "id": "obj029",
+      "text": "May garantiya po ito ng isang taon.",
+      "tag": "objection_handling",
+      "mode": "neutral"
+    },
+    {
+      "id": "obj030",
+      "text": "Wala pong pilitan, kayo po ang bahala.",
+      "tag": "objection_handling",
+      "mode": "reassuring"
+    },
+    {
+      "id": "obj031",
+      "text": "Naiintindihan ko po, medyo mahal nga po pero matibay.",
+      "tag": "objection_handling",
+      "mode": "reassuring"
+    },
+    {
+      "id": "obj032",
+      "text": "Wala pong problema kung gusto niyo munang mag-isip.",
+      "tag": "objection_handling",
+      "mode": "reassuring"
+    },
+    {
+      "id": "obj033",
+      "text": "May warranty po yan, isang taon po, sir.",
+      "tag": "objection_handling",
+      "mode": "neutral"
+    },
+    {
+      "id": "obj034",
+      "text": "Marami na pong bumili nito at maganda ang feedback.",
+      "tag": "objection_handling",
+      "mode": "reassuring"
+    },
+    {
+      "id": "obj035",
+      "text": "Kung gusto niyo po, ipapadala ko yung mga review.",
+      "tag": "objection_handling",
+      "mode": "bright"
+    },
+    {
+      "id": "obj036",
+      "text": "COD po kayo, bayad lang pagdating ng item.",
+      "tag": "objection_handling",
+      "mode": "reassuring"
+    },
+    {
+      "id": "obj037",
+      "text": "Legit po kami, may physical store kami sa Pasig.",
+      "tag": "objection_handling",
+      "mode": "reassuring"
+    },
+    {
+      "id": "obj038",
+      "text": "Pasensya na po kung na-scam kayo dati.",
+      "tag": "objection_handling",
+      "mode": "apologetic"
+    },
+    {
+      "id": "obj039",
+      "text": "Pwede po ninyong i-check yung page namin.",
+      "tag": "objection_handling",
+      "mode": "neutral"
+    },
+    {
+      "id": "obj040",
+      "text": "Yung ibang tindahan po, hindi kasama ang shipping.",
+      "tag": "objection_handling",
+      "mode": "neutral"
+    },
+    {
+      "id": "obj041",
+      "text": "I-hold ko po para sa inyo hanggang sahod.",
+      "tag": "objection_handling",
+      "mode": "bright"
+    },
+    {
+      "id": "obj042",
+      "text": "Sorry po, hindi na po pwedeng bawasan pa.",
+      "tag": "objection_handling",
+      "mode": "apologetic"
+    },
+    {
+      "id": "obj043",
+      "text": "Sulit po talaga sa quality na makukuha ninyo.",
+      "tag": "objection_handling",
+      "mode": "reassuring"
+    },
+    {
+      "id": "obj044",
+      "text": "Naiintindihan ko po yung concern ninyo, sir.",
+      "tag": "objection_handling",
+      "mode": "reassuring"
+    },
+    {
+      "id": "obj045",
+      "text": "Ipapaliwanag ko po kung bakit iba ang sa amin.",
+      "tag": "objection_handling",
+      "mode": "neutral"
+    },
+    {
+      "id": "obj046",
+      "text": "Hindi po kayo obligadong magdesisyon ngayon.",
+      "tag": "objection_handling",
+      "mode": "reassuring"
+    },
+    {
+      "id": "obj047",
+      "text": "Bibigyan ko po kayo ng discount sa first order.",
+      "tag": "objection_handling",
+      "mode": "bright"
+    },
+    {
+      "id": "obj048",
+      "text": "Ganyan din po ang tanong ng ibang customer.",
+      "tag": "objection_handling",
+      "mode": "reassuring"
+    },
+    {
+      "id": "obj049",
+      "text": "Palitan po namin agad kung may depekto.",
+      "tag": "objection_handling",
+      "mode": "reassuring"
+    },
+    {
+      "id": "obj050",
+      "text": "Tiwalaan niyo lang po kami, hindi namin kayo bibiguin.",
+      "tag": "objection_handling",
+      "mode": "reassuring"
+    },
+    {
+      "id": "obj051",
+      "text": "Pwede po kayong mag-inspect bago tanggapin.",
+      "tag": "objection_handling",
+      "mode": "reassuring"
+    },
+    {
+      "id": "obj052",
+      "text": "Registered po ang aming negosyo sa DTI.",
+      "tag": "objection_handling",
+      "mode": "reassuring"
+    },
+    {
+      "id": "obj053",
+      "text": "Naku, naiintindihan ko po ang pag-aalala ninyo.",
+      "tag": "objection_handling",
+      "mode": "reassuring"
+    },
+    {
+      "id": "obj054",
+      "text": "Sige po, isipin niyo muna, tatawag ako bukas.",
+      "tag": "objection_handling",
+      "mode": "reassuring"
+    },
+    {
+      "id": "obj055",
+      "text": "Mas mura po pag tinignan sa haba ng gamit.",
+      "tag": "objection_handling",
+      "mode": "neutral"
+    },
+    {
+      "id": "obj056",
+      "text": "Yung mura po kasi, madalas mabilis masira.",
+      "tag": "objection_handling",
+      "mode": "neutral"
+    },
+    {
+      "id": "obj057",
+      "text": "Walang po kaming itinatago sa inyo.",
+      "tag": "objection_handling",
+      "mode": "reassuring"
+    },
+    {
+      "id": "obj058",
+      "text": "Marami pong repeat customer ang meron kami.",
+      "tag": "objection_handling",
+      "mode": "reassuring"
+    },
+    {
+      "id": "obj059",
+      "text": "Ipapakita ko po yung mga larawan ng naipadala na.",
+      "tag": "objection_handling",
+      "mode": "bright"
+    },
+    {
+      "id": "obj060",
+      "text": "Pasensya na po, wala na po talaga kaming tawad.",
+      "tag": "objection_handling",
+      "mode": "apologetic"
+    },
+    {
+      "id": "obj061",
+      "text": "Nauunawaan ko po na mahirap ang panahon ngayon.",
+      "tag": "objection_handling",
+      "mode": "reassuring"
+    },
+    {
+      "id": "obj062",
+      "text": "Hindi po kami mawawala, matagal na kami dito.",
+      "tag": "objection_handling",
+      "mode": "reassuring"
+    },
+    {
+      "id": "obj063",
+      "text": "Kung hindi po kayo kuntento, ibabalik namin ang bayad.",
+      "tag": "objection_handling",
+      "mode": "reassuring"
+    },
+    {
+      "id": "obj064",
+      "text": "Malaya po kayong pumili ng ibang tindahan.",
+      "tag": "objection_handling",
+      "mode": "reassuring"
+    },
+    {
+      "id": "obj065",
+      "text": "Pero sana po bigyan ninyo kami ng pagkakataon.",
+      "tag": "objection_handling",
+      "mode": "reassuring"
+    },
+    {
+      "id": "obj066",
+      "text": "Ang tibay po nito, taon bago mapalitan.",
+      "tag": "objection_handling",
+      "mode": "neutral"
+    },
+    {
+      "id": "obj067",
+      "text": "Paumanhin po kung hindi kayo nakumbinsi.",
+      "tag": "objection_handling",
+      "mode": "apologetic"
+    },
+    {
+      "id": "obj068",
+      "text": "Tumawag lang po kayo kung magbago ang isip.",
+      "tag": "objection_handling",
+      "mode": "reassuring"
+    },
+    {
+      "id": "obj069",
+      "text": "Hindi po namin kayo pipilitin, sir.",
+      "tag": "objection_handling",
+      "mode": "reassuring"
+    },
+    {
+      "id": "obj070",
+      "text": "Karapatan po ninyong magtanong at mag-alinlangan.",
+      "tag": "objection_handling",
+      "mode": "reassuring"
+    },
+    {
+      "id": "obj071",
+      "text": "Kaya ko po kayong tulungan makapili ng abot-kaya.",
+      "tag": "objection_handling",
+      "mode": "reassuring"
+    },
+    {
+      "id": "obj072",
+      "text": "May mas murang bersyon po kami kung gusto ninyo.",
+      "tag": "objection_handling",
+      "mode": "bright"
+    },
+    {
+      "id": "obj073",
+      "text": "Sabihin niyo lang po ang budget ninyo.",
+      "tag": "objection_handling",
+      "mode": "reassuring"
+    },
+    {
+      "id": "obj074",
+      "text": "Marami pong nagtanong ng ganyan at bumili rin.",
+      "tag": "objection_handling",
+      "mode": "reassuring"
+    },
+    {
+      "id": "obj075",
+      "text": "Hindi po kailangang magmadali sa desisyon.",
+      "tag": "objection_handling",
+      "mode": "reassuring"
+    },
+    {
+      "id": "obj076",
+      "text": "Ang mahalaga po ay kuntento kayo sa bibilhin.",
+      "tag": "objection_handling",
+      "mode": "reassuring"
+    },
+    {
+      "id": "obj077",
+      "text": "Sorry po kung hindi ko naipaliwanag nang maayos.",
+      "tag": "objection_handling",
+      "mode": "apologetic"
+    },
+    {
+      "id": "obj078",
+      "text": "Subukan ko pong ipaliwanag muli, sandali lang.",
+      "tag": "objection_handling",
+      "mode": "reassuring"
+    },
+    {
+      "id": "obj079",
+      "text": "Ang presyo po namin ay patas at makatwiran.",
+      "tag": "objection_handling",
+      "mode": "neutral"
+    },
+    {
+      "id": "obj080",
+      "text": "Hindi po kami nagtataas ng presyo bigla-bigla.",
+      "tag": "objection_handling",
+      "mode": "reassuring"
+    },
+    {
+      "id": "obj081",
+      "text": "Kilala po kami sa lugar na ito, matanong niyo.",
+      "tag": "objection_handling",
+      "mode": "reassuring"
+    },
+    {
+      "id": "obj082",
+      "text": "May mga larawan po kaming maipapakita sa inyo.",
+      "tag": "objection_handling",
+      "mode": "bright"
+    },
+    {
+      "id": "obj083",
+      "text": "Ligtas po ang bawat transaksyon sa amin.",
+      "tag": "objection_handling",
+      "mode": "reassuring"
+    },
+    {
+      "id": "obj084",
+      "text": "Naiintindihan ko po, marami ngang manloloko ngayon.",
+      "tag": "objection_handling",
+      "mode": "reassuring"
+    },
+    {
+      "id": "obj085",
+      "text": "Kaya nga po may cash on delivery kami.",
+      "tag": "objection_handling",
+      "mode": "reassuring"
+    },
+    {
+      "id": "obj086",
+      "text": "Hindi po kayo magbabayad hangga't wala pa sa inyo.",
+      "tag": "objection_handling",
+      "mode": "reassuring"
+    },
+    {
+      "id": "obj087",
+      "text": "Wala pong panganib sa panig ninyo.",
+      "tag": "objection_handling",
+      "mode": "reassuring"
+    },
+    {
+      "id": "obj088",
+      "text": "Sige po, balikan niyo na lang ako mamaya.",
+      "tag": "objection_handling",
+      "mode": "reassuring"
+    },
+    {
+      "id": "obj089",
+      "text": "Nandito lang po ako kung may tanong pa kayo.",
+      "tag": "objection_handling",
+      "mode": "reassuring"
+    },
+    {
+      "id": "obj090",
+      "text": "Salamat po sa oras ninyo kahit hindi kayo bumili.",
+      "tag": "objection_handling",
+      "mode": "bright"
+    },
+    {
+      "id": "obj091",
+      "text": "Alam ko pong nakakapag-alala ang online shopping.",
+      "tag": "objection_handling",
+      "mode": "reassuring"
+    },
+    {
+      "id": "obj092",
+      "text": "Pero po, meron kaming tindahan na pwede ninyong puntahan.",
+      "tag": "objection_handling",
+      "mode": "reassuring"
+    },
+    {
+      "id": "obj093",
+      "text": "Bibigyan ko po kayo ng address namin.",
+      "tag": "objection_handling",
+      "mode": "neutral"
+    },
+    {
+      "id": "obj094",
+      "text": "Puwede po kayong tumingin muna bago magpasya.",
+      "tag": "objection_handling",
+      "mode": "reassuring"
+    },
+    {
+      "id": "obj095",
+      "text": "Naiintindihan ko po ang inyong pagdududa.",
+      "tag": "objection_handling",
+      "mode": "reassuring"
+    },
+    {
+      "id": "obj096",
+      "text": "Hindi po namin sasayangin ang tiwala ninyo.",
+      "tag": "objection_handling",
+      "mode": "reassuring"
+    },
+    {
+      "id": "obj097",
+      "text": "Sorry po talaga kung hindi kayo kumbinsido.",
+      "tag": "objection_handling",
+      "mode": "apologetic"
+    },
+    {
+      "id": "obj098",
+      "text": "Ano po kaya ang makakatulong para makapagdesisyon kayo?",
+      "tag": "objection_handling",
+      "mode": "reassuring"
+    },
+    {
+      "id": "obj099",
+      "text": "Sabihin lang po ninyo kung ano ang alalahanin ninyo.",
+      "tag": "objection_handling",
+      "mode": "reassuring"
+    },
+    {
+      "id": "obj100",
+      "text": "Tutulungan ko po kayo hanggang sa makuntento kayo.",
+      "tag": "objection_handling",
+      "mode": "reassuring"
+    },
+    {
+      "id": "obj101",
+      "text": "Marami pong nagsabi na sulit ang binili nila.",
+      "tag": "objection_handling",
+      "mode": "reassuring"
+    },
+    {
+      "id": "obj102",
+      "text": "Hindi po ito basta-bastang produkto lang.",
+      "tag": "objection_handling",
+      "mode": "neutral"
+    },
+    {
+      "id": "obj103",
+      "text": "Kung ikukumpara po sa iba, mas mahaba ang buhay nito.",
+      "tag": "objection_handling",
+      "mode": "neutral"
+    },
+    {
+      "id": "obj104",
+      "text": "Ang mura po minsan, mas mahal sa huli.",
+      "tag": "objection_handling",
+      "mode": "neutral"
+    },
+    {
+      "id": "obj105",
+      "text": "Paumanhin po, hindi ko po masasagot yan ngayon.",
+      "tag": "objection_handling",
+      "mode": "apologetic"
+    },
+    {
+      "id": "obj106",
+      "text": "Itatanong ko po sa aking supervisor at babalikan kayo.",
+      "tag": "objection_handling",
+      "mode": "reassuring"
+    },
+    {
+      "id": "obj107",
+      "text": "Kalma lang po tayo, may solusyon dito.",
+      "tag": "objection_handling",
+      "mode": "reassuring"
+    },
+    {
+      "id": "obj108",
+      "text": "Hindi po kayo unang nagtanong ng ganito.",
+      "tag": "objection_handling",
+      "mode": "reassuring"
+    },
+    {
+      "id": "obj109",
+      "text": "Normal lang po yang tanong, huwag mahiya.",
+      "tag": "objection_handling",
+      "mode": "reassuring"
+    },
+    {
+      "id": "obj110",
+      "text": "Bibigyan ko po kayo ng panahon mag-isip.",
+      "tag": "objection_handling",
+      "mode": "reassuring"
+    },
+    {
+      "id": "obj111",
+      "text": "Wala pong deadline, kayo po ang bahala.",
+      "tag": "objection_handling",
+      "mode": "reassuring"
+    },
+    {
+      "id": "obj112",
+      "text": "Sana po makapili kayo ng tama para sa inyo.",
+      "tag": "objection_handling",
+      "mode": "reassuring"
+    },
+    {
+      "id": "obj113",
+      "text": "Salamat po sa katanungan, mahalaga po yan.",
+      "tag": "objection_handling",
+      "mode": "bright"
+    },
+    {
+      "id": "obj114",
+      "text": "May libre pong pagsusuri bago bumili.",
+      "tag": "objection_handling",
+      "mode": "bright"
+    },
+    {
+      "id": "obj115",
+      "text": "Hindi po namin kayo hahayaang malugi.",
+      "tag": "objection_handling",
+      "mode": "reassuring"
+    },
+    {
+      "id": "obj116",
+      "text": "Naiintindihan ko po na kailangan ninyong mag-ipon muna.",
+      "tag": "objection_handling",
+      "mode": "reassuring"
+    },
+    {
+      "id": "obj117",
+      "text": "Ipagpaliban po natin hanggang handa na kayo.",
+      "tag": "objection_handling",
+      "mode": "reassuring"
+    },
+    {
+      "id": "obj118",
+      "text": "Nandito lang po kami, hindi kami aalis.",
+      "tag": "objection_handling",
+      "mode": "reassuring"
+    },
+    {
+      "id": "obj119",
+      "text": "Kahit next month po, tatanggapin pa rin namin kayo.",
+      "tag": "objection_handling",
+      "mode": "bright"
+    },
+    {
+      "id": "obj120",
+      "text": "Sorry po kung nakakaabala ang aming pagtawag.",
+      "tag": "objection_handling",
+      "mode": "apologetic"
+    },
+    {
+      "id": "obj121",
+      "text": "Hindi po namin kayo tatawagan ulit kung ayaw ninyo.",
+      "tag": "objection_handling",
+      "mode": "reassuring"
+    },
+    {
+      "id": "obj122",
+      "text": "Sabihin lang po ninyo at titigil na kami.",
+      "tag": "objection_handling",
+      "mode": "reassuring"
+    },
+    {
+      "id": "obj123",
+      "text": "Respetado po namin ang desisyon ninyo.",
+      "tag": "objection_handling",
+      "mode": "reassuring"
+    },
+    {
+      "id": "obj124",
+      "text": "Puwede po kayong magtanong kahit hindi bibili.",
+      "tag": "objection_handling",
+      "mode": "reassuring"
+    },
+    {
+      "id": "obj125",
+      "text": "Libre po ang magtanong, walang bayad yan.",
+      "tag": "objection_handling",
+      "mode": "bright"
+    },
+    {
+      "id": "obj126",
+      "text": "Ang tagal na po naming nagbebenta nito.",
+      "tag": "objection_handling",
+      "mode": "reassuring"
+    },
+    {
+      "id": "obj127",
+      "text": "Kung may problema po, tawagan ninyo lang ako.",
+      "tag": "objection_handling",
+      "mode": "reassuring"
+    },
+    {
+      "id": "obj128",
+      "text": "Personal ko pong aasikasuhin ang inyong order.",
+      "tag": "objection_handling",
+      "mode": "reassuring"
+    },
+    {
+      "id": "obj129",
+      "text": "Ako po mismo ang magcha-check nito.",
+      "tag": "objection_handling",
+      "mode": "reassuring"
+    },
+    {
+      "id": "obj130",
+      "text": "Naniniwala po ako na magugustuhan ninyo ito.",
+      "tag": "objection_handling",
+      "mode": "reassuring"
+    },
+    {
+      "id": "obj131",
+      "text": "Ang laki po ng ipon ninyo kung tatagal ito.",
+      "tag": "objection_handling",
+      "mode": "neutral"
+    },
+    {
+      "id": "obj132",
+      "text": "Sorry po, wala po kaming ganyang klase ng bayad.",
+      "tag": "objection_handling",
+      "mode": "apologetic"
+    },
+    {
+      "id": "obj133",
+      "text": "Pero may iba po tayong pwedeng ayusin.",
+      "tag": "objection_handling",
+      "mode": "reassuring"
+    },
+    {
+      "id": "obj134",
+      "text": "Sige po, mag-isip muna kayo nang mabuti.",
+      "tag": "objection_handling",
+      "mode": "reassuring"
+    },
+    {
+      "id": "obj135",
+      "text": "Bukas po ulit tayo mag-usap kung gusto ninyo.",
+      "tag": "objection_handling",
+      "mode": "neutral"
+    },
+    {
+      "id": "obj136",
+      "text": "Naiintindihan ko po kung kailangan ninyong magtanong sa iba.",
+      "tag": "objection_handling",
+      "mode": "reassuring"
+    },
+    {
+      "id": "obj137",
+      "text": "Ikumpara niyo lang po, sigurado ako sa amin.",
+      "tag": "objection_handling",
+      "mode": "reassuring"
+    },
+    {
+      "id": "obj138",
+      "text": "Hindi po kami natatakot sa kumpetisyon.",
+      "tag": "objection_handling",
+      "mode": "bright"
+    },
+    {
+      "id": "obj139",
+      "text": "Ang serbisyo po namin ang pinagkaiba.",
+      "tag": "objection_handling",
+      "mode": "neutral"
+    },
+    {
+      "id": "obj140",
+      "text": "Tinutulungan po namin kayo kahit pagkatapos bumili.",
+      "tag": "objection_handling",
+      "mode": "reassuring"
+    },
+    {
+      "id": "obj141",
+      "text": "Hindi po namin kayo iiwan pagkatapos ng bayad.",
+      "tag": "objection_handling",
+      "mode": "reassuring"
+    },
+    {
+      "id": "obj142",
+      "text": "Paumanhin po sa naging abala nito sa inyo.",
+      "tag": "objection_handling",
+      "mode": "apologetic"
+    },
+    {
+      "id": "obj143",
+      "text": "Ayusin po natin ito nang sama-sama.",
+      "tag": "objection_handling",
+      "mode": "reassuring"
+    },
+    {
+      "id": "obj144",
+      "text": "Ano pong maitutulong ko para gumaan ang loob ninyo?",
+      "tag": "objection_handling",
+      "mode": "reassuring"
+    },
+    {
+      "id": "obj145",
+      "text": "Handa po akong makinig sa inyong reklamo.",
+      "tag": "objection_handling",
+      "mode": "reassuring"
+    },
+    {
+      "id": "obj146",
+      "text": "Tama po kayong magtanong bago magbayad.",
+      "tag": "objection_handling",
+      "mode": "reassuring"
+    },
+    {
+      "id": "obj147",
+      "text": "Mabuti pong maingat kayo sa pera ninyo.",
+      "tag": "objection_handling",
+      "mode": "reassuring"
+    },
+    {
+      "id": "obj148",
+      "text": "Sana po sa susunod ay makabili kayo sa amin.",
+      "tag": "objection_handling",
+      "mode": "bright"
+    },
+    {
+      "id": "obj149",
+      "text": "Salamat po sa inyong panahon at pasensya.",
+      "tag": "objection_handling",
+      "mode": "bright"
+    },
+    {
+      "id": "obj150",
+      "text": "Nandito lang po kami kung kailangan ninyo kami.",
+      "tag": "objection_handling",
+      "mode": "reassuring"
+    },
+    {
+      "id": "cls001",
+      "text": "Perfect, I will place your order now.",
+      "tag": "closing_confirmation",
+      "mode": "bright"
+    },
+    {
+      "id": "cls002",
+      "text": "Please confirm your name and mobile number.",
+      "tag": "closing_confirmation",
+      "mode": "neutral"
+    },
+    {
+      "id": "cls003",
+      "text": "Thank you so much for your order!",
+      "tag": "closing_confirmation",
+      "mode": "bright"
+    },
+    {
+      "id": "cls004",
+      "text": "Let me read that back to make sure it is right.",
+      "tag": "closing_confirmation",
+      "mode": "neutral"
+    },
+    {
+      "id": "cls005",
+      "text": "Your total is one thousand four hundred pesos.",
+      "tag": "closing_confirmation",
+      "mode": "neutral"
+    },
+    {
+      "id": "cls006",
+      "text": "You will receive it in two to three days.",
+      "tag": "closing_confirmation",
+      "mode": "neutral"
+    },
+    {
+      "id": "cls007",
+      "text": "Message us again if you need anything.",
+      "tag": "closing_confirmation",
+      "mode": "bright"
+    },
+    {
+      "id": "cls008",
+      "text": "Have a great day, and take care!",
+      "tag": "closing_confirmation",
+      "mode": "bright"
+    },
+    {
+      "id": "cls009",
+      "text": "I have noted everything down for you.",
+      "tag": "closing_confirmation",
+      "mode": "reassuring"
+    },
+    {
+      "id": "cls010",
+      "text": "I am sorry we could not help this time.",
+      "tag": "closing_confirmation",
+      "mode": "apologetic"
+    },
+    {
+      "id": "cls011",
+      "text": "Is there anything else I can help with?",
+      "tag": "closing_confirmation",
+      "mode": "neutral"
+    },
+    {
+      "id": "cls012",
+      "text": "Your order number will be sent by text.",
+      "tag": "closing_confirmation",
+      "mode": "neutral"
+    },
+    {
+      "id": "cls013",
+      "text": "Thank you for choosing us today!",
+      "tag": "closing_confirmation",
+      "mode": "bright"
+    },
+    {
+      "id": "cls014",
+      "text": "Everything is confirmed on our side.",
+      "tag": "closing_confirmation",
+      "mode": "reassuring"
+    },
+    {
+      "id": "cls015",
+      "text": "I will follow this up personally for you.",
+      "tag": "closing_confirmation",
+      "mode": "reassuring"
+    },
+    {
+      "id": "cls016",
+      "text": "Please keep your receipt for the warranty.",
+      "tag": "closing_confirmation",
+      "mode": "neutral"
+    },
+    {
+      "id": "cls017",
+      "text": "We appreciate your business very much.",
+      "tag": "closing_confirmation",
+      "mode": "bright"
+    },
+    {
+      "id": "cls018",
+      "text": "Goodbye, and thank you for calling.",
+      "tag": "closing_confirmation",
+      "mode": "bright"
+    },
+    {
+      "id": "cls019",
+      "text": "Let me confirm the delivery address once more.",
+      "tag": "closing_confirmation",
+      "mode": "neutral"
+    },
+    {
+      "id": "cls020",
+      "text": "Sorry again for the trouble, and thank you.",
+      "tag": "closing_confirmation",
+      "mode": "apologetic"
+    },
+    {
+      "id": "cls021",
+      "text": "Sige po, ipe-place ko na ang inyong order.",
+      "tag": "closing_confirmation",
+      "mode": "bright"
+    },
+    {
+      "id": "cls022",
+      "text": "Pakikumpirma po ng pangalan at numero ninyo.",
+      "tag": "closing_confirmation",
+      "mode": "neutral"
+    },
+    {
+      "id": "cls023",
+      "text": "Maraming salamat po sa inyong order!",
+      "tag": "closing_confirmation",
+      "mode": "bright"
+    },
+    {
+      "id": "cls024",
+      "text": "Uulitin ko po para sigurado tayo.",
+      "tag": "closing_confirmation",
+      "mode": "neutral"
+    },
+    {
+      "id": "cls025",
+      "text": "Ang kabuuan po ninyo ay isang libo apat na raan.",
+      "tag": "closing_confirmation",
+      "mode": "neutral"
+    },
+    {
+      "id": "cls026",
+      "text": "Mag-message po kayo ulit kung may kailangan.",
+      "tag": "closing_confirmation",
+      "mode": "bright"
+    },
+    {
+      "id": "cls027",
+      "text": "Magandang araw po sa inyo, ingat po kayo!",
+      "tag": "closing_confirmation",
+      "mode": "bright"
+    },
+    {
+      "id": "cls028",
+      "text": "Naitala ko na po ang lahat ng detalye.",
+      "tag": "closing_confirmation",
+      "mode": "reassuring"
+    },
+    {
+      "id": "cls029",
+      "text": "Paumanhin po at hindi namin kayo natulungan.",
+      "tag": "closing_confirmation",
+      "mode": "apologetic"
+    },
+    {
+      "id": "cls030",
+      "text": "May iba pa po ba kayong kailangan?",
+      "tag": "closing_confirmation",
+      "mode": "neutral"
+    },
+    {
+      "id": "cls031",
+      "text": "Sige po, ipe-place ko na po yung order ninyo.",
+      "tag": "closing_confirmation",
+      "mode": "bright"
+    },
+    {
+      "id": "cls032",
+      "text": "Pakikumpirma na lang po ng pangalan at number ninyo.",
+      "tag": "closing_confirmation",
+      "mode": "neutral"
+    },
+    {
+      "id": "cls033",
+      "text": "Maraming salamat po sa order! Ingat po kayo.",
+      "tag": "closing_confirmation",
+      "mode": "bright"
+    },
+    {
+      "id": "cls034",
+      "text": "Tatawagan ko po kayo ulit mamayang hapon.",
+      "tag": "closing_confirmation",
+      "mode": "neutral"
+    },
+    {
+      "id": "cls035",
+      "text": "Salamat po at magandang araw sa inyo!",
+      "tag": "closing_confirmation",
+      "mode": "bright"
+    },
+    {
+      "id": "cls036",
+      "text": "I-text ko po sa inyo yung order number.",
+      "tag": "closing_confirmation",
+      "mode": "neutral"
+    },
+    {
+      "id": "cls037",
+      "text": "Confirmed na po lahat sa side namin.",
+      "tag": "closing_confirmation",
+      "mode": "reassuring"
+    },
+    {
+      "id": "cls038",
+      "text": "Ako na po ang bahala sa follow up nito.",
+      "tag": "closing_confirmation",
+      "mode": "reassuring"
+    },
+    {
+      "id": "cls039",
+      "text": "Itago niyo lang po yung resibo para sa warranty.",
+      "tag": "closing_confirmation",
+      "mode": "neutral"
+    },
+    {
+      "id": "cls040",
+      "text": "Salamat po sa pagtitiwala sa aming shop!",
+      "tag": "closing_confirmation",
+      "mode": "bright"
+    },
+    {
+      "id": "cls041",
+      "text": "Paalam po, salamat sa pagtawag ninyo.",
+      "tag": "closing_confirmation",
+      "mode": "bright"
+    },
+    {
+      "id": "cls042",
+      "text": "I-confirm ko lang po ulit yung delivery address.",
+      "tag": "closing_confirmation",
+      "mode": "neutral"
+    },
+    {
+      "id": "cls043",
+      "text": "Sorry po ulit sa abala, salamat po.",
+      "tag": "closing_confirmation",
+      "mode": "apologetic"
+    },
+    {
+      "id": "cls044",
+      "text": "Ayan po, tapos na tayo, salamat po!",
+      "tag": "closing_confirmation",
+      "mode": "bright"
+    },
+    {
+      "id": "cls045",
+      "text": "Naka-record na po ang order ninyo sa system.",
+      "tag": "closing_confirmation",
+      "mode": "reassuring"
+    },
+    {
+      "id": "cls046",
+      "text": "Ready na po ang lahat, hintayin niyo na lang.",
+      "tag": "closing_confirmation",
+      "mode": "bright"
+    },
+    {
+      "id": "cls047",
+      "text": "May reference number po kayo, i-send ko mamaya.",
+      "tag": "closing_confirmation",
+      "mode": "neutral"
+    },
+    {
+      "id": "cls048",
+      "text": "Sige po, sa susunod ulit, salamat!",
+      "tag": "closing_confirmation",
+      "mode": "bright"
+    },
+    {
+      "id": "cls049",
+      "text": "Naitala ko na po lahat, walang mawawala.",
+      "tag": "closing_confirmation",
+      "mode": "reassuring"
+    },
+    {
+      "id": "cls050",
+      "text": "Kung may tanong pa po, tawag lang kayo.",
+      "tag": "closing_confirmation",
+      "mode": "reassuring"
+    },
+    {
+      "id": "cls051",
+      "text": "Salamat po sa oras ninyo, magandang gabi.",
+      "tag": "closing_confirmation",
+      "mode": "bright"
+    },
+    {
+      "id": "cls052",
+      "text": "Uulitin ko po: dalawang piraso, itim, bukas.",
+      "tag": "closing_confirmation",
+      "mode": "neutral"
+    },
+    {
+      "id": "cls053",
+      "text": "Tama po ba lahat ng nakuha ko?",
+      "tag": "closing_confirmation",
+      "mode": "neutral"
+    },
+    {
+      "id": "cls054",
+      "text": "Sige po, isasampa ko na ito ngayon din.",
+      "tag": "closing_confirmation",
+      "mode": "bright"
+    },
+    {
+      "id": "cls055",
+      "text": "Excited na po kami sa order ninyo!",
+      "tag": "closing_confirmation",
+      "mode": "bright"
+    },
+    {
+      "id": "cls056",
+      "text": "Paumanhin po kung natagalan ang usapan natin.",
+      "tag": "closing_confirmation",
+      "mode": "apologetic"
+    },
+    {
+      "id": "cls057",
+      "text": "Salamat po sa inyong pasensya, sir.",
+      "tag": "closing_confirmation",
+      "mode": "bright"
+    },
+    {
+      "id": "cls058",
+      "text": "Aasahan po namin kayo sa susunod.",
+      "tag": "closing_confirmation",
+      "mode": "bright"
+    },
+    {
+      "id": "cls059",
+      "text": "Ipapadala ko po ang kumpirmasyon sa text.",
+      "tag": "closing_confirmation",
+      "mode": "neutral"
+    },
+    {
+      "id": "cls060",
+      "text": "Sige po, hanggang sa muli, ingat po!",
+      "tag": "closing_confirmation",
+      "mode": "bright"
+    },
+    {
+      "id": "cls061",
+      "text": "Naipasok ko na po ang order sa aming talaan.",
+      "tag": "closing_confirmation",
+      "mode": "neutral"
+    },
+    {
+      "id": "cls062",
+      "text": "Salamat po sa inyong tiwala sa amin.",
+      "tag": "closing_confirmation",
+      "mode": "bright"
+    },
+    {
+      "id": "cls063",
+      "text": "Magpapadala po kami ng abiso pagkatapos.",
+      "tag": "closing_confirmation",
+      "mode": "neutral"
+    },
+    {
+      "id": "cls064",
+      "text": "Sana po ay magustuhan ninyo ang binili.",
+      "tag": "closing_confirmation",
+      "mode": "bright"
+    },
+    {
+      "id": "cls065",
+      "text": "Tandaan po ninyo ang aming numero.",
+      "tag": "closing_confirmation",
+      "mode": "neutral"
+    },
+    {
+      "id": "cls066",
+      "text": "Maligayang araw po sa inyo at sa pamilya.",
+      "tag": "closing_confirmation",
+      "mode": "bright"
+    },
+    {
+      "id": "cls067",
+      "text": "Nakumpirma na po ang lahat ng detalye.",
+      "tag": "closing_confirmation",
+      "mode": "reassuring"
+    },
+    {
+      "id": "cls068",
+      "text": "Huwag po kayong mag-alala, aasikasuhin namin ito.",
+      "tag": "closing_confirmation",
+      "mode": "reassuring"
+    },
+    {
+      "id": "cls069",
+      "text": "Paumanhin po sa anumang naging abala.",
+      "tag": "closing_confirmation",
+      "mode": "apologetic"
+    },
+    {
+      "id": "cls070",
+      "text": "Salamat po ulit, hanggang sa susunod!",
+      "tag": "closing_confirmation",
+      "mode": "bright"
+    },
+    {
+      "id": "cls071",
+      "text": "Ang inyong order po ay nakatakda na.",
+      "tag": "closing_confirmation",
+      "mode": "neutral"
+    },
+    {
+      "id": "cls072",
+      "text": "Kumpirmado na po ang lahat, sir.",
+      "tag": "closing_confirmation",
+      "mode": "reassuring"
+    },
+    {
+      "id": "cls073",
+      "text": "Ipaalam po ninyo kung may nabago sa plano.",
+      "tag": "closing_confirmation",
+      "mode": "neutral"
+    },
+    {
+      "id": "cls074",
+      "text": "Tawag lang po kayo anumang oras.",
+      "tag": "closing_confirmation",
+      "mode": "reassuring"
+    },
+    {
+      "id": "cls075",
+      "text": "Salamat po sa inyong pagbili, ingat po!",
+      "tag": "closing_confirmation",
+      "mode": "bright"
+    },
+    {
+      "id": "cls076",
+      "text": "Nasa listahan na po kayo ng aming mga suki.",
+      "tag": "closing_confirmation",
+      "mode": "bright"
+    },
+    {
+      "id": "cls077",
+      "text": "Bibigyan po namin kayo ng update bukas.",
+      "tag": "closing_confirmation",
+      "mode": "neutral"
+    },
+    {
+      "id": "cls078",
+      "text": "Sige po, tapos na po tayo, salamat!",
+      "tag": "closing_confirmation",
+      "mode": "bright"
+    },
+    {
+      "id": "cls079",
+      "text": "Kumpleto na po ang inyong impormasyon.",
+      "tag": "closing_confirmation",
+      "mode": "neutral"
+    },
+    {
+      "id": "cls080",
+      "text": "Mag-iingat po kayo sa daan, paalam!",
+      "tag": "closing_confirmation",
+      "mode": "bright"
+    },
+    {
+      "id": "cls081",
+      "text": "Salamat po at pinili ninyo kami.",
+      "tag": "closing_confirmation",
+      "mode": "bright"
+    },
+    {
+      "id": "cls082",
+      "text": "Naiwan ko po ang aking numero sa inyo.",
+      "tag": "closing_confirmation",
+      "mode": "neutral"
+    },
+    {
+      "id": "cls083",
+      "text": "Kung may problema po, ako ang hanapin ninyo.",
+      "tag": "closing_confirmation",
+      "mode": "reassuring"
+    },
+    {
+      "id": "cls084",
+      "text": "Sisiguraduhin ko pong maayos ang lahat.",
+      "tag": "closing_confirmation",
+      "mode": "reassuring"
+    },
+    {
+      "id": "cls085",
+      "text": "Paumanhin po kung may nakalimutan ako.",
+      "tag": "closing_confirmation",
+      "mode": "apologetic"
+    },
+    {
+      "id": "cls086",
+      "text": "Ito na po ang huling kumpirmasyon natin.",
+      "tag": "closing_confirmation",
+      "mode": "neutral"
+    },
+    {
+      "id": "cls087",
+      "text": "Salamat po sa napakagandang usapan!",
+      "tag": "closing_confirmation",
+      "mode": "bright"
+    },
+    {
+      "id": "cls088",
+      "text": "Ipagbibigay-alam ko po ang inyong order sa team.",
+      "tag": "closing_confirmation",
+      "mode": "neutral"
+    },
+    {
+      "id": "cls089",
+      "text": "Handa na po ang lahat sa aming panig.",
+      "tag": "closing_confirmation",
+      "mode": "reassuring"
+    },
+    {
+      "id": "cls090",
+      "text": "Sa muling pagkikita po, salamat!",
+      "tag": "closing_confirmation",
+      "mode": "bright"
+    },
+    {
+      "id": "cls091",
+      "text": "Ang inyong pangalan po ay nakatala nang tama.",
+      "tag": "closing_confirmation",
+      "mode": "neutral"
+    },
+    {
+      "id": "cls092",
+      "text": "Maayos na po ang lahat ng detalye.",
+      "tag": "closing_confirmation",
+      "mode": "reassuring"
+    },
+    {
+      "id": "cls093",
+      "text": "Salamat po, aasahan namin kayo bukas.",
+      "tag": "closing_confirmation",
+      "mode": "bright"
+    },
+    {
+      "id": "cls094",
+      "text": "Kung sakali pong magbago ang isip ninyo, sabihin lang.",
+      "tag": "closing_confirmation",
+      "mode": "reassuring"
+    },
+    {
+      "id": "cls095",
+      "text": "Wala na po akong ibang itatanong, salamat!",
+      "tag": "closing_confirmation",
+      "mode": "bright"
+    },
+    {
+      "id": "cls096",
+      "text": "Paumanhin po sa mahabang tawag natin.",
+      "tag": "closing_confirmation",
+      "mode": "apologetic"
+    },
+    {
+      "id": "cls097",
+      "text": "Napakasarap po kayong kausap, salamat!",
+      "tag": "closing_confirmation",
+      "mode": "bright"
+    },
+    {
+      "id": "cls098",
+      "text": "Tapos na po ang proseso, hintayin niyo na lang.",
+      "tag": "closing_confirmation",
+      "mode": "reassuring"
+    },
+    {
+      "id": "cls099",
+      "text": "Mabuhay po kayo at salamat ulit!",
+      "tag": "closing_confirmation",
+      "mode": "bright"
+    },
+    {
+      "id": "cls100",
+      "text": "Paalam po at magandang araw sa inyo.",
+      "tag": "closing_confirmation",
+      "mode": "bright"
+    },
+    {
+      "id": "fup001",
+      "text": "I am following up on your inquiry from yesterday.",
+      "tag": "followup_callback",
+      "mode": "neutral"
+    },
+    {
+      "id": "fup002",
+      "text": "Have you had a chance to decide yet?",
+      "tag": "followup_callback",
+      "mode": "neutral"
+    },
+    {
+      "id": "fup003",
+      "text": "I am sorry I missed your call earlier.",
+      "tag": "followup_callback",
+      "mode": "apologetic"
+    },
+    {
+      "id": "fup004",
+      "text": "Would you like me to call back at a better time?",
+      "tag": "followup_callback",
+      "mode": "reassuring"
+    },
+    {
+      "id": "fup005",
+      "text": "Just checking if your order arrived safely.",
+      "tag": "followup_callback",
+      "mode": "bright"
+    },
+    {
+      "id": "fup006",
+      "text": "How are you finding the product so far?",
+      "tag": "followup_callback",
+      "mode": "bright"
+    },
+    {
+      "id": "fup007",
+      "text": "I will leave a message and try again later.",
+      "tag": "followup_callback",
+      "mode": "neutral"
+    },
+    {
+      "id": "fup008",
+      "text": "If you know anyone who needs this, please tell them.",
+      "tag": "followup_callback",
+      "mode": "bright"
+    },
+    {
+      "id": "fup009",
+      "text": "No rush at all, I just wanted to check in.",
+      "tag": "followup_callback",
+      "mode": "reassuring"
+    },
+    {
+      "id": "fup010",
+      "text": "Shall we reschedule for next week instead?",
+      "tag": "followup_callback",
+      "mode": "neutral"
+    },
+    {
+      "id": "fup011",
+      "text": "I promised to call you back today.",
+      "tag": "followup_callback",
+      "mode": "neutral"
+    },
+    {
+      "id": "fup012",
+      "text": "Sorry for the delay in getting back to you.",
+      "tag": "followup_callback",
+      "mode": "apologetic"
+    },
+    {
+      "id": "fup013",
+      "text": "Thank you for waiting, I have the answer now.",
+      "tag": "followup_callback",
+      "mode": "bright"
+    },
+    {
+      "id": "fup014",
+      "text": "Is this still a good time to talk?",
+      "tag": "followup_callback",
+      "mode": "neutral"
+    },
+    {
+      "id": "fup015",
+      "text": "I understand you are busy, I will be quick.",
+      "tag": "followup_callback",
+      "mode": "reassuring"
+    },
+    {
+      "id": "fup016",
+      "text": "Your item is ready whenever you are.",
+      "tag": "followup_callback",
+      "mode": "bright"
+    },
+    {
+      "id": "fup017",
+      "text": "Please let me know if anything is wrong.",
+      "tag": "followup_callback",
+      "mode": "reassuring"
+    },
+    {
+      "id": "fup018",
+      "text": "I will try you again tomorrow morning.",
+      "tag": "followup_callback",
+      "mode": "neutral"
+    },
+    {
+      "id": "fup019",
+      "text": "We would love to hear your feedback.",
+      "tag": "followup_callback",
+      "mode": "bright"
+    },
+    {
+      "id": "fup020",
+      "text": "Sorry to bother you again about this.",
+      "tag": "followup_callback",
+      "mode": "apologetic"
+    },
+    {
+      "id": "fup021",
+      "text": "Nag-follow up lang po ako sa tanong ninyo kahapon.",
+      "tag": "followup_callback",
+      "mode": "neutral"
+    },
+    {
+      "id": "fup022",
+      "text": "Nakapag-isip na po ba kayo tungkol dun?",
+      "tag": "followup_callback",
+      "mode": "neutral"
+    },
+    {
+      "id": "fup023",
+      "text": "Paumanhin po at hindi ko nasagot ang tawag ninyo.",
+      "tag": "followup_callback",
+      "mode": "apologetic"
+    },
+    {
+      "id": "fup024",
+      "text": "Kailan po ba kayo mas maluwag para tumawag ako?",
+      "tag": "followup_callback",
+      "mode": "reassuring"
+    },
+    {
+      "id": "fup025",
+      "text": "Tinitignan ko lang po kung dumating na ang order.",
+      "tag": "followup_callback",
+      "mode": "bright"
+    },
+    {
+      "id": "fup026",
+      "text": "Kumusta po ang gamit, maayos naman po ba?",
+      "tag": "followup_callback",
+      "mode": "bright"
+    },
+    {
+      "id": "fup027",
+      "text": "Kung may kakilala po kayong nangangailangan, sabihin ninyo.",
+      "tag": "followup_callback",
+      "mode": "bright"
+    },
+    {
+      "id": "fup028",
+      "text": "Walang pong pilitan, nagtatanong lang po ako.",
+      "tag": "followup_callback",
+      "mode": "reassuring"
+    },
+    {
+      "id": "fup029",
+      "text": "Ililipat po ba natin sa susunod na linggo?",
+      "tag": "followup_callback",
+      "mode": "neutral"
+    },
+    {
+      "id": "fup030",
+      "text": "Pasensya na po sa pagkaantala ng pagbalik ko.",
+      "tag": "followup_callback",
+      "mode": "apologetic"
+    },
+    {
+      "id": "fup031",
+      "text": "Nag-follow up lang po ako sa inquiry ninyo kahapon.",
+      "tag": "followup_callback",
+      "mode": "neutral"
+    },
+    {
+      "id": "fup032",
+      "text": "Nakapag-decide na po ba kayo sa order?",
+      "tag": "followup_callback",
+      "mode": "neutral"
+    },
+    {
+      "id": "fup033",
+      "text": "Sorry po, na-miss ko yung tawag ninyo kanina.",
+      "tag": "followup_callback",
+      "mode": "apologetic"
+    },
+    {
+      "id": "fup034",
+      "text": "Anong oras po kayo pwedeng tawagan ulit?",
+      "tag": "followup_callback",
+      "mode": "reassuring"
+    },
+    {
+      "id": "fup035",
+      "text": "I-check ko lang po kung na-receive niyo na.",
+      "tag": "followup_callback",
+      "mode": "bright"
+    },
+    {
+      "id": "fup036",
+      "text": "Kumusta po yung item, okay naman po ba?",
+      "tag": "followup_callback",
+      "mode": "bright"
+    },
+    {
+      "id": "fup037",
+      "text": "Mag-iiwan po ako ng message, tatawag ulit ako.",
+      "tag": "followup_callback",
+      "mode": "neutral"
+    },
+    {
+      "id": "fup038",
+      "text": "Kung may kilala po kayo, i-refer niyo lang kami.",
+      "tag": "followup_callback",
+      "mode": "bright"
+    },
+    {
+      "id": "fup039",
+      "text": "Walang po kayong dapat ipag-alala, check lang po.",
+      "tag": "followup_callback",
+      "mode": "reassuring"
+    },
+    {
+      "id": "fup040",
+      "text": "I-reschedule po ba natin sa next week?",
+      "tag": "followup_callback",
+      "mode": "neutral"
+    },
+    {
+      "id": "fup041",
+      "text": "Nangako po ako na tatawagan ko kayo ngayon.",
+      "tag": "followup_callback",
+      "mode": "neutral"
+    },
+    {
+      "id": "fup042",
+      "text": "Pasensya po sa delay ng aking pagbalik.",
+      "tag": "followup_callback",
+      "mode": "apologetic"
+    },
+    {
+      "id": "fup043",
+      "text": "Salamat po sa paghihintay, may sagot na po ako.",
+      "tag": "followup_callback",
+      "mode": "bright"
+    },
+    {
+      "id": "fup044",
+      "text": "Okay lang po ba na mag-usap tayo ngayon?",
+      "tag": "followup_callback",
+      "mode": "neutral"
+    },
+    {
+      "id": "fup045",
+      "text": "Alam ko pong busy kayo, mabilis lang po ito.",
+      "tag": "followup_callback",
+      "mode": "reassuring"
+    },
+    {
+      "id": "fup046",
+      "text": "Ready na po yung item ninyo anumang oras.",
+      "tag": "followup_callback",
+      "mode": "bright"
+    },
+    {
+      "id": "fup047",
+      "text": "Sabihin lang po ninyo kung may mali.",
+      "tag": "followup_callback",
+      "mode": "reassuring"
+    },
+    {
+      "id": "fup048",
+      "text": "Tatawag po ulit ako bukas ng umaga.",
+      "tag": "followup_callback",
+      "mode": "neutral"
+    },
+    {
+      "id": "fup049",
+      "text": "Gusto po sana naming marinig ang inyong feedback.",
+      "tag": "followup_callback",
+      "mode": "bright"
+    },
+    {
+      "id": "fup050",
+      "text": "Sorry po sa abala, huling tawag ko na po ito.",
+      "tag": "followup_callback",
+      "mode": "apologetic"
+    },
+    {
+      "id": "fup051",
+      "text": "Naalala ko po kayo, kayo yung nagtanong tungkol sa presyo.",
+      "tag": "followup_callback",
+      "mode": "bright"
+    },
+    {
+      "id": "fup052",
+      "text": "May update na po ako sa hinihintay ninyo.",
+      "tag": "followup_callback",
+      "mode": "bright"
+    },
+    {
+      "id": "fup053",
+      "text": "Dumating na po yung stock na hinahanap ninyo.",
+      "tag": "followup_callback",
+      "mode": "bright"
+    },
+    {
+      "id": "fup054",
+      "text": "Naitabi ko po para sa inyo, hanggang bukas lang.",
+      "tag": "followup_callback",
+      "mode": "reassuring"
+    },
+    {
+      "id": "fup055",
+      "text": "Kung hindi pa po kayo handa, ayos lang.",
+      "tag": "followup_callback",
+      "mode": "reassuring"
+    },
+    {
+      "id": "fup056",
+      "text": "Babalikan ko na lang po kayo sa ibang araw.",
+      "tag": "followup_callback",
+      "mode": "neutral"
+    },
+    {
+      "id": "fup057",
+      "text": "Naipadala na po ba yung bayad ninyo?",
+      "tag": "followup_callback",
+      "mode": "neutral"
+    },
+    {
+      "id": "fup058",
+      "text": "Sana po ay nasiyahan kayo sa aming serbisyo.",
+      "tag": "followup_callback",
+      "mode": "bright"
+    },
+    {
+      "id": "fup059",
+      "text": "Marami pong salamat sa inyong suporta.",
+      "tag": "followup_callback",
+      "mode": "bright"
+    },
+    {
+      "id": "fup060",
+      "text": "May promo po kami ngayon, baka interesado kayo.",
+      "tag": "followup_callback",
+      "mode": "bright"
+    },
+    {
+      "id": "fup061",
+      "text": "Naghihintay pa rin po kami ng inyong sagot.",
+      "tag": "followup_callback",
+      "mode": "neutral"
+    },
+    {
+      "id": "fup062",
+      "text": "Kumusta na po kayo, matagal na tayong hindi nag-usap.",
+      "tag": "followup_callback",
+      "mode": "bright"
+    },
+    {
+      "id": "fup063",
+      "text": "Nais ko lang pong malaman kung ayos ang lahat.",
+      "tag": "followup_callback",
+      "mode": "reassuring"
+    },
+    {
+      "id": "fup064",
+      "text": "Paumanhin po kung nakaabala ako sa oras ninyo.",
+      "tag": "followup_callback",
+      "mode": "apologetic"
+    },
+    {
+      "id": "fup065",
+      "text": "Sabihin lang po ninyo kung ayaw niyo nang tawagan.",
+      "tag": "followup_callback",
+      "mode": "reassuring"
+    },
+    {
+      "id": "fup066",
+      "text": "Bibigyan ko po kayo ng ilang araw pa.",
+      "tag": "followup_callback",
+      "mode": "reassuring"
+    },
+    {
+      "id": "fup067",
+      "text": "Naaalala niyo po ba ang aming pinag-usapan?",
+      "tag": "followup_callback",
+      "mode": "neutral"
+    },
+    {
+      "id": "fup068",
+      "text": "Handa na po ang inyong hinihiling na presyo.",
+      "tag": "followup_callback",
+      "mode": "bright"
+    },
+    {
+      "id": "fup069",
+      "text": "May bago po kaming produkto na bagay sa inyo.",
+      "tag": "followup_callback",
+      "mode": "bright"
+    },
+    {
+      "id": "fup070",
+      "text": "Salamat po at tinanggap ninyo ang aking tawag.",
+      "tag": "followup_callback",
+      "mode": "bright"
+    },
+    {
+      "id": "fup071",
+      "text": "Kailan po kaya kayo makakapagpasya?",
+      "tag": "followup_callback",
+      "mode": "neutral"
+    },
+    {
+      "id": "fup072",
+      "text": "Wala pong problema kung hindi pa ngayon.",
+      "tag": "followup_callback",
+      "mode": "reassuring"
+    },
+    {
+      "id": "fup073",
+      "text": "Ipapaalala ko lang po ang ating usapan.",
+      "tag": "followup_callback",
+      "mode": "neutral"
+    },
+    {
+      "id": "fup074",
+      "text": "Naibigay ko na po ba ang lahat ng detalye?",
+      "tag": "followup_callback",
+      "mode": "neutral"
+    },
+    {
+      "id": "fup075",
+      "text": "Sorry po talaga sa madalas na pagtawag.",
+      "tag": "followup_callback",
+      "mode": "apologetic"
+    },
+    {
+      "id": "fup076",
+      "text": "Titigil na po ako kung ito ang gusto ninyo.",
+      "tag": "followup_callback",
+      "mode": "reassuring"
+    },
+    {
+      "id": "fup077",
+      "text": "Salamat po sa inyong panahon kanina.",
+      "tag": "followup_callback",
+      "mode": "bright"
+    },
+    {
+      "id": "fup078",
+      "text": "Naipadala ko na po ang lahat sa inyong text.",
+      "tag": "followup_callback",
+      "mode": "neutral"
+    },
+    {
+      "id": "fup079",
+      "text": "Nabasa niyo na po ba ang aking mensahe?",
+      "tag": "followup_callback",
+      "mode": "neutral"
+    },
+    {
+      "id": "fup080",
+      "text": "Kumpleto na po ba ang inyong natanggap?",
+      "tag": "followup_callback",
+      "mode": "neutral"
+    },
+    {
+      "id": "fup081",
+      "text": "Kung may kulang po, ipaalam ninyo agad.",
+      "tag": "followup_callback",
+      "mode": "reassuring"
+    },
+    {
+      "id": "fup082",
+      "text": "Aayusin po namin agad ang anumang problema.",
+      "tag": "followup_callback",
+      "mode": "reassuring"
+    },
+    {
+      "id": "fup083",
+      "text": "Ikinagagalak po naming maglingkod sa inyo.",
+      "tag": "followup_callback",
+      "mode": "bright"
+    },
+    {
+      "id": "fup084",
+      "text": "Sana po ay tumawag kayo ulit sa amin.",
+      "tag": "followup_callback",
+      "mode": "bright"
+    },
+    {
+      "id": "fup085",
+      "text": "Naghahanda po kami ng bago para sa inyo.",
+      "tag": "followup_callback",
+      "mode": "bright"
+    },
+    {
+      "id": "fup086",
+      "text": "Pasensya na po kung naistorbo ko kayo.",
+      "tag": "followup_callback",
+      "mode": "apologetic"
+    },
+    {
+      "id": "fup087",
+      "text": "Tatawag na lang po ako sa ibang araw.",
+      "tag": "followup_callback",
+      "mode": "neutral"
+    },
+    {
+      "id": "fup088",
+      "text": "Ipagpaliban po natin hanggang sa handa kayo.",
+      "tag": "followup_callback",
+      "mode": "reassuring"
+    },
+    {
+      "id": "fup089",
+      "text": "Naisulat ko na po ang inyong hiling.",
+      "tag": "followup_callback",
+      "mode": "neutral"
+    },
+    {
+      "id": "fup090",
+      "text": "Susubaybayan ko po ito para sa inyo.",
+      "tag": "followup_callback",
+      "mode": "reassuring"
+    },
+    {
+      "id": "fup091",
+      "text": "Kumusta po ang naging karanasan ninyo sa amin?",
+      "tag": "followup_callback",
+      "mode": "bright"
+    },
+    {
+      "id": "fup092",
+      "text": "Maraming salamat po sa magandang salita.",
+      "tag": "followup_callback",
+      "mode": "bright"
+    },
+    {
+      "id": "fup093",
+      "text": "Ipagbibigay-alam ko po ito sa aming koponan.",
+      "tag": "followup_callback",
+      "mode": "neutral"
+    },
+    {
+      "id": "fup094",
+      "text": "Paumanhin po sa naging kakulangan namin.",
+      "tag": "followup_callback",
+      "mode": "apologetic"
+    },
+    {
+      "id": "fup095",
+      "text": "Bibigyan po namin kayo ng mas mabuting serbisyo.",
+      "tag": "followup_callback",
+      "mode": "reassuring"
+    },
+    {
+      "id": "fup096",
+      "text": "Salamat po sa pagtitiwala ninyong muli.",
+      "tag": "followup_callback",
+      "mode": "bright"
+    },
+    {
+      "id": "fup097",
+      "text": "Nandito lang po ako kung may kailangan kayo.",
+      "tag": "followup_callback",
+      "mode": "reassuring"
+    },
+    {
+      "id": "fup098",
+      "text": "Tawagan niyo lang po ako anumang oras.",
+      "tag": "followup_callback",
+      "mode": "reassuring"
+    },
+    {
+      "id": "fup099",
+      "text": "Hanggang sa muli po, salamat ulit!",
+      "tag": "followup_callback",
+      "mode": "bright"
+    },
+    {
+      "id": "fup100",
+      "text": "Magandang araw po at ingat kayo palagi.",
+      "tag": "followup_callback",
+      "mode": "bright"
+    },
+    {
+      "id": "num001",
+      "text": "Zero nine one seven, three four five, six seven eight nine.",
+      "tag": "numbers_dates_times",
+      "mode": "neutral"
+    },
+    {
+      "id": "num002",
+      "text": "One, two, three, four, five, six, seven, eight, nine, ten.",
+      "tag": "numbers_dates_times",
+      "mode": "neutral"
+    },
+    {
+      "id": "num003",
+      "text": "Monday, Tuesday, Wednesday, Thursday, Friday.",
+      "tag": "numbers_dates_times",
+      "mode": "neutral"
+    },
+    {
+      "id": "num004",
+      "text": "We are open from nine in the morning to five in the afternoon.",
+      "tag": "numbers_dates_times",
+      "mode": "neutral"
+    },
+    {
+      "id": "num005",
+      "text": "Your reference number is A B one two three four.",
+      "tag": "numbers_dates_times",
+      "mode": "neutral"
+    },
+    {
+      "id": "num006",
+      "text": "That will be on the fifteenth of this month.",
+      "tag": "numbers_dates_times",
+      "mode": "neutral"
+    },
+    {
+      "id": "num007",
+      "text": "January, February, March, April, May, June.",
+      "tag": "numbers_dates_times",
+      "mode": "neutral"
+    },
+    {
+      "id": "num008",
+      "text": "The total is four thousand seven hundred fifty pesos.",
+      "tag": "numbers_dates_times",
+      "mode": "neutral"
+    },
+    {
+      "id": "num009",
+      "text": "Please arrive at half past two in the afternoon.",
+      "tag": "numbers_dates_times",
+      "mode": "neutral"
+    },
+    {
+      "id": "num010",
+      "text": "Your order number is one one zero two four.",
+      "tag": "numbers_dates_times",
+      "mode": "neutral"
+    },
+    {
+      "id": "num011",
+      "text": "The house number is forty two, Rizal Street.",
+      "tag": "numbers_dates_times",
+      "mode": "neutral"
+    },
+    {
+      "id": "num012",
+      "text": "It costs eighty five pesos per piece.",
+      "tag": "numbers_dates_times",
+      "mode": "neutral"
+    },
+    {
+      "id": "num013",
+      "text": "We need twelve pieces for the whole set.",
+      "tag": "numbers_dates_times",
+      "mode": "neutral"
+    },
+    {
+      "id": "num014",
+      "text": "Great, that is confirmed for eleven o'clock!",
+      "tag": "numbers_dates_times",
+      "mode": "bright"
+    },
+    {
+      "id": "num015",
+      "text": "Please wait about twenty minutes.",
+      "tag": "numbers_dates_times",
+      "mode": "reassuring"
+    },
+    {
+      "id": "num016",
+      "text": "July, August, September, October, November, December.",
+      "tag": "numbers_dates_times",
+      "mode": "neutral"
+    },
+    {
+      "id": "num017",
+      "text": "The warranty lasts for twelve months.",
+      "tag": "numbers_dates_times",
+      "mode": "neutral"
+    },
+    {
+      "id": "num018",
+      "text": "Saturday and Sunday we close at four.",
+      "tag": "numbers_dates_times",
+      "mode": "neutral"
+    },
+    {
+      "id": "num019",
+      "text": "It weighs about three and a half kilos.",
+      "tag": "numbers_dates_times",
+      "mode": "neutral"
+    },
+    {
+      "id": "num020",
+      "text": "Your appointment is on the twenty eighth.",
+      "tag": "numbers_dates_times",
+      "mode": "neutral"
+    },
+    {
+      "id": "num021",
+      "text": "Isa, dalawa, tatlo, apat, lima, anim, pito, walo, siyam, sampu.",
+      "tag": "numbers_dates_times",
+      "mode": "neutral"
+    },
+    {
+      "id": "num022",
+      "text": "Lunes, Martes, Miyerkules, Huwebes, Biyernes, Sabado, Linggo.",
+      "tag": "numbers_dates_times",
+      "mode": "neutral"
+    },
+    {
+      "id": "num023",
+      "text": "Alas-nuwebe po ng umaga hanggang alas-singko ng hapon.",
+      "tag": "numbers_dates_times",
+      "mode": "neutral"
+    },
+    {
+      "id": "num024",
+      "text": "Sa ika-labinlima po ng buwan, sir.",
+      "tag": "numbers_dates_times",
+      "mode": "neutral"
+    },
+    {
+      "id": "num025",
+      "text": "Apat na libo pitong daan limampung piso po lahat.",
+      "tag": "numbers_dates_times",
+      "mode": "neutral"
+    },
+    {
+      "id": "num026",
+      "text": "Alas-dos y medya po ng hapon.",
+      "tag": "numbers_dates_times",
+      "mode": "neutral"
+    },
+    {
+      "id": "num027",
+      "text": "Labindalawang piraso po ang isang set.",
+      "tag": "numbers_dates_times",
+      "mode": "neutral"
+    },
+    {
+      "id": "num028",
+      "text": "Mga dalawampung minuto po ang hintayin ninyo.",
+      "tag": "numbers_dates_times",
+      "mode": "reassuring"
+    },
+    {
+      "id": "num029",
+      "text": "Isang taon po ang garantiya nito.",
+      "tag": "numbers_dates_times",
+      "mode": "neutral"
+    },
+    {
+      "id": "num030",
+      "text": "Sa ika-dalawampu't walo po ang inyong iskedyul.",
+      "tag": "numbers_dates_times",
+      "mode": "neutral"
+    },
+    {
+      "id": "num031",
+      "text": "Zero nine one seven, tatlo apat lima, anim pito walo siyam.",
+      "tag": "numbers_dates_times",
+      "mode": "neutral"
+    },
+    {
+      "id": "num032",
+      "text": "Ang order number po ninyo ay isa isa zero dalawa apat.",
+      "tag": "numbers_dates_times",
+      "mode": "neutral"
+    },
+    {
+      "id": "num033",
+      "text": "Open po kami from nine AM to five PM.",
+      "tag": "numbers_dates_times",
+      "mode": "neutral"
+    },
+    {
+      "id": "num034",
+      "text": "Ang reference po ninyo ay A B isa dalawa tatlo apat.",
+      "tag": "numbers_dates_times",
+      "mode": "neutral"
+    },
+    {
+      "id": "num035",
+      "text": "Walumpu't limang piso po kada piraso.",
+      "tag": "numbers_dates_times",
+      "mode": "neutral"
+    },
+    {
+      "id": "num036",
+      "text": "Sa Sabado at Linggo po, hanggang alas-kuwatro lang.",
+      "tag": "numbers_dates_times",
+      "mode": "neutral"
+    },
+    {
+      "id": "num037",
+      "text": "Mga tatlo't kalahating kilo po ang bigat.",
+      "tag": "numbers_dates_times",
+      "mode": "neutral"
+    },
+    {
+      "id": "num038",
+      "text": "Ang bahay po ay numero kuwarenta y dos, Rizal Street.",
+      "tag": "numbers_dates_times",
+      "mode": "neutral"
+    },
+    {
+      "id": "num039",
+      "text": "Enero, Pebrero, Marso, Abril, Mayo, Hunyo.",
+      "tag": "numbers_dates_times",
+      "mode": "neutral"
+    },
+    {
+      "id": "num040",
+      "text": "Hulyo, Agosto, Setyembre, Oktubre, Nobyembre, Disyembre.",
+      "tag": "numbers_dates_times",
+      "mode": "neutral"
+    },
+    {
+      "id": "num041",
+      "text": "Confirmed na po sa alas-onse ng umaga!",
+      "tag": "numbers_dates_times",
+      "mode": "bright"
+    },
+    {
+      "id": "num042",
+      "text": "Sampung minuto na lang po, malapit na.",
+      "tag": "numbers_dates_times",
+      "mode": "reassuring"
+    },
+    {
+      "id": "num043",
+      "text": "Dalawang libo limang daan po ang halaga.",
+      "tag": "numbers_dates_times",
+      "mode": "neutral"
+    },
+    {
+      "id": "num044",
+      "text": "Alas-siyete po ng gabi ang pagsasara namin.",
+      "tag": "numbers_dates_times",
+      "mode": "neutral"
+    },
+    {
+      "id": "num045",
+      "text": "Tatlong araw po mula ngayon, ika-labing pito.",
+      "tag": "numbers_dates_times",
+      "mode": "neutral"
+    },
+    {
+      "id": "num046",
+      "text": "Ang inyong PIN po ay siyam walo pito anim.",
+      "tag": "numbers_dates_times",
+      "mode": "neutral"
+    },
+    {
+      "id": "num047",
+      "text": "Limampung porsyento po ang bawas ngayon.",
+      "tag": "numbers_dates_times",
+      "mode": "bright"
+    },
+    {
+      "id": "num048",
+      "text": "Anim na buwan po ang hulugan ninyo.",
+      "tag": "numbers_dates_times",
+      "mode": "neutral"
+    },
+    {
+      "id": "num049",
+      "text": "Isang daan dalawampung metro po ang haba.",
+      "tag": "numbers_dates_times",
+      "mode": "neutral"
+    },
+    {
+      "id": "num050",
+      "text": "Sa taong dalawang libo dalawampu't anim po.",
+      "tag": "numbers_dates_times",
+      "mode": "neutral"
+    },
+    {
+      "id": "num051",
+      "text": "Ala-una po ng hapon ang meeting natin.",
+      "tag": "numbers_dates_times",
+      "mode": "neutral"
+    },
+    {
+      "id": "num052",
+      "text": "Dalawampu't apat na oras po ang serbisyo namin.",
+      "tag": "numbers_dates_times",
+      "mode": "bright"
+    },
+    {
+      "id": "num053",
+      "text": "Pitong araw po sa isang linggo, bukas kami.",
+      "tag": "numbers_dates_times",
+      "mode": "bright"
+    },
+    {
+      "id": "num054",
+      "text": "Ang unit number po ay lima B, ikatlong palapag.",
+      "tag": "numbers_dates_times",
+      "mode": "neutral"
+    },
+    {
+      "id": "num055",
+      "text": "Tatlumpung minuto po ang biyahe mula dito.",
+      "tag": "numbers_dates_times",
+      "mode": "neutral"
+    },
+    {
+      "id": "num056",
+      "text": "Labing-apat na piraso po ang natitira sa amin.",
+      "tag": "numbers_dates_times",
+      "mode": "neutral"
+    },
+    {
+      "id": "num057",
+      "text": "Ang zip code po namin ay isa siyam siyam apat.",
+      "tag": "numbers_dates_times",
+      "mode": "neutral"
+    },
+    {
+      "id": "num058",
+      "text": "Alas-otso y medya po ng umaga bukas.",
+      "tag": "numbers_dates_times",
+      "mode": "neutral"
+    },
+    {
+      "id": "num059",
+      "text": "Dalawang linggo po ang hihintayin natin.",
+      "tag": "numbers_dates_times",
+      "mode": "neutral"
+    },
+    {
+      "id": "num060",
+      "text": "Siyam na raan pitumpu't lima po ang kabuuan.",
+      "tag": "numbers_dates_times",
+      "mode": "neutral"
+    },
+    {
+      "id": "num061",
+      "text": "Ika-labing tatlo po ng Marso ang deadline.",
+      "tag": "numbers_dates_times",
+      "mode": "neutral"
+    },
+    {
+      "id": "num062",
+      "text": "Limang piraso po sa presyong isang libo.",
+      "tag": "numbers_dates_times",
+      "mode": "neutral"
+    },
+    {
+      "id": "num063",
+      "text": "Ang telepono po namin ay walo dalawa tatlo, apat lima anim pito.",
+      "tag": "numbers_dates_times",
+      "mode": "neutral"
+    },
+    {
+      "id": "num064",
+      "text": "Sa ikalawang linggo po ng Abril.",
+      "tag": "numbers_dates_times",
+      "mode": "neutral"
+    },
+    {
+      "id": "num065",
+      "text": "Anim na raan animnapung piso po, sir.",
+      "tag": "numbers_dates_times",
+      "mode": "neutral"
+    },
+    {
+      "id": "num066",
+      "text": "Mga labinlimang minuto na lang po, malapit na siya.",
+      "tag": "numbers_dates_times",
+      "mode": "reassuring"
+    },
+    {
+      "id": "num067",
+      "text": "Tatlong buwan po ang libreng serbisyo.",
+      "tag": "numbers_dates_times",
+      "mode": "bright"
+    },
+    {
+      "id": "num068",
+      "text": "Alas-kuwatro po ng hapon ang cut-off namin.",
+      "tag": "numbers_dates_times",
+      "mode": "neutral"
+    },
+    {
+      "id": "num069",
+      "text": "Dalawang daang piraso po ang minimum order.",
+      "tag": "numbers_dates_times",
+      "mode": "neutral"
+    },
+    {
+      "id": "num070",
+      "text": "Sa ika-tatlumpu po ng buwan ang bayad.",
+      "tag": "numbers_dates_times",
+      "mode": "neutral"
+    },
+    {
+      "id": "num071",
+      "text": "Ang laki po ay tatlumpu't limang sentimetro.",
+      "tag": "numbers_dates_times",
+      "mode": "neutral"
+    },
+    {
+      "id": "num072",
+      "text": "Pitong libo walong daan po ang buong package.",
+      "tag": "numbers_dates_times",
+      "mode": "neutral"
+    },
+    {
+      "id": "num073",
+      "text": "Ala-singko po ng hapon, huwag pong ma-late.",
+      "tag": "numbers_dates_times",
+      "mode": "neutral"
+    },
+    {
+      "id": "num074",
+      "text": "Dalawang taon na po kaming bukas dito.",
+      "tag": "numbers_dates_times",
+      "mode": "bright"
+    },
+    {
+      "id": "num075",
+      "text": "Ang tracking po ninyo ay tatlo lima pito siyam.",
+      "tag": "numbers_dates_times",
+      "mode": "neutral"
+    },
+    {
+      "id": "num076",
+      "text": "Isang daan po ang bawat kilo ng bigat.",
+      "tag": "numbers_dates_times",
+      "mode": "neutral"
+    },
+    {
+      "id": "num077",
+      "text": "Alas-sais po ng umaga kami nagbubukas.",
+      "tag": "numbers_dates_times",
+      "mode": "neutral"
+    },
+    {
+      "id": "num078",
+      "text": "Sa Miyerkules po, ika-dalawampu't lima.",
+      "tag": "numbers_dates_times",
+      "mode": "neutral"
+    },
+    {
+      "id": "num079",
+      "text": "Tatlong daan tatlumpu't tatlo po ang presyo.",
+      "tag": "numbers_dates_times",
+      "mode": "neutral"
+    },
+    {
+      "id": "num080",
+      "text": "Apatnapung minuto po ang biyahe papunta doon.",
+      "tag": "numbers_dates_times",
+      "mode": "neutral"
+    },
+    {
+      "id": "num081",
+      "text": "Ang inyong account number po ay anim pito walo siyam.",
+      "tag": "numbers_dates_times",
+      "mode": "neutral"
+    },
+    {
+      "id": "num082",
+      "text": "Sampung taon na pong ginagamit ang modelong ito.",
+      "tag": "numbers_dates_times",
+      "mode": "neutral"
+    },
+    {
+      "id": "num083",
+      "text": "Dalawampung piraso po sa isang kahon.",
+      "tag": "numbers_dates_times",
+      "mode": "neutral"
+    },
+    {
+      "id": "num084",
+      "text": "Alas-dose po ng tanghali ang aming pahinga.",
+      "tag": "numbers_dates_times",
+      "mode": "neutral"
+    },
+    {
+      "id": "num085",
+      "text": "Sa unang araw po ng buwan ang bayarin.",
+      "tag": "numbers_dates_times",
+      "mode": "neutral"
+    },
+    {
+      "id": "num086",
+      "text": "Limang libo po ang deposito na kailangan.",
+      "tag": "numbers_dates_times",
+      "mode": "neutral"
+    },
+    {
+      "id": "num087",
+      "text": "Ika-pito po ng Hunyo ang aming anibersaryo.",
+      "tag": "numbers_dates_times",
+      "mode": "bright"
+    },
+    {
+      "id": "num088",
+      "text": "Walumpung porsyento po ang natapos na.",
+      "tag": "numbers_dates_times",
+      "mode": "bright"
+    },
+    {
+      "id": "num089",
+      "text": "Isang oras at kalahati po ang aabutin.",
+      "tag": "numbers_dates_times",
+      "mode": "neutral"
+    },
+    {
+      "id": "num090",
+      "text": "Ang kuwarto po ay numero tatlong daan lima.",
+      "tag": "numbers_dates_times",
+      "mode": "neutral"
+    },
+    {
+      "id": "num091",
+      "text": "Dalawang daan limampung piso kada oras po.",
+      "tag": "numbers_dates_times",
+      "mode": "neutral"
+    },
+    {
+      "id": "num092",
+      "text": "Sa susunod na Biyernes po, ika-labing siyam.",
+      "tag": "numbers_dates_times",
+      "mode": "neutral"
+    },
+    {
+      "id": "num093",
+      "text": "Anim na piraso po sa halagang limang daan.",
+      "tag": "numbers_dates_times",
+      "mode": "neutral"
+    },
+    {
+      "id": "num094",
+      "text": "Alas-nuwebe y medya po ng gabi kami nagsasara.",
+      "tag": "numbers_dates_times",
+      "mode": "neutral"
+    },
+    {
+      "id": "num095",
+      "text": "Labing-isang taon na po ang aming negosyo.",
+      "tag": "numbers_dates_times",
+      "mode": "bright"
+    },
+    {
+      "id": "num096",
+      "text": "Ang inyong PIN code po ay isa dalawa tatlo apat.",
+      "tag": "numbers_dates_times",
+      "mode": "neutral"
+    },
+    {
+      "id": "num097",
+      "text": "Tatlumpung araw po ang palugit ng pagbabalik.",
+      "tag": "numbers_dates_times",
+      "mode": "neutral"
+    },
+    {
+      "id": "num098",
+      "text": "Sa ikalimang palapag po ng gusali.",
+      "tag": "numbers_dates_times",
+      "mode": "neutral"
+    },
+    {
+      "id": "num099",
+      "text": "Apat na raan po kada araw ang upa.",
+      "tag": "numbers_dates_times",
+      "mode": "neutral"
+    },
+    {
+      "id": "num100",
+      "text": "Kalahating oras na lang po, hintay lang.",
+      "tag": "numbers_dates_times",
+      "mode": "reassuring"
+    },
+    {
+      "id": "eng001",
+      "text": "Good morning, how may I help you today?",
+      "tag": "english_block",
+      "mode": "bright"
+    },
+    {
+      "id": "eng002",
+      "text": "Thank you for calling, my name is Grace.",
+      "tag": "english_block",
+      "mode": "bright"
+    },
+    {
+      "id": "eng003",
+      "text": "Let me check that for you right now.",
+      "tag": "english_block",
+      "mode": "neutral"
+    },
+    {
+      "id": "eng004",
+      "text": "The item is available in three different colours.",
+      "tag": "english_block",
+      "mode": "neutral"
+    },
+    {
+      "id": "eng005",
+      "text": "I am sorry, that is out of stock today.",
+      "tag": "english_block",
+      "mode": "apologetic"
+    },
+    {
+      "id": "eng006",
+      "text": "We can deliver it to you by Thursday.",
+      "tag": "english_block",
+      "mode": "neutral"
+    },
+    {
+      "id": "eng007",
+      "text": "The total comes to two thousand four hundred pesos.",
+      "tag": "english_block",
+      "mode": "neutral"
+    },
+    {
+      "id": "eng008",
+      "text": "Rest assured, we will take care of it.",
+      "tag": "english_block",
+      "mode": "reassuring"
+    },
+    {
+      "id": "eng009",
+      "text": "May I have your complete delivery address?",
+      "tag": "english_block",
+      "mode": "neutral"
+    },
+    {
+      "id": "eng010",
+      "text": "Your payment has been received, thank you.",
+      "tag": "english_block",
+      "mode": "bright"
+    },
+    {
+      "id": "eng011",
+      "text": "There is a discount if you buy three pieces.",
+      "tag": "english_block",
+      "mode": "bright"
+    },
+    {
+      "id": "eng012",
+      "text": "I understand your concern completely.",
+      "tag": "english_block",
+      "mode": "reassuring"
+    },
+    {
+      "id": "eng013",
+      "text": "We have been serving customers for eight years.",
+      "tag": "english_block",
+      "mode": "reassuring"
+    },
+    {
+      "id": "eng014",
+      "text": "Please send a screenshot of your payment.",
+      "tag": "english_block",
+      "mode": "neutral"
+    },
+    {
+      "id": "eng015",
+      "text": "I apologise for the delay in your order.",
+      "tag": "english_block",
+      "mode": "apologetic"
+    },
+    {
+      "id": "eng016",
+      "text": "Would you like me to reserve one for you?",
+      "tag": "english_block",
+      "mode": "bright"
+    },
+    {
+      "id": "eng017",
+      "text": "The warranty covers one full year of use.",
+      "tag": "english_block",
+      "mode": "neutral"
+    },
+    {
+      "id": "eng018",
+      "text": "Kindly wait a moment while I confirm.",
+      "tag": "english_block",
+      "mode": "neutral"
+    },
+    {
+      "id": "eng019",
+      "text": "Cash on delivery is available for your area.",
+      "tag": "english_block",
+      "mode": "bright"
+    },
+    {
+      "id": "eng020",
+      "text": "Thank you very much for your order today.",
+      "tag": "english_block",
+      "mode": "bright"
+    },
+    {
+      "id": "eng021",
+      "text": "Could you please repeat your mobile number?",
+      "tag": "english_block",
+      "mode": "neutral"
+    },
+    {
+      "id": "eng022",
+      "text": "The rider will contact you before arriving.",
+      "tag": "english_block",
+      "mode": "reassuring"
+    },
+    {
+      "id": "eng023",
+      "text": "We accept GCash, bank transfer and cash.",
+      "tag": "english_block",
+      "mode": "neutral"
+    },
+    {
+      "id": "eng024",
+      "text": "Please take your time to decide.",
+      "tag": "english_block",
+      "mode": "reassuring"
+    },
+    {
+      "id": "eng025",
+      "text": "I will make sure this gets sorted out.",
+      "tag": "english_block",
+      "mode": "reassuring"
+    },
+    {
+      "id": "eng026",
+      "text": "Sorry, we are closed on Sundays and holidays.",
+      "tag": "english_block",
+      "mode": "apologetic"
+    },
+    {
+      "id": "eng027",
+      "text": "Our store opens at eight in the morning.",
+      "tag": "english_block",
+      "mode": "neutral"
+    },
+    {
+      "id": "eng028",
+      "text": "That is a very popular choice with our customers.",
+      "tag": "english_block",
+      "mode": "bright"
+    },
+    {
+      "id": "eng029",
+      "text": "Let me read your order back to you.",
+      "tag": "english_block",
+      "mode": "neutral"
+    },
+    {
+      "id": "eng030",
+      "text": "Is there anything else you need from us?",
+      "tag": "english_block",
+      "mode": "neutral"
+    },
+    {
+      "id": "eng031",
+      "text": "We are open from Monday until Saturday.",
+      "tag": "english_block",
+      "mode": "neutral"
+    },
+    {
+      "id": "eng032",
+      "text": "Shipping is free for orders above one thousand.",
+      "tag": "english_block",
+      "mode": "bright"
+    },
+    {
+      "id": "eng033",
+      "text": "The delivery usually takes two to three days.",
+      "tag": "english_block",
+      "mode": "neutral"
+    },
+    {
+      "id": "eng034",
+      "text": "Do not worry, your parcel is on the way.",
+      "tag": "english_block",
+      "mode": "reassuring"
+    },
+    {
+      "id": "eng035",
+      "text": "Unfortunately the courier reported a delay.",
+      "tag": "english_block",
+      "mode": "apologetic"
+    },
+    {
+      "id": "eng036",
+      "text": "I can offer you a small discount on this.",
+      "tag": "english_block",
+      "mode": "bright"
+    },
+    {
+      "id": "eng037",
+      "text": "Please keep the receipt for your warranty claim.",
+      "tag": "english_block",
+      "mode": "neutral"
+    },
+    {
+      "id": "eng038",
+      "text": "We will replace it immediately if it is damaged.",
+      "tag": "english_block",
+      "mode": "reassuring"
+    },
+    {
+      "id": "eng039",
+      "text": "Your reference number will be sent by text.",
+      "tag": "english_block",
+      "mode": "neutral"
+    },
+    {
+      "id": "eng040",
+      "text": "How many pieces would you like to order?",
+      "tag": "english_block",
+      "mode": "neutral"
+    },
+    {
+      "id": "eng041",
+      "text": "That is a wonderful choice, thank you!",
+      "tag": "english_block",
+      "mode": "bright"
+    },
+    {
+      "id": "eng042",
+      "text": "I am checking our inventory as we speak.",
+      "tag": "english_block",
+      "mode": "neutral"
+    },
+    {
+      "id": "eng043",
+      "text": "We appreciate your patience very much.",
+      "tag": "english_block",
+      "mode": "bright"
+    },
+    {
+      "id": "eng044",
+      "text": "Sorry for the inconvenience this has caused.",
+      "tag": "english_block",
+      "mode": "apologetic"
+    },
+    {
+      "id": "eng045",
+      "text": "You may inspect the item before paying.",
+      "tag": "english_block",
+      "mode": "reassuring"
+    },
+    {
+      "id": "eng046",
+      "text": "Our shop is located along Ortigas Avenue.",
+      "tag": "english_block",
+      "mode": "neutral"
+    },
+    {
+      "id": "eng047",
+      "text": "There is parking available in front.",
+      "tag": "english_block",
+      "mode": "bright"
+    },
+    {
+      "id": "eng048",
+      "text": "Let me transfer the details to our system.",
+      "tag": "english_block",
+      "mode": "neutral"
+    },
+    {
+      "id": "eng049",
+      "text": "Everything has been confirmed on our side.",
+      "tag": "english_block",
+      "mode": "reassuring"
+    },
+    {
+      "id": "eng050",
+      "text": "Have a wonderful day and take care!",
+      "tag": "english_block",
+      "mode": "bright"
+    },
+    {
+      "id": "eng051",
+      "text": "I will call you back within the hour.",
+      "tag": "english_block",
+      "mode": "reassuring"
+    },
+    {
+      "id": "eng052",
+      "text": "Are you still there on the line?",
+      "tag": "english_block",
+      "mode": "neutral"
+    },
+    {
+      "id": "eng053",
+      "text": "I can barely hear you, could you speak up?",
+      "tag": "english_block",
+      "mode": "neutral"
+    },
+    {
+      "id": "eng054",
+      "text": "Thank you for waiting so patiently.",
+      "tag": "english_block",
+      "mode": "bright"
+    },
+    {
+      "id": "eng055",
+      "text": "We cannot lower the price any further.",
+      "tag": "english_block",
+      "mode": "apologetic"
+    },
+    {
+      "id": "eng056",
+      "text": "No extra charge will be added to that.",
+      "tag": "english_block",
+      "mode": "neutral"
+    },
+    {
+      "id": "eng057",
+      "text": "Many customers have asked the same question.",
+      "tag": "english_block",
+      "mode": "reassuring"
+    },
+    {
+      "id": "eng058",
+      "text": "You can find our reviews on our page.",
+      "tag": "english_block",
+      "mode": "neutral"
+    },
+    {
+      "id": "eng059",
+      "text": "We will send you an update tomorrow morning.",
+      "tag": "english_block",
+      "mode": "neutral"
+    },
+    {
+      "id": "eng060",
+      "text": "It was a pleasure speaking with you today.",
+      "tag": "english_block",
+      "mode": "bright"
+    }
+  ]
+}
