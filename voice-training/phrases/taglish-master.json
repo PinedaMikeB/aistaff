@@ -1,7 +1,7 @@
 {
   "name": "Taglish Master — AIStaff Pitch voice",
-  "generated": "2026-08-28T06:15:39.128Z",
-  "totalLines": 200,
+  "generated": "2026-08-28T07:41:13.170Z",
+  "totalLines": 1110,
   "lines": [
     {
       "id": "grt001",
@@ -293,7 +293,7 @@
     },
     {
       "id": "grt049",
-      "text": "Paumanhin po, ngunit sarado na kami tuwing alas-singko ng hapon. Mag-iwan na lang po ng mensahe.",
+      "text": "Paumanhin po, sarado na kami tuwing five PM. Mag-iwan na lang po ng mensahe.",
       "tag": "greeting_opening",
       "mode": "apologetic"
     },
@@ -1202,6 +1202,5466 @@
       "text": "Pwede pong ma-delay ang restock kasi naipit sa customs ang mga produkto.",
       "tag": "product_availability",
       "mode": "neutral"
+    },
+    {
+      "id": "prc001",
+      "text": "Naku, swerte po kayo kasi naka-sale po tayo ngayon ng twenty percent!",
+      "tag": "pricing_quotation",
+      "mode": "bright"
+    },
+    {
+      "id": "prc002",
+      "text": "We currently have an amazing buy one take one promo today!",
+      "tag": "pricing_quotation",
+      "mode": "bright"
+    },
+    {
+      "id": "prc003",
+      "text": "Good news po, pasok yung order niyo sa free shipping natin!",
+      "tag": "pricing_quotation",
+      "mode": "bright"
+    },
+    {
+      "id": "prc004",
+      "text": "One thousand pesos na lang po kung bibilhin niyo ngayon.",
+      "tag": "pricing_quotation",
+      "mode": "bright"
+    },
+    {
+      "id": "prc005",
+      "text": "Makakatipid po kayo ng five hundred kapag kinuha niyo ang buong set.",
+      "tag": "pricing_quotation",
+      "mode": "bright"
+    },
+    {
+      "id": "prc006",
+      "text": "You can save five hundred pesos if you purchase the bundle now.",
+      "tag": "pricing_quotation",
+      "mode": "bright"
+    },
+    {
+      "id": "prc007",
+      "text": "Tamang-tama po, may discount kami na ten percent para sa mga new customers.",
+      "tag": "pricing_quotation",
+      "mode": "bright"
+    },
+    {
+      "id": "prc008",
+      "text": "Sulit na sulit po ito dahil libre na rin ang pagpapa-deliver.",
+      "tag": "pricing_quotation",
+      "mode": "bright"
+    },
+    {
+      "id": "prc009",
+      "text": "Yes po! Magiging six hundred na lang po siya dahil sa promo code.",
+      "tag": "pricing_quotation",
+      "mode": "bright"
+    },
+    {
+      "id": "prc010",
+      "text": "The discounted total comes out to exactly one thousand five hundred pesos.",
+      "tag": "pricing_quotation",
+      "mode": "bright"
+    },
+    {
+      "id": "prc011",
+      "text": "Swerte po ninyo, nag-extend kami ng flash sale hanggang mamayang gabi!",
+      "tag": "pricing_quotation",
+      "mode": "bright"
+    },
+    {
+      "id": "prc012",
+      "text": "Makakakuha po kayo ng freebie kung aabot ng two thousand ang bibilhin niyo.",
+      "tag": "pricing_quotation",
+      "mode": "bright"
+    },
+    {
+      "id": "prc013",
+      "text": "We will automatically apply the fifty percent discount upon checkout!",
+      "tag": "pricing_quotation",
+      "mode": "bright"
+    },
+    {
+      "id": "prc014",
+      "text": "Sobrang baba na po ng presyo natin diyan kumpara sa iba.",
+      "tag": "pricing_quotation",
+      "mode": "bright"
+    },
+    {
+      "id": "prc015",
+      "text": "Ang ganda po ng timing niyo, nagbagsak-presyo po kami kahapon.",
+      "tag": "pricing_quotation",
+      "mode": "bright"
+    },
+    {
+      "id": "prc016",
+      "text": "You are in luck, this item is on clearance for three hundred pesos.",
+      "tag": "pricing_quotation",
+      "mode": "bright"
+    },
+    {
+      "id": "prc017",
+      "text": "Naka-promo po tayo na less fifty pesos sa bawat additional na piraso.",
+      "tag": "pricing_quotation",
+      "mode": "bright"
+    },
+    {
+      "id": "prc018",
+      "text": "Kapag kumuha kayo ng dalawa, may libre na po kayong isa!",
+      "tag": "pricing_quotation",
+      "mode": "bright"
+    },
+    {
+      "id": "prc019",
+      "text": "Our weekend sale gives you twenty percent off all regular items!",
+      "tag": "pricing_quotation",
+      "mode": "bright"
+    },
+    {
+      "id": "prc020",
+      "text": "Oo naman po, sagot na po namin ang shipping fee niyan.",
+      "tag": "pricing_quotation",
+      "mode": "bright"
+    },
+    {
+      "id": "prc021",
+      "text": "Bongga po ang discount niyo rito dahil suki na po kayo.",
+      "tag": "pricing_quotation",
+      "mode": "bright"
+    },
+    {
+      "id": "prc022",
+      "text": "The final price will only be nine hundred ninety nine pesos.",
+      "tag": "pricing_quotation",
+      "mode": "bright"
+    },
+    {
+      "id": "prc023",
+      "text": "Yes, three hundred na lang po ang babayaran niyo para diyan.",
+      "tag": "pricing_quotation",
+      "mode": "bright"
+    },
+    {
+      "id": "prc024",
+      "text": "Naku, sakto po dahil may pa-voucher pa po tayo sa inyo!",
+      "tag": "pricing_quotation",
+      "mode": "bright"
+    },
+    {
+      "id": "prc025",
+      "text": "Grab the chance now because this offer is truly our biggest yet.",
+      "tag": "pricing_quotation",
+      "mode": "bright"
+    },
+    {
+      "id": "prc026",
+      "text": "Wag po kayong mag-alala, wala pong hidden charges yung breakdown natin.",
+      "tag": "pricing_quotation",
+      "mode": "reassuring"
+    },
+    {
+      "id": "prc027",
+      "text": "I assure you, this is the most competitive price in the market today.",
+      "tag": "pricing_quotation",
+      "mode": "reassuring"
+    },
+    {
+      "id": "prc028",
+      "text": "Sulit po ang ibabayad niyo dahil pangmatagalan ang kalidad ng produkto natin.",
+      "tag": "pricing_quotation",
+      "mode": "reassuring"
+    },
+    {
+      "id": "prc029",
+      "text": "Garantisado po na ang siningil ko lang ay yung nakalagay sa resibo.",
+      "tag": "pricing_quotation",
+      "mode": "reassuring"
+    },
+    {
+      "id": "prc030",
+      "text": "Please do not worry, the installation fee is already included in that amount.",
+      "tag": "pricing_quotation",
+      "mode": "reassuring"
+    },
+    {
+      "id": "prc031",
+      "text": "Naiintindihan ko po, kaya binigyan ko na kayo ng pinakamababang presyo.",
+      "tag": "pricing_quotation",
+      "mode": "reassuring"
+    },
+    {
+      "id": "prc032",
+      "text": "We guarantee that our pricing is completely transparent from the very start.",
+      "tag": "pricing_quotation",
+      "mode": "reassuring"
+    },
+    {
+      "id": "prc033",
+      "text": "Sigurado po kayong hindi kayo luge sa binayaran niyo para sa item na ito.",
+      "tag": "pricing_quotation",
+      "mode": "reassuring"
+    },
+    {
+      "id": "prc034",
+      "text": "Hayaan niyo po, itototal ko ulit para makita niyo na tama ang computation.",
+      "tag": "pricing_quotation",
+      "mode": "reassuring"
+    },
+    {
+      "id": "prc035",
+      "text": "You have my word, there are no additional fees upon delivery.",
+      "tag": "pricing_quotation",
+      "mode": "reassuring"
+    },
+    {
+      "id": "prc036",
+      "text": "Makakaasa po kayo na ito na po ang final at totoong presyo.",
+      "tag": "pricing_quotation",
+      "mode": "reassuring"
+    },
+    {
+      "id": "prc037",
+      "text": "We will match the competitor price just to give you the best deal.",
+      "tag": "pricing_quotation",
+      "mode": "reassuring"
+    },
+    {
+      "id": "prc038",
+      "text": "Huwag pong mabahala, pwede naman po nating i-refund kapag may sumobra.",
+      "tag": "pricing_quotation",
+      "mode": "reassuring"
+    },
+    {
+      "id": "prc039",
+      "text": "Ibibigay ko na po sa inyo ang wholesale price para makatipid kayo.",
+      "tag": "pricing_quotation",
+      "mode": "reassuring"
+    },
+    {
+      "id": "prc040",
+      "text": "The warranty coverage makes the extra cost completely worth your peace of mind.",
+      "tag": "pricing_quotation",
+      "mode": "reassuring"
+    },
+    {
+      "id": "prc041",
+      "text": "Transparent po kami sa lahat ng add-ons kaya wag po kayong mag-atubiling magtanong.",
+      "tag": "pricing_quotation",
+      "mode": "reassuring"
+    },
+    {
+      "id": "prc042",
+      "text": "Sige po, aayusin ko ang presyo para pasok sa budget na sinabi niyo.",
+      "tag": "pricing_quotation",
+      "mode": "reassuring"
+    },
+    {
+      "id": "prc043",
+      "text": "We can certainly work out a payment schedule that fits your budget.",
+      "tag": "pricing_quotation",
+      "mode": "reassuring"
+    },
+    {
+      "id": "prc044",
+      "text": "Pangako po, hindi po tataas iyan kahit abutin tayo ng next week.",
+      "tag": "pricing_quotation",
+      "mode": "reassuring"
+    },
+    {
+      "id": "prc045",
+      "text": "Rest assured that the quotation is locked in for thirty days.",
+      "tag": "pricing_quotation",
+      "mode": "reassuring"
+    },
+    {
+      "id": "prc046",
+      "text": "Pasensya na po, pero fixed price na po kasi iyan talaga.",
+      "tag": "pricing_quotation",
+      "mode": "apologetic"
+    },
+    {
+      "id": "prc047",
+      "text": "I am really sorry, but the promotional period ended exactly at midnight.",
+      "tag": "pricing_quotation",
+      "mode": "apologetic"
+    },
+    {
+      "id": "prc048",
+      "text": "Paumanhin po, hindi po namin kaya tapatan ang presyo ng kabilang tindahan.",
+      "tag": "pricing_quotation",
+      "mode": "apologetic"
+    },
+    {
+      "id": "prc049",
+      "text": "Sorry po talaga, tumaas na po kasi ang singil sa amin ng supplier.",
+      "tag": "pricing_quotation",
+      "mode": "apologetic"
+    },
+    {
+      "id": "prc050",
+      "text": "We sincerely apologize, but we cannot offer any further discounts on this model.",
+      "tag": "pricing_quotation",
+      "mode": "apologetic"
+    },
+    {
+      "id": "prc051",
+      "text": "Naku po, pasensya na dahil hindi na po valid yung binigay ninyong voucher code.",
+      "tag": "pricing_quotation",
+      "mode": "apologetic"
+    },
+    {
+      "id": "prc052",
+      "text": "I am sorry, but the shipping cost is computed separately from the product price.",
+      "tag": "pricing_quotation",
+      "mode": "apologetic"
+    },
+    {
+      "id": "prc053",
+      "text": "Patawad po, wala po kasi kaming installment option para diyan sa ngayon.",
+      "tag": "pricing_quotation",
+      "mode": "apologetic"
+    },
+    {
+      "id": "prc054",
+      "text": "Sorry po ah, pero sagad na po ang discount na maibibigay ko diyan.",
+      "tag": "pricing_quotation",
+      "mode": "apologetic"
+    },
+    {
+      "id": "prc055",
+      "text": "We apologize for the confusion, the lower price was for a different size.",
+      "tag": "pricing_quotation",
+      "mode": "apologetic"
+    },
+    {
+      "id": "prc056",
+      "text": "Ang regular price po ng item na iyan ay eight hundred pesos.",
+      "tag": "pricing_quotation",
+      "mode": "neutral"
+    },
+    {
+      "id": "prc057",
+      "text": "The total amount due is three thousand five hundred pesos.",
+      "tag": "pricing_quotation",
+      "mode": "neutral"
+    },
+    {
+      "id": "prc058",
+      "text": "Kung iisahin niyo po, two hundred ang presyo ng bawat piraso.",
+      "tag": "pricing_quotation",
+      "mode": "neutral"
+    },
+    {
+      "id": "prc059",
+      "text": "Bale aabot po lahat ng one thousand fifty pesos.",
+      "tag": "pricing_quotation",
+      "mode": "neutral"
+    },
+    {
+      "id": "prc060",
+      "text": "The retail price for one unit is exactly eight hundred pesos.",
+      "tag": "pricing_quotation",
+      "mode": "neutral"
+    },
+    {
+      "id": "prc061",
+      "text": "May dagdag po na fifty pesos para sa ating special packaging.",
+      "tag": "pricing_quotation",
+      "mode": "neutral"
+    },
+    {
+      "id": "prc062",
+      "text": "Sa computation po natin, nagkakahalaga ito ng seven thousand lahat-lahat.",
+      "tag": "pricing_quotation",
+      "mode": "neutral"
+    },
+    {
+      "id": "prc063",
+      "text": "That will be four hundred pesos per square meter, including labor.",
+      "tag": "pricing_quotation",
+      "mode": "neutral"
+    },
+    {
+      "id": "prc064",
+      "text": "Wala pa pong kasamang delivery fee yung kinowt ko na presyo.",
+      "tag": "pricing_quotation",
+      "mode": "neutral"
+    },
+    {
+      "id": "prc065",
+      "text": "The estimated total is roughly fifteen thousand pesos before any taxes.",
+      "tag": "pricing_quotation",
+      "mode": "neutral"
+    },
+    {
+      "id": "prc066",
+      "text": "Kung babawasan ng ten percent, magiging nine hundred na lang po siya.",
+      "tag": "pricing_quotation",
+      "mode": "neutral"
+    },
+    {
+      "id": "prc067",
+      "text": "Ipadadala ko po sa inyo ang kumpletong breakdown ng mga babayaran niyo.",
+      "tag": "pricing_quotation",
+      "mode": "neutral"
+    },
+    {
+      "id": "prc068",
+      "text": "We charge a standard flat rate of one hundred pesos for metro manila shipping.",
+      "tag": "pricing_quotation",
+      "mode": "neutral"
+    },
+    {
+      "id": "prc069",
+      "text": "Yung nakalagay po sa resibo ay ang mismong halaga na hinihingi namin.",
+      "tag": "pricing_quotation",
+      "mode": "neutral"
+    },
+    {
+      "id": "prc070",
+      "text": "Bale yung downpayment po natin ay fifty percent ng total price.",
+      "tag": "pricing_quotation",
+      "mode": "neutral"
+    },
+    {
+      "id": "prc071",
+      "text": "Let me pull up the exact quotation we sent you last tuesday.",
+      "tag": "pricing_quotation",
+      "mode": "neutral"
+    },
+    {
+      "id": "prc072",
+      "text": "Kapag maramihan po ang kinuha ninyo, mas bababa pa po ang unit price.",
+      "tag": "pricing_quotation",
+      "mode": "neutral"
+    },
+    {
+      "id": "prc073",
+      "text": "Ang minimum spend po para maka-avail ng promo ay two thousand pesos.",
+      "tag": "pricing_quotation",
+      "mode": "neutral"
+    },
+    {
+      "id": "prc074",
+      "text": "For purchases above five thousand, we automatically waive the delivery fee entirely.",
+      "tag": "pricing_quotation",
+      "mode": "neutral"
+    },
+    {
+      "id": "prc075",
+      "text": "Kasama na po sa presyong iyan ang isang taon na warranty ng produkto.",
+      "tag": "pricing_quotation",
+      "mode": "neutral"
+    },
+    {
+      "id": "prc076",
+      "text": "Babasahin ko po ang itemized breakdown para malinaw sa atin ang computation.",
+      "tag": "pricing_quotation",
+      "mode": "neutral"
+    },
+    {
+      "id": "prc077",
+      "text": "The base cost is around two hundred pesos, but it depends on the design.",
+      "tag": "pricing_quotation",
+      "mode": "neutral"
+    },
+    {
+      "id": "prc078",
+      "text": "Kapag umorder po kayo ng higit sa sampu, bibigyan ko kayo ng wholesale rate.",
+      "tag": "pricing_quotation",
+      "mode": "neutral"
+    },
+    {
+      "id": "prc079",
+      "text": "Ang huling presyo na binigay sa amin para diyan ay three hundred.",
+      "tag": "pricing_quotation",
+      "mode": "neutral"
+    },
+    {
+      "id": "prc080",
+      "text": "We accept bulk orders starting at fifty pieces for a lower price point.",
+      "tag": "pricing_quotation",
+      "mode": "neutral"
+    },
+    {
+      "id": "prc081",
+      "text": "Wala po tayong tubo diyan dahil benta-palugi na po natin iyan.",
+      "tag": "pricing_quotation",
+      "mode": "neutral"
+    },
+    {
+      "id": "prc082",
+      "text": "Kung idadagdag po natin yung accessories, aabot po tayo ng five thousand.",
+      "tag": "pricing_quotation",
+      "mode": "neutral"
+    },
+    {
+      "id": "prc083",
+      "text": "The promotion specifically applies to cash payments made within this week.",
+      "tag": "pricing_quotation",
+      "mode": "neutral"
+    },
+    {
+      "id": "prc084",
+      "text": "Magkakaiba po ang presyo depende sa size at kulay na mapipili ninyo.",
+      "tag": "pricing_quotation",
+      "mode": "neutral"
+    },
+    {
+      "id": "prc085",
+      "text": "Siningil po kayo ng extra dahil nag-request po kayo ng express delivery.",
+      "tag": "pricing_quotation",
+      "mode": "neutral"
+    },
+    {
+      "id": "prc086",
+      "text": "Please review the attached quote to see the line by line charges.",
+      "tag": "pricing_quotation",
+      "mode": "neutral"
+    },
+    {
+      "id": "prc087",
+      "text": "One thousand eight hundred po ang nakikita kong total dito sa system.",
+      "tag": "pricing_quotation",
+      "mode": "neutral"
+    },
+    {
+      "id": "prc088",
+      "text": "Ang promo code na sinasabi niyo po ay para sa first time buyers lamang.",
+      "tag": "pricing_quotation",
+      "mode": "neutral"
+    },
+    {
+      "id": "prc089",
+      "text": "If you look closely, the add-on feature costs an extra two hundred pesos.",
+      "tag": "pricing_quotation",
+      "mode": "neutral"
+    },
+    {
+      "id": "prc090",
+      "text": "Kapag pinagsama po natin ang dalawang items, one thousand po ang aabutin.",
+      "tag": "pricing_quotation",
+      "mode": "neutral"
+    },
+    {
+      "id": "prc091",
+      "text": "Libre na po ang pag-assemble niyan, kasama na po sa binayaran niyo.",
+      "tag": "pricing_quotation",
+      "mode": "neutral"
+    },
+    {
+      "id": "prc092",
+      "text": "Our pricing tiers are based on the volume of your monthly orders.",
+      "tag": "pricing_quotation",
+      "mode": "neutral"
+    },
+    {
+      "id": "prc093",
+      "text": "Ang hinihingi lang po namin ngayon ay yung kalahati para umpisahan ang trabaho.",
+      "tag": "pricing_quotation",
+      "mode": "neutral"
+    },
+    {
+      "id": "prc094",
+      "text": "Nakadepende po ang shipping rate natin sa bigat ng mismong package ninyo.",
+      "tag": "pricing_quotation",
+      "mode": "neutral"
+    },
+    {
+      "id": "prc095",
+      "text": "Sales tax is already computed into the final amount you see there.",
+      "tag": "pricing_quotation",
+      "mode": "neutral"
+    },
+    {
+      "id": "prc096",
+      "text": "Idadagdag ko na lang po ba yung bubble wrap na bente pesos?",
+      "tag": "pricing_quotation",
+      "mode": "neutral"
+    },
+    {
+      "id": "prc097",
+      "text": "Babalik po sa normal price ang item kapag natapos na ang buwan na ito.",
+      "tag": "pricing_quotation",
+      "mode": "neutral"
+    },
+    {
+      "id": "prc098",
+      "text": "The standard quotation is valid for only fourteen days from the date issued.",
+      "tag": "pricing_quotation",
+      "mode": "neutral"
+    },
+    {
+      "id": "prc099",
+      "text": "Four hundred seventy five pesos po ang eksaktong halaga.",
+      "tag": "pricing_quotation",
+      "mode": "neutral"
+    },
+    {
+      "id": "prc100",
+      "text": "Kung bibilangin po natin lahat, pumatak po ng siyam na libo ang bill.",
+      "tag": "pricing_quotation",
+      "mode": "neutral"
+    },
+    {
+      "id": "prc101",
+      "text": "There is a small processing fee of fifty pesos for card transactions.",
+      "tag": "pricing_quotation",
+      "mode": "neutral"
+    },
+    {
+      "id": "prc102",
+      "text": "Ang binigay po sa aking presyo ng supplier ay tumaas kaya nag-adjust kami.",
+      "tag": "pricing_quotation",
+      "mode": "neutral"
+    },
+    {
+      "id": "prc103",
+      "text": "Nakahiwalay po sa resibo ang bayad para sa pag-deliver ng gamit.",
+      "tag": "pricing_quotation",
+      "mode": "neutral"
+    },
+    {
+      "id": "prc104",
+      "text": "We do not require any downpayment for items under one thousand pesos.",
+      "tag": "pricing_quotation",
+      "mode": "neutral"
+    },
+    {
+      "id": "prc105",
+      "text": "Kapag pina-rush niyo po ang order, may additional na one hundred.",
+      "tag": "pricing_quotation",
+      "mode": "neutral"
+    },
+    {
+      "id": "prc106",
+      "text": "Magiging doble po ang babayaran niyo kung dalawang set ang kukunin.",
+      "tag": "pricing_quotation",
+      "mode": "neutral"
+    },
+    {
+      "id": "prc107",
+      "text": "Your invoice shows a pending balance of exactly four hundred thirty pesos.",
+      "tag": "pricing_quotation",
+      "mode": "neutral"
+    },
+    {
+      "id": "prc108",
+      "text": "Ibabawas po natin yung five hundred galing sa una ninyong binayaran.",
+      "tag": "pricing_quotation",
+      "mode": "neutral"
+    },
+    {
+      "id": "prc109",
+      "text": "Ang nakalagay po na presyo sa website ay hindi pa kasama ang tax.",
+      "tag": "pricing_quotation",
+      "mode": "neutral"
+    },
+    {
+      "id": "prc110",
+      "text": "You will notice a minor price difference compared to our physical store.",
+      "tag": "pricing_quotation",
+      "mode": "neutral"
+    },
+    {
+      "id": "prc111",
+      "text": "Fifty percent po muna ang kailangan nating ideposito bago natin i-process.",
+      "tag": "pricing_quotation",
+      "mode": "neutral"
+    },
+    {
+      "id": "prc112",
+      "text": "Yung susunod na payment niyo po ay naka-schedule sa katapusan ng buwan.",
+      "tag": "pricing_quotation",
+      "mode": "neutral"
+    },
+    {
+      "id": "prc113",
+      "text": "The current market price for that material is quite high this season.",
+      "tag": "pricing_quotation",
+      "mode": "neutral"
+    },
+    {
+      "id": "prc114",
+      "text": "Nakadepende po talaga sa layo ng inyong address ang babayaran sa courier.",
+      "tag": "pricing_quotation",
+      "mode": "neutral"
+    },
+    {
+      "id": "prc115",
+      "text": "Kapag tinotal po natin kasama yung discount, pumatak po ng two thousand.",
+      "tag": "pricing_quotation",
+      "mode": "neutral"
+    },
+    {
+      "id": "prc116",
+      "text": "We can provide a detailed breakdown so you can check every single item.",
+      "tag": "pricing_quotation",
+      "mode": "neutral"
+    },
+    {
+      "id": "prc117",
+      "text": "Pwede po nating alisin yung add-ons kung gusto niyo makatipid nang kaunti.",
+      "tag": "pricing_quotation",
+      "mode": "neutral"
+    },
+    {
+      "id": "prc118",
+      "text": "Hindi na po kami naniningil ng extra para sa mga simpleng alterations.",
+      "tag": "pricing_quotation",
+      "mode": "neutral"
+    },
+    {
+      "id": "prc119",
+      "text": "The discount coupon will expire exactly at midnight on friday.",
+      "tag": "pricing_quotation",
+      "mode": "neutral"
+    },
+    {
+      "id": "prc120",
+      "text": "Bale twenty pesos lang naman po ang nadagdag kaya hindi masyadong mabigat.",
+      "tag": "pricing_quotation",
+      "mode": "neutral"
+    },
+    {
+      "id": "prc121",
+      "text": "Iche-check ko muna kung magkano na ang inabot ng pinagsama-samang order niyo.",
+      "tag": "pricing_quotation",
+      "mode": "neutral"
+    },
+    {
+      "id": "prc122",
+      "text": "Your total bill comes out to exactly seven thousand eight hundred pesos.",
+      "tag": "pricing_quotation",
+      "mode": "neutral"
+    },
+    {
+      "id": "prc123",
+      "text": "Ang puhunan lang po namin diyan ay halos kalahati ng bentahan ngayon.",
+      "tag": "pricing_quotation",
+      "mode": "neutral"
+    },
+    {
+      "id": "prc124",
+      "text": "Pag lumampas po kayo sa oras, may panibagong charge na po tayo.",
+      "tag": "pricing_quotation",
+      "mode": "neutral"
+    },
+    {
+      "id": "prc125",
+      "text": "We calculate the shipping based on the volumetric weight of the box.",
+      "tag": "pricing_quotation",
+      "mode": "neutral"
+    },
+    {
+      "id": "prc126",
+      "text": "Nakuha niyo po iyan sa mas murang halaga dahil sa promo nung nakaraang lingo.",
+      "tag": "pricing_quotation",
+      "mode": "neutral"
+    },
+    {
+      "id": "prc127",
+      "text": "Bukod po doon sa item, magbabayad din po kayo para sa mismong box.",
+      "tag": "pricing_quotation",
+      "mode": "neutral"
+    },
+    {
+      "id": "prc128",
+      "text": "Please refer to the second page of the quote for the pricing terms.",
+      "tag": "pricing_quotation",
+      "mode": "neutral"
+    },
+    {
+      "id": "prc129",
+      "text": "Kapag binawasan po natin ng dalawang piraso, mas bababa po ang total ninyo.",
+      "tag": "pricing_quotation",
+      "mode": "neutral"
+    },
+    {
+      "id": "prc130",
+      "text": "Ang nakalista po rito na bayarin ay three hundred sixty pesos.",
+      "tag": "pricing_quotation",
+      "mode": "neutral"
+    },
+    {
+      "id": "prc131",
+      "text": "The promotional price is strictly limited to one purchase per customer today.",
+      "tag": "pricing_quotation",
+      "mode": "neutral"
+    },
+    {
+      "id": "prc132",
+      "text": "Ise-send ko po yung official quotation sa email ninyo pagkatapos ng tawag.",
+      "tag": "pricing_quotation",
+      "mode": "neutral"
+    },
+    {
+      "id": "prc133",
+      "text": "Hahatiin po natin sa dalawang hulog ang inyong kabuuang bayarin.",
+      "tag": "pricing_quotation",
+      "mode": "neutral"
+    },
+    {
+      "id": "prc134",
+      "text": "We highly recommend buying the set instead of getting individual pieces.",
+      "tag": "pricing_quotation",
+      "mode": "neutral"
+    },
+    {
+      "id": "prc135",
+      "text": "Wala na po tayong magagawa sa presyo kasi system generated na po iyan.",
+      "tag": "pricing_quotation",
+      "mode": "neutral"
+    },
+    {
+      "id": "prc136",
+      "text": "Bawat isang metro po ng tela ay nagkakahalaga ng ninety pesos.",
+      "tag": "pricing_quotation",
+      "mode": "neutral"
+    },
+    {
+      "id": "prc137",
+      "text": "For a more accurate estimate, I need to know the specific model first.",
+      "tag": "pricing_quotation",
+      "mode": "neutral"
+    },
+    {
+      "id": "prc138",
+      "text": "Titignan ko lang kung tama ba ang nai-punch ko na halaga sa inyo.",
+      "tag": "pricing_quotation",
+      "mode": "neutral"
+    },
+    {
+      "id": "prc139",
+      "text": "Mula po ngayon, nagtaas na po ng sampung piso ang presyo ng supplier.",
+      "tag": "pricing_quotation",
+      "mode": "neutral"
+    },
+    {
+      "id": "prc140",
+      "text": "We are currently updating our price list to reflect the new seasonal rates.",
+      "tag": "pricing_quotation",
+      "mode": "neutral"
+    },
+    {
+      "id": "prc141",
+      "text": "Isasama ko na po sa invoice yung hiningi ninyong libreng paper bag.",
+      "tag": "pricing_quotation",
+      "mode": "neutral"
+    },
+    {
+      "id": "prc142",
+      "text": "Naka-indicate po rito na nabayaran niyo na yung downpayment na one thousand.",
+      "tag": "pricing_quotation",
+      "mode": "neutral"
+    },
+    {
+      "id": "prc143",
+      "text": "The remaining balance must be cleared before we release the final product.",
+      "tag": "pricing_quotation",
+      "mode": "neutral"
+    },
+    {
+      "id": "prc144",
+      "text": "Ang computation po nito ay base sa dami ng kinuha ninyong produkto kanina.",
+      "tag": "pricing_quotation",
+      "mode": "neutral"
+    },
+    {
+      "id": "prc145",
+      "text": "Kapag inalis ko po ito, magiging three thousand na lang ang babayaran niyo.",
+      "tag": "pricing_quotation",
+      "mode": "neutral"
+    },
+    {
+      "id": "prc146",
+      "text": "We have a standard pricing matrix that applies to all our provincial distributors.",
+      "tag": "pricing_quotation",
+      "mode": "neutral"
+    },
+    {
+      "id": "prc147",
+      "text": "Ilalagay ko po bilang discount yung naipon ninyong points sa inyong loyalty card.",
+      "tag": "pricing_quotation",
+      "mode": "neutral"
+    },
+    {
+      "id": "prc148",
+      "text": "Babawasan ko na lang po ng bente pesos dahil medyo matagal po kayong naghintay.",
+      "tag": "pricing_quotation",
+      "mode": "neutral"
+    },
+    {
+      "id": "prc149",
+      "text": "Please note that prices are subject to change without prior notice next month.",
+      "tag": "pricing_quotation",
+      "mode": "neutral"
+    },
+    {
+      "id": "prc150",
+      "text": "Pumatak po ng four thousand, kasama na po yung delivery at taxes.",
+      "tag": "pricing_quotation",
+      "mode": "neutral"
+    },
+    {
+      "id": "dlv001",
+      "text": "Pasensya na po, medyo na-delay ang rider natin dahil sa malakas na ulan.",
+      "tag": "delivery_logistics",
+      "mode": "apologetic"
+    },
+    {
+      "id": "dlv002",
+      "text": "I sincerely apologize, but provincial shipments take a bit longer this week.",
+      "tag": "delivery_logistics",
+      "mode": "apologetic"
+    },
+    {
+      "id": "dlv003",
+      "text": "Sorry po talaga, hindi umabot sa cut off ang order niyo kahapon.",
+      "tag": "delivery_logistics",
+      "mode": "apologetic"
+    },
+    {
+      "id": "dlv004",
+      "text": "Paumanhin po kung hindi agad na-update ang tracking system ng ating courier.",
+      "tag": "delivery_logistics",
+      "mode": "apologetic"
+    },
+    {
+      "id": "dlv005",
+      "text": "We are very sorry for the unexpected delay in our delivery schedule today.",
+      "tag": "delivery_logistics",
+      "mode": "apologetic"
+    },
+    {
+      "id": "dlv006",
+      "text": "Naku, pasensya na po at nagka-aberya sa sorting center kaninang madaling araw.",
+      "tag": "delivery_logistics",
+      "mode": "apologetic"
+    },
+    {
+      "id": "dlv007",
+      "text": "Sorry po, hindi kasi nahanap ng rider yung mismong address ninyo kanina.",
+      "tag": "delivery_logistics",
+      "mode": "apologetic"
+    },
+    {
+      "id": "dlv008",
+      "text": "I apologize for the inconvenience, your package was routed to the wrong hub.",
+      "tag": "delivery_logistics",
+      "mode": "apologetic"
+    },
+    {
+      "id": "dlv009",
+      "text": "Patawad po dahil medyo natagalan ang pagbalot namin sa inyong mga binili.",
+      "tag": "delivery_logistics",
+      "mode": "apologetic"
+    },
+    {
+      "id": "dlv010",
+      "text": "Sorry to say, but we cannot deliver to that specific area right now.",
+      "tag": "delivery_logistics",
+      "mode": "apologetic"
+    },
+    {
+      "id": "dlv011",
+      "text": "Pasensya na po, nasira daw po ang sasakyan ng aming delivery team.",
+      "tag": "delivery_logistics",
+      "mode": "apologetic"
+    },
+    {
+      "id": "dlv012",
+      "text": "We apologize that your order did not arrive on the promised date.",
+      "tag": "delivery_logistics",
+      "mode": "apologetic"
+    },
+    {
+      "id": "dlv013",
+      "text": "Sorry po talaga, out of coverage area po ang location na binigay ninyo.",
+      "tag": "delivery_logistics",
+      "mode": "apologetic"
+    },
+    {
+      "id": "dlv014",
+      "text": "Paumanhin po, ngunit kailangan po nating i-reschedule ang delivery para bukas ng hapon.",
+      "tag": "delivery_logistics",
+      "mode": "apologetic"
+    },
+    {
+      "id": "dlv015",
+      "text": "I am extremely sorry, but the courier returned the parcel to our warehouse.",
+      "tag": "delivery_logistics",
+      "mode": "apologetic"
+    },
+    {
+      "id": "dlv016",
+      "text": "Wag po kayong mag-alala, tatawag muna ang rider bago siya pumunta diyan.",
+      "tag": "delivery_logistics",
+      "mode": "reassuring"
+    },
+    {
+      "id": "dlv017",
+      "text": "Rest assured that your package is safely secured inside our bubble wrap.",
+      "tag": "delivery_logistics",
+      "mode": "reassuring"
+    },
+    {
+      "id": "dlv018",
+      "text": "Makakaasa po kayong ipapadala namin agad ang replacement parcel ninyo bukas.",
+      "tag": "delivery_logistics",
+      "mode": "reassuring"
+    },
+    {
+      "id": "dlv019",
+      "text": "I will personally track this shipment until it reaches your front door.",
+      "tag": "delivery_logistics",
+      "mode": "reassuring"
+    },
+    {
+      "id": "dlv020",
+      "text": "Huwag pong mabahala, sigurado pong darating ang order ninyo bago mag-weekend.",
+      "tag": "delivery_logistics",
+      "mode": "reassuring"
+    },
+    {
+      "id": "dlv021",
+      "text": "We guarantee that your items will arrive in perfect condition without any damage.",
+      "tag": "delivery_logistics",
+      "mode": "reassuring"
+    },
+    {
+      "id": "dlv022",
+      "text": "Safe po ang inyong package, binantayan ko po mismo ang pag-pack nito.",
+      "tag": "delivery_logistics",
+      "mode": "reassuring"
+    },
+    {
+      "id": "dlv023",
+      "text": "I-a-update ko po kayo palagi kung nasaan na ang inyong order.",
+      "tag": "delivery_logistics",
+      "mode": "reassuring"
+    },
+    {
+      "id": "dlv024",
+      "text": "Please do not worry, I already expedited the shipping for this order.",
+      "tag": "delivery_logistics",
+      "mode": "reassuring"
+    },
+    {
+      "id": "dlv025",
+      "text": "Sigurado pong tatawag ang logistics team kapag malapit na sila sa bahay ninyo.",
+      "tag": "delivery_logistics",
+      "mode": "reassuring"
+    },
+    {
+      "id": "dlv026",
+      "text": "Sagot na po namin ang shipping fee kung sakaling magka-problema ulit sa courier.",
+      "tag": "delivery_logistics",
+      "mode": "reassuring"
+    },
+    {
+      "id": "dlv027",
+      "text": "The dispatch team is doing everything they can to deliver it today.",
+      "tag": "delivery_logistics",
+      "mode": "reassuring"
+    },
+    {
+      "id": "dlv028",
+      "text": "Wag po kayong mag-alala, babalik ang rider bukas kung wala kayo ngayon.",
+      "tag": "delivery_logistics",
+      "mode": "reassuring"
+    },
+    {
+      "id": "dlv029",
+      "text": "Nandito lang po kami para asikasuhin ang inyong delivery kung may aberya.",
+      "tag": "delivery_logistics",
+      "mode": "reassuring"
+    },
+    {
+      "id": "dlv030",
+      "text": "I promise to closely monitor the tracking number for you this entire week.",
+      "tag": "delivery_logistics",
+      "mode": "reassuring"
+    },
+    {
+      "id": "dlv031",
+      "text": "Good news po, na-pick up na ng courier ang inyong package kanina!",
+      "tag": "delivery_logistics",
+      "mode": "bright"
+    },
+    {
+      "id": "dlv032",
+      "text": "Your item is already out for delivery and will arrive very soon!",
+      "tag": "delivery_logistics",
+      "mode": "bright"
+    },
+    {
+      "id": "dlv033",
+      "text": "Yehey, pasok po ang order ninyo para sa aming free shipping promo!",
+      "tag": "delivery_logistics",
+      "mode": "bright"
+    },
+    {
+      "id": "dlv034",
+      "text": "Bukas na bukas din po ay matatanggap niyo na ang inyong parcel!",
+      "tag": "delivery_logistics",
+      "mode": "bright"
+    },
+    {
+      "id": "dlv035",
+      "text": "The driver will arrive at your address in less than thirty minutes!",
+      "tag": "delivery_logistics",
+      "mode": "bright"
+    },
+    {
+      "id": "dlv036",
+      "text": "Sakto po ang dating ninyo, ipapadala na namin ito mamayang hapon mismo!",
+      "tag": "delivery_logistics",
+      "mode": "bright"
+    },
+    {
+      "id": "dlv037",
+      "text": "We upgraded your delivery to express shipping for absolutely no extra cost!",
+      "tag": "delivery_logistics",
+      "mode": "bright"
+    },
+    {
+      "id": "dlv038",
+      "text": "Ang galing, naka-abot pa po tayo sa cut off time ng courier ngayon!",
+      "tag": "delivery_logistics",
+      "mode": "bright"
+    },
+    {
+      "id": "dlv039",
+      "text": "Yes po, pwede niyo nang kunin ang item sa aming pick up point.",
+      "tag": "delivery_logistics",
+      "mode": "bright"
+    },
+    {
+      "id": "dlv040",
+      "text": "Our delivery partner successfully dropped off the package at your front gate!",
+      "tag": "delivery_logistics",
+      "mode": "bright"
+    },
+    {
+      "id": "dlv041",
+      "text": "Sulit na sulit po kasi libre na ang delivery papunta sa inyo!",
+      "tag": "delivery_logistics",
+      "mode": "bright"
+    },
+    {
+      "id": "dlv042",
+      "text": "Wow, ang bilis pong dumating ng parcel ninyo, nandiyan na raw agad!",
+      "tag": "delivery_logistics",
+      "mode": "bright"
+    },
+    {
+      "id": "dlv043",
+      "text": "You will receive a text message once the rider is nearby today!",
+      "tag": "delivery_logistics",
+      "mode": "bright"
+    },
+    {
+      "id": "dlv044",
+      "text": "Pwede po nating ipadala agad ito via lalamove kung nagmamadali po kayo.",
+      "tag": "delivery_logistics",
+      "mode": "bright"
+    },
+    {
+      "id": "dlv045",
+      "text": "Handa na po ang inyong package at naghihintay na lang sa rider!",
+      "tag": "delivery_logistics",
+      "mode": "bright"
+    },
+    {
+      "id": "dlv046",
+      "text": "The shipping fee is completely waived since you are a loyal customer!",
+      "tag": "delivery_logistics",
+      "mode": "bright"
+    },
+    {
+      "id": "dlv047",
+      "text": "Naku, malapit na malapit na po yung rider sa mismong bahay ninyo!",
+      "tag": "delivery_logistics",
+      "mode": "bright"
+    },
+    {
+      "id": "dlv048",
+      "text": "Madali lang po hanapin ang address ninyo kaya mabilis po itong makakarating.",
+      "tag": "delivery_logistics",
+      "mode": "bright"
+    },
+    {
+      "id": "dlv049",
+      "text": "The local courier just confirmed that your order is on the way!",
+      "tag": "delivery_logistics",
+      "mode": "bright"
+    },
+    {
+      "id": "dlv050",
+      "text": "Aasikasuhin ko po agad para maipadala natin ang order ninyo mamayang gabi.",
+      "tag": "delivery_logistics",
+      "mode": "bright"
+    },
+    {
+      "id": "dlv051",
+      "text": "Saktong-sakto po, may parating na rider dito kaya isasabay na namin ito!",
+      "tag": "delivery_logistics",
+      "mode": "bright"
+    },
+    {
+      "id": "dlv052",
+      "text": "We are happy to inform you that your box is ready for dispatch!",
+      "tag": "delivery_logistics",
+      "mode": "bright"
+    },
+    {
+      "id": "dlv053",
+      "text": "Oo naman po, pwede kayong mag-request ng same day delivery para mabilis!",
+      "tag": "delivery_logistics",
+      "mode": "bright"
+    },
+    {
+      "id": "dlv054",
+      "text": "Kumpleto na po ang details kaya ipapasa ko na agad sa logistics team.",
+      "tag": "delivery_logistics",
+      "mode": "bright"
+    },
+    {
+      "id": "dlv055",
+      "text": "Your special package has officially left our warehouse and is traveling to you!",
+      "tag": "delivery_logistics",
+      "mode": "bright"
+    },
+    {
+      "id": "dlv056",
+      "text": "Pwede ko po bang makuha ang kumpletong address para sa ating delivery?",
+      "tag": "delivery_logistics",
+      "mode": "neutral"
+    },
+    {
+      "id": "dlv057",
+      "text": "Kindly provide your exact house number and street name for the rider.",
+      "tag": "delivery_logistics",
+      "mode": "neutral"
+    },
+    {
+      "id": "dlv058",
+      "text": "Magkano po ang karaniwang shipping fee papunta sa inyong probinsya?",
+      "tag": "delivery_logistics",
+      "mode": "neutral"
+    },
+    {
+      "id": "dlv059",
+      "text": "Kadalasan po ay inaabot ng tatlong araw bago makarating sa inyo.",
+      "tag": "delivery_logistics",
+      "mode": "neutral"
+    },
+    {
+      "id": "dlv060",
+      "text": "We will send you the tracking link through text message later today.",
+      "tag": "delivery_logistics",
+      "mode": "neutral"
+    },
+    {
+      "id": "dlv061",
+      "text": "May landmark po ba tayo malapit sa bahay ninyo para madaling mahanap?",
+      "tag": "delivery_logistics",
+      "mode": "neutral"
+    },
+    {
+      "id": "dlv062",
+      "text": "Provincial deliveries usually take about five to seven business days to arrive.",
+      "tag": "delivery_logistics",
+      "mode": "neutral"
+    },
+    {
+      "id": "dlv063",
+      "text": "Ang courier po natin para sa order na ito ay j and t.",
+      "tag": "delivery_logistics",
+      "mode": "neutral"
+    },
+    {
+      "id": "dlv064",
+      "text": "I-track niyo na lang po sa website nila gamit ang reference number.",
+      "tag": "delivery_logistics",
+      "mode": "neutral"
+    },
+    {
+      "id": "dlv065",
+      "text": "The estimated delivery date is on thursday next week in the afternoon.",
+      "tag": "delivery_logistics",
+      "mode": "neutral"
+    },
+    {
+      "id": "dlv066",
+      "text": "Pwede po ninyong piliin kung kailan ninyo gustong matanggap ang inyong package.",
+      "tag": "delivery_logistics",
+      "mode": "neutral"
+    },
+    {
+      "id": "dlv067",
+      "text": "Kapag sa metro manila lang po, kinabukasan ay nandiyan na agad ito.",
+      "tag": "delivery_logistics",
+      "mode": "neutral"
+    },
+    {
+      "id": "dlv068",
+      "text": "The delivery fee varies depending on the total weight of your items.",
+      "tag": "delivery_logistics",
+      "mode": "neutral"
+    },
+    {
+      "id": "dlv069",
+      "text": "Gusto niyo po ba ng door to door delivery o branch pick up?",
+      "tag": "delivery_logistics",
+      "mode": "neutral"
+    },
+    {
+      "id": "dlv070",
+      "text": "Pakisabi na lang po sa rider kung saan ninyo gustong iwan ang box.",
+      "tag": "delivery_logistics",
+      "mode": "neutral"
+    },
+    {
+      "id": "dlv071",
+      "text": "We partnered with lbc to ensure faster shipping to the visayas region.",
+      "tag": "delivery_logistics",
+      "mode": "neutral"
+    },
+    {
+      "id": "dlv072",
+      "text": "Kayo po ang magbabayad ng shipping fee direkta sa mismong lalamove rider.",
+      "tag": "delivery_logistics",
+      "mode": "neutral"
+    },
+    {
+      "id": "dlv073",
+      "text": "Araw-araw po kaming nagpapadala ng packages tuwing four PM.",
+      "tag": "delivery_logistics",
+      "mode": "neutral"
+    },
+    {
+      "id": "dlv074",
+      "text": "Please make sure someone is at home to receive the package tomorrow.",
+      "tag": "delivery_logistics",
+      "mode": "neutral"
+    },
+    {
+      "id": "dlv075",
+      "text": "Kung gusto niyo po, sa opisina ninyo na lang namin ito ipapadala.",
+      "tag": "delivery_logistics",
+      "mode": "neutral"
+    },
+    {
+      "id": "dlv076",
+      "text": "Iche-check ko po sa system kung nasaan na ang inyong order ngayon.",
+      "tag": "delivery_logistics",
+      "mode": "neutral"
+    },
+    {
+      "id": "dlv077",
+      "text": "It looks like your parcel is still stuck at the central sorting hub.",
+      "tag": "delivery_logistics",
+      "mode": "neutral"
+    },
+    {
+      "id": "dlv078",
+      "text": "Iiwan na lang daw po ng rider sa guard house ang inyong parcel.",
+      "tag": "delivery_logistics",
+      "mode": "neutral"
+    },
+    {
+      "id": "dlv079",
+      "text": "Dalawang beses po magtatangkang mag-deliver ang courier bago ibalik sa amin.",
+      "tag": "delivery_logistics",
+      "mode": "neutral"
+    },
+    {
+      "id": "dlv080",
+      "text": "We highly recommend standard shipping if you are not in a rush.",
+      "tag": "delivery_logistics",
+      "mode": "neutral"
+    },
+    {
+      "id": "dlv081",
+      "text": "May dagdag pong singil ang courier kapag out of town ang inyong address.",
+      "tag": "delivery_logistics",
+      "mode": "neutral"
+    },
+    {
+      "id": "dlv082",
+      "text": "Pwede rin po kayong gumamit ng grab express para mas mabilis makarating.",
+      "tag": "delivery_logistics",
+      "mode": "neutral"
+    },
+    {
+      "id": "dlv083",
+      "text": "Ibabalot po namin ito nang maayos para hindi masira sa mahabang byahe.",
+      "tag": "delivery_logistics",
+      "mode": "neutral"
+    },
+    {
+      "id": "dlv084",
+      "text": "The courier will contact you directly using the phone number you provided.",
+      "tag": "delivery_logistics",
+      "mode": "neutral"
+    },
+    {
+      "id": "dlv085",
+      "text": "Nakadepende po ang oras ng dating sa ruta ng mismong delivery rider.",
+      "tag": "delivery_logistics",
+      "mode": "neutral"
+    },
+    {
+      "id": "dlv086",
+      "text": "Sa lingo po ay walang byahe ang aming logistics partner.",
+      "tag": "delivery_logistics",
+      "mode": "neutral"
+    },
+    {
+      "id": "dlv087",
+      "text": "All weekend orders will be processed and shipped out on monday morning.",
+      "tag": "delivery_logistics",
+      "mode": "neutral"
+    },
+    {
+      "id": "dlv088",
+      "text": "Paki-check po ang inyong email para sa kumpirmasyon ng inyong tracking number.",
+      "tag": "delivery_logistics",
+      "mode": "neutral"
+    },
+    {
+      "id": "dlv089",
+      "text": "Kapag bumagyo po, asahan po natin na may kaunting delay sa byahe.",
+      "tag": "delivery_logistics",
+      "mode": "neutral"
+    },
+    {
+      "id": "dlv090",
+      "text": "The local branch will handle the final leg of the delivery process.",
+      "tag": "delivery_logistics",
+      "mode": "neutral"
+    },
+    {
+      "id": "dlv091",
+      "text": "Maaari po ninyong bayaran ang shipping fee pagdating ng rider diyan.",
+      "tag": "delivery_logistics",
+      "mode": "neutral"
+    },
+    {
+      "id": "dlv092",
+      "text": "I-update po namin ang status ng order sa aming app mamayang gabi.",
+      "tag": "delivery_logistics",
+      "mode": "neutral"
+    },
+    {
+      "id": "dlv093",
+      "text": "Ilang kilometro po ang layo ng bahay ninyo mula sa main highway?",
+      "tag": "delivery_logistics",
+      "mode": "neutral"
+    },
+    {
+      "id": "dlv094",
+      "text": "We process all provincial shipments differently from the metro manila orders today.",
+      "tag": "delivery_logistics",
+      "mode": "neutral"
+    },
+    {
+      "id": "dlv095",
+      "text": "Ipapaubaya po natin sa courier ang pag-schedule ng mismong araw ng delivery.",
+      "tag": "delivery_logistics",
+      "mode": "neutral"
+    },
+    {
+      "id": "dlv096",
+      "text": "Ang bayad po sa shipping ay depende sa laki ng mismong kahon.",
+      "tag": "delivery_logistics",
+      "mode": "neutral"
+    },
+    {
+      "id": "dlv097",
+      "text": "Do you want us to leave the package with your next door neighbor?",
+      "tag": "delivery_logistics",
+      "mode": "neutral"
+    },
+    {
+      "id": "dlv098",
+      "text": "Papunta na po ang package sa pinakamalapit na hub sa inyong lugar.",
+      "tag": "delivery_logistics",
+      "mode": "neutral"
+    },
+    {
+      "id": "dlv099",
+      "text": "Kailangan po ng pirma ninyo bago ibigay ng rider ang inyong item.",
+      "tag": "delivery_logistics",
+      "mode": "neutral"
+    },
+    {
+      "id": "dlv100",
+      "text": "The dispatch center is located right beside our main warehouse building.",
+      "tag": "delivery_logistics",
+      "mode": "neutral"
+    },
+    {
+      "id": "dlv101",
+      "text": "Kung wala po kayo sa bahay, pwede pong mag-iwan ng authorization letter.",
+      "tag": "delivery_logistics",
+      "mode": "neutral"
+    },
+    {
+      "id": "dlv102",
+      "text": "Ipapadala ko po sa messenger ang screenshot ng resibo mula sa courier.",
+      "tag": "delivery_logistics",
+      "mode": "neutral"
+    },
+    {
+      "id": "dlv103",
+      "text": "Pwede po natin ipa-pick up sa branch kung mas pabor po sa inyo.",
+      "tag": "delivery_logistics",
+      "mode": "neutral"
+    },
+    {
+      "id": "dlv104",
+      "text": "You can choose your preferred delivery time slot during the checkout process.",
+      "tag": "delivery_logistics",
+      "mode": "neutral"
+    },
+    {
+      "id": "dlv105",
+      "text": "Ang huling update po sa system ay nasa transit pa rin ang parcel.",
+      "tag": "delivery_logistics",
+      "mode": "neutral"
+    },
+    {
+      "id": "dlv106",
+      "text": "Saang barangay po eksakto ang inyong lokasyon para ma-pin natin nang maayos?",
+      "tag": "delivery_logistics",
+      "mode": "neutral"
+    },
+    {
+      "id": "dlv107",
+      "text": "Mula po dito, ibabyahe po iyan ng courier papunta sa norte.",
+      "tag": "delivery_logistics",
+      "mode": "neutral"
+    },
+    {
+      "id": "dlv108",
+      "text": "The default shipping method will take around three to four working days.",
+      "tag": "delivery_logistics",
+      "mode": "neutral"
+    },
+    {
+      "id": "dlv109",
+      "text": "Paki-double check po ang zip code para hindi magkamali ng ruta ang rider.",
+      "tag": "delivery_logistics",
+      "mode": "neutral"
+    },
+    {
+      "id": "dlv110",
+      "text": "Ipapalagay ko po sa kahon na fragile para mas mag-ingat ang magdedeliver.",
+      "tag": "delivery_logistics",
+      "mode": "neutral"
+    },
+    {
+      "id": "dlv111",
+      "text": "Aabisuhan po kayo ng rider kapag malapit na siya sa inyong kanto.",
+      "tag": "delivery_logistics",
+      "mode": "neutral"
+    },
+    {
+      "id": "dlv112",
+      "text": "The shipping timeline begins the day after your payment is fully verified.",
+      "tag": "delivery_logistics",
+      "mode": "neutral"
+    },
+    {
+      "id": "dlv113",
+      "text": "Sisingilin po kayo ng dagdag kung ipapabago ninyo ang address on the day.",
+      "tag": "delivery_logistics",
+      "mode": "neutral"
+    },
+    {
+      "id": "dlv114",
+      "text": "Ise-separate po ang dalawang items dahil hindi sila kasya sa iisang pouch.",
+      "tag": "delivery_logistics",
+      "mode": "neutral"
+    },
+    {
+      "id": "dlv115",
+      "text": "Ang cut off po natin para ma-ship ngayon ay three PM.",
+      "tag": "delivery_logistics",
+      "mode": "neutral"
+    },
+    {
+      "id": "dlv116",
+      "text": "Please verify if the delivery address entered on your account is correct.",
+      "tag": "delivery_logistics",
+      "mode": "neutral"
+    },
+    {
+      "id": "dlv117",
+      "text": "Hintayin niyo na lang po ang text ni shopee tungkol sa delivery ninyo.",
+      "tag": "delivery_logistics",
+      "mode": "neutral"
+    },
+    {
+      "id": "dlv118",
+      "text": "Isang araw lang po ang inaabot kapag sa loob lang ng siyudad.",
+      "tag": "delivery_logistics",
+      "mode": "neutral"
+    },
+    {
+      "id": "dlv119",
+      "text": "Ang byahe po ng barko ay tuwing biyernes lamang para sa probinsya ninyo.",
+      "tag": "delivery_logistics",
+      "mode": "neutral"
+    },
+    {
+      "id": "dlv120",
+      "text": "We cannot process deliveries to post office boxes at this current time.",
+      "tag": "delivery_logistics",
+      "mode": "neutral"
+    },
+    {
+      "id": "dlv121",
+      "text": "Mag-iwan na lang po kayo ng pambayad sa inyong kasama sa bahay bukas.",
+      "tag": "delivery_logistics",
+      "mode": "neutral"
+    },
+    {
+      "id": "dlv122",
+      "text": "Kailangan po natin ng malinaw na landmark para hindi maligaw ang driver.",
+      "tag": "delivery_logistics",
+      "mode": "neutral"
+    },
+    {
+      "id": "dlv123",
+      "text": "Hihingi po ako ng update sa aming logistics team mamayang hapon.",
+      "tag": "delivery_logistics",
+      "mode": "neutral"
+    },
+    {
+      "id": "dlv124",
+      "text": "International shipping takes up to two weeks depending on the customs clearance.",
+      "tag": "delivery_logistics",
+      "mode": "neutral"
+    },
+    {
+      "id": "dlv125",
+      "text": "Iche-check ko po kung nakasakay na ang inyong package sa delivery van.",
+      "tag": "delivery_logistics",
+      "mode": "neutral"
+    },
+    {
+      "id": "dlv126",
+      "text": "Wala po tayong magagawa sa delay kung ang problema ay sa courier mismong.",
+      "tag": "delivery_logistics",
+      "mode": "neutral"
+    },
+    {
+      "id": "dlv127",
+      "text": "Bukas po ang aming opisina para sa mga gustong mag-pick up ng order.",
+      "tag": "delivery_logistics",
+      "mode": "neutral"
+    },
+    {
+      "id": "dlv128",
+      "text": "Your shipping address must exactly match your billing address to prevent fraud.",
+      "tag": "delivery_logistics",
+      "mode": "neutral"
+    },
+    {
+      "id": "dlv129",
+      "text": "Ipapadala po natin sa lbc para mas sigurado kayong makakarating nang ligtas.",
+      "tag": "delivery_logistics",
+      "mode": "neutral"
+    },
+    {
+      "id": "dlv130",
+      "text": "Bago po natin ipa-book, paki-confirm muna ang eksaktong sukat ng inyong kahon.",
+      "tag": "delivery_logistics",
+      "mode": "neutral"
+    },
+    {
+      "id": "dlv131",
+      "text": "Pwede pong ma-track ang order gamit ang aming official mobile application.",
+      "tag": "delivery_logistics",
+      "mode": "neutral"
+    },
+    {
+      "id": "dlv132",
+      "text": "You might experience a slight delay due to the upcoming national holiday.",
+      "tag": "delivery_logistics",
+      "mode": "neutral"
+    },
+    {
+      "id": "dlv133",
+      "text": "Babalik po ang rider kapag hindi niya kayo na-contact kaninang umaga.",
+      "tag": "delivery_logistics",
+      "mode": "neutral"
+    },
+    {
+      "id": "dlv134",
+      "text": "Hati po kayo sa shipping fee kung dalawa ang nag-order sa iisang bahay.",
+      "tag": "delivery_logistics",
+      "mode": "neutral"
+    },
+    {
+      "id": "dlv135",
+      "text": "Ang pinakamalapit po na branch sa inyo ay nasa kabilang kanto lang.",
+      "tag": "delivery_logistics",
+      "mode": "neutral"
+    },
+    {
+      "id": "dlv136",
+      "text": "Deliveries are usually scheduled between eight in the morning and five afternoon.",
+      "tag": "delivery_logistics",
+      "mode": "neutral"
+    },
+    {
+      "id": "dlv137",
+      "text": "Nakadepende po sa traffic ang eksaktong oras ng pagdating ng inyong gamit.",
+      "tag": "delivery_logistics",
+      "mode": "neutral"
+    },
+    {
+      "id": "dlv138",
+      "text": "Kasama po ba sa loob ng subdivision ang address na binigay ninyo?",
+      "tag": "delivery_logistics",
+      "mode": "neutral"
+    },
+    {
+      "id": "dlv139",
+      "text": "Magpapabigay na lang po ako ng instructions sa rider kung paano makapasok.",
+      "tag": "delivery_logistics",
+      "mode": "neutral"
+    },
+    {
+      "id": "dlv140",
+      "text": "A valid identification card is required when claiming your package from them.",
+      "tag": "delivery_logistics",
+      "mode": "neutral"
+    },
+    {
+      "id": "dlv141",
+      "text": "Isasama ko po ang mapa ng inyong bahay para hindi sila maligaw.",
+      "tag": "delivery_logistics",
+      "mode": "neutral"
+    },
+    {
+      "id": "dlv142",
+      "text": "Siguraduhin po ninyong may tao sa bahay para matanggap ang inyong order.",
+      "tag": "delivery_logistics",
+      "mode": "neutral"
+    },
+    {
+      "id": "dlv143",
+      "text": "Yung delivery partner po natin ang magti-text sa inyo ng eksaktong amount.",
+      "tag": "delivery_logistics",
+      "mode": "neutral"
+    },
+    {
+      "id": "dlv144",
+      "text": "Our shipping rates are strictly based on the standard courier pricing matrix.",
+      "tag": "delivery_logistics",
+      "mode": "neutral"
+    },
+    {
+      "id": "dlv145",
+      "text": "Papunta na po ang aming sariling driver para ihatid ang inyong binili.",
+      "tag": "delivery_logistics",
+      "mode": "neutral"
+    },
+    {
+      "id": "dlv146",
+      "text": "Ang bayad po para sa return shipping ay sagutin na ng customer.",
+      "tag": "delivery_logistics",
+      "mode": "neutral"
+    },
+    {
+      "id": "dlv147",
+      "text": "Dadaan po muna sa main hub ang inyong package bago pumunta diyan.",
+      "tag": "delivery_logistics",
+      "mode": "neutral"
+    },
+    {
+      "id": "dlv148",
+      "text": "Please allow twenty four hours for the tracking system to fully update.",
+      "tag": "delivery_logistics",
+      "mode": "neutral"
+    },
+    {
+      "id": "dlv149",
+      "text": "Kapag umulan po nang malakas, ititigil muna ng rider ang pag-deliver niya.",
+      "tag": "delivery_logistics",
+      "mode": "neutral"
+    },
+    {
+      "id": "dlv150",
+      "text": "Pwede po ninyong tawagan ang numero ng driver kapag nandiyan na siya.",
+      "tag": "delivery_logistics",
+      "mode": "neutral"
+    },
+    {
+      "id": "pay001",
+      "text": "Great news, pumasok na po ang inyong bayad sa aming system!",
+      "tag": "payment_methods",
+      "mode": "bright"
+    },
+    {
+      "id": "pay002",
+      "text": "Yes po, pwede kayong magbayad gamit ang inyong gcash o kaya maya.",
+      "tag": "payment_methods",
+      "mode": "bright"
+    },
+    {
+      "id": "pay003",
+      "text": "Thank you for sending the screenshot, I have confirmed your payment now.",
+      "tag": "payment_methods",
+      "mode": "bright"
+    },
+    {
+      "id": "pay004",
+      "text": "Nakatanggap po kami ng notification na bayad na ang inyong order!",
+      "tag": "payment_methods",
+      "mode": "bright"
+    },
+    {
+      "id": "pay005",
+      "text": "Perfect! We successfully processed your online transaction a few minutes ago.",
+      "tag": "payment_methods",
+      "mode": "bright"
+    },
+    {
+      "id": "pay006",
+      "text": "Sige po, isesend ko na ang aming qr code para madali niyo i-scan.",
+      "tag": "payment_methods",
+      "mode": "bright"
+    },
+    {
+      "id": "pay007",
+      "text": "Ayun, nakita ko na po ang inyong deposit sa aming bank account.",
+      "tag": "payment_methods",
+      "mode": "bright"
+    },
+    {
+      "id": "pay008",
+      "text": "Maraming salamat po sa mabilis na pagbabayad ninyo ng inyong balanse.",
+      "tag": "payment_methods",
+      "mode": "bright"
+    },
+    {
+      "id": "pay009",
+      "text": "Your cash on delivery request has been approved and ready to go!",
+      "tag": "payment_methods",
+      "mode": "bright"
+    },
+    {
+      "id": "pay010",
+      "text": "Mabuti naman po at umokey na yung transfer niyo sa wakas!",
+      "tag": "payment_methods",
+      "mode": "bright"
+    },
+    {
+      "id": "pay011",
+      "text": "Okay na po ang payment niyo, ipa-pack na namin ang inyong order.",
+      "tag": "payment_methods",
+      "mode": "bright"
+    },
+    {
+      "id": "pay012",
+      "text": "We are happy to confirm that your final balance is completely settled.",
+      "tag": "payment_methods",
+      "mode": "bright"
+    },
+    {
+      "id": "pay013",
+      "text": "Pwede rin po tayong cash on delivery kung iyon ang mas madali.",
+      "tag": "payment_methods",
+      "mode": "bright"
+    },
+    {
+      "id": "pay014",
+      "text": "Ang galing, pumasok agad yung payment niyo kahit weekend ngayon!",
+      "tag": "payment_methods",
+      "mode": "bright"
+    },
+    {
+      "id": "pay015",
+      "text": "Your refund has been fully processed and credited back to your wallet.",
+      "tag": "payment_methods",
+      "mode": "bright"
+    },
+    {
+      "id": "pay016",
+      "text": "Na-receive na po namin ang inyong resibo kaya tuloy na ang transaction.",
+      "tag": "payment_methods",
+      "mode": "bright"
+    },
+    {
+      "id": "pay017",
+      "text": "Magandang balita po, kumpleto na ang inyong hulog para sa buwang ito.",
+      "tag": "payment_methods",
+      "mode": "bright"
+    },
+    {
+      "id": "pay018",
+      "text": "You can definitely use your credit card for this specific purchase today!",
+      "tag": "payment_methods",
+      "mode": "bright"
+    },
+    {
+      "id": "pay019",
+      "text": "Yes, tatanggapin po namin ang buong bayad pagdating ng rider sa inyo.",
+      "tag": "payment_methods",
+      "mode": "bright"
+    },
+    {
+      "id": "pay020",
+      "text": "Cleared na po ang inyong account kaya wala na kayong aalalahanin.",
+      "tag": "payment_methods",
+      "mode": "bright"
+    },
+    {
+      "id": "pay021",
+      "text": "It is very easy to pay using our official online payment link!",
+      "tag": "payment_methods",
+      "mode": "bright"
+    },
+    {
+      "id": "pay022",
+      "text": "Sakto po ang inyong ibinayad kaya wala na pong sukli na kailangan.",
+      "tag": "payment_methods",
+      "mode": "bright"
+    },
+    {
+      "id": "pay023",
+      "text": "Ayan, successful na po ang inyong gcash transfer, salamat po nang marami!",
+      "tag": "payment_methods",
+      "mode": "bright"
+    },
+    {
+      "id": "pay024",
+      "text": "We gladly accept major debit cards if you prefer visiting our store.",
+      "tag": "payment_methods",
+      "mode": "bright"
+    },
+    {
+      "id": "pay025",
+      "text": "Bayad na po ang lahat, kaya maghihintay na lang kayo sa delivery!",
+      "tag": "payment_methods",
+      "mode": "bright"
+    },
+    {
+      "id": "pay026",
+      "text": "Pasensya na po, pero nag-fail kasi yung credit card transaction ninyo.",
+      "tag": "payment_methods",
+      "mode": "apologetic"
+    },
+    {
+      "id": "pay027",
+      "text": "I am very sorry, but the bank rejected your online transfer today.",
+      "tag": "payment_methods",
+      "mode": "apologetic"
+    },
+    {
+      "id": "pay028",
+      "text": "Patawad po, hindi po kasi namin natanggap ang inyong proof of payment.",
+      "tag": "payment_methods",
+      "mode": "apologetic"
+    },
+    {
+      "id": "pay029",
+      "text": "Sorry po talaga, hindi kami tumatanggap ng personal na tseke sa ngayon.",
+      "tag": "payment_methods",
+      "mode": "apologetic"
+    },
+    {
+      "id": "pay030",
+      "text": "We apologize for the delay in processing your refund this past week.",
+      "tag": "payment_methods",
+      "mode": "apologetic"
+    },
+    {
+      "id": "pay031",
+      "text": "Wag po kayong mag-alala, ibabalik namin ang inyong pera sa lalong madaling panahon.",
+      "tag": "payment_methods",
+      "mode": "reassuring"
+    },
+    {
+      "id": "pay032",
+      "text": "Please do not panic, your money is completely safe in our system.",
+      "tag": "payment_methods",
+      "mode": "reassuring"
+    },
+    {
+      "id": "pay033",
+      "text": "Hayaan niyo po at iche-check ko ulit sa finance department ang inyong bayad.",
+      "tag": "payment_methods",
+      "mode": "reassuring"
+    },
+    {
+      "id": "pay034",
+      "text": "Rest assured that we will double check the payment gateway for you.",
+      "tag": "payment_methods",
+      "mode": "reassuring"
+    },
+    {
+      "id": "pay035",
+      "text": "Babalik din po sa account ninyo ang nabawas na pera bukas.",
+      "tag": "payment_methods",
+      "mode": "reassuring"
+    },
+    {
+      "id": "pay036",
+      "text": "Ligtas po ang inyong bank details dahil secured ang aming online portal.",
+      "tag": "payment_methods",
+      "mode": "reassuring"
+    },
+    {
+      "id": "pay037",
+      "text": "We will make sure you receive the correct change upon delivery tomorrow.",
+      "tag": "payment_methods",
+      "mode": "reassuring"
+    },
+    {
+      "id": "pay038",
+      "text": "Aasikasuhin ko po agad ang inyong refund request para hindi kayo maghintay.",
+      "tag": "payment_methods",
+      "mode": "reassuring"
+    },
+    {
+      "id": "pay039",
+      "text": "Sigurado pong hindi kayo madodoble ng charge sa inyong credit card ngayon.",
+      "tag": "payment_methods",
+      "mode": "reassuring"
+    },
+    {
+      "id": "pay040",
+      "text": "I guarantee that your payment issue will be resolved by the end of today.",
+      "tag": "payment_methods",
+      "mode": "reassuring"
+    },
+    {
+      "id": "pay041",
+      "text": "Kailangan po muna nating magbayad ng downpayment bago umpisahan ang inyong project.",
+      "tag": "payment_methods",
+      "mode": "neutral"
+    },
+    {
+      "id": "pay042",
+      "text": "Please send a copy of the deposit slip to our email address.",
+      "tag": "payment_methods",
+      "mode": "neutral"
+    },
+    {
+      "id": "pay043",
+      "text": "Ang natitirang balanse po ay babayaran ninyo pagdating ng inyong mga gamit.",
+      "tag": "payment_methods",
+      "mode": "neutral"
+    },
+    {
+      "id": "pay044",
+      "text": "Paki-send na lang po yung screenshot ng inyong gcash transaction sa messenger.",
+      "tag": "payment_methods",
+      "mode": "neutral"
+    },
+    {
+      "id": "pay045",
+      "text": "We require a fifty percent initial deposit to confirm your pre order.",
+      "tag": "payment_methods",
+      "mode": "neutral"
+    },
+    {
+      "id": "pay046",
+      "text": "Maaari po ninyong ipadala ang bayad sa aming opisyal na bank account.",
+      "tag": "payment_methods",
+      "mode": "neutral"
+    },
+    {
+      "id": "pay047",
+      "text": "Tumatanggap po kami ng cash on delivery para sa mga order na ganito.",
+      "tag": "payment_methods",
+      "mode": "neutral"
+    },
+    {
+      "id": "pay048",
+      "text": "Your monthly billing statement will be sent automatically to your registered email.",
+      "tag": "payment_methods",
+      "mode": "neutral"
+    },
+    {
+      "id": "pay049",
+      "text": "Paki-check po kung tama ang account name bago ninyo i-send ang pera.",
+      "tag": "payment_methods",
+      "mode": "neutral"
+    },
+    {
+      "id": "pay050",
+      "text": "Ang huling araw po ng pagbabayad ay sa susunod na byernes pa.",
+      "tag": "payment_methods",
+      "mode": "neutral"
+    },
+    {
+      "id": "pay051",
+      "text": "Our system automatically updates your account balance after every successful online payment.",
+      "tag": "payment_methods",
+      "mode": "neutral"
+    },
+    {
+      "id": "pay052",
+      "text": "Kalahati po muna ang ibabayad niyo tapos yung kalahati ay sa katapusan.",
+      "tag": "payment_methods",
+      "mode": "neutral"
+    },
+    {
+      "id": "pay053",
+      "text": "Pwede po kayong magbayad sa kahit anong branch ng bangko na malapit.",
+      "tag": "payment_methods",
+      "mode": "neutral"
+    },
+    {
+      "id": "pay054",
+      "text": "You can pay the rider directly with cash once your package arrives.",
+      "tag": "payment_methods",
+      "mode": "neutral"
+    },
+    {
+      "id": "pay055",
+      "text": "Hihintayin po namin ang inyong resibo bago namin ipadala ang inyong parcel.",
+      "tag": "payment_methods",
+      "mode": "neutral"
+    },
+    {
+      "id": "pay056",
+      "text": "I-scan niyo lang po ang qr code na ipapadala ko sa inyo ngayon.",
+      "tag": "payment_methods",
+      "mode": "neutral"
+    },
+    {
+      "id": "pay057",
+      "text": "Bale two thousand five hundred po ang kailangan ninyong i-transfer sa amin.",
+      "tag": "payment_methods",
+      "mode": "neutral"
+    },
+    {
+      "id": "pay058",
+      "text": "The outstanding balance must be fully paid before we release the documents.",
+      "tag": "payment_methods",
+      "mode": "neutral"
+    },
+    {
+      "id": "pay059",
+      "text": "Pwede niyo pong i-save ang aming number para sa mga susunod na bayad.",
+      "tag": "payment_methods",
+      "mode": "neutral"
+    },
+    {
+      "id": "pay060",
+      "text": "Tanging pera lamang po ang tinatanggap ng aming mga delivery rider ngayon.",
+      "tag": "payment_methods",
+      "mode": "neutral"
+    },
+    {
+      "id": "pay061",
+      "text": "We strictly follow a no downpayment no processing policy for custom orders.",
+      "tag": "payment_methods",
+      "mode": "neutral"
+    },
+    {
+      "id": "pay062",
+      "text": "Kapag maya po ang gamit, real time po pumapasok ang bayad ninyo.",
+      "tag": "payment_methods",
+      "mode": "neutral"
+    },
+    {
+      "id": "pay063",
+      "text": "Ipapadala ko po sa text ang bank details para hindi kayo malito.",
+      "tag": "payment_methods",
+      "mode": "neutral"
+    },
+    {
+      "id": "pay064",
+      "text": "Please indicate your order number in the remarks section of the transfer.",
+      "tag": "payment_methods",
+      "mode": "neutral"
+    },
+    {
+      "id": "pay065",
+      "text": "Kung gusto niyo po ay i-bank transfer na lang ang buong halaga.",
+      "tag": "payment_methods",
+      "mode": "neutral"
+    },
+    {
+      "id": "pay066",
+      "text": "Nakadepende po sa bangko ninyo kung may karagdagang charge ang pag-send.",
+      "tag": "payment_methods",
+      "mode": "neutral"
+    },
+    {
+      "id": "pay067",
+      "text": "You may use our provided payment link to settle your remaining balance.",
+      "tag": "payment_methods",
+      "mode": "neutral"
+    },
+    {
+      "id": "pay068",
+      "text": "Ibawas niyo na lang po yung naunang deposit sa inyong final bill.",
+      "tag": "payment_methods",
+      "mode": "neutral"
+    },
+    {
+      "id": "pay069",
+      "text": "Ang refund po ay umaabot ng tatlo hanggang limang araw bago makuha.",
+      "tag": "payment_methods",
+      "mode": "neutral"
+    },
+    {
+      "id": "pay070",
+      "text": "A service fee of twenty pesos applies for over the counter transactions.",
+      "tag": "payment_methods",
+      "mode": "neutral"
+    },
+    {
+      "id": "pay071",
+      "text": "Paki-sigurado po na tama ang reference number na ilalagay ninyo sa form.",
+      "tag": "payment_methods",
+      "mode": "neutral"
+    },
+    {
+      "id": "pay072",
+      "text": "Wala pa po kasi sa system namin ang binayad ninyo kahapon ng hapon.",
+      "tag": "payment_methods",
+      "mode": "neutral"
+    },
+    {
+      "id": "pay073",
+      "text": "All partial payments are completely non refundable once the item is shipped.",
+      "tag": "payment_methods",
+      "mode": "neutral"
+    },
+    {
+      "id": "pay074",
+      "text": "Kung hindi po gumana ang gcash, subukan po nating gamitin ang maya.",
+      "tag": "payment_methods",
+      "mode": "neutral"
+    },
+    {
+      "id": "pay075",
+      "text": "Idadagdag po namin ang utang ninyo sa inyong susunod na billing cycle.",
+      "tag": "payment_methods",
+      "mode": "neutral"
+    },
+    {
+      "id": "pay076",
+      "text": "You have exactly three days to complete the payment for this reservation.",
+      "tag": "payment_methods",
+      "mode": "neutral"
+    },
+    {
+      "id": "pay077",
+      "text": "Tatanggapin po ba ng rider ang eksaktong bayad o kailangan ninyo ng sukli?",
+      "tag": "payment_methods",
+      "mode": "neutral"
+    },
+    {
+      "id": "pay078",
+      "text": "I-forward ko lang po sa accounting ang inyong resibo para ma-verify nila.",
+      "tag": "payment_methods",
+      "mode": "neutral"
+    },
+    {
+      "id": "pay079",
+      "text": "Kindly hold the line while I manually verify your deposit right now.",
+      "tag": "payment_methods",
+      "mode": "neutral"
+    },
+    {
+      "id": "pay080",
+      "text": "Pagkatapos niyo pong magbayad, mag-message lang po agad kayo sa aming page.",
+      "tag": "payment_methods",
+      "mode": "neutral"
+    },
+    {
+      "id": "pay081",
+      "text": "Bawal po ang installment plan para sa mga produktong naka-sale na ngayon.",
+      "tag": "payment_methods",
+      "mode": "neutral"
+    },
+    {
+      "id": "pay082",
+      "text": "Our finance department will process your refund request by tomorrow morning.",
+      "tag": "payment_methods",
+      "mode": "neutral"
+    },
+    {
+      "id": "pay083",
+      "text": "Hindi po kami tumatanggap ng tseke, cash o kaya online transfer lamang.",
+      "tag": "payment_methods",
+      "mode": "neutral"
+    },
+    {
+      "id": "pay084",
+      "text": "Mag-rereply po ang aming system kapag na-confirm na ang inyong naging transaksyon.",
+      "tag": "payment_methods",
+      "mode": "neutral"
+    },
+    {
+      "id": "pay085",
+      "text": "The payment gateway is undergoing scheduled maintenance for the next two hours.",
+      "tag": "payment_methods",
+      "mode": "neutral"
+    },
+    {
+      "id": "pay086",
+      "text": "Kung nag-fail po ang transfer, paki-check muna ang balance ng inyong account.",
+      "tag": "payment_methods",
+      "mode": "neutral"
+    },
+    {
+      "id": "pay087",
+      "text": "Paki-picture-an po nang malinaw ang resibo para mabasa namin ang reference number.",
+      "tag": "payment_methods",
+      "mode": "neutral"
+    },
+    {
+      "id": "pay088",
+      "text": "We cannot release the item until the post dated check is fully cleared.",
+      "tag": "payment_methods",
+      "mode": "neutral"
+    },
+    {
+      "id": "pay089",
+      "text": "Tatlong buwan po ninyong huhulugan ang inyong kinuha na package sa amin.",
+      "tag": "payment_methods",
+      "mode": "neutral"
+    },
+    {
+      "id": "pay090",
+      "text": "Kapag card po ang gamit, may dagdag na bank charge na five percent.",
+      "tag": "payment_methods",
+      "mode": "neutral"
+    },
+    {
+      "id": "pay091",
+      "text": "Please review the payment instructions sent to your email yesterday afternoon.",
+      "tag": "payment_methods",
+      "mode": "neutral"
+    },
+    {
+      "id": "pay092",
+      "text": "Sige po, ipapa-cancel ko muna ang unang order dahil sa failed payment.",
+      "tag": "payment_methods",
+      "mode": "neutral"
+    },
+    {
+      "id": "pay093",
+      "text": "Ipapasok po namin ang inyong refund pabalik sa inyong ginamit na credit card.",
+      "tag": "payment_methods",
+      "mode": "neutral"
+    },
+    {
+      "id": "pay094",
+      "text": "If you choose cash on delivery, please prepare the exact amount beforehand.",
+      "tag": "payment_methods",
+      "mode": "neutral"
+    },
+    {
+      "id": "pay095",
+      "text": "Maaari po ninyong ipadala sa anumang pera padala na malapit sa inyo.",
+      "tag": "payment_methods",
+      "mode": "neutral"
+    },
+    {
+      "id": "pay096",
+      "text": "Para po ma-process ang refund, kailangan namin ang inyong buong bank details.",
+      "tag": "payment_methods",
+      "mode": "neutral"
+    },
+    {
+      "id": "pay097",
+      "text": "Once the downpayment is received, we will begin production on your order.",
+      "tag": "payment_methods",
+      "mode": "neutral"
+    },
+    {
+      "id": "pay098",
+      "text": "I-verify ko lang sa bangko kung pumasok na yung tseke na idineposito ninyo.",
+      "tag": "payment_methods",
+      "mode": "neutral"
+    },
+    {
+      "id": "pay099",
+      "text": "Hindi na po kayo sisingilin ng aming rider dahil bayad na po ito.",
+      "tag": "payment_methods",
+      "mode": "neutral"
+    },
+    {
+      "id": "pay100",
+      "text": "Your account will be temporarily suspended if the monthly due remains unpaid.",
+      "tag": "payment_methods",
+      "mode": "neutral"
+    },
+    {
+      "id": "obj001",
+      "text": "Sige lang po, take your time pag-isipan, nandito lang kami palagi!",
+      "tag": "objection_handling",
+      "mode": "bright"
+    },
+    {
+      "id": "obj002",
+      "text": "No problem at all, take as much time as you need to decide!",
+      "tag": "objection_handling",
+      "mode": "bright"
+    },
+    {
+      "id": "obj003",
+      "text": "Balikan niyo lang po kami kapag nakapagdesisyon na kayong tuluyang bumili.",
+      "tag": "objection_handling",
+      "mode": "bright"
+    },
+    {
+      "id": "obj004",
+      "text": "Okay lang po iyan, just let me know kapag ready na kayo!",
+      "tag": "objection_handling",
+      "mode": "bright"
+    },
+    {
+      "id": "obj005",
+      "text": "We will gladly wait for you when you are ready to order.",
+      "tag": "objection_handling",
+      "mode": "bright"
+    },
+    {
+      "id": "obj006",
+      "text": "Pasensya na po kung medyo mataas yung presyo natin ngayon.",
+      "tag": "objection_handling",
+      "mode": "apologetic"
+    },
+    {
+      "id": "obj007",
+      "text": "Paumanhin po, ngunit iyon na po ang pinakamababang presyo na aming maibibigay.",
+      "tag": "objection_handling",
+      "mode": "apologetic"
+    },
+    {
+      "id": "obj008",
+      "text": "I am truly sorry if our pricing does not fit your current budget.",
+      "tag": "objection_handling",
+      "mode": "apologetic"
+    },
+    {
+      "id": "obj009",
+      "text": "Sorry po, hindi po talaga namin kaya tapatan ang presyo ng iba.",
+      "tag": "objection_handling",
+      "mode": "apologetic"
+    },
+    {
+      "id": "obj010",
+      "text": "Pasensya na po kung nagka-problema kayo sa amin noong nakaraan.",
+      "tag": "objection_handling",
+      "mode": "apologetic"
+    },
+    {
+      "id": "obj011",
+      "text": "We apologize if your previous experience made you hesitant to buy today.",
+      "tag": "objection_handling",
+      "mode": "apologetic"
+    },
+    {
+      "id": "obj012",
+      "text": "Naku, sorry po talaga, sagad na po ang ibinigay kong discount sa inyo.",
+      "tag": "objection_handling",
+      "mode": "apologetic"
+    },
+    {
+      "id": "obj013",
+      "text": "Humihingi po ako ng tawad kung hindi namin naabot ang inaasahan ninyo.",
+      "tag": "objection_handling",
+      "mode": "apologetic"
+    },
+    {
+      "id": "obj014",
+      "text": "I deeply apologize, but we cannot offer any further discounts right now.",
+      "tag": "objection_handling",
+      "mode": "apologetic"
+    },
+    {
+      "id": "obj015",
+      "text": "Sorry po kung na-disappoint kayo sa quality ng unang order ninyo.",
+      "tag": "objection_handling",
+      "mode": "apologetic"
+    },
+    {
+      "id": "obj016",
+      "text": "Pasensya na po, wala po kaming cash on delivery sa inyong lugar.",
+      "tag": "objection_handling",
+      "mode": "apologetic"
+    },
+    {
+      "id": "obj017",
+      "text": "I am sorry to hear you feel that way about our new product.",
+      "tag": "objection_handling",
+      "mode": "apologetic"
+    },
+    {
+      "id": "obj018",
+      "text": "Sorry po, naiintindihan ko kung gusto niyo muna maghanap ng mas mura.",
+      "tag": "objection_handling",
+      "mode": "apologetic"
+    },
+    {
+      "id": "obj019",
+      "text": "Patawad po kung nag-aalangan kayo dahil sa mga nabasa ninyong balita.",
+      "tag": "objection_handling",
+      "mode": "apologetic"
+    },
+    {
+      "id": "obj020",
+      "text": "We sincerely apologize for any confusion regarding the actual shipping fee.",
+      "tag": "objection_handling",
+      "mode": "apologetic"
+    },
+    {
+      "id": "obj021",
+      "text": "Pasensya na po kung medyo malayo ang pwesto namin sa inyo.",
+      "tag": "objection_handling",
+      "mode": "apologetic"
+    },
+    {
+      "id": "obj022",
+      "text": "Paumanhin, naiintindihan ko po na kailangan ninyo muna itong pag-isipang mabuti.",
+      "tag": "objection_handling",
+      "mode": "apologetic"
+    },
+    {
+      "id": "obj023",
+      "text": "I am sorry if the upfront payment requirement is a bit difficult today.",
+      "tag": "objection_handling",
+      "mode": "apologetic"
+    },
+    {
+      "id": "obj024",
+      "text": "Sorry po kung mukhang scam, pero legit po ang aming online shop.",
+      "tag": "objection_handling",
+      "mode": "apologetic"
+    },
+    {
+      "id": "obj025",
+      "text": "Pasensya na po talaga kung hindi ko mabawasan ang shipping fee.",
+      "tag": "objection_handling",
+      "mode": "apologetic"
+    },
+    {
+      "id": "obj026",
+      "text": "We apologize if our items seem more expensive than our direct competitors.",
+      "tag": "objection_handling",
+      "mode": "apologetic"
+    },
+    {
+      "id": "obj027",
+      "text": "Sorry po, strict po kasi kami sa no refund policy kapag nabuksan na.",
+      "tag": "objection_handling",
+      "mode": "apologetic"
+    },
+    {
+      "id": "obj028",
+      "text": "Paumanhin po, sadyang nagtaas lang po talaga ng puhunan kaya ganyan.",
+      "tag": "objection_handling",
+      "mode": "apologetic"
+    },
+    {
+      "id": "obj029",
+      "text": "I apologize, but the promo discount cannot be applied to this item.",
+      "tag": "objection_handling",
+      "mode": "apologetic"
+    },
+    {
+      "id": "obj030",
+      "text": "Sorry po ha, gusto ko man kayo bigyan ng discount, bawal talaga.",
+      "tag": "objection_handling",
+      "mode": "apologetic"
+    },
+    {
+      "id": "obj031",
+      "text": "Naiintindihan ko po, mag-usap muna kayo ng asawa ninyo bago kayo bumili.",
+      "tag": "objection_handling",
+      "mode": "neutral"
+    },
+    {
+      "id": "obj032",
+      "text": "Maaari ninyong basahin ang aming mga reviews upang kayo ay mas makasiguro.",
+      "tag": "objection_handling",
+      "mode": "neutral"
+    },
+    {
+      "id": "obj033",
+      "text": "You can read our customer reviews on facebook to verify our store.",
+      "tag": "objection_handling",
+      "mode": "neutral"
+    },
+    {
+      "id": "obj034",
+      "text": "Kung gusto niyo po, itago ko muna yung item hanggang bukas.",
+      "tag": "objection_handling",
+      "mode": "neutral"
+    },
+    {
+      "id": "obj035",
+      "text": "Ipadadala ko po ang mga litrato upang makita ninyo ang kalidad.",
+      "tag": "objection_handling",
+      "mode": "neutral"
+    },
+    {
+      "id": "obj036",
+      "text": "Let me send you a video of the actual item for your reference.",
+      "tag": "objection_handling",
+      "mode": "neutral"
+    },
+    {
+      "id": "obj037",
+      "text": "Okay lang po kung next week na kayo o-order, walang problema.",
+      "tag": "objection_handling",
+      "mode": "neutral"
+    },
+    {
+      "id": "obj038",
+      "text": "Maaari po kayong bumisita sa aming tindahan upang makita ninyo nang personal.",
+      "tag": "objection_handling",
+      "mode": "neutral"
+    },
+    {
+      "id": "obj039",
+      "text": "We understand if you want to compare our prices with other brands first.",
+      "tag": "objection_handling",
+      "mode": "neutral"
+    },
+    {
+      "id": "obj040",
+      "text": "Sige po, i-message niyo na lang ako kapag nakausap niyo na si mister.",
+      "tag": "objection_handling",
+      "mode": "neutral"
+    },
+    {
+      "id": "obj041",
+      "text": "Nasa inyo po ang huling desisyon kung itutuloy ninyo ang pagbili ngayon.",
+      "tag": "objection_handling",
+      "mode": "neutral"
+    },
+    {
+      "id": "obj042",
+      "text": "Please take your time to consider if this purchase fits your budget.",
+      "tag": "objection_handling",
+      "mode": "neutral"
+    },
+    {
+      "id": "obj043",
+      "text": "Wala po tayong pilitan, kung kailan lang kayo ready, doon po tayo.",
+      "tag": "objection_handling",
+      "mode": "neutral"
+    },
+    {
+      "id": "obj044",
+      "text": "Ilalagay ko muna sa inyong cart para hindi ninyo makalimutan mamaya.",
+      "tag": "objection_handling",
+      "mode": "neutral"
+    },
+    {
+      "id": "obj045",
+      "text": "It is completely fine if you decide to buy the alternative option instead.",
+      "tag": "objection_handling",
+      "mode": "neutral"
+    },
+    {
+      "id": "obj046",
+      "text": "Pwede niyo po i-check ang aming shopee store para sa mas maraming reviews.",
+      "tag": "objection_handling",
+      "mode": "neutral"
+    },
+    {
+      "id": "obj047",
+      "text": "Babalikan ko po kayo sa biyernes upang malaman ang inyong huling pasya.",
+      "tag": "objection_handling",
+      "mode": "neutral"
+    },
+    {
+      "id": "obj048",
+      "text": "Feel free to explore other suppliers to see the price differences available.",
+      "tag": "objection_handling",
+      "mode": "neutral"
+    },
+    {
+      "id": "obj049",
+      "text": "Sige po, ibibigay ko ang number ko para matawagan niyo ako agad.",
+      "tag": "objection_handling",
+      "mode": "neutral"
+    },
+    {
+      "id": "obj050",
+      "text": "Hihintayin ko po ang inyong tawag kung kailan ninyo gustong umorder.",
+      "tag": "objection_handling",
+      "mode": "neutral"
+    },
+    {
+      "id": "obj051",
+      "text": "You can always return to our shop once you have made your decision.",
+      "tag": "objection_handling",
+      "mode": "neutral"
+    },
+    {
+      "id": "obj052",
+      "text": "Okay po, pag-isipan niyo munang mabuti para hindi kayo maghinayang sa huli.",
+      "tag": "objection_handling",
+      "mode": "neutral"
+    },
+    {
+      "id": "obj053",
+      "text": "Makikita ninyo ang pagkakaiba ng aming produkto kapag hinawakan ninyo ito.",
+      "tag": "objection_handling",
+      "mode": "neutral"
+    },
+    {
+      "id": "obj054",
+      "text": "I will document your feedback regarding the pricing of this specific product.",
+      "tag": "objection_handling",
+      "mode": "neutral"
+    },
+    {
+      "id": "obj055",
+      "text": "Kung nag-aalangan kayo, pwede kayong mag-order muna ng isa para ma-test.",
+      "tag": "objection_handling",
+      "mode": "neutral"
+    },
+    {
+      "id": "obj056",
+      "text": "Wag kayong mag-alala, one hundred percent authentic po itong ibinebenta namin sa inyo.",
+      "tag": "objection_handling",
+      "mode": "reassuring"
+    },
+    {
+      "id": "obj057",
+      "text": "Naiintindihan ko ang inyong pag-aalala, ngunit sisiguraduhin kong maayos itong makakarating.",
+      "tag": "objection_handling",
+      "mode": "reassuring"
+    },
+    {
+      "id": "obj058",
+      "text": "I understand your hesitation, but I guarantee this product will meet your expectations.",
+      "tag": "objection_handling",
+      "mode": "reassuring"
+    },
+    {
+      "id": "obj059",
+      "text": "Sigurado po kayong sulit na sulit ang ibabayad niyo sa quality nito.",
+      "tag": "objection_handling",
+      "mode": "reassuring"
+    },
+    {
+      "id": "obj060",
+      "text": "Huwag po kayong matakot, maaasahan ninyo na totoo ang aming sinasabi.",
+      "tag": "objection_handling",
+      "mode": "reassuring"
+    },
+    {
+      "id": "obj061",
+      "text": "Rest assured that our online store has been operating safely for three years.",
+      "tag": "objection_handling",
+      "mode": "reassuring"
+    },
+    {
+      "id": "obj062",
+      "text": "Wag po kayong mag-alala na ma-scam, may physical store po kami sa makati.",
+      "tag": "objection_handling",
+      "mode": "reassuring"
+    },
+    {
+      "id": "obj063",
+      "text": "Makakaasa po kayo na hindi masasayang ang inyong pera sa produktong ito.",
+      "tag": "objection_handling",
+      "mode": "reassuring"
+    },
+    {
+      "id": "obj064",
+      "text": "Please do not worry, we offer a money back guarantee if it fails.",
+      "tag": "objection_handling",
+      "mode": "reassuring"
+    },
+    {
+      "id": "obj065",
+      "text": "Garantisado pong maganda ang quality niyan kaya hindi kayo magsisisi sa huli.",
+      "tag": "objection_handling",
+      "mode": "reassuring"
+    },
+    {
+      "id": "obj066",
+      "text": "Nauunawaan ko po kung bakit kayo nagdududa, ngunit libo na ang aming parokyano.",
+      "tag": "objection_handling",
+      "mode": "reassuring"
+    },
+    {
+      "id": "obj067",
+      "text": "I completely understand why you need to think about it before purchasing today.",
+      "tag": "objection_handling",
+      "mode": "reassuring"
+    },
+    {
+      "id": "obj068",
+      "text": "Wag po kayong matakot mag-bayad online, secured po ang system ng gcash natin.",
+      "tag": "objection_handling",
+      "mode": "reassuring"
+    },
+    {
+      "id": "obj069",
+      "text": "Handa po kaming palitan ang produkto kung may nakita kayong sira pagdating.",
+      "tag": "objection_handling",
+      "mode": "reassuring"
+    },
+    {
+      "id": "obj070",
+      "text": "You are making a very safe choice, many customers love this exact item.",
+      "tag": "objection_handling",
+      "mode": "reassuring"
+    },
+    {
+      "id": "obj071",
+      "text": "Naiintindihan ko po kung mahal, pero pangmatagalan po kasi ang tibay nito.",
+      "tag": "objection_handling",
+      "mode": "reassuring"
+    },
+    {
+      "id": "obj072",
+      "text": "Huwag kayong mag-alala, tutulungan ko kayong makatipid nang hindi isinasakripisyo ang kalidad.",
+      "tag": "objection_handling",
+      "mode": "reassuring"
+    },
+    {
+      "id": "obj073",
+      "text": "Rest assured, the higher price directly translates to much better material quality.",
+      "tag": "objection_handling",
+      "mode": "reassuring"
+    },
+    {
+      "id": "obj074",
+      "text": "Wag po kayong mag-alangan, nagpapadala po kami ng litrato bago namin i-ship.",
+      "tag": "objection_handling",
+      "mode": "reassuring"
+    },
+    {
+      "id": "obj075",
+      "text": "Makakatiyak po kayo na ang bawat detalye ng item ay aming sinuri.",
+      "tag": "objection_handling",
+      "mode": "reassuring"
+    },
+    {
+      "id": "obj076",
+      "text": "We truly value your trust, so we only provide the best possible service.",
+      "tag": "objection_handling",
+      "mode": "reassuring"
+    },
+    {
+      "id": "obj077",
+      "text": "Hindi po tayo gaya ng iba na nagpapadala ng maling item sa customer.",
+      "tag": "objection_handling",
+      "mode": "reassuring"
+    },
+    {
+      "id": "obj078",
+      "text": "Ipangangako ko po na mas maganda ang inyong magiging karanasan sa amin ngayon.",
+      "tag": "objection_handling",
+      "mode": "reassuring"
+    },
+    {
+      "id": "obj079",
+      "text": "I promise you will see a huge difference compared to your past supplier.",
+      "tag": "objection_handling",
+      "mode": "reassuring"
+    },
+    {
+      "id": "obj080",
+      "text": "Wag niyo na po masyadong isipin yung presyo, maganda po talaga yung item.",
+      "tag": "objection_handling",
+      "mode": "reassuring"
+    },
+    {
+      "id": "obj081",
+      "text": "Huwag po kayong mangamba, legal at rehistrado po ang aming maliit na negosyo.",
+      "tag": "objection_handling",
+      "mode": "reassuring"
+    },
+    {
+      "id": "obj082",
+      "text": "Please feel confident in your purchase, we stand by our product quality entirely.",
+      "tag": "objection_handling",
+      "mode": "reassuring"
+    },
+    {
+      "id": "obj083",
+      "text": "Nakakasiguro po kayong safe ang inyong details, hindi po namin iyan ipagkakalat.",
+      "tag": "objection_handling",
+      "mode": "reassuring"
+    },
+    {
+      "id": "obj084",
+      "text": "Asahan po ninyo na tutulungan ko kayo mula ngayon hanggang makuha ang parcel.",
+      "tag": "objection_handling",
+      "mode": "reassuring"
+    },
+    {
+      "id": "obj085",
+      "text": "Do not worry about hidden fees, everything is fully detailed on your receipt.",
+      "tag": "objection_handling",
+      "mode": "reassuring"
+    },
+    {
+      "id": "obj086",
+      "text": "Alam ko pong nag-aalinlangan kayo sa ngayon, kaya andito ako para mag-paliwanag.",
+      "tag": "objection_handling",
+      "mode": "reassuring"
+    },
+    {
+      "id": "obj087",
+      "text": "Maniwala po kayo, malaking ginhawa ang maibibigay nito sa inyong pamilya.",
+      "tag": "objection_handling",
+      "mode": "reassuring"
+    },
+    {
+      "id": "obj088",
+      "text": "I understand it is an investment, but it will save you money eventually.",
+      "tag": "objection_handling",
+      "mode": "reassuring"
+    },
+    {
+      "id": "obj089",
+      "text": "Wag po kayong ma-stress kung hindi pa kayo sure, pwede naman bukas na.",
+      "tag": "objection_handling",
+      "mode": "reassuring"
+    },
+    {
+      "id": "obj090",
+      "text": "Huwag po kayong mag-alala kung kailangan ninyo pa ng oras upang magpasya.",
+      "tag": "objection_handling",
+      "mode": "reassuring"
+    },
+    {
+      "id": "obj091",
+      "text": "We will be right here whenever you are ready to make a purchase.",
+      "tag": "objection_handling",
+      "mode": "reassuring"
+    },
+    {
+      "id": "obj092",
+      "text": "I-aassure ko po sa inyo na worth it bawat piso na ilalabas ninyo.",
+      "tag": "objection_handling",
+      "mode": "reassuring"
+    },
+    {
+      "id": "obj093",
+      "text": "Nakatitiyak ako na magugustuhan din ng inyong asawa ang produktong napili ninyo.",
+      "tag": "objection_handling",
+      "mode": "reassuring"
+    },
+    {
+      "id": "obj094",
+      "text": "I am confident that this item will solve the problem you described earlier.",
+      "tag": "objection_handling",
+      "mode": "reassuring"
+    },
+    {
+      "id": "obj095",
+      "text": "Wag po kayong kabahan sa online payment, ire-resibo po namin agad iyan.",
+      "tag": "objection_handling",
+      "mode": "reassuring"
+    },
+    {
+      "id": "obj096",
+      "text": "Hayaan ninyong ipakita ko kung gaano kaganda ang ginamit na materyales dito.",
+      "tag": "objection_handling",
+      "mode": "reassuring"
+    },
+    {
+      "id": "obj097",
+      "text": "Your peace of mind is our priority, so we check every single box.",
+      "tag": "objection_handling",
+      "mode": "reassuring"
+    },
+    {
+      "id": "obj098",
+      "text": "Kung may hesitation po kayo, pwede tayong mag video call para makita niyo.",
+      "tag": "objection_handling",
+      "mode": "reassuring"
+    },
+    {
+      "id": "obj099",
+      "text": "Maiintindihan po ninyo kung bakit ganyan ang presyo kapag nagamit ninyo na.",
+      "tag": "objection_handling",
+      "mode": "reassuring"
+    },
+    {
+      "id": "obj100",
+      "text": "We completely understand the need to consult with your partner before buying anything.",
+      "tag": "objection_handling",
+      "mode": "reassuring"
+    },
+    {
+      "id": "obj101",
+      "text": "Wag po mag-alala, marami na rin po kaming naging customer diyan sa inyo.",
+      "tag": "objection_handling",
+      "mode": "reassuring"
+    },
+    {
+      "id": "obj102",
+      "text": "Sisiguraduhin ko pong hindi na mauulit ang pangit ninyong naging karanasan sa iba.",
+      "tag": "objection_handling",
+      "mode": "reassuring"
+    },
+    {
+      "id": "obj103",
+      "text": "I assure you that our customer service team will handle any future issues.",
+      "tag": "objection_handling",
+      "mode": "reassuring"
+    },
+    {
+      "id": "obj104",
+      "text": "Legit na legit po kami, kaya wag po kayong matakot mag-transact ngayon.",
+      "tag": "objection_handling",
+      "mode": "reassuring"
+    },
+    {
+      "id": "obj105",
+      "text": "Makakaasa kayong hindi namin sasayangin ang tiwalang ibinibigay ninyo sa aming tindahan.",
+      "tag": "objection_handling",
+      "mode": "reassuring"
+    },
+    {
+      "id": "obj106",
+      "text": "Please be assured that this model is highly durable and very reliable overall.",
+      "tag": "objection_handling",
+      "mode": "reassuring"
+    },
+    {
+      "id": "obj107",
+      "text": "Wag po kayong mag-alala kung medyo pricey, mas tatagal naman po ito sa inyo.",
+      "tag": "objection_handling",
+      "mode": "reassuring"
+    },
+    {
+      "id": "obj108",
+      "text": "Sadyang mas mahal lang po nang kaunti dahil mas makapal ang telang ginamit.",
+      "tag": "objection_handling",
+      "mode": "reassuring"
+    },
+    {
+      "id": "obj109",
+      "text": "We have thousands of satisfied customers who initially had the exact same concerns.",
+      "tag": "objection_handling",
+      "mode": "reassuring"
+    },
+    {
+      "id": "obj110",
+      "text": "Naiintindihan ko po na mahalaga sa inyo ang quality, kaya ito ang pini-present ko.",
+      "tag": "objection_handling",
+      "mode": "reassuring"
+    },
+    {
+      "id": "obj111",
+      "text": "Walang problema kung kailangan ninyong magtanong muna sa inyong mga kasama sa bahay.",
+      "tag": "objection_handling",
+      "mode": "reassuring"
+    },
+    {
+      "id": "obj112",
+      "text": "Rest assured, you can easily reach us if you have questions after delivery.",
+      "tag": "objection_handling",
+      "mode": "reassuring"
+    },
+    {
+      "id": "obj113",
+      "text": "Okay lang po na mag-duda kayo, pero ipapakita ko na legit kami.",
+      "tag": "objection_handling",
+      "mode": "reassuring"
+    },
+    {
+      "id": "obj114",
+      "text": "Huwag ninyong isipin na scam ito, nagbabayad po kami ng tamang buwis taon-taon.",
+      "tag": "objection_handling",
+      "mode": "reassuring"
+    },
+    {
+      "id": "obj115",
+      "text": "I guarantee that the color and material will perfectly match the provided photos.",
+      "tag": "objection_handling",
+      "mode": "reassuring"
+    },
+    {
+      "id": "obj116",
+      "text": "Wag po kayong matakot, may return policy tayo kung hindi niyo magustuhan.",
+      "tag": "objection_handling",
+      "mode": "reassuring"
+    },
+    {
+      "id": "obj117",
+      "text": "Kayo po ay aming pinapahalagahan, kaya hindi namin kayo bibiguin sa kalidad.",
+      "tag": "objection_handling",
+      "mode": "reassuring"
+    },
+    {
+      "id": "obj118",
+      "text": "You are definitely getting the best value for your hard earned money today.",
+      "tag": "objection_handling",
+      "mode": "reassuring"
+    },
+    {
+      "id": "obj119",
+      "text": "Kahit mas mura yung sa kabila, garantisado namang tatagal itong sa aming shop.",
+      "tag": "objection_handling",
+      "mode": "reassuring"
+    },
+    {
+      "id": "obj120",
+      "text": "Hindi ninyo kailangang magmadali, nandito lamang ako kung sakaling handa na kayo.",
+      "tag": "objection_handling",
+      "mode": "reassuring"
+    },
+    {
+      "id": "obj121",
+      "text": "We completely stand behind our product, ensuring every customer gets exactly what they need.",
+      "tag": "objection_handling",
+      "mode": "reassuring"
+    },
+    {
+      "id": "obj122",
+      "text": "Wag po kayong mag-alala, pwede niyo itong i-check bago niyo ibigay ang bayad.",
+      "tag": "objection_handling",
+      "mode": "reassuring"
+    },
+    {
+      "id": "obj123",
+      "text": "Maiintindihan ko kung gusto ninyo munang mag-ipon bago bumili ng malaking item.",
+      "tag": "objection_handling",
+      "mode": "reassuring"
+    },
+    {
+      "id": "obj124",
+      "text": "It is totally understandable if you need a few days to think deeply.",
+      "tag": "objection_handling",
+      "mode": "reassuring"
+    },
+    {
+      "id": "obj125",
+      "text": "Opo, medyo mahal talaga, pero tignan niyo naman po yung napakagandang finish niya.",
+      "tag": "objection_handling",
+      "mode": "reassuring"
+    },
+    {
+      "id": "obj126",
+      "text": "Huwag kayong mag-alala kung nakaranas kayo ng palpak na order noong mga nakaraan.",
+      "tag": "objection_handling",
+      "mode": "reassuring"
+    },
+    {
+      "id": "obj127",
+      "text": "I promise to oversee your order personally to ensure everything goes smoothly today.",
+      "tag": "objection_handling",
+      "mode": "reassuring"
+    },
+    {
+      "id": "obj128",
+      "text": "Kung gusto niyo po ng peace of mind, i-cash on delivery na lang natin.",
+      "tag": "objection_handling",
+      "mode": "reassuring"
+    },
+    {
+      "id": "obj129",
+      "text": "Asahan ninyo na mananatiling maayos ang kondisyon ng item kahit pagkatapos ng taon.",
+      "tag": "objection_handling",
+      "mode": "reassuring"
+    },
+    {
+      "id": "obj130",
+      "text": "Rest assured, we strictly maintain high quality control standards before shipping any package.",
+      "tag": "objection_handling",
+      "mode": "reassuring"
+    },
+    {
+      "id": "obj131",
+      "text": "Hindi po tayo manloloko, kaya wag po kayong mag-alala sa inyong idedeposito.",
+      "tag": "objection_handling",
+      "mode": "reassuring"
+    },
+    {
+      "id": "obj132",
+      "text": "Makikita ninyo po na mas malinaw at detalyado ang pagkakagawa ng aming produkto.",
+      "tag": "objection_handling",
+      "mode": "reassuring"
+    },
+    {
+      "id": "obj133",
+      "text": "We fully understand your budget constraints, which is why we suggest this alternative.",
+      "tag": "objection_handling",
+      "mode": "reassuring"
+    },
+    {
+      "id": "obj134",
+      "text": "Hayaan niyo po, gagawin ko ang lahat para maging sulit ang ibabayad niyo.",
+      "tag": "objection_handling",
+      "mode": "reassuring"
+    },
+    {
+      "id": "obj135",
+      "text": "Naiintindihan ko po na mahirap magtiwala ngayon, kaya handa akong magbigay ng patunay.",
+      "tag": "objection_handling",
+      "mode": "reassuring"
+    },
+    {
+      "id": "obj136",
+      "text": "You can safely verify our business registration if you feel slightly hesitant today.",
+      "tag": "objection_handling",
+      "mode": "reassuring"
+    },
+    {
+      "id": "obj137",
+      "text": "Wag niyo na pong isipin yung bad experience niyo, iba po kami mag-alaga.",
+      "tag": "objection_handling",
+      "mode": "reassuring"
+    },
+    {
+      "id": "obj138",
+      "text": "Narito po kami upang magbigay ng solusyon sa inyong matagal na problema.",
+      "tag": "objection_handling",
+      "mode": "reassuring"
+    },
+    {
+      "id": "obj139",
+      "text": "Do not worry, we always prioritize the satisfaction of our loyal returning customers.",
+      "tag": "objection_handling",
+      "mode": "reassuring"
+    },
+    {
+      "id": "obj140",
+      "text": "Pag-usapan niyo po muna, hindi naman po paubos ang stock natin sa ngayon.",
+      "tag": "objection_handling",
+      "mode": "reassuring"
+    },
+    {
+      "id": "obj141",
+      "text": "Mas nakabubuti nga po na sigurado kayo bago kayo maglabas ng inyong pera.",
+      "tag": "objection_handling",
+      "mode": "reassuring"
+    },
+    {
+      "id": "obj142",
+      "text": "I completely agree that quality should never be compromised for a lower price.",
+      "tag": "objection_handling",
+      "mode": "reassuring"
+    },
+    {
+      "id": "obj143",
+      "text": "Wag po kayong mag-alala, marami na kaming natulungan na may parehong problema sa inyo.",
+      "tag": "objection_handling",
+      "mode": "reassuring"
+    },
+    {
+      "id": "obj144",
+      "text": "Ipapaubaya ko sa inyo ang pagpapasya dahil alam kong alam ninyo ang tama.",
+      "tag": "objection_handling",
+      "mode": "reassuring"
+    },
+    {
+      "id": "obj145",
+      "text": "We will gladly provide all the necessary information so you can decide comfortably.",
+      "tag": "objection_handling",
+      "mode": "reassuring"
+    },
+    {
+      "id": "obj146",
+      "text": "Sige po, take your time mag-isip, walang mawawala kung titingin-tingin muna kayo ngayon.",
+      "tag": "objection_handling",
+      "mode": "reassuring"
+    },
+    {
+      "id": "obj147",
+      "text": "Huwag po kayong mahiya na sabihin sa akin kung hindi kaya ng badyet.",
+      "tag": "objection_handling",
+      "mode": "reassuring"
+    },
+    {
+      "id": "obj148",
+      "text": "I am confident you will find our services vastly superior to the competition.",
+      "tag": "objection_handling",
+      "mode": "reassuring"
+    },
+    {
+      "id": "obj149",
+      "text": "Wag po kayong ma-pressure umorder ngayon, nandito lang kami pwedeng balikan bukas.",
+      "tag": "objection_handling",
+      "mode": "reassuring"
+    },
+    {
+      "id": "obj150",
+      "text": "Makakaasa po kayo na kahit bumili kayo o hindi, ituturing namin kayong mahalaga.",
+      "tag": "objection_handling",
+      "mode": "reassuring"
+    },
+    {
+      "id": "cls001",
+      "text": "Pasensya na po ulit sa naging abala kanina, salamat sa pag-unawa ninyo.",
+      "tag": "closing_confirmation",
+      "mode": "apologetic"
+    },
+    {
+      "id": "cls002",
+      "text": "We apologize again for the slight delay during our call today.",
+      "tag": "closing_confirmation",
+      "mode": "apologetic"
+    },
+    {
+      "id": "cls003",
+      "text": "Sorry po kung medyo natagalan ang pag-process natin ng inyong order.",
+      "tag": "closing_confirmation",
+      "mode": "apologetic"
+    },
+    {
+      "id": "cls004",
+      "text": "Paumanhin po sa anumang pagkukulang, asahan ninyong pagbubutihin pa namin ito.",
+      "tag": "closing_confirmation",
+      "mode": "apologetic"
+    },
+    {
+      "id": "cls005",
+      "text": "I am truly sorry for the inconvenience, but thank you for ordering.",
+      "tag": "closing_confirmation",
+      "mode": "apologetic"
+    },
+    {
+      "id": "cls006",
+      "text": "Wag po kayong mag-alala, babantayan ko mismo ang inyong order hanggang dumating.",
+      "tag": "closing_confirmation",
+      "mode": "reassuring"
+    },
+    {
+      "id": "cls007",
+      "text": "Rest assured that your package will be delivered safely right to your doorstep.",
+      "tag": "closing_confirmation",
+      "mode": "reassuring"
+    },
+    {
+      "id": "cls008",
+      "text": "Sigurado pong matatanggap ninyo nang maayos ang lahat ng inyong binili ngayon.",
+      "tag": "closing_confirmation",
+      "mode": "reassuring"
+    },
+    {
+      "id": "cls009",
+      "text": "I assure you that everything is completely finalized and ready for dispatch.",
+      "tag": "closing_confirmation",
+      "mode": "reassuring"
+    },
+    {
+      "id": "cls010",
+      "text": "Makakaasa po kayong maipapadala agad namin ito bukas na bukas din.",
+      "tag": "closing_confirmation",
+      "mode": "reassuring"
+    },
+    {
+      "id": "cls011",
+      "text": "Babasahin ko lang po ulit ang inyong order para makasiguro tayo.",
+      "tag": "closing_confirmation",
+      "mode": "neutral"
+    },
+    {
+      "id": "cls012",
+      "text": "Let me read back ang inyong complete delivery details bago tayo mag-end.",
+      "tag": "closing_confirmation",
+      "mode": "neutral"
+    },
+    {
+      "id": "cls013",
+      "text": "Uulitin ko po, dalawang malaking t-shirt na kulay itim ang inyong kinuha.",
+      "tag": "closing_confirmation",
+      "mode": "neutral"
+    },
+    {
+      "id": "cls014",
+      "text": "I-confirm ko lang po ang inyong address, ito ay sa quezon city.",
+      "tag": "closing_confirmation",
+      "mode": "neutral"
+    },
+    {
+      "id": "cls015",
+      "text": "Paki-check po ang inyong telepono mamaya para sa official text ng courier.",
+      "tag": "closing_confirmation",
+      "mode": "neutral"
+    },
+    {
+      "id": "cls016",
+      "text": "Your final total is exactly one thousand two hundred fifty pesos today.",
+      "tag": "closing_confirmation",
+      "mode": "neutral"
+    },
+    {
+      "id": "cls017",
+      "text": "Isasara ko na po ang transaction natin para sa araw na ito.",
+      "tag": "closing_confirmation",
+      "mode": "neutral"
+    },
+    {
+      "id": "cls018",
+      "text": "Ipapasok ko na po ang mga detalye ninyo sa aming system ngayon.",
+      "tag": "closing_confirmation",
+      "mode": "neutral"
+    },
+    {
+      "id": "cls019",
+      "text": "Please expect a confirmation email containing your digital receipt later this afternoon.",
+      "tag": "closing_confirmation",
+      "mode": "neutral"
+    },
+    {
+      "id": "cls020",
+      "text": "Bale pito po lahat ang items na ipadadala namin sa inyong bahay.",
+      "tag": "closing_confirmation",
+      "mode": "neutral"
+    },
+    {
+      "id": "cls021",
+      "text": "Kumpirmahin po natin ang inyong pangalan at contact number bago ibaba ang linya.",
+      "tag": "closing_confirmation",
+      "mode": "neutral"
+    },
+    {
+      "id": "cls022",
+      "text": "Naka-record na po ang inyong request kaya wala na po kayong gagawin.",
+      "tag": "closing_confirmation",
+      "mode": "neutral"
+    },
+    {
+      "id": "cls023",
+      "text": "I will process the invoice pagkatapos na pagkatapos ng ating pag-uusap ngayon.",
+      "tag": "closing_confirmation",
+      "mode": "neutral"
+    },
+    {
+      "id": "cls024",
+      "text": "Three hundred po ang inyong sukli na ibibigay ng rider bukas.",
+      "tag": "closing_confirmation",
+      "mode": "neutral"
+    },
+    {
+      "id": "cls025",
+      "text": "Hanggang dito na lang po muna ang ating pag-uusap tungkol sa order ninyo.",
+      "tag": "closing_confirmation",
+      "mode": "neutral"
+    },
+    {
+      "id": "cls026",
+      "text": "Nakuha ko na po ang lahat ng kailangan kong impormasyon mula sa inyo.",
+      "tag": "closing_confirmation",
+      "mode": "neutral"
+    },
+    {
+      "id": "cls027",
+      "text": "Thank you for providing all the necessary information for your account update.",
+      "tag": "closing_confirmation",
+      "mode": "neutral"
+    },
+    {
+      "id": "cls028",
+      "text": "Hintayin niyo na lang po ang pagtawag ng aming dispatch team mamaya.",
+      "tag": "closing_confirmation",
+      "mode": "neutral"
+    },
+    {
+      "id": "cls029",
+      "text": "Two thousand five hundred pesos po ang total ng inyong bibilhin.",
+      "tag": "closing_confirmation",
+      "mode": "neutral"
+    },
+    {
+      "id": "cls030",
+      "text": "We will keep your personal details strictly confidential dito sa aming database.",
+      "tag": "closing_confirmation",
+      "mode": "neutral"
+    },
+    {
+      "id": "cls031",
+      "text": "Pwede na po nating i-finalize ang inyong payment para maka-usad na tayo.",
+      "tag": "closing_confirmation",
+      "mode": "neutral"
+    },
+    {
+      "id": "cls032",
+      "text": "Iche-check po muna nila nang maigi ang bawat item bago tuluyang ipasok sa kahon.",
+      "tag": "closing_confirmation",
+      "mode": "neutral"
+    },
+    {
+      "id": "cls033",
+      "text": "Once the system validates your request, ia-arrange na po namin ang pickup.",
+      "tag": "closing_confirmation",
+      "mode": "neutral"
+    },
+    {
+      "id": "cls034",
+      "text": "Kung wala na po kayong idadagdag, ipa-process ko na po ito agad.",
+      "tag": "closing_confirmation",
+      "mode": "neutral"
+    },
+    {
+      "id": "cls035",
+      "text": "Mangyaring itago ang inyong reference number para sa mga susunod ninyong transaksyon.",
+      "tag": "closing_confirmation",
+      "mode": "neutral"
+    },
+    {
+      "id": "cls036",
+      "text": "I will now submit your completed order form diretso sa aming warehouse.",
+      "tag": "closing_confirmation",
+      "mode": "neutral"
+    },
+    {
+      "id": "cls037",
+      "text": "Ilalagay ko na po ito sa listahan ng mga ipapadala natin sa lingo.",
+      "tag": "closing_confirmation",
+      "mode": "neutral"
+    },
+    {
+      "id": "cls038",
+      "text": "Paki-ready na lang po ang bayad ninyo kapag dumating na ang rider.",
+      "tag": "closing_confirmation",
+      "mode": "neutral"
+    },
+    {
+      "id": "cls039",
+      "text": "Your purchase is now completely logged sa aming main inventory tracking system.",
+      "tag": "closing_confirmation",
+      "mode": "neutral"
+    },
+    {
+      "id": "cls040",
+      "text": "Titignan po ng aming supervisor ang inyong form bago nila ito pirmahan.",
+      "tag": "closing_confirmation",
+      "mode": "neutral"
+    },
+    {
+      "id": "cls041",
+      "text": "Ang resibo po ninyo ay ipapadala kasama ng mismong package sa kahon.",
+      "tag": "closing_confirmation",
+      "mode": "neutral"
+    },
+    {
+      "id": "cls042",
+      "text": "We have successfully updated your shipping preferences para sa inyong future orders.",
+      "tag": "closing_confirmation",
+      "mode": "neutral"
+    },
+    {
+      "id": "cls043",
+      "text": "Bukas po nang umaga namin sisimulan ang pagbalot ng inyong mga gamit.",
+      "tag": "closing_confirmation",
+      "mode": "neutral"
+    },
+    {
+      "id": "cls044",
+      "text": "Tatawag po ulit kami kapag kailangan pa namin ng karagdagang impormasyon mula sa inyo.",
+      "tag": "closing_confirmation",
+      "mode": "neutral"
+    },
+    {
+      "id": "cls045",
+      "text": "If you have no further questions, we can end the call right here.",
+      "tag": "closing_confirmation",
+      "mode": "neutral"
+    },
+    {
+      "id": "cls046",
+      "text": "Maraming salamat po sa inyong tiwala at pag-order sa aming shop ngayon!",
+      "tag": "closing_confirmation",
+      "mode": "bright"
+    },
+    {
+      "id": "cls047",
+      "text": "Thank you so much for choosing our store for your shopping today!",
+      "tag": "closing_confirmation",
+      "mode": "bright"
+    },
+    {
+      "id": "cls048",
+      "text": "Yay, confirmed na po ang inyong order at ready na for shipping!",
+      "tag": "closing_confirmation",
+      "mode": "bright"
+    },
+    {
+      "id": "cls049",
+      "text": "Magandang araw po at maraming salamat sa inyong walang sawang pagtangkilik sa amin!",
+      "tag": "closing_confirmation",
+      "mode": "bright"
+    },
+    {
+      "id": "cls050",
+      "text": "Have a wonderful day ahead and thank you for calling us today!",
+      "tag": "closing_confirmation",
+      "mode": "bright"
+    },
+    {
+      "id": "cls051",
+      "text": "Sige po, asahan niyo pong darating iyan sa lalong madaling panahon!",
+      "tag": "closing_confirmation",
+      "mode": "bright"
+    },
+    {
+      "id": "cls052",
+      "text": "Perfect! Naka-secure na po ang inyong items and ready for immediate dispatch!",
+      "tag": "closing_confirmation",
+      "mode": "bright"
+    },
+    {
+      "id": "cls053",
+      "text": "Maraming salamat po, mag-iingat po kayo palagi at magandang hapon sa inyo!",
+      "tag": "closing_confirmation",
+      "mode": "bright"
+    },
+    {
+      "id": "cls054",
+      "text": "We look forward to serving you again very soon, have a great afternoon!",
+      "tag": "closing_confirmation",
+      "mode": "bright"
+    },
+    {
+      "id": "cls055",
+      "text": "Yehey, pasok na po sa system natin ang inyong napakagandang purchase today!",
+      "tag": "closing_confirmation",
+      "mode": "bright"
+    },
+    {
+      "id": "cls056",
+      "text": "Maraming salamat sa masayang pag-uusap natin, hanggang sa muli nating pagkikita!",
+      "tag": "closing_confirmation",
+      "mode": "bright"
+    },
+    {
+      "id": "cls057",
+      "text": "Thank you for your wonderful patience, your order is now fully confirmed!",
+      "tag": "closing_confirmation",
+      "mode": "bright"
+    },
+    {
+      "id": "cls058",
+      "text": "Sige po, ibababa ko na ang linya, enjoy the rest of your day!",
+      "tag": "closing_confirmation",
+      "mode": "bright"
+    },
+    {
+      "id": "cls059",
+      "text": "You made a fantastic choice today, salamat po sa pag-trust sa amin!",
+      "tag": "closing_confirmation",
+      "mode": "bright"
+    },
+    {
+      "id": "cls060",
+      "text": "Salamat po sa masiglang kwentuhan, aasikasuhin ko na po ang inyong package!",
+      "tag": "closing_confirmation",
+      "mode": "bright"
+    },
+    {
+      "id": "cls061",
+      "text": "Walang anuman po, isang malaking karangalan ang paglingkuran kayo ngayong araw na ito!",
+      "tag": "closing_confirmation",
+      "mode": "bright"
+    },
+    {
+      "id": "cls062",
+      "text": "Have a safe and happy weekend, thank you for calling our hotline!",
+      "tag": "closing_confirmation",
+      "mode": "bright"
+    },
+    {
+      "id": "cls063",
+      "text": "Ayan, okay na po lahat, maraming salamat ulit at bye bye po!",
+      "tag": "closing_confirmation",
+      "mode": "bright"
+    },
+    {
+      "id": "cls064",
+      "text": "We truly appreciate your business, please take care at goodbye for now!",
+      "tag": "closing_confirmation",
+      "mode": "bright"
+    },
+    {
+      "id": "cls065",
+      "text": "Maraming salamat po, excited na akong matanggap ninyo ang inyong napiling item!",
+      "tag": "closing_confirmation",
+      "mode": "bright"
+    },
+    {
+      "id": "cls066",
+      "text": "Lubos po kaming nagpapasalamat sa inyong pagbili, magandang araw po sa inyo!",
+      "tag": "closing_confirmation",
+      "mode": "bright"
+    },
+    {
+      "id": "cls067",
+      "text": "It was a pleasure speaking with you, have a highly productive day ahead!",
+      "tag": "closing_confirmation",
+      "mode": "bright"
+    },
+    {
+      "id": "cls068",
+      "text": "Sige po, maraming salamat sa time niyo at ingat po palagi sa byahe!",
+      "tag": "closing_confirmation",
+      "mode": "bright"
+    },
+    {
+      "id": "cls069",
+      "text": "Thank you for being such a kind and wonderful customer to us today!",
+      "tag": "closing_confirmation",
+      "mode": "bright"
+    },
+    {
+      "id": "cls070",
+      "text": "Na-process na po natin nang maayos, salamat po sa inyong tiwala at suporta!",
+      "tag": "closing_confirmation",
+      "mode": "bright"
+    },
+    {
+      "id": "cls071",
+      "text": "Kagalakan po naming matulungan kayo, nawa ay maging maganda ang inyong buong linggo!",
+      "tag": "closing_confirmation",
+      "mode": "bright"
+    },
+    {
+      "id": "cls072",
+      "text": "Thank you for reaching out, sana magustuhan niyo po ang bagong item!",
+      "tag": "closing_confirmation",
+      "mode": "bright"
+    },
+    {
+      "id": "cls073",
+      "text": "Done na po tayo, maraming salamat at have a very nice day po!",
+      "tag": "closing_confirmation",
+      "mode": "bright"
+    },
+    {
+      "id": "cls074",
+      "text": "You are all set, thank you for allowing me to assist you today!",
+      "tag": "closing_confirmation",
+      "mode": "bright"
+    },
+    {
+      "id": "cls075",
+      "text": "Maraming salamat po sa pag-order, siguradong magugustuhan niyo po ang item na ito!",
+      "tag": "closing_confirmation",
+      "mode": "bright"
+    },
+    {
+      "id": "cls076",
+      "text": "Taos puso po kaming nagpapasalamat, pagpalain po nawa kayo ng ating maykapal ngayon!",
+      "tag": "closing_confirmation",
+      "mode": "bright"
+    },
+    {
+      "id": "cls077",
+      "text": "I am so glad we could quickly resolve everything for you right now!",
+      "tag": "closing_confirmation",
+      "mode": "bright"
+    },
+    {
+      "id": "cls078",
+      "text": "Okay na po, maraming salamat at sana makapag-order po kayo ulit sa amin!",
+      "tag": "closing_confirmation",
+      "mode": "bright"
+    },
+    {
+      "id": "cls079",
+      "text": "Thank you for your continued loyalty, nandito lang kami palagi para tumulong!",
+      "tag": "closing_confirmation",
+      "mode": "bright"
+    },
+    {
+      "id": "cls080",
+      "text": "Maraming salamat po, looking forward na matanggap niyo ang order niyo this week!",
+      "tag": "closing_confirmation",
+      "mode": "bright"
+    },
+    {
+      "id": "cls081",
+      "text": "Isang masayang araw po sa inyo at maraming salamat sa pagtawag sa amin!",
+      "tag": "closing_confirmation",
+      "mode": "bright"
+    },
+    {
+      "id": "cls082",
+      "text": "We highly value your feedback and thank you for taking the time today!",
+      "tag": "closing_confirmation",
+      "mode": "bright"
+    },
+    {
+      "id": "cls083",
+      "text": "Sige po, i-pack na namin ito agad-agad para mabilis pong dumating sa inyo!",
+      "tag": "closing_confirmation",
+      "mode": "bright"
+    },
+    {
+      "id": "cls084",
+      "text": "Please enjoy your brand new purchase, have a beautiful and relaxing day!",
+      "tag": "closing_confirmation",
+      "mode": "bright"
+    },
+    {
+      "id": "cls085",
+      "text": "Maraming salamat po sa inyong pang-unawa at pasensya, ingat po kayo palagi diyan!",
+      "tag": "closing_confirmation",
+      "mode": "bright"
+    },
+    {
+      "id": "cls086",
+      "text": "Maraming salamat sa napakagandang transaksyon natin, nawa ay masiyahan kayo sa inyong binili!",
+      "tag": "closing_confirmation",
+      "mode": "bright"
+    },
+    {
+      "id": "cls087",
+      "text": "Thank you for letting me handle your request, take care and bye now!",
+      "tag": "closing_confirmation",
+      "mode": "bright"
+    },
+    {
+      "id": "cls088",
+      "text": "Sige po, babye na po at maraming salamat sa pagpili sa aming shop!",
+      "tag": "closing_confirmation",
+      "mode": "bright"
+    },
+    {
+      "id": "cls089",
+      "text": "We sincerely hope to hear from you again soon, have a great night!",
+      "tag": "closing_confirmation",
+      "mode": "bright"
+    },
+    {
+      "id": "cls090",
+      "text": "Salamat po sa masayang chikahan natin habang pino-process ko ang inyong order ngayon!",
+      "tag": "closing_confirmation",
+      "mode": "bright"
+    },
+    {
+      "id": "cls091",
+      "text": "Malugod po kaming nagpapasalamat sa inyong pagtangkilik, hanggang sa muli nating pag-uusap bukas!",
+      "tag": "closing_confirmation",
+      "mode": "bright"
+    },
+    {
+      "id": "cls092",
+      "text": "Thank you very much, your order is officially the highlight of my day!",
+      "tag": "closing_confirmation",
+      "mode": "bright"
+    },
+    {
+      "id": "cls093",
+      "text": "Okay na okay na po lahat, maraming salamat at mag-ingat po kayo palagi!",
+      "tag": "closing_confirmation",
+      "mode": "bright"
+    },
+    {
+      "id": "cls094",
+      "text": "Enjoy the rest of your week and thank you for trusting our team!",
+      "tag": "closing_confirmation",
+      "mode": "bright"
+    },
+    {
+      "id": "cls095",
+      "text": "Sige po sir, maraming salamat po talaga at have a wonderful day ahead!",
+      "tag": "closing_confirmation",
+      "mode": "bright"
+    },
+    {
+      "id": "cls096",
+      "text": "Maraming salamat po sa napakabilis ninyong pagtugon, isang magandang hapon po sa inyo!",
+      "tag": "closing_confirmation",
+      "mode": "bright"
+    },
+    {
+      "id": "cls097",
+      "text": "It was absolutely wonderful assisting you today, goodbye and please stay safe always!",
+      "tag": "closing_confirmation",
+      "mode": "bright"
+    },
+    {
+      "id": "cls098",
+      "text": "Maraming salamat po sa napakalaking order ninyo, ipapasa ko na po sa warehouse!",
+      "tag": "closing_confirmation",
+      "mode": "bright"
+    },
+    {
+      "id": "cls099",
+      "text": "I am extremely happy to help you process this transaction, have fun today!",
+      "tag": "closing_confirmation",
+      "mode": "bright"
+    },
+    {
+      "id": "cls100",
+      "text": "Sige po, thank you so much again, babye at mag-ingat po kayo palagi!",
+      "tag": "closing_confirmation",
+      "mode": "bright"
+    },
+    {
+      "id": "fup001",
+      "text": "Napag-isipan niyo na po ba yung tungkol sa inalok ko sa inyong item?",
+      "tag": "followup_callback",
+      "mode": "bright"
+    },
+    {
+      "id": "fup002",
+      "text": "Hello po, nagbabasakali lang kung kailangan niyo pa rin yung kinowt namin kanina.",
+      "tag": "followup_callback",
+      "mode": "bright"
+    },
+    {
+      "id": "fup003",
+      "text": "Just following up on your previous inquiry regarding our best selling product variants.",
+      "tag": "followup_callback",
+      "mode": "bright"
+    },
+    {
+      "id": "fup004",
+      "text": "Kumusta po ang naging experience ninyo sa binili ninyong item noong nakaraang linggo?",
+      "tag": "followup_callback",
+      "mode": "bright"
+    },
+    {
+      "id": "fup005",
+      "text": "Naalala ko po na sabi niyo tatawag kayo ngayong araw para sa desisyon niyo.",
+      "tag": "followup_callback",
+      "mode": "bright"
+    },
+    {
+      "id": "fup006",
+      "text": "We wanted to check if you have any questions about the quotation sent earlier.",
+      "tag": "followup_callback",
+      "mode": "bright"
+    },
+    {
+      "id": "fup007",
+      "text": "Magandang araw po! Nais ko lang i-follow up yung status ng inyong pending order.",
+      "tag": "followup_callback",
+      "mode": "bright"
+    },
+    {
+      "id": "fup008",
+      "text": "Baka po gusto ninyong ituloy na ang pag-order habang mayroon pa kaming stock.",
+      "tag": "followup_callback",
+      "mode": "bright"
+    },
+    {
+      "id": "fup009",
+      "text": "Checking in to see if you need any further assistance with your recent purchase.",
+      "tag": "followup_callback",
+      "mode": "bright"
+    },
+    {
+      "id": "fup010",
+      "text": "Tumatawag po ako para i-reschedule ang ating napag-usapang delivery date kahapon.",
+      "tag": "followup_callback",
+      "mode": "bright"
+    },
+    {
+      "id": "fup011",
+      "text": "Na-receive ko po ang miss call ninyo kaya narito ako para tumawag pabalik.",
+      "tag": "followup_callback",
+      "mode": "bright"
+    },
+    {
+      "id": "fup012",
+      "text": "I am calling back to give you the exact details you requested yesterday afternoon.",
+      "tag": "followup_callback",
+      "mode": "bright"
+    },
+    {
+      "id": "fup013",
+      "text": "Sabi niyo po kasi ay tatawag kayo mamaya para sa kumpirmasyon ng address.",
+      "tag": "followup_callback",
+      "mode": "bright"
+    },
+    {
+      "id": "fup014",
+      "text": "Nais ko lang po kamustahin kung nakuha na ninyo nang maayos ang inyong package.",
+      "tag": "followup_callback",
+      "mode": "bright"
+    },
+    {
+      "id": "fup015",
+      "text": "Following up on the payment proof you promised to send us this morning.",
+      "tag": "followup_callback",
+      "mode": "bright"
+    },
+    {
+      "id": "fup016",
+      "text": "Kung busy po kayo ngayon, kailan ko po kayo pwedeng tawagan ulit para i-follow up?",
+      "tag": "followup_callback",
+      "mode": "neutral"
+    },
+    {
+      "id": "fup017",
+      "text": "Mag-iiwan lang po ako ng mensahe dahil mukhang hindi po kayo available ngayon.",
+      "tag": "followup_callback",
+      "mode": "neutral"
+    },
+    {
+      "id": "fup018",
+      "text": "Please let me know if you would like me to call back at a better time.",
+      "tag": "followup_callback",
+      "mode": "neutral"
+    },
+    {
+      "id": "fup019",
+      "text": "Susubukan ko po kayong tawagan ulit bukas ng umaga para sa inyong desisyon.",
+      "tag": "followup_callback",
+      "mode": "neutral"
+    },
+    {
+      "id": "fup020",
+      "text": "I will leave a message with your colleague regarding our pending business proposal.",
+      "tag": "followup_callback",
+      "mode": "neutral"
+    },
+    {
+      "id": "fup021",
+      "text": "Magpapadala na lang po ako ng text message sakaling hindi ko kayo maabutang online.",
+      "tag": "followup_callback",
+      "mode": "neutral"
+    },
+    {
+      "id": "fup022",
+      "text": "Pasensya na po kung nakakaistorbo ako sa inyong trabaho sa ganitong oras ngayon.",
+      "tag": "followup_callback",
+      "mode": "apologetic"
+    },
+    {
+      "id": "fup023",
+      "text": "I sincerely apologize for missing your call earlier while I was in a meeting.",
+      "tag": "followup_callback",
+      "mode": "apologetic"
+    },
+    {
+      "id": "fup024",
+      "text": "Sorry po kung napilitan akong tawagan kayo ulit para sa kulang ninyong dokumento.",
+      "tag": "followup_callback",
+      "mode": "apologetic"
+    },
+    {
+      "id": "fup025",
+      "text": "Paumanhin po sa istorbo, nais ko lang i-verify kung natuloy ang inyong lakad.",
+      "tag": "followup_callback",
+      "mode": "apologetic"
+    },
+    {
+      "id": "fup026",
+      "text": "I apologize if my previous message sounded pushy regarding your product evaluation today.",
+      "tag": "followup_callback",
+      "mode": "apologetic"
+    },
+    {
+      "id": "fup027",
+      "text": "Huwag po kayong mag-alala, hindi ko na po kayo kukulitin kapag busy kayo.",
+      "tag": "followup_callback",
+      "mode": "reassuring"
+    },
+    {
+      "id": "fup028",
+      "text": "Rest assured that we only follow up to ensure your complete satisfaction with us.",
+      "tag": "followup_callback",
+      "mode": "reassuring"
+    },
+    {
+      "id": "fup029",
+      "text": "Nandito lang po ako para mag-assist sakaling kailanganin niyo ulit ang aming serbisyo.",
+      "tag": "followup_callback",
+      "mode": "reassuring"
+    },
+    {
+      "id": "fup030",
+      "text": "Take all the time you need, I am just checking in to offer help.",
+      "tag": "followup_callback",
+      "mode": "reassuring"
+    },
+    {
+      "id": "fup031",
+      "text": "Sakali pong may kakilala kayong nangangailangan ng aming produkto, baka pwede niyo kaming irekomenda.",
+      "tag": "followup_callback",
+      "mode": "bright"
+    },
+    {
+      "id": "fup032",
+      "text": "If you know anyone else looking for our services, we would deeply appreciate referrals.",
+      "tag": "followup_callback",
+      "mode": "bright"
+    },
+    {
+      "id": "fup033",
+      "text": "Mayroon po ba kayong maibibigay na kakilala na pwede naming tawagan para sa promo?",
+      "tag": "followup_callback",
+      "mode": "bright"
+    },
+    {
+      "id": "fup034",
+      "text": "We love giving special discounts to customers who refer their friends to our shop.",
+      "tag": "followup_callback",
+      "mode": "bright"
+    },
+    {
+      "id": "fup035",
+      "text": "Kung nasiyahan po kayo sa aming serbisyo, pwede niyo kaming ikuwento sa inyong mga kaibigan.",
+      "tag": "followup_callback",
+      "mode": "bright"
+    },
+    {
+      "id": "fup036",
+      "text": "Tumatawag po ako para kamustahin kung kumusta ang naging takbo ng inyong negosyo.",
+      "tag": "followup_callback",
+      "mode": "bright"
+    },
+    {
+      "id": "fup037",
+      "text": "Following up to see if you had a chance to review our new service catalog.",
+      "tag": "followup_callback",
+      "mode": "neutral"
+    },
+    {
+      "id": "fup038",
+      "text": "Binabalikan ko lang po kayo tungkol sa ten percent na napag-usapan natin.",
+      "tag": "followup_callback",
+      "mode": "neutral"
+    },
+    {
+      "id": "fup039",
+      "text": "I am returning your missed call from earlier this morning, how can I help?",
+      "tag": "followup_callback",
+      "mode": "bright"
+    },
+    {
+      "id": "fup040",
+      "text": "Nais ko lang pong itanong kung na-deliver na ba ng maayos ang inyong package.",
+      "tag": "followup_callback",
+      "mode": "neutral"
+    },
+    {
+      "id": "fup041",
+      "text": "Nagbabakasakali po akong makapanayam kayo ngayon para sa inyong feedback sa binili niyo.",
+      "tag": "followup_callback",
+      "mode": "neutral"
+    },
+    {
+      "id": "fup042",
+      "text": "We are following up on your pending request to change the delivery address details.",
+      "tag": "followup_callback",
+      "mode": "neutral"
+    },
+    {
+      "id": "fup043",
+      "text": "Kailan po kaya kayo magkakaroon ng libreng oras para mapag-usapan natin ito ulit?",
+      "tag": "followup_callback",
+      "mode": "neutral"
+    },
+    {
+      "id": "fup044",
+      "text": "Just checking in to confirm if your equipment is running smoothly after our maintenance.",
+      "tag": "followup_callback",
+      "mode": "bright"
+    },
+    {
+      "id": "fup045",
+      "text": "Tumawag po ako para ipaalala na mag-eexpire na ang inyong discount voucher bukas.",
+      "tag": "followup_callback",
+      "mode": "bright"
+    },
+    {
+      "id": "fup046",
+      "text": "Pasensya na po sa istorbo, gusto ko lang i-confirm kung tama ang numero ninyo.",
+      "tag": "followup_callback",
+      "mode": "apologetic"
+    },
+    {
+      "id": "fup047",
+      "text": "I apologize for calling late, but I needed an update regarding your shipment.",
+      "tag": "followup_callback",
+      "mode": "apologetic"
+    },
+    {
+      "id": "fup048",
+      "text": "Wag po kayong mag-alala, hindi ko na po kayo kukulitin pagkatapos nitong tawag.",
+      "tag": "followup_callback",
+      "mode": "reassuring"
+    },
+    {
+      "id": "fup049",
+      "text": "Makakaasa kayong hihintayin ko ang inyong pagbabalik tuwing kailangan ninyo ng tulong.",
+      "tag": "followup_callback",
+      "mode": "reassuring"
+    },
+    {
+      "id": "fup050",
+      "text": "Kung may mga kaibigan kayong gustong umorder, pwede niyo silang papuntahin sa aming pahina.",
+      "tag": "followup_callback",
+      "mode": "bright"
+    },
+    {
+      "id": "fup051",
+      "text": "Naalala ko po na naghahanap kayo ng alternative, kaya tinatawagan ko kayo ngayon.",
+      "tag": "followup_callback",
+      "mode": "bright"
+    },
+    {
+      "id": "fup052",
+      "text": "Following up to see if you still require the items we reserved last week.",
+      "tag": "followup_callback",
+      "mode": "neutral"
+    },
+    {
+      "id": "fup053",
+      "text": "Nais ko lang itanong kung pumasok na sa inyong isip ang alok naming presyo.",
+      "tag": "followup_callback",
+      "mode": "neutral"
+    },
+    {
+      "id": "fup054",
+      "text": "Tumatawag ako para i-update kayo na dumating na ang inaabangan ninyong kulay.",
+      "tag": "followup_callback",
+      "mode": "bright"
+    },
+    {
+      "id": "fup055",
+      "text": "I am following up on your feedback so we can improve our customer service.",
+      "tag": "followup_callback",
+      "mode": "neutral"
+    },
+    {
+      "id": "fup056",
+      "text": "Gusto ko lang po kamustahin kung nasubukan niyo na ang bagong produktong ipinadala namin.",
+      "tag": "followup_callback",
+      "mode": "bright"
+    },
+    {
+      "id": "fup057",
+      "text": "Just calling back to give you the tracking number for your replacement package.",
+      "tag": "followup_callback",
+      "mode": "bright"
+    },
+    {
+      "id": "fup058",
+      "text": "Sakali pong may concern kayo sa items, pwede niyo akong tawagan anumang oras.",
+      "tag": "followup_callback",
+      "mode": "reassuring"
+    },
+    {
+      "id": "fup059",
+      "text": "Binabalikan ko po ang inyong mensahe tungkol sa nagka-aberyang pagpapadala noong isang araw.",
+      "tag": "followup_callback",
+      "mode": "neutral"
+    },
+    {
+      "id": "fup060",
+      "text": "We appreciate your time, please let us know if you have any new referrals.",
+      "tag": "followup_callback",
+      "mode": "bright"
+    },
+    {
+      "id": "fup061",
+      "text": "Nais ko lang pong itanong kung tuloy pa rin po ang ating miting bukas.",
+      "tag": "followup_callback",
+      "mode": "neutral"
+    },
+    {
+      "id": "fup062",
+      "text": "Following up to make sure that you received our official digital receipt successfully.",
+      "tag": "followup_callback",
+      "mode": "neutral"
+    },
+    {
+      "id": "fup063",
+      "text": "Tumatawag ako para i-check kung napag-usapan niyo na ng pamilya niyo ang pagbili.",
+      "tag": "followup_callback",
+      "mode": "neutral"
+    },
+    {
+      "id": "fup064",
+      "text": "I apologize if I caught you at a bad time during your busy workday.",
+      "tag": "followup_callback",
+      "mode": "apologetic"
+    },
+    {
+      "id": "fup065",
+      "text": "Pasensya na po sa abala, gusto ko lang i-follow up yung naiwang balanse ninyo.",
+      "tag": "followup_callback",
+      "mode": "apologetic"
+    },
+    {
+      "id": "fup066",
+      "text": "Wag po kayong mabahala, maghihintay po kami sa inyong tawag kahit kailan kayo maging handa.",
+      "tag": "followup_callback",
+      "mode": "reassuring"
+    },
+    {
+      "id": "fup067",
+      "text": "Kung sakaling may mairekomenda kayong kakilala, bibigyan namin kayo ng libreng shipping ngayon.",
+      "tag": "followup_callback",
+      "mode": "bright"
+    },
+    {
+      "id": "fup068",
+      "text": "Nais ko lang kamustahin ang lagay ng iyong biniling gamit pagkatapos ng ilang buwan.",
+      "tag": "followup_callback",
+      "mode": "bright"
+    },
+    {
+      "id": "fup069",
+      "text": "Following up on the status of your warranty claim with our technical repair team.",
+      "tag": "followup_callback",
+      "mode": "neutral"
+    },
+    {
+      "id": "fup070",
+      "text": "Tumatawag po ako para batiin kayo at alamin kung kailangan niyo ng bagong supply.",
+      "tag": "followup_callback",
+      "mode": "bright"
+    },
+    {
+      "id": "fup071",
+      "text": "I am returning your call from yesterday to answer all your questions directly.",
+      "tag": "followup_callback",
+      "mode": "bright"
+    },
+    {
+      "id": "fup072",
+      "text": "Baka po sakaling nagbago ang isip niyo tungkol sa pinag-usapan nating bulk order kahapon.",
+      "tag": "followup_callback",
+      "mode": "bright"
+    },
+    {
+      "id": "fup073",
+      "text": "Just checking in to ensure everything is operating to your utmost satisfaction today.",
+      "tag": "followup_callback",
+      "mode": "bright"
+    },
+    {
+      "id": "fup074",
+      "text": "Nais ko lang pong ipaalala na may naghihintay na promo para sa mga susuking suki.",
+      "tag": "followup_callback",
+      "mode": "bright"
+    },
+    {
+      "id": "fup075",
+      "text": "Pasensya na po kung na-ulit ang pagtawag ko, nais ko lang po talagang makasiguro.",
+      "tag": "followup_callback",
+      "mode": "apologetic"
+    },
+    {
+      "id": "fup076",
+      "text": "I apologize for the multiple attempts to reach you regarding your delivery schedule.",
+      "tag": "followup_callback",
+      "mode": "apologetic"
+    },
+    {
+      "id": "fup077",
+      "text": "Makakaasa kayong hindi namin ibibigay sa iba ang reserbang item na naka-assign sa inyo.",
+      "tag": "followup_callback",
+      "mode": "reassuring"
+    },
+    {
+      "id": "fup078",
+      "text": "Kung may mga kakilala kayong naghahanap ng murang kagamitan, huwag kalimutang banggitin ang pangalan namin.",
+      "tag": "followup_callback",
+      "mode": "bright"
+    },
+    {
+      "id": "fup079",
+      "text": "Nais ko lang i-follow up kung pumasok na sa inyong account ang aming mensahe.",
+      "tag": "followup_callback",
+      "mode": "neutral"
+    },
+    {
+      "id": "fup080",
+      "text": "Following up on your request for a special customized quotation for your office.",
+      "tag": "followup_callback",
+      "mode": "neutral"
+    },
+    {
+      "id": "fup081",
+      "text": "Tumatawag ako para kamustahin kung nasubukan niyo nang tawagan yung binigay kong numero.",
+      "tag": "followup_callback",
+      "mode": "neutral"
+    },
+    {
+      "id": "fup082",
+      "text": "I am calling back to give you the good news about your approved discount.",
+      "tag": "followup_callback",
+      "mode": "bright"
+    },
+    {
+      "id": "fup083",
+      "text": "Baka po sakaling may oras na kayong pag-usapan ang tungkol sa ating partnership ngayon.",
+      "tag": "followup_callback",
+      "mode": "bright"
+    },
+    {
+      "id": "fup084",
+      "text": "Just following up to see if you need any changes made to your reservation.",
+      "tag": "followup_callback",
+      "mode": "neutral"
+    },
+    {
+      "id": "fup085",
+      "text": "Nais ko lang itanong kung naging maayos ba ang naging transaksyon ninyo kahapon.",
+      "tag": "followup_callback",
+      "mode": "bright"
+    },
+    {
+      "id": "fup086",
+      "text": "Pasensya na po kung nakakaistorbo sa pahinga ninyo, mabilis lang po itong pag-uusapan natin.",
+      "tag": "followup_callback",
+      "mode": "apologetic"
+    },
+    {
+      "id": "fup087",
+      "text": "I apologize if my call interrupted your lunch break, I just wanted a quick update.",
+      "tag": "followup_callback",
+      "mode": "apologetic"
+    },
+    {
+      "id": "fup088",
+      "text": "Huwag po kayong mag-alala, gagawa kami ng paraan para matulungan kayong magka-oras sa susunod.",
+      "tag": "followup_callback",
+      "mode": "reassuring"
+    },
+    {
+      "id": "fup089",
+      "text": "Kung may kakilala kayong gustong kumita sa pamamagitan ng pag-reseller, sabihin niyo lang sa amin.",
+      "tag": "followup_callback",
+      "mode": "bright"
+    },
+    {
+      "id": "fup090",
+      "text": "Nais ko lang pong i-follow up kung nasaan na ang ipinangako ninyong feedback form.",
+      "tag": "followup_callback",
+      "mode": "neutral"
+    },
+    {
+      "id": "fup091",
+      "text": "Following up to confirm if your delivery instructions for tomorrow are still the same.",
+      "tag": "followup_callback",
+      "mode": "neutral"
+    },
+    {
+      "id": "fup092",
+      "text": "Tumatawag po ako para itanong kung pwedeng i-reschedule sa ten AM.",
+      "tag": "followup_callback",
+      "mode": "neutral"
+    },
+    {
+      "id": "fup093",
+      "text": "I am returning your call to make sure all your concerns were addressed properly.",
+      "tag": "followup_callback",
+      "mode": "bright"
+    },
+    {
+      "id": "fup094",
+      "text": "Binabalikan ko po ang hiningi ninyong listahan ng mga bagong dating naming produkto ngayon.",
+      "tag": "followup_callback",
+      "mode": "bright"
+    },
+    {
+      "id": "fup095",
+      "text": "Just checking in to see if you are completely happy with your recent order.",
+      "tag": "followup_callback",
+      "mode": "bright"
+    },
+    {
+      "id": "fup096",
+      "text": "Nais ko lang itanong kung naibigay ninyo na sa inyong kaibigan ang aming flyers.",
+      "tag": "followup_callback",
+      "mode": "bright"
+    },
+    {
+      "id": "fup097",
+      "text": "Pasensya na po sa pangungulit, gusto ko lang po kasing masigurong maayos ang lahat.",
+      "tag": "followup_callback",
+      "mode": "apologetic"
+    },
+    {
+      "id": "fup098",
+      "text": "I apologize if this call is untimely, but we needed your quick confirmation today.",
+      "tag": "followup_callback",
+      "mode": "apologetic"
+    },
+    {
+      "id": "fup099",
+      "text": "Makakaasa po kayong hihintayin ko ang inyong pagtawag kahit abutin pa tayo ng gabi.",
+      "tag": "followup_callback",
+      "mode": "reassuring"
+    },
+    {
+      "id": "fup100",
+      "text": "Maraming salamat po sa pakikipag-usap sa akin, hihintayin ko na lamang ang inyong desisyon.",
+      "tag": "followup_callback",
+      "mode": "bright"
+    },
+    {
+      "id": "num001",
+      "text": "Maaari po bang pakisulat ang contact number na zero nine one seven, three four five, six seven eight nine?",
+      "tag": "numbers_dates_times",
+      "mode": "neutral"
+    },
+    {
+      "id": "num002",
+      "text": "Two thousand five hundred pesos po lahat ang total ng bibilhin ninyo ngayon.",
+      "tag": "numbers_dates_times",
+      "mode": "bright"
+    },
+    {
+      "id": "num003",
+      "text": "Eight AM po kami magbubukas ng ating shop bukas para sa mga customer.",
+      "tag": "numbers_dates_times",
+      "mode": "neutral"
+    },
+    {
+      "id": "num004",
+      "text": "Three pieces na lang po ang natitira sa kulay itim na kailangan ninyo.",
+      "tag": "numbers_dates_times",
+      "mode": "neutral"
+    },
+    {
+      "id": "num005",
+      "text": "August twenty eight po ang date ngayon sa ating kalendaryo.",
+      "tag": "numbers_dates_times",
+      "mode": "neutral"
+    },
+    {
+      "id": "num006",
+      "text": "Paki-check po ang numerong zero nine one seven, eight eight eight, one two three four.",
+      "tag": "numbers_dates_times",
+      "mode": "neutral"
+    },
+    {
+      "id": "num007",
+      "text": "Three fifty po bawat piraso ang sisingilin namin para sa item na iyan.",
+      "tag": "numbers_dates_times",
+      "mode": "neutral"
+    },
+    {
+      "id": "num008",
+      "text": "Five PM na po kami magsasara kaya magmadali po kayong mag-order.",
+      "tag": "numbers_dates_times",
+      "mode": "neutral"
+    },
+    {
+      "id": "num009",
+      "text": "Twelve pieces po ang laman ng isang box na ipapadala namin sa inyo.",
+      "tag": "numbers_dates_times",
+      "mode": "neutral"
+    },
+    {
+      "id": "num010",
+      "text": "Friday po ngayon, August twenty eight, kaya medyo busy ang aming courier.",
+      "tag": "numbers_dates_times",
+      "mode": "neutral"
+    },
+    {
+      "id": "num011",
+      "text": "Ang reference number po ninyo para sa transaction na ito ay four hundred twelve.",
+      "tag": "numbers_dates_times",
+      "mode": "neutral"
+    },
+    {
+      "id": "num012",
+      "text": "Three thousand eight hundred seventy five pesos po ang kabuuang babayaran ninyo.",
+      "tag": "numbers_dates_times",
+      "mode": "neutral"
+    },
+    {
+      "id": "num013",
+      "text": "Three thirty PM po darating ang rider sa inyong bahay mamaya.",
+      "tag": "numbers_dates_times",
+      "mode": "neutral"
+    },
+    {
+      "id": "num014",
+      "text": "Ten percent discount po ang makukuha ninyo kapag kinuha ninyo ang buong set.",
+      "tag": "numbers_dates_times",
+      "mode": "bright"
+    },
+    {
+      "id": "num015",
+      "text": "December thirty first po ang huling araw ng ating malaking taunang sale.",
+      "tag": "numbers_dates_times",
+      "mode": "bright"
+    },
+    {
+      "id": "num016",
+      "text": "Zero nine one nine, five four three, two one zero nine po ang contact number.",
+      "tag": "numbers_dates_times",
+      "mode": "neutral"
+    },
+    {
+      "id": "num017",
+      "text": "Six eighty pesos po ang presyo ng bawat isang piraso sa aming shop.",
+      "tag": "numbers_dates_times",
+      "mode": "neutral"
+    },
+    {
+      "id": "num018",
+      "text": "Nine AM po kami magsisimulang tumanggap ng mga tawag mula sa mga kliyente.",
+      "tag": "numbers_dates_times",
+      "mode": "neutral"
+    },
+    {
+      "id": "num019",
+      "text": "Twenty five percent downpayment po muna ang kailangan nating i-settle ngayon.",
+      "tag": "numbers_dates_times",
+      "mode": "neutral"
+    },
+    {
+      "id": "num020",
+      "text": "Monday, August thirty one po ang ating next meeting schedule sa office.",
+      "tag": "numbers_dates_times",
+      "mode": "neutral"
+    },
+    {
+      "id": "num021",
+      "text": "House number twenty three po tayo sa Second Street dito sa subdivision.",
+      "tag": "numbers_dates_times",
+      "mode": "neutral"
+    },
+    {
+      "id": "num022",
+      "text": "Five thousand pesos po ang minimum spend para sa free delivery natin.",
+      "tag": "numbers_dates_times",
+      "mode": "neutral"
+    },
+    {
+      "id": "num023",
+      "text": "Twelve thirty PM po mag-uusap ang ating mga tauhan sa stockroom.",
+      "tag": "numbers_dates_times",
+      "mode": "neutral"
+    },
+    {
+      "id": "num024",
+      "text": "Nine pieces na lang po ang available stock natin para sa design na iyon.",
+      "tag": "numbers_dates_times",
+      "mode": "neutral"
+    },
+    {
+      "id": "num025",
+      "text": "September four po magsisimula ang ating special promo para sa lahat.",
+      "tag": "numbers_dates_times",
+      "mode": "bright"
+    },
+    {
+      "id": "num026",
+      "text": "Zero nine two seven, six four one, two three four five po ang number.",
+      "tag": "numbers_dates_times",
+      "mode": "neutral"
+    },
+    {
+      "id": "num027",
+      "text": "Four fifty pesos po ang dagdag na singil para sa express shipping natin.",
+      "tag": "numbers_dates_times",
+      "mode": "neutral"
+    },
+    {
+      "id": "num028",
+      "text": "Seven PM po kayo tumawag ulit para malaman ang status ng order ninyo.",
+      "tag": "numbers_dates_times",
+      "mode": "neutral"
+    },
+    {
+      "id": "num029",
+      "text": "Twelve pieces po ang kasya sa loob ng maliit na pouch na ito.",
+      "tag": "numbers_dates_times",
+      "mode": "neutral"
+    },
+    {
+      "id": "num030",
+      "text": "Twenty twenty six po ang kasalukuyang taon ng ating operasyon ngayon.",
+      "tag": "numbers_dates_times",
+      "mode": "neutral"
+    },
+    {
+      "id": "num031",
+      "text": "Zero nine three one, six seven eight, nine zero one two po.",
+      "tag": "numbers_dates_times",
+      "mode": "neutral"
+    },
+    {
+      "id": "num032",
+      "text": "Seven twenty pesos po ang dapat niyong i-transfer sa aming gcash account.",
+      "tag": "numbers_dates_times",
+      "mode": "neutral"
+    },
+    {
+      "id": "num033",
+      "text": "Ten thirty AM po magbubukas ang pinakamalapit naming branch sa inyo.",
+      "tag": "numbers_dates_times",
+      "mode": "neutral"
+    },
+    {
+      "id": "num034",
+      "text": "Eight years na po kaming naglilingkod sa ating lokal na komunidad ngayon.",
+      "tag": "numbers_dates_times",
+      "mode": "bright"
+    },
+    {
+      "id": "num035",
+      "text": "October fifteen po ang deadline ng inyong monthly payment sa aming system.",
+      "tag": "numbers_dates_times",
+      "mode": "neutral"
+    },
+    {
+      "id": "num036",
+      "text": "Zero nine four seven, five eight six, three two one zero po ang number.",
+      "tag": "numbers_dates_times",
+      "mode": "neutral"
+    },
+    {
+      "id": "num037",
+      "text": "Two thousand one hundred pesos po ang naging kabuuang gastos sa materials.",
+      "tag": "numbers_dates_times",
+      "mode": "neutral"
+    },
+    {
+      "id": "num038",
+      "text": "Four PM po tayo magkita malapit sa main entrance ng building.",
+      "tag": "numbers_dates_times",
+      "mode": "neutral"
+    },
+    {
+      "id": "num039",
+      "text": "Eleven days po ang itatagal ng shipping kapag sa province ang address.",
+      "tag": "numbers_dates_times",
+      "mode": "neutral"
+    },
+    {
+      "id": "num040",
+      "text": "Saturday, August twenty nine po natin i-schedule ang inyong delivery ngayon.",
+      "tag": "numbers_dates_times",
+      "mode": "neutral"
+    },
+    {
+      "id": "num041",
+      "text": "Order reference number five hundred eight po ang ilagay ninyo sa form.",
+      "tag": "numbers_dates_times",
+      "mode": "neutral"
+    },
+    {
+      "id": "num042",
+      "text": "Three thousand fifty pesos po ang sisingilin ng rider sa inyong pinto.",
+      "tag": "numbers_dates_times",
+      "mode": "neutral"
+    },
+    {
+      "id": "num043",
+      "text": "Six AM po kami nagbubukas ng aming tindahan para sa mga early buyers.",
+      "tag": "numbers_dates_times",
+      "mode": "neutral"
+    },
+    {
+      "id": "num044",
+      "text": "Forty percent off po ang ibinigay naming discount sa lumang stock ngayon.",
+      "tag": "numbers_dates_times",
+      "mode": "bright"
+    },
+    {
+      "id": "num045",
+      "text": "Twenty eight days lang po ang meron ang February sa ordinaryong taon.",
+      "tag": "numbers_dates_times",
+      "mode": "neutral"
+    },
+    {
+      "id": "num046",
+      "text": "Zero nine five six, seven eight nine, zero one two three po ito.",
+      "tag": "numbers_dates_times",
+      "mode": "neutral"
+    },
+    {
+      "id": "num047",
+      "text": "One thousand one hundred pesos po ang babayaran para sa bawat set.",
+      "tag": "numbers_dates_times",
+      "mode": "neutral"
+    },
+    {
+      "id": "num048",
+      "text": "Three PM po kayo tumawag ulit para makuha ang tracking details ninyo.",
+      "tag": "numbers_dates_times",
+      "mode": "neutral"
+    },
+    {
+      "id": "num049",
+      "text": "Six boxes po ng kulay blue ang natitira sa aming main inventory.",
+      "tag": "numbers_dates_times",
+      "mode": "neutral"
+    },
+    {
+      "id": "num050",
+      "text": "September ten po magtatapos ang ating malaking end of season sale.",
+      "tag": "numbers_dates_times",
+      "mode": "bright"
+    },
+    {
+      "id": "num051",
+      "text": "Zero nine eight six, seven three four, five six seven eight po.",
+      "tag": "numbers_dates_times",
+      "mode": "neutral"
+    },
+    {
+      "id": "num052",
+      "text": "Five ninety pesos po ang huling presyo ng item na hinahanap ninyo.",
+      "tag": "numbers_dates_times",
+      "mode": "neutral"
+    },
+    {
+      "id": "num053",
+      "text": "Nine thirty PM po magtatapos ang ating live selling session mamayang gabi.",
+      "tag": "numbers_dates_times",
+      "mode": "neutral"
+    },
+    {
+      "id": "num054",
+      "text": "Twenty people po ang kasalukuyang nagtatrabaho sa aming opisina sa Taytay.",
+      "tag": "numbers_dates_times",
+      "mode": "neutral"
+    },
+    {
+      "id": "num055",
+      "text": "October thirteen po ang birthday ng aming business partner ngayong taon.",
+      "tag": "numbers_dates_times",
+      "mode": "neutral"
+    },
+    {
+      "id": "num056",
+      "text": "Zero nine six seven, eight nine one, two three four five po.",
+      "tag": "numbers_dates_times",
+      "mode": "neutral"
+    },
+    {
+      "id": "num057",
+      "text": "Nine hundred seventy five pesos po ang ibinayad ng customer kanina.",
+      "tag": "numbers_dates_times",
+      "mode": "neutral"
+    },
+    {
+      "id": "num058",
+      "text": "Twelve noon po magsisimula ang delivery ng mga pagkain sa ating shop.",
+      "tag": "numbers_dates_times",
+      "mode": "neutral"
+    },
+    {
+      "id": "num059",
+      "text": "Twelve months po ang itatagal ng warranty ng binili ninyong makina.",
+      "tag": "numbers_dates_times",
+      "mode": "neutral"
+    },
+    {
+      "id": "num060",
+      "text": "Sunday, August thirty po ang date ngayon sa ating sistema.",
+      "tag": "numbers_dates_times",
+      "mode": "neutral"
+    },
+    {
+      "id": "num061",
+      "text": "Transaction code nine hundred po ang binigay sa amin sa chat.",
+      "tag": "numbers_dates_times",
+      "mode": "neutral"
+    },
+    {
+      "id": "num062",
+      "text": "Four thousand five hundred one pesos po ang kabuuang halaga ngayon.",
+      "tag": "numbers_dates_times",
+      "mode": "neutral"
+    },
+    {
+      "id": "num063",
+      "text": "Eight thirty PM po kami huling tumatanggap ng tawag mula sa customer.",
+      "tag": "numbers_dates_times",
+      "mode": "neutral"
+    },
+    {
+      "id": "num064",
+      "text": "Five percent po ang bawas sa mga transaksyong gumagamit ng credit card.",
+      "tag": "numbers_dates_times",
+      "mode": "neutral"
+    },
+    {
+      "id": "num065",
+      "text": "November twenty five po ang napag-usapang araw ng ating pagpapadala ng items.",
+      "tag": "numbers_dates_times",
+      "mode": "neutral"
+    },
+    {
+      "id": "num066",
+      "text": "Zero nine two four, six eight one, three five seven nine po.",
+      "tag": "numbers_dates_times",
+      "mode": "neutral"
+    },
+    {
+      "id": "num067",
+      "text": "Three twenty pesos po ang ipapadala ninyong bayad sa aming gcash.",
+      "tag": "numbers_dates_times",
+      "mode": "neutral"
+    },
+    {
+      "id": "num068",
+      "text": "Five thirty AM po kami magbubukas ng shop para sa mga suki.",
+      "tag": "numbers_dates_times",
+      "mode": "neutral"
+    },
+    {
+      "id": "num069",
+      "text": "Sixteen pieces po ang natitira sa aming kulay white na t-shirt.",
+      "tag": "numbers_dates_times",
+      "mode": "neutral"
+    },
+    {
+      "id": "num070",
+      "text": "Twenty twenty six po ang taon ngayon kaya mabilis ang mga sistema.",
+      "tag": "numbers_dates_times",
+      "mode": "neutral"
+    },
+    {
+      "id": "num071",
+      "text": "Zero nine three four, five six seven, eight nine zero one po.",
+      "tag": "numbers_dates_times",
+      "mode": "neutral"
+    },
+    {
+      "id": "num072",
+      "text": "One thousand eight hundred pesos po ang sisingilin sa inyo total.",
+      "tag": "numbers_dates_times",
+      "mode": "neutral"
+    },
+    {
+      "id": "num073",
+      "text": "Four thirty PM po darating ang delivery rider sa inyong kanto.",
+      "tag": "numbers_dates_times",
+      "mode": "neutral"
+    },
+    {
+      "id": "num074",
+      "text": "Ten items po ang limitasyon ng bawat customer sa ating promo ngayon.",
+      "tag": "numbers_dates_times",
+      "mode": "neutral"
+    },
+    {
+      "id": "num075",
+      "text": "November six po magsisimula ang aming technical training sa opisina.",
+      "tag": "numbers_dates_times",
+      "mode": "neutral"
+    },
+    {
+      "id": "num076",
+      "text": "Zero nine eight seven, six five four, three two one zero po.",
+      "tag": "numbers_dates_times",
+      "mode": "neutral"
+    },
+    {
+      "id": "num077",
+      "text": "Six fifty pesos po ang bayad para sa standard delivery service natin.",
+      "tag": "numbers_dates_times",
+      "mode": "neutral"
+    },
+    {
+      "id": "num078",
+      "text": "Seven thirty PM po tayo mag-uusap ulit tungkol sa inyong order.",
+      "tag": "numbers_dates_times",
+      "mode": "neutral"
+    },
+    {
+      "id": "num079",
+      "text": "Twenty five days po ang lumipas mula nang simulan natin ang proyektong ito.",
+      "tag": "numbers_dates_times",
+      "mode": "neutral"
+    },
+    {
+      "id": "num080",
+      "text": "Monday, August thirty one po ang araw ngayon sa ating kalendaryo.",
+      "tag": "numbers_dates_times",
+      "mode": "neutral"
+    },
+    {
+      "id": "num081",
+      "text": "Reference number seven hundred po ang ibinigay sa amin kanina.",
+      "tag": "numbers_dates_times",
+      "mode": "neutral"
+    },
+    {
+      "id": "num082",
+      "text": "Five thousand eight hundred pesos po ang total ng biniling kagamitan.",
+      "tag": "numbers_dates_times",
+      "mode": "neutral"
+    },
+    {
+      "id": "num083",
+      "text": "Ten AM po tayo magsisimula ng ating general meeting sa conference room.",
+      "tag": "numbers_dates_times",
+      "mode": "neutral"
+    },
+    {
+      "id": "num084",
+      "text": "Three percent po ang service fee para sa over the counter payment.",
+      "tag": "numbers_dates_times",
+      "mode": "neutral"
+    },
+    {
+      "id": "num085",
+      "text": "December eleven po ang huling araw ng aming pasok bago mag-pasko.",
+      "tag": "numbers_dates_times",
+      "mode": "neutral"
+    },
+    {
+      "id": "num086",
+      "text": "Zero nine one two, three four five, six seven eight nine po.",
+      "tag": "numbers_dates_times",
+      "mode": "neutral"
+    },
+    {
+      "id": "num087",
+      "text": "Eight forty pesos po ang eksaktong halaga ng inorder ninyong item.",
+      "tag": "numbers_dates_times",
+      "mode": "neutral"
+    },
+    {
+      "id": "num088",
+      "text": "Two thirty PM po tayo magkikita sa kanto para sa pickup.",
+      "tag": "numbers_dates_times",
+      "mode": "neutral"
+    },
+    {
+      "id": "num089",
+      "text": "Eighteen pieces po ang inorder ng ating suking kliyente sa Rizal.",
+      "tag": "numbers_dates_times",
+      "mode": "neutral"
+    },
+    {
+      "id": "num090",
+      "text": "September one po ang date para sa susunod nating delivery schedule.",
+      "tag": "numbers_dates_times",
+      "mode": "neutral"
+    },
+    {
+      "id": "num091",
+      "text": "Zero nine four five, six seven eight, nine zero one two po.",
+      "tag": "numbers_dates_times",
+      "mode": "neutral"
+    },
+    {
+      "id": "num092",
+      "text": "Two thousand three hundred pesos po ang inyong kabuuang sukli ngayon.",
+      "tag": "numbers_dates_times",
+      "mode": "bright"
+    },
+    {
+      "id": "num093",
+      "text": "Nine PM po kami magsasara ng aming opisina para sa araw na ito.",
+      "tag": "numbers_dates_times",
+      "mode": "neutral"
+    },
+    {
+      "id": "num094",
+      "text": "Ten days po ang hihintayin bago makuha ang custom item sa supplier.",
+      "tag": "numbers_dates_times",
+      "mode": "neutral"
+    },
+    {
+      "id": "num095",
+      "text": "August twenty eight po ang tamang date ngayon sa ating sistema.",
+      "tag": "numbers_dates_times",
+      "mode": "neutral"
+    },
+    {
+      "id": "num096",
+      "text": "Zero nine six eight, seven five four, three two one zero po.",
+      "tag": "numbers_dates_times",
+      "mode": "neutral"
+    },
+    {
+      "id": "num097",
+      "text": "One thousand ninety pesos po ang presyo ng bagong sapatos natin.",
+      "tag": "numbers_dates_times",
+      "mode": "neutral"
+    },
+    {
+      "id": "num098",
+      "text": "Six AM po kayo tumawag bukas para sa inyong advanced reservation.",
+      "tag": "numbers_dates_times",
+      "mode": "neutral"
+    },
+    {
+      "id": "num099",
+      "text": "Seven boxes po ng red at blue items ang naihatid sa amin.",
+      "tag": "numbers_dates_times",
+      "mode": "neutral"
+    },
+    {
+      "id": "num100",
+      "text": "Twelve noon po ang eksaktong oras ng pagdating ng shipment sa warehouse.",
+      "tag": "numbers_dates_times",
+      "mode": "neutral"
+    },
+    {
+      "id": "eng001",
+      "text": "Good morning and thank you for calling, my name is Sarah speaking.",
+      "tag": "english_block",
+      "mode": "bright"
+    },
+    {
+      "id": "eng002",
+      "text": "How may I assist you with your order details today?",
+      "tag": "english_block",
+      "mode": "bright"
+    },
+    {
+      "id": "eng003",
+      "text": "Please hold the line for a moment while I check our system.",
+      "tag": "english_block",
+      "mode": "neutral"
+    },
+    {
+      "id": "eng004",
+      "text": "Thank you for waiting, I have successfully retrieved your account records.",
+      "tag": "english_block",
+      "mode": "neutral"
+    },
+    {
+      "id": "eng005",
+      "text": "I am so sorry to inform you that the item is out of stock.",
+      "tag": "english_block",
+      "mode": "apologetic"
+    },
+    {
+      "id": "eng006",
+      "text": "We expect a new shipment to arrive by Monday morning.",
+      "tag": "english_block",
+      "mode": "neutral"
+    },
+    {
+      "id": "eng007",
+      "text": "Yes, we have plenty of available inventory in the medium size.",
+      "tag": "english_block",
+      "mode": "bright"
+    },
+    {
+      "id": "eng008",
+      "text": "The total price comes out to exactly one thousand five hundred pesos.",
+      "tag": "english_block",
+      "mode": "neutral"
+    },
+    {
+      "id": "eng009",
+      "text": "You can save twenty percent if you purchase the bundle package today.",
+      "tag": "english_block",
+      "mode": "bright"
+    },
+    {
+      "id": "eng010",
+      "text": "We offer free shipping for all orders above five thousand pesos.",
+      "tag": "english_block",
+      "mode": "bright"
+    },
+    {
+      "id": "eng011",
+      "text": "Your package will be delivered right to your front door tomorrow.",
+      "tag": "english_block",
+      "mode": "bright"
+    },
+    {
+      "id": "eng012",
+      "text": "The delivery rider will send you a text message before arriving.",
+      "tag": "english_block",
+      "mode": "neutral"
+    },
+    {
+      "id": "eng013",
+      "text": "We accept payments through GCash, bank transfer, and cash on delivery.",
+      "tag": "english_block",
+      "mode": "neutral"
+    },
+    {
+      "id": "eng014",
+      "text": "Please send a screenshot of your payment receipt to our email.",
+      "tag": "english_block",
+      "mode": "neutral"
+    },
+    {
+      "id": "eng015",
+      "text": "I completely understand your concern regarding the price of this product.",
+      "tag": "english_block",
+      "mode": "reassuring"
+    },
+    {
+      "id": "eng016",
+      "text": "Rest assured that our items are made from premium quality materials.",
+      "tag": "english_block",
+      "mode": "reassuring"
+    },
+    {
+      "id": "eng017",
+      "text": "Take all the time you need to think about your purchase.",
+      "tag": "english_block",
+      "mode": "reassuring"
+    },
+    {
+      "id": "eng018",
+      "text": "Let me read back your complete delivery address to ensure accuracy.",
+      "tag": "english_block",
+      "mode": "neutral"
+    },
+    {
+      "id": "eng019",
+      "text": "Your order has been confirmed and is ready for dispatch now.",
+      "tag": "english_block",
+      "mode": "bright"
+    },
+    {
+      "id": "eng020",
+      "text": "Thank you for shopping with us today, have a wonderful afternoon ahead.",
+      "tag": "english_block",
+      "mode": "bright"
+    },
+    {
+      "id": "eng021",
+      "text": "Hello, thank you for reaching out to our customer support hotline.",
+      "tag": "english_block",
+      "mode": "bright"
+    },
+    {
+      "id": "eng022",
+      "text": "May I please have your full name and your reference number?",
+      "tag": "english_block",
+      "mode": "neutral"
+    },
+    {
+      "id": "eng023",
+      "text": "I will transfer your call to our logistics department right now.",
+      "tag": "english_block",
+      "mode": "neutral"
+    },
+    {
+      "id": "eng024",
+      "text": "Unfortunately, that specific color variant has been discontinued by the supplier.",
+      "tag": "english_block",
+      "mode": "apologetic"
+    },
+    {
+      "id": "eng025",
+      "text": "We can suggest an alternative model that offers similar powerful features.",
+      "tag": "english_block",
+      "mode": "bright"
+    },
+    {
+      "id": "eng026",
+      "text": "Our records show that we have exactly five pieces remaining left.",
+      "tag": "english_block",
+      "mode": "neutral"
+    },
+    {
+      "id": "eng027",
+      "text": "The standard shipping fee is one hundred pesos within Metro Manila.",
+      "tag": "english_block",
+      "mode": "neutral"
+    },
+    {
+      "id": "eng028",
+      "text": "Provincial deliveries usually take about three to five business days.",
+      "tag": "english_block",
+      "mode": "neutral"
+    },
+    {
+      "id": "eng029",
+      "text": "Please ensure someone is at home to receive the package tomorrow.",
+      "tag": "english_block",
+      "mode": "neutral"
+    },
+    {
+      "id": "eng030",
+      "text": "We require a fifty percent downpayment before starting your custom order.",
+      "tag": "english_block",
+      "mode": "neutral"
+    },
+    {
+      "id": "eng031",
+      "text": "Your refund request has been successfully processed by our finance department.",
+      "tag": "english_block",
+      "mode": "bright"
+    },
+    {
+      "id": "eng032",
+      "text": "I apologize for the brief disconnection on our phone line earlier.",
+      "tag": "english_block",
+      "mode": "apologetic"
+    },
+    {
+      "id": "eng033",
+      "text": "Do not worry, I will personally monitor your shipment until arrival.",
+      "tag": "english_block",
+      "mode": "reassuring"
+    },
+    {
+      "id": "eng034",
+      "text": "Feel free to compare our prices with other stores in town.",
+      "tag": "english_block",
+      "mode": "neutral"
+    },
+    {
+      "id": "eng035",
+      "text": "We stand completely behind the durability and quality of our items.",
+      "tag": "english_block",
+      "mode": "reassuring"
+    },
+    {
+      "id": "eng036",
+      "text": "Let me know if you need any further assistance with anything else.",
+      "tag": "english_block",
+      "mode": "bright"
+    },
+    {
+      "id": "eng037",
+      "text": "We appreciate your patience while we investigated the system error today.",
+      "tag": "english_block",
+      "mode": "bright"
+    },
+    {
+      "id": "eng038",
+      "text": "Our business hours are from eight AM until five PM daily.",
+      "tag": "english_block",
+      "mode": "neutral"
+    },
+    {
+      "id": "eng039",
+      "text": "You can reach us at zero nine one seven, three four five, six seven eight nine.",
+      "tag": "english_block",
+      "mode": "neutral"
+    },
+    {
+      "id": "eng040",
+      "text": "Thank you for being a valued customer of our small business.",
+      "tag": "english_block",
+      "mode": "bright"
+    },
+    {
+      "id": "eng041",
+      "text": "Good afternoon, welcome back to our online store service center.",
+      "tag": "english_block",
+      "mode": "bright"
+    },
+    {
+      "id": "eng042",
+      "text": "Could you please spell out your last name for our records?",
+      "tag": "english_block",
+      "mode": "neutral"
+    },
+    {
+      "id": "eng043",
+      "text": "I am checking the warehouse inventory for that particular size now.",
+      "tag": "english_block",
+      "mode": "neutral"
+    },
+    {
+      "id": "eng044",
+      "text": "We apologize for any inconvenience caused by the unexpected shipping delay.",
+      "tag": "english_block",
+      "mode": "apologetic"
+    },
+    {
+      "id": "eng045",
+      "text": "The upgraded version includes a one year official manufacturer warranty.",
+      "tag": "english_block",
+      "mode": "neutral"
+    },
+    {
+      "id": "eng046",
+      "text": "That item is currently on sale for nine hundred ninety pesos.",
+      "tag": "english_block",
+      "mode": "bright"
+    },
+    {
+      "id": "eng047",
+      "text": "Express delivery option is available for an additional small service fee.",
+      "tag": "english_block",
+      "mode": "neutral"
+    },
+    {
+      "id": "eng048",
+      "text": "Please verify that your delivery address details entered online are correct.",
+      "tag": "english_block",
+      "mode": "neutral"
+    },
+    {
+      "id": "eng049",
+      "text": "Our payment gateway is fully secured to protect your financial information.",
+      "tag": "english_block",
+      "mode": "reassuring"
+    },
+    {
+      "id": "eng050",
+      "text": "I am following up on your pending inquiry from yesterday afternoon.",
+      "tag": "english_block",
+      "mode": "neutral"
+    },
+    {
+      "id": "eng051",
+      "text": "Would you like me to reserve one unit for you today?",
+      "tag": "english_block",
+      "mode": "neutral"
+    },
+    {
+      "id": "eng052",
+      "text": "Rest assured that your feedback helps us improve our daily operations.",
+      "tag": "english_block",
+      "mode": "reassuring"
+    },
+    {
+      "id": "eng053",
+      "text": "Have a wonderful weekend ahead and stay safe wherever you go.",
+      "tag": "english_block",
+      "mode": "bright"
+    },
+    {
+      "id": "eng054",
+      "text": "Hello, thank you for calling back to finalize your pending transaction.",
+      "tag": "english_block",
+      "mode": "bright"
+    },
+    {
+      "id": "eng055",
+      "text": "Please allow me two minutes to generate your official sales invoice.",
+      "tag": "english_block",
+      "mode": "neutral"
+    },
+    {
+      "id": "eng056",
+      "text": "We sincerely apologize for the incorrect item delivered to your house.",
+      "tag": "english_block",
+      "mode": "apologetic"
+    },
+    {
+      "id": "eng057",
+      "text": "We will arrange a free replacement package pickup by tomorrow morning.",
+      "tag": "english_block",
+      "mode": "reassuring"
+    },
+    {
+      "id": "eng058",
+      "text": "Your tracking number will be sent via text message very shortly.",
+      "tag": "english_block",
+      "mode": "neutral"
+    },
+    {
+      "id": "eng059",
+      "text": "Please let us know if you need recommendations for similar products.",
+      "tag": "english_block",
+      "mode": "bright"
+    },
+    {
+      "id": "eng060",
+      "text": "Thank you for choosing our services, goodbye and have a great day.",
+      "tag": "english_block",
+      "mode": "bright"
     }
   ]
 }

@@ -46,7 +46,7 @@
 {"id":"grt046","text":"Naku, pasensya na po sa paghihintay. Medyo matagal lang po mag-load ang system namin.","tag":"greeting_opening","mode":"apologetic"},
 {"id":"grt047","text":"I am so sorry to keep you on the line this long. Thank you for your patience.","tag":"greeting_opening","mode":"apologetic"},
 {"id":"grt048","text":"Pasensya na po, closed na ang aming opisina ngayon. Pwede po kayong tumawag bukas.","tag":"greeting_opening","mode":"apologetic"},
-{"id":"grt049","text":"Paumanhin po, ngunit sarado na kami tuwing alas-singko ng hapon. Mag-iwan na lang po ng mensahe.","tag":"greeting_opening","mode":"apologetic"},
+{"id":"grt049","text":"Paumanhin po, sarado na kami tuwing five PM. Mag-iwan na lang po ng mensahe.","tag":"greeting_opening","mode":"apologetic"},
 {"id":"grt050","text":"Hello po ulit! Si Christine ito, ano pong additional na kailangan nating i-check?","tag":"greeting_opening","mode":"bright"},
 {"id":"grt051","text":"Welcome back po! Salamat at tumawag kayo ulit sa amin. Tuloy po natin ang usapan.","tag":"greeting_opening","mode":"bright"},
 {"id":"grt052","text":"Hi, good to hear from you again! Paano ko po kayo matutulungan this time?","tag":"greeting_opening","mode":"bright"},
