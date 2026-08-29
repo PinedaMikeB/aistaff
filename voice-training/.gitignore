@@ -1,2 +1,4 @@
-recordings/*/wavs/
-recordings/*/*.csv
+# Recordings are committed deliberately, per voice, once a dataset is final.
+# 204 MB of WAV in plain git is acceptable for a dataset that will not be
+# re-recorded. If a voice gets re-recorded repeatedly, move to Git LFS —
+# plain git keeps a full copy of every version forever.
