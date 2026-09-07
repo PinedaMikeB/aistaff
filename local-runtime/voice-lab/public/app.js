@@ -12,6 +12,7 @@ async function boot() {
   if (!r.ok) { $("prompt").textContent = "No script file found in scripts/."; return; }
   const data = await r.json();
   lines = data.lines; takes = data.takes || {};
+  if (data.voiceActor) document.title = `Voice Lab — ${data.voiceActor}`;
   const first = lines.findIndex((l) => !takes[l.id]);
   idx = first === -1 ? 0 : first;
   renderList(); render();

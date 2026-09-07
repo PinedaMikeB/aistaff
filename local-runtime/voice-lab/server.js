@@ -22,8 +22,14 @@ const fs = require("fs");
 const path = require("path");
 
 const ROOT = __dirname;
-const WAVS = path.join(ROOT, "dataset", "wavs");
-const TAKES = path.join(ROOT, "dataset", "takes.json");
+// VOICE_ACTOR selects which dataset this recorder writes to, so a second
+// actor (e.g. Irenz) never overwrites the first (Mike) -- both use the same
+// line ids (grt001.wav etc), so without this a new session would silently
+// clobber the previous actor's takes.
+const VOICE_ACTOR = process.env.VOICE_ACTOR || "default";
+const DATASET_DIR = path.join(ROOT, VOICE_ACTOR === "default" ? "dataset" : `dataset-${VOICE_ACTOR}`);
+const WAVS = path.join(DATASET_DIR, "wavs");
+const TAKES = path.join(DATASET_DIR, "takes.json");
 const SCRIPTS = path.join(ROOT, "scripts");
 const PORT = Number(process.env.VOICE_LAB_PORT || 9890);
 
@@ -117,7 +123,7 @@ const server = http.createServer(async (req, res) => {
       const file = path.join(SCRIPTS, name);
       if (!fs.existsSync(file)) return sendJson(res, 404, { error: "script not found", looked: file });
       const script = JSON.parse(fs.readFileSync(file, "utf8"));
-      return sendJson(res, 200, { lines: script.lines || script, takes: loadTakes() });
+      return sendJson(res, 200, { lines: script.lines || script, takes: loadTakes(), voiceActor: VOICE_ACTOR });
     }
 
     // ---- save a take: raw 16-bit PCM body, 22050 mono ----
@@ -168,7 +174,7 @@ const server = http.createServer(async (req, res) => {
         .filter((t) => t.text && t.status !== "bad" && fs.existsSync(path.join(WAVS, `${t.id}.wav`)))
         .sort((a, b) => a.id.localeCompare(b.id))
         .map((t) => `${t.id}|${t.text.replace(/\|/g, " ")}`);
-      const out = path.join(ROOT, "dataset", "metadata.csv");
+      const out = path.join(DATASET_DIR, "metadata.csv");
       fs.writeFileSync(out, rows.join("\n") + "\n");
       return sendJson(res, 200, { written: rows.length, path: out });
     }
