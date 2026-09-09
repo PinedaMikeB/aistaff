@@ -62,6 +62,16 @@
            background:#2a1f14; border:1px solid #5a3d1a; color:#f0c078; max-width:820px; }
   .issue.bad { background:#2a1414; border-color:#5a1a1a; color:#f08787; }
   .ok { color:var(--good); font-size:13px; }
+  .whisper { max-width:820px; margin-top:14px; padding:14px 18px; border-radius:10px;
+             background:var(--panel); border:1px solid var(--line); }
+  .whisper.wfail { border-color:#5a1a1a; background:#241414; }
+  .whisper-head { display:flex; justify-content:space-between; align-items:center; margin-bottom:8px; }
+  .whisper-head b { font-size:12px; color:var(--dim); text-transform:uppercase; letter-spacing:.6px; }
+  .wbadge { font-size:11px; font-weight:600; padding:3px 9px; border-radius:20px; letter-spacing:.3px; }
+  .wbadge.wpass { background:#123d2c; color:var(--good); }
+  .wbadge.wfail { background:#3d1414; color:#f08787; }
+  .whisper-text { font-size:14px; color:var(--text); font-style:italic; line-height:1.5; }
+  .row .dot.wfail { background:var(--bad); box-shadow:0 0 0 2px #5a1a1a33; }
   audio { width:100%; max-width:820px; margin-bottom:14px; }
   .hint { color:var(--dim); font-size:12.5px; margin-top:auto; padding-top:20px; }
   kbd { background:var(--panel); border:1px solid var(--line); border-radius:4px;

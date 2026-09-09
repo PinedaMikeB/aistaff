@@ -135,13 +135,32 @@ const server = http.createServer(async (req, res) => {
 
       const a = analyse(int16);
       const v = verdict(a);
-      fs.writeFileSync(path.join(WAVS, `${id}.wav`), wavFromPcm(raw, 22050));
+      const wavBuf = wavFromPcm(raw, 22050);
+      fs.writeFileSync(path.join(WAVS, `${id}.wav`), wavBuf);
+
+      // Ask the whisper QA service whether it can actually understand the
+      // take as the intended line. This is separate from the level check
+      // above: a take can be perfectly clean audio (good peak/floor) and
+      // still be a genuinely bad take (wrong words, mumbled, wrong line
+      // read) -- that's exactly the class of error the 617-line rerecord
+      // audit found that level analysis alone could never catch.
+      let whisper = null;
+      try {
+        whisper = await checkWithWhisper(wavBuf, text);
+      } catch (e) {
+        // A ringing recording session must not die because the QA sidecar
+        // is down -- log it, leave whisper fields null, let the take save.
+        console.error(`whisper QA unavailable: ${e.message}`);
+      }
 
       const takes = loadTakes();
       takes[id] = {
         id, text, wav: `wavs/${id}.wav`,
         peak: a.peak, rms: a.rms, floor: a.floor, duration: a.seconds,
         issues: v.issues, status: v.status, recordedAt: new Date().toISOString(),
+        whisperHeard: whisper ? whisper.heard : null,
+        whisperScore: whisper ? whisper.similarity : null,
+        whisperPass: whisper ? whisper.pass : null,
       };
       saveTakes(takes);
       return sendJson(res, 200, takes[id]);
@@ -171,7 +190,7 @@ const server = http.createServer(async (req, res) => {
     if (p === "/api/export" && req.method === "POST") {
       const takes = loadTakes();
       const rows = Object.values(takes)
-        .filter((t) => t.text && t.status !== "bad" && fs.existsSync(path.join(WAVS, `${t.id}.wav`)))
+        .filter((t) => t.text && t.status !== "bad" && t.whisperPass !== false && fs.existsSync(path.join(WAVS, `${t.id}.wav`)))
         .sort((a, b) => a.id.localeCompare(b.id))
         .map((t) => `${t.id}|${t.text.replace(/\|/g, " ")}`);
       const out = path.join(DATASET_DIR, "metadata.csv");
@@ -200,6 +219,40 @@ const server = http.createServer(async (req, res) => {
 });
 
 /** Minimal 16-bit mono WAV header around raw PCM. */
+const WHISPER_QA_URL = process.env.WHISPER_QA_URL || "http://127.0.0.1:9891/check";
+
+/** Call the whisper-qa sidecar (whisper-qa/server.py) to check whether the
+ *  take actually says the intended line, not just whether the levels are
+ *  clean. 8s timeout: whisper small on CPU takes 1-3s normally, but a cold
+ *  first request after the model reloads can run longer. */
+function checkWithWhisper(wavBuf, expectedText) {
+  return new Promise((resolve, reject) => {
+    const body = JSON.stringify({
+      wav_base64: wavBuf.toString("base64"),
+      expected_text: expectedText,
+    });
+    const req = http.request(WHISPER_QA_URL, {
+      method: "POST",
+      headers: { "Content-Type": "application/json", "Content-Length": Buffer.byteLength(body) },
+      timeout: 8000,
+    }, (res) => {
+      let data = "";
+      res.on("data", (c) => (data += c));
+      res.on("end", () => {
+        try {
+          const parsed = JSON.parse(data);
+          if (parsed.error) reject(new Error(parsed.error));
+          else resolve(parsed);
+        } catch (e) { reject(e); }
+      });
+    });
+    req.on("timeout", () => req.destroy(new Error("whisper QA timed out")));
+    req.on("error", reject);
+    req.write(body);
+    req.end();
+  });
+}
+
 function wavFromPcm(pcm, rate) {
   const h = Buffer.alloc(44);
   h.write("RIFF", 0);

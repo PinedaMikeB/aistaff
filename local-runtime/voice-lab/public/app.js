@@ -8,7 +8,8 @@ const cur = () => lines[idx] || null;
 const esc = (s) => String(s).replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
 
 async function boot() {
-  const r = await fetch("/api/script");
+  const scriptParam = new URLSearchParams(location.search).get("name");
+  const r = await fetch(scriptParam ? ("/api/script?name=" + encodeURIComponent(scriptParam)) : "/api/script");
   if (!r.ok) { $("prompt").textContent = "No script file found in scripts/."; return; }
   const data = await r.json();
   lines = data.lines; takes = data.takes || {};
@@ -146,7 +147,7 @@ function renderList() {
   $("list").innerHTML = lines.map((l, i) => {
     const t = takes[l.id];
     return `<div class="row ${i === idx ? "active" : ""}" data-i="${i}">
-      <span class="dot ${t ? (t.status || "good") : ""}"></span>
+      <span class="dot ${t ? (t.whisperPass === false ? "wfail" : (t.status || "good")) : ""}"></span>
       <span class="id">${l.id}</span>
       <span class="tx">${esc(l.text)}</span>
     </div>`;
@@ -159,6 +160,20 @@ function renderList() {
 }
 
 const fmt = (v, u = " dB") => (v === null || v === undefined || !isFinite(v) ? "—" : v.toFixed(1) + u);
+
+/** Renders the whisper QA result under a take, if one exists. Absent
+ *  (t.whisperHeard == null) means the QA sidecar wasn't running when the
+ *  take was recorded -- not an error, just no data to show. */
+function whisperBox(t) {
+  if (t.whisperHeard == null) return "";
+  const pct = t.whisperScore == null ? "" : Math.round(t.whisperScore * 100) + "%";
+  const cls = t.whisperPass ? "wpass" : "wfail";
+  const label = t.whisperPass ? "PASS" : "FAIL -- rerecord this line";
+  return `<div class="whisper ${cls}">
+      <div class="whisper-head"><b>Whisper heard</b> <span class="wbadge ${cls}">${label} ${pct}</span></div>
+      <div class="whisper-text">"${esc(t.whisperHeard)}"</div>
+    </div>`;
+}
 
 function render() {
   const l = cur(); if (!l) return;
@@ -178,7 +193,7 @@ function render() {
         <div class="stat"><b>RMS</b><span>${fmt(t.rms)}</span></div>
         <div class="stat"><b>Noise floor</b><span>${fmt(t.floor)}</span></div>
         <div class="stat"><b>Length</b><span>${fmt(t.duration, "s")}</span></div>
-      </div>${issues || '<div class="ok">✓ Levels look good</div>'}`;
+      </div>${issues || '<div class="ok">✓ Levels look good</div>'}${whisperBox(t)}`;
   } else {
     p.hidden = true; p.removeAttribute("src");
     $("statsBox").innerHTML = "";
@@ -198,7 +213,7 @@ async function toggle() {
   }
 
   recording = false; clearInterval(tick);
-  $("rec").textContent = "● Record"; $("rec").classList.remove("on");
+  $("rec").textContent = "Checking pronunciation..."; $("rec").classList.remove("on");
   $("rec").disabled = true;
 
   const total = chunks.reduce((n, c) => n + c.length, 0);
@@ -217,6 +232,7 @@ async function toggle() {
   });
   const take = await res.json();
   $("rec").disabled = false;
+  $("rec").textContent = "● Record";
   if (take && take.id) { takes[take.id] = take; renderList(); render(); }
 }
 

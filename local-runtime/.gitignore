@@ -3,18 +3,27 @@
 # The phrase sets are the durable asset — they took real work to build and
 # they train every future voice. Recordings are large binaries tied to one
 # actor, and models are re-downloadable.
+#
+# NOTE: this file lives at local-runtime/.gitignore, so every pattern below
+# is relative to local-runtime/, NOT the repo root. An earlier version of
+# this file used repo-root-style paths (e.g. "local-runtime/voice-lab/dataset/"),
+# which silently matched nothing -- confirmed via `git check-ignore`. Fixed
+# here; if you add a new rule, don't repeat the "local-runtime/" prefix.
 
-# recordings and their metadata (back these up separately, not in git)
-local-runtime/voice-lab/dataset/
-local-runtime/voice-lab/previews/
+# recordings and their metadata (curated copies live in voice-training/recordings/,
+# committed from there instead -- back these raw working folders up separately)
+voice-lab/dataset/
+voice-lab/dataset-*/
+voice-lab/previews/
 
 # downloaded model weights and virtualenvs
-local-runtime/models/
-local-runtime/venvs/
-local-runtime/piper/voices/
-local-runtime/piper/samples/
-local-runtime/piper/previews/
-local-runtime/whisper.cpp/
+models/
+venvs/
+voice-lab/venv-whisper/
+piper/voices/
+piper/samples/
+piper/previews/
+whisper.cpp/
 *.onnx
 *.bin
 *.wav
@@ -22,4 +31,4 @@ local-runtime/whisper.cpp/
 *.safetensors
 
 # runtime state
-local-runtime/pitch-config.json
+pitch-config.json
