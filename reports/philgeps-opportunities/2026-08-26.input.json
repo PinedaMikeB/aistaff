@@ -1,0 +1,116 @@
+{
+  "date_iso": "2026-08-26",
+  "date_long": "August 26, 2026",
+  "opportunities_reviewed": 6,
+  "opportunities_screened": 44,
+  "best_opportunities": [
+    {
+      "match_rating": "STRONG MATCH",
+      "score": 7,
+      "project": "TIWI DISASTER AI (Supply, Delivery, Installation, Integration, Training, Testing and Commissioning of an Integrated Disaster Intelligence, Unified Command Hazard Monitoring Risk Reduction Management Platform for the Municipal Government of Tiwi, Albay)",
+      "procuring_entity": "Municipality of Tiwi, Albay",
+      "reference_number": "13211679",
+      "abc": "PHP 2,000,000.00",
+      "deadline": "Header closing date: September 8, 2026 5:00 PM; description says short-listing documents due on or before September 3, 2026 at the BAC Office",
+      "procurement_method": "Public Bidding / Request for Expression of Interest",
+      "why_fit": "This remains the clearest capability match for AIStaff's custom AI systems, automated notifications, dashboards, and workflow orchestration. The notice explicitly names AI and an integrated disaster-intelligence platform rather than generic software alone.",
+      "important_requirements": [
+        "Short-listing documents due under pass/fail eligibility screening",
+        "Bid security required",
+        "Bidding restricted to Filipino citizens, sole proprietorships, cooperatives, partnerships, or organizations with at least 60% Filipino ownership",
+        "Contract duration stated as fifteen (15) days",
+        "BAC contact: Sharmaine Kristine R. Carlet / Ma. Yvonne C. Domanais, LGU-Tiwi, lgutiwibac@gmail.com, 0946-573-4974",
+        "Public abstract does not clearly state whether Red PhilGEPS registration is acceptable; confirm in the bidding documents or DRL"
+      ],
+      "risks_or_blockers": [
+        "The notice changed materially from the previous run: the header now shows a September 8, 2026 5:00 PM closing date instead of the earlier September 3 timing, while the body still says short-listing documents are due on September 3, 2026",
+        "The fifteen-day contract duration is extremely aggressive for a real integrated platform and may indicate a narrower or differently staged scope",
+        "The public abstract does not expose the detailed short-listing criteria, prior-experience requirements, or precise PhilGEPS registration level requirement"
+      ],
+      "recommended_next_action": "Call or email the BAC immediately to confirm which date controls, request the exact short-listing checklist, and verify whether the scope is full deployment, pilot rollout, or a phased delivery with later implementation.",
+      "official_link": "https://notices.philgeps.gov.ph/GEPSNONPILOT/Tender/SplashBidNoticeAbstractUI.aspx?BusCatID=43&DirectFrom=OpenOpp&Type=category&menuIndex=3&refID=13211679"
+    },
+    {
+      "match_rating": "POSSIBLE MATCH",
+      "score": 6,
+      "project": "Installation of Updated Human Resource Management System for the Office of Human Resource Management Gumaca Quezon",
+      "procuring_entity": "Municipality of Gumaca, Quezon",
+      "reference_number": "13212827",
+      "abc": "PHP 300,000.00",
+      "deadline": "September 2, 2026 1:00 AM",
+      "procurement_method": "Negotiated Procurement - Small Value Procurement (Sec. 34) / RFQ",
+      "why_fit": "This is a practical custom-system deployment with a small-value procurement route, a limited module set, and a 60-day duration. It is not AI-specific, but it fits AIStaff's systems and workflow-automation service line better than most commodity IT postings.",
+      "important_requirements": [
+        "Scope shown in the public abstract: user access control, employee records, DTR management, leave administration, travel orders, and report generation",
+        "Contract duration: 60 days",
+        "BAC contact: Shiela Marie Cortez Grantoza, gumacabac@gmail.com, (042) 317-8113",
+        "Public abstract does not list the full eligibility-document checklist or PhilGEPS membership level requirement",
+        "No explicit prior-government-project requirement is visible in the public abstract"
+      ],
+      "risks_or_blockers": [
+        "The scope is HRMS-focused rather than AI-led, so the fit depends on AIStaff positioning this as a workflow-system build rather than a packaged AI product sale",
+        "Because the public abstract is short, the real implementation depth, deployment expectations, and acceptance requirements may only appear in attachments or the RFQ packet",
+        "The notice does not explicitly confirm whether Red PhilGEPS registration is sufficient"
+      ],
+      "recommended_next_action": "Request the RFQ packet and implementation checklist immediately, then decide whether AIStaff can quote a lean HRMS deployment without overcommitting on payroll-grade features or deep government HR compliance modules.",
+      "official_link": "https://notices.philgeps.gov.ph/GEPSNONPILOT/Tender/SplashBidNoticeAbstractUI.aspx?BusCatID=10&DirectFrom=OpenOpp&Type=category&menuIndex=3&refID=13212827"
+    }
+  ],
+  "urgent_deadlines": [],
+  "not_recommended": [
+    {
+      "project": "NEGO-PROCUREMENT OF CENTRALIZED LEGISLATIVE AND ADMINISTRATIVE MANAGEMENT AND TRACKING SYSTEM FOR SANGGUNIANG BAYAN, LOS BANOS, LAGUNA",
+      "procuring_entity": "Municipality of Los Baños, Laguna",
+      "reference_number": "13205295",
+      "reason": "The title is attractive because it includes AI assistant integration and speech-to-text, but the public scope is dominated by server infrastructure, network hardware, Wi-Fi rollout, on-prem deployment, domain integration, and a large integrated delivery package under a two-failed-biddings route. That makes it too hardware-heavy and too operationally broad for a clean AIStaff first-government bid.",
+      "official_link": "https://notices.philgeps.gov.ph/GEPSNONPILOT/Tender/SplashBidNoticeAbstractUI.aspx?BusCatID=10&DirectFrom=OpenOpp&Type=category&menuIndex=3&refID=13205295"
+    },
+    {
+      "project": "Procurement of Consulting Services for the BCDA Strategic Communications and Developmental Advocacy Program",
+      "procuring_entity": "Bases Conversion and Development Authority - Main",
+      "reference_number": "13215061",
+      "reason": "This is a one-year public-bidding communications consultancy using shortlist criteria that emphasize relevant consultant experience, key personnel, and current workload. It is closer to a traditional institutional communications-retainer engagement than to AIStaff's Brandee or automation work, and the compliance burden is high.",
+      "official_link": "https://notices.philgeps.gov.ph/GEPSNONPILOT/Tender/SplashBidNoticeAbstractUI.aspx?BusCatID=43&DirectFrom=OpenOpp&Type=category&menuIndex=3&refID=13215061"
+    },
+    {
+      "project": "OCM-26-CS-023 CONSULTING SERVICES FOR THE DEVELOPMENT OF THE BRAND STRATEGY, OFFICIAL THEME, AND TAGLINE FOR THE 2027 PALARONG PAMBANSA",
+      "procuring_entity": "City of Quezon",
+      "reference_number": "13214877",
+      "reason": "This is a straightforward branding-strategy engagement. Even though the procurement mode is small value, the public notice points to conventional campaign-branding work rather than AI-led content operations, chatbot/voice work, or a systems build.",
+      "official_link": "https://notices.philgeps.gov.ph/GEPSNONPILOT/Tender/SplashBidNoticeAbstractUI.aspx?BusCatID=43&DirectFrom=OpenOpp&Type=category&menuIndex=3&refID=13214877"
+    }
+  ],
+  "todays_recommendation": {
+    "best_opportunity": "Installation of Updated Human Resource Management System for the Office of Human Resource Management Gumaca Quezon (Ref 13212827) is the most actionable opportunity today; TIWI DISASTER AI (Ref 13211679) is the strongest capability fit but has higher compliance and scope ambiguity.",
+    "documents_to_prepare": [
+      "Current PhilGEPS registration and annexes",
+      "Mayor's/Business Permit and SEC registration",
+      "Notarized Omnibus Sworn Statement",
+      "Short company profile focused on custom systems, workflow automation, and implementation support",
+      "One-page capability statement describing chat/voice automation, systems integration, dashboards, and delivery methodology",
+      "Sample project summaries or references for software or workflow-system implementations"
+    ],
+    "clarifications_to_request": [
+      "For Tiwi: which date controls, September 3, 2026 eligibility submission or September 8, 2026 5:00 PM closing in the notice header",
+      "For Tiwi: whether Red PhilGEPS registration is acceptable and whether prior government projects are mandatory in the short-listing packet",
+      "For Gumaca: whether the HRMS is a new build, an upgrade of an existing system, or deployment of a pre-approved package",
+      "For Gumaca: whether attendance, leave, and reporting modules require local hosting, source-code turnover, or post-go-live support beyond the 60-day contract"
+    ]
+  },
+  "source_urls_checked": [
+    "https://notices.philgeps.gov.ph/GEPSNONPILOT/Tender/SplashOpportunitiesSearchUI.aspx?BusCatID=43&ClickFrom=OpenOpp&menuIndex=3&type=category",
+    "https://notices.philgeps.gov.ph/GEPSNONPILOT/Tender/SplashOpportunitiesSearchUI.aspx?BusCatID=10&ClickFrom=OpenOpp&menuIndex=3&type=category",
+    "https://notices.philgeps.gov.ph/GEPSNONPILOT/Tender/SplashBidNoticeAbstractUI.aspx?BusCatID=43&DirectFrom=OpenOpp&Type=category&menuIndex=3&refID=13211679",
+    "https://notices.philgeps.gov.ph/GEPSNONPILOT/Tender/SplashBidNoticeAbstractUI.aspx?BusCatID=43&DirectFrom=OpenOpp&Type=category&menuIndex=3&refID=13210169",
+    "https://notices.philgeps.gov.ph/GEPSNONPILOT/Tender/SplashBidNoticeAbstractUI.aspx?BusCatID=10&DirectFrom=OpenOpp&Type=category&menuIndex=3&refID=13205295",
+    "https://notices.philgeps.gov.ph/GEPSNONPILOT/Tender/SplashBidNoticeAbstractUI.aspx?BusCatID=10&DirectFrom=OpenOpp&Type=category&menuIndex=3&refID=13212827",
+    "https://notices.philgeps.gov.ph/GEPSNONPILOT/Tender/SplashBidNoticeAbstractUI.aspx?BusCatID=43&DirectFrom=OpenOpp&Type=category&menuIndex=3&refID=13215061",
+    "https://notices.philgeps.gov.ph/GEPSNONPILOT/Tender/SplashBidNoticeAbstractUI.aspx?BusCatID=43&DirectFrom=OpenOpp&Type=category&menuIndex=3&refID=13214877"
+  ],
+  "notes": [
+    "This run used only official PhilGEPS public notices pages.",
+    "The current public PhilGEPS pages displayed Thursday, August 27, 2026 during the scan, even though this automation run is being recorded for August 26, 2026. The report preserves the dates exactly as shown in the source notices.",
+    "Previously reported PBSAP Monitoring and Evaluation Platform (Ref 13210169) was rechecked and remains active, but no material deadline, budget, or requirement change was found, so it was not repeated as a new recommendation.",
+    "The requested categories were checked through current official listings. No genuine new AIStaff-fit opportunity was found in the office-equipment, communication-equipment, or generic services notices that were visible during this run."
+  ]
+}

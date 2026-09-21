@@ -411,19 +411,7 @@
 </section>
 </main>
 
-<footer class="site-footer">
-  <b>AIStaff.click</b>
-  <span>Closer — AI Sales Agent for Facebook Messenger</span>
-  <span>Built and supported in Metro Manila, for Philippine businesses</span>
-  <a href="mailto:support@aistaff.click">support@aistaff.click</a>
-  <a href="/about/">About Us</a>
-  <a href="/contact/">Contact Us</a>
-  <a href="/pricing/">Pricing</a>
-  <a href="/privacy">Privacy Policy</a>
-  <a href="/terms">Terms</a>
-  <a href="/refund-policy/">Refund Policy</a>
-  <a href="/support/">Support</a>
-</footer>
+<div id="site-footer-root"></div>
 <style>
   .closer-page { overflow: visible !important; }
   .closer-hero { padding: clamp(120px,16vh,170px) clamp(20px,8vw,130px) clamp(60px,9vh,100px); }
@@ -887,7 +875,9 @@
       preferredTime: preferredTime,
       preferredSchedule: [preferredDate, preferredTime].filter(Boolean).join(' '),
       reasons: reasons,
-      notes: String(formData.get('notes') || '').trim()
+      notes: String(formData.get('notes') || '').trim(),
+      visitorId: window.aiStaffVisitorId || null,
+      tracking: window.aiStaffAttributionPayload ? window.aiStaffAttributionPayload({ source_page: 'agents_closer' }) : null
     };
     if (action !== 'not_yet' && (!payload.name || !payload.email || !payload.mobile)) {
       decisionStatus.textContent = 'Please add your full name, email, and mobile number.';
@@ -1281,5 +1271,5 @@
   });
 })();
 </script>
-</body>
+<script src="/js/site-footer.js" defer></script></body>
 </html>

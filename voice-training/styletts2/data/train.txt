@@ -1,0 +1,873 @@
+resampled-24k/mike-taglish-v1/wavs/cls001.wav|pasɛnʃa na po ulit sa naɡiŋ abala kanina, salamat sa paɡunawa niɲo.|0
+resampled-24k/mike-taglish-v1/wavs/cls002.wav|wˈiː ɐpˈɑːlədʒˌaɪz ɐɡˈɛn fˈɔːɹ ðˈə slˈaɪt dᵻlˈeɪ dˈʊɹɹɪŋ ˈaʊɚ kˈɔːl tədˈeɪ.|0
+resampled-24k/mike-taglish-v1/wavs/cls004.wav|paumanhin po sa anumaŋ paɡkukulaŋ, asahan niɲoŋ paɡbubutihin pa namin ito.|0
+resampled-24k/mike-taglish-v1/wavs/cls005.wav|ˈaɪ am tɾulj sˈɑːɹi fˈɔːɹ ðˈə ɪŋkənvˈiːnɪəns, bˈʌt θˈæŋk jˈuː fˈɔːɹ oɾdɛɾiŋ.|0
+resampled-24k/mike-taglish-v1/wavs/cls006.wav|waɡ po kajoŋ maɡalala, babantajan ko mismo aŋ iɲoŋ ˈɔːɹdɚ haŋɡaŋ dumatiŋ.|0
+resampled-24k/mike-taglish-v1/wavs/cls007.wav|ɹˈɛst əʃˈʊɹd ðˈæt jˈʊɹ pˈækɪdʒ wˈɪl bˈiː dᵻlˈɪvɚd sˈeɪfli ɹˈaɪt tˈuː jˈʊɹ dooɾstɛp.|0
+resampled-24k/mike-taglish-v1/wavs/cls008.wav|siɡuɾado poŋ matataŋɡap niɲo naŋ maajos aŋ lahat ŋ iɲoŋ binili ŋajon.|0
+resampled-24k/mike-taglish-v1/wavs/cls009.wav|ˈaɪ assuɾɛ jˈuː ðˈæt ˈɛvɹɪθˌɪŋ ˈɪz kəmplˈiːtli fˈaɪnəlˌaɪzd ˈænd ɹˈɛdi fˈɔːɹ dɪspˈætʃ.|0
+resampled-24k/mike-taglish-v1/wavs/cls010.wav|makakaasa po kajoŋ maipapadala aɡad namin ito bukas na bukas din.|0
+resampled-24k/mike-taglish-v1/wavs/cls011.wav|babasahin ko laŋ po ulit aŋ iɲoŋ ˈɔːɹdɚ paɾa makasiɡuɾo tajo.|0
+resampled-24k/mike-taglish-v1/wavs/cls012.wav|lˈɛt mˈiː ɾɛad bˈæk aŋ iɲoŋ kəmplˈiːt dᵻlˈɪvɚɹi diːtˈeɪlz baɡo tajo maɡɛnd.|0
+resampled-24k/mike-taglish-v1/wavs/cls013.wav|uulitin ko po, dalawaŋ malakiŋ ʧhiɾt na kulaj itim aŋ iɲoŋ kinuha.|0
+resampled-24k/mike-taglish-v1/wavs/cls014.wav|ikənfˈɜːm ko laŋ po aŋ iɲoŋ addɾɛss, ito aj sa kuɛzon sˈɪɾi.|0
+resampled-24k/mike-taglish-v1/wavs/cls015.wav|pˈækitʃˈɛk po aŋ iɲoŋ tɛlɛpono mamaja paɾa sa əfˈɪʃəl tˈɛkst ŋ kˈɜːɹiɚ.|0
+resampled-24k/mike-taglish-v1/wavs/cls016.wav|jˈʊɹ fˈaɪnəl tˈoʊɾəl ˈɪz ɛɡzˈæktli onɛ θˈaʊzənd tˈuː hˈʌndɹɪd fˈɪfti pɛsos tədˈeɪ.|0
+resampled-24k/mike-taglish-v1/wavs/cls017.wav|isasaɾa ko na po aŋ tɹænsˈækʃən natin paɾa sa aɾaw na ito.|0
+resampled-24k/mike-taglish-v1/wavs/cls018.wav|ipapasok ko na po aŋ maŋa dɛtaljɛ niɲo sa amiŋ sˈɪstəm ŋajon.|0
+resampled-24k/mike-taglish-v1/wavs/cls019.wav|plˈiːz ɛkspˈɛkt ˈeɪ kɑːnfɚmˈeɪʃən ɛmail kəntˈeɪnɪŋ jˈʊɹ diɡital ɹᵻsˈiːt latɛɾ ðˈɪs ˌæftɚnˈuːn.|0
+resampled-24k/mike-taglish-v1/wavs/cls020.wav|balɛ pito po lahat aŋ itɛms na ipadadala namin sa iɲoŋ bahaj.|0
+resampled-24k/mike-taglish-v1/wavs/cls021.wav|kumpiɾmahin po natin aŋ iɲoŋ paŋalan at kˈɑːntækt nˈʌmbɚ baɡo ibaba aŋ liɲa.|0
+resampled-24k/mike-taglish-v1/wavs/cls022.wav|nakaɹˈɛkɚd na po aŋ iɲoŋ ɹᵻkwˈɛst kaja wala na po kajoŋ ɡaɡawin.|0
+resampled-24k/mike-taglish-v1/wavs/cls023.wav|ˈaɪ wˈɪl pɹˈɑːsɛs ðˈə ˈɪnvɔɪs paɡkatapos na paɡkatapos ŋ atiŋ paɡuusap ŋajon.|0
+resampled-24k/mike-taglish-v1/wavs/cls024.wav|θɹˈiː hˈʌndɹɪd po aŋ iɲoŋ sukli na ibibiɡaj ŋ ɾidɛɾ bukas.|0
+resampled-24k/mike-taglish-v1/wavs/cls025.wav|haŋɡaŋ dito na laŋ po muna aŋ atiŋ paɡuusap tuŋkol sa ˈɔːɹdɚ niɲo.|0
+resampled-24k/mike-taglish-v1/wavs/cls026.wav|nakuha ko na po aŋ lahat ŋ kailaŋan koŋ impoɾmaʃon mula sa iɲo.|0
+resampled-24k/mike-taglish-v1/wavs/cls027.wav|θˈæŋk jˈuː fˈɔːɹ pɹəvˈaɪdɪŋ ˈɔːl ðˈə nˈɛsᵻsɚɹi ˌɪnfɚmˈeɪʃən fˈɔːɹ jˈʊɹ ɐkˈaʊnt updatɛ.|0
+resampled-24k/mike-taglish-v1/wavs/cls028.wav|hintajin nijo na laŋ po aŋ paɡtawaɡ ŋ amiŋ dɪspˈætʃ tɛam mamaja.|0
+resampled-24k/mike-taglish-v1/wavs/cls029.wav|tˈuː θˈaʊzənd fˈaɪv hˈʌndɹɪd pɛsos po aŋ tˈoʊɾəl ŋ iɲoŋ bibilhin.|0
+resampled-24k/mike-taglish-v1/wavs/cls030.wav|wˈiː wˈɪl kɛɛp jˈʊɹ pɛɾsonal diːtˈeɪlz stɹˈɪktli kˌɑːnfɪdˈɛnʃəl dito sa amiŋ databasɛ.|0
+resampled-24k/mike-taglish-v1/wavs/cls031.wav|pwɛdɛ na po natiŋ ifˈaɪnəlˌaɪz aŋ iɲoŋ pˈeɪmənt paɾa makausad na tajo.|0
+resampled-24k/mike-taglish-v1/wavs/cls032.wav|ˈɪktʃˈɛk po muna nila naŋ maiɡi aŋ bawat ˈaɪɾəm baɡo tulujaŋ ipasok sa kahon.|0
+resampled-24k/mike-taglish-v1/wavs/cls033.wav|wˈʌns ðˈə sˈɪstəm vˈælᵻdˌeɪts jˈʊɹ ɹᵻkwˈɛst, iaaɾɾaŋɛ na po namin aŋ pˈɪkʌp.|0
+resampled-24k/mike-taglish-v1/wavs/cls034.wav|kuŋ wala na po kajoŋ idadaɡdaɡ, ipapɹˈɑːsɛs ko na po ito aɡad.|0
+resampled-24k/mike-taglish-v1/wavs/cls035.wav|maŋjaɾiŋ itaɡo aŋ iɲoŋ ɹˈɛfɹəns nˈʌmbɚ paɾa sa maŋa susunod niɲoŋ tɾansakʃon.|0
+resampled-24k/mike-taglish-v1/wavs/cls037.wav|ilalaɡaj ko na po ito sa listahan ŋ maŋa ipapadala natin sa liŋo.|0
+resampled-24k/mike-taglish-v1/wavs/cls038.wav|pakiɾɛadj na laŋ po aŋ bajad niɲo kapaɡ dumatiŋ na aŋ ɾidɛɾ.|0
+resampled-24k/mike-taglish-v1/wavs/cls039.wav|jˈʊɹ pˈɜːtʃɪs ˈɪz nˈaʊ kəmplˈiːtli loɡɡɛd sa amiŋ main ˈɪnvəntˌɔːɹi tɹˈækɪŋ sˈɪstəm.|0
+resampled-24k/mike-taglish-v1/wavs/cls040.wav|titiɡnan po ŋ amiŋ sˈuːpɚvˌaɪzɚ aŋ iɲoŋ fˈɔːɹm baɡo nila ito piɾmahan.|0
+resampled-24k/mike-taglish-v1/wavs/cls041.wav|aŋ ɾɛsibo po niɲo aj ipapadala kasama ŋ mismoŋ pˈækɪdʒ sa kahon.|0
+resampled-24k/mike-taglish-v1/wavs/cls043.wav|bukas po naŋ umaɡa namin sisimulan aŋ paɡbalot ŋ iɲoŋ maŋa ɡamit.|0
+resampled-24k/mike-taglish-v1/wavs/cls044.wav|tatawaɡ po ulit kami kapaɡ kailaŋan pa namin ŋ kaɾaɡdaɡaŋ impoɾmaʃon mula sa iɲo.|0
+resampled-24k/mike-taglish-v1/wavs/cls045.wav|ˈɪf jˈuː hˈæv nˈoʊ fˈɜːðɚ kwˈɛstʃənz, wˈiː kˈæn ɛnd ðˈə kˈɔːl ɹˈaɪt hˈɪɹ.|0
+resampled-24k/mike-taglish-v1/wavs/cls046.wav|maɾamiŋ salamat po sa iɲoŋ tiwala at paɡˈɔːɹdɚ sa amiŋ ʃˈɑːp ŋajon!|0
+resampled-24k/mike-taglish-v1/wavs/cls047.wav|θˈæŋk jˈuː sˈoʊ mˈʌtʃ fˈɔːɹ tʃˈuːzɪŋ ˈaʊɚ stˈɔːɹ fˈɔːɹ jˈʊɹ ʃoppiŋ tədˈeɪ!|0
+resampled-24k/mike-taglish-v1/wavs/cls048.wav|jaj, kənfˈɜːmd na po aŋ iɲoŋ ˈɔːɹdɚ at ɹˈɛdi na fˈɔːɹ ʃˈɪpɪŋ!|0
+resampled-24k/mike-taglish-v1/wavs/cls049.wav|maɡandaŋ aɾaw po at maɾamiŋ salamat sa iɲoŋ walaŋ sawaŋ paɡtaŋkilik sa amin!|0
+resampled-24k/mike-taglish-v1/wavs/cls050.wav|hˈæv ˈeɪ wˈʌndɚfəl dˈeɪ ahɛad ˈænd θˈæŋk jˈuː fˈɔːɹ kˈɔːlɪŋ ˈʌs tədˈeɪ!|0
+resampled-24k/mike-taglish-v1/wavs/cls051.wav|siɡɛ po, asahan nijo poŋ daɾatiŋ ijan sa laloŋ madaliŋ panahon!|0
+resampled-24k/mike-taglish-v1/wavs/cls052.wav|pˈɜːfɛkt! nakasᵻkjˈʊɹ na po aŋ iɲoŋ itɛms ˈænd ɹˈɛdi fˈɔːɹ immɛdiatɛ dɪspˈætʃ!|0
+resampled-24k/mike-taglish-v1/wavs/cls053.wav|maɾamiŋ salamat po, maɡiiŋat po kajo palaɡi at maɡandaŋ hapon sa iɲo!|0
+resampled-24k/mike-taglish-v1/wavs/cls054.wav|wˈiː look fˈɔːɹwɚd tˈuː sˈɜːvɪŋ jˈuː ɐɡˈɛn vˈɛɹi soon, hˈæv ˈeɪ ɡɹˈeɪt ˌæftɚnˈuːn!|0
+resampled-24k/mike-taglish-v1/wavs/cls055.wav|jɛhɛj, pasok na po sa sˈɪstəm natin aŋ iɲoŋ napakaɡandaŋ pˈɜːtʃɪs tədˈeɪ!|0
+resampled-24k/mike-taglish-v1/wavs/cls056.wav|maɾamiŋ salamat sa masajaŋ paɡuusap natin, haŋɡaŋ sa muli natiŋ paɡkikita!|0
+resampled-24k/mike-taglish-v1/wavs/cls057.wav|θˈæŋk jˈuː fˈɔːɹ jˈʊɹ wˈʌndɚfəl pˈeɪʃəns, jˈʊɹ ˈɔːɹdɚ ˈɪz nˈaʊ fˈʊli kənfˈɜːmd!|0
+resampled-24k/mike-taglish-v1/wavs/cls058.wav|siɡɛ po, ibababa ko na aŋ liɲa, ɛndʒˈɔɪ ðˈə ɹˈɛst ˈʌv jˈʊɹ dˈeɪ!|0
+resampled-24k/mike-taglish-v1/wavs/cls059.wav|jˈuː madɛ ˈeɪ fæntˈæstɪk tʃˈɔɪs tədˈeɪ, salamat po sa paɡtɾust sa amin!|0
+resampled-24k/mike-taglish-v1/wavs/cls061.wav|walaŋ anuman po, isaŋ malakiŋ kaɾaŋalan aŋ paɡliŋkuɾan kajo ŋajoŋ aɾaw na ito!|0
+resampled-24k/mike-taglish-v1/wavs/cls062.wav|hˈæv ˈeɪ sˈeɪf ˈænd happj wɛɛkɛnd, θˈæŋk jˈuː fˈɔːɹ kˈɔːlɪŋ ˈaʊɚ hotlinɛ!|0
+resampled-24k/mike-taglish-v1/wavs/cls063.wav|ajan, oʊkˈeɪ na po lahat, maɾamiŋ salamat ulit at bjɛ bjɛ po!|0
+resampled-24k/mike-taglish-v1/wavs/cls064.wav|wˈiː tɾulj ɐpɹˈiːʃɪˌeɪt jˈʊɹ bˈɪznəs, plˈiːz tˈeɪk kˈɛɹ at ɡoodbjɛ fˈɔːɹ nˈaʊ!|0
+resampled-24k/mike-taglish-v1/wavs/cls065.wav|maɾamiŋ salamat po, ɛksˈaɪɾᵻd na akoŋ mataŋɡap niɲo aŋ iɲoŋ napiliŋ ˈaɪɾəm!|0
+resampled-24k/mike-taglish-v1/wavs/cls066.wav|lubos po kamiŋ naɡpapasalamat sa iɲoŋ paɡbili, maɡandaŋ aɾaw po sa iɲo!|0
+resampled-24k/mike-taglish-v1/wavs/cls067.wav|ˈɪt wˈʌz ˈeɪ plɛasuɾɛ spɛakiŋ wˈɪð jˈuː, hˈæv ˈeɪ hiɡhlj pɹədˈʌktɪv dˈeɪ ahɛad!|0
+resampled-24k/mike-taglish-v1/wavs/cls068.wav|siɡɛ po, maɾamiŋ salamat sa tˈaɪm nijo at iŋat po palaɡi sa bjahɛ!|0
+resampled-24k/mike-taglish-v1/wavs/cls069.wav|θˈæŋk jˈuː fˈɔːɹ bˈiːɪŋ sˈʌtʃ ˈeɪ kind ˈænd wˈʌndɚfəl kˈʌstəmɚ tˈuː ˈʌs tədˈeɪ!|0
+resampled-24k/mike-taglish-v1/wavs/cls070.wav|nˈɑːpɹˈɑːsɛs na po natin naŋ maajos, salamat po sa iɲoŋ tiwala at supoɾta!|0
+resampled-24k/mike-taglish-v1/wavs/cls071.wav|kaɡalakan po namiŋ matuluŋan kajo, nawa aj maɡiŋ maɡanda aŋ iɲoŋ buoŋ liŋɡo!|0
+resampled-24k/mike-taglish-v1/wavs/cls072.wav|θˈæŋk jˈuː fˈɔːɹ ɹˈiːtʃɪŋ ˈaʊt, sana maɡustuhan nijo po aŋ baɡoŋ ˈaɪɾəm!|0
+resampled-24k/mike-taglish-v1/wavs/cls073.wav|donɛ na po tajo, maɾamiŋ salamat at hˈæv ˈeɪ vˈɛɹi nˈaɪs dˈeɪ po!|0
+resampled-24k/mike-taglish-v1/wavs/cls074.wav|jˈuː ˈɑːɹ ˈɔːl sɛt, θˈæŋk jˈuː fˈɔːɹ allowiŋ mˈiː tˈuː ɐsˈɪst jˈuː tədˈeɪ!|0
+resampled-24k/mike-taglish-v1/wavs/cls075.wav|maɾamiŋ salamat po sa paɡˈɔːɹdɚ, siɡuɾadoŋ maɡuɡustuhan nijo po aŋ ˈaɪɾəm na ito!|0
+resampled-24k/mike-taglish-v1/wavs/cls076.wav|taos puso po kamiŋ naɡpapasalamat, paɡpalain po nawa kajo ŋ atiŋ majkapal ŋajon!|0
+resampled-24k/mike-taglish-v1/wavs/cls077.wav|ˈaɪ am sˈoʊ ɡlˈæd wˈiː kˈʊd kwˈɪkli ɹᵻzˈɑːlv ˈɛvɹɪθˌɪŋ fˈɔːɹ jˈuː ɹˈaɪt nˈaʊ!|0
+resampled-24k/mike-taglish-v1/wavs/cls078.wav|oʊkˈeɪ na po, maɾamiŋ salamat at sana makapaɡoɾdɛɾ po kajo ulit sa amin!|0
+resampled-24k/mike-taglish-v1/wavs/cls079.wav|θˈæŋk jˈuː fˈɔːɹ jˈʊɹ kəntˈɪnjuːd lojaltj, nandito laŋ kami palaɡi paɾa tumuloŋ!|0
+resampled-24k/mike-taglish-v1/wavs/cls080.wav|maɾamiŋ salamat po, lˈʊkɪŋ fˈɔːɹwɚd na mataŋɡap nijo aŋ ˈɔːɹdɚ nijo ðˈɪs wˈiːk!|0
+resampled-24k/mike-taglish-v1/wavs/cls081.wav|isaŋ masajaŋ aɾaw po sa iɲo at maɾamiŋ salamat sa paɡtawaɡ sa amin!|0
+resampled-24k/mike-taglish-v1/wavs/cls083.wav|siɡɛ po, ipˈæk na namin ito aɡadaɡad paɾa mabilis poŋ dumatiŋ sa iɲo!|0
+resampled-24k/mike-taglish-v1/wavs/cls084.wav|plˈiːz ɛndʒˈɔɪ jˈʊɹ bɾand nɛw pˈɜːtʃɪs, hˈæv ˈeɪ bjˈuːɾifəl ˈænd ɹᵻlˈæksɪŋ dˈeɪ!|0
+resampled-24k/mike-taglish-v1/wavs/cls086.wav|maɾamiŋ salamat sa napakaɡandaŋ tɾansakʃon natin, nawa aj masijahan kajo sa iɲoŋ binili!|0
+resampled-24k/mike-taglish-v1/wavs/cls087.wav|θˈæŋk jˈuː fˈɔːɹ lɛttiŋ mˈiː handlɛ jˈʊɹ ɹᵻkwˈɛst, tˈeɪk kˈɛɹ ˈænd bjɛ nˈaʊ!|0
+resampled-24k/mike-taglish-v1/wavs/cls088.wav|siɡɛ po, babjɛ na po at maɾamiŋ salamat sa paɡpili sa amiŋ ʃˈɑːp!|0
+resampled-24k/mike-taglish-v1/wavs/cls089.wav|wˈiː sɪnsˈɪɹli hopɛ tˈuː hˈɪɹ fɹˈʌm jˈuː ɐɡˈɛn soon, hˈæv ˈeɪ ɡɹˈeɪt nˈaɪt!|0
+resampled-24k/mike-taglish-v1/wavs/cls090.wav|salamat po sa masajaŋ tʃˈɪkɐhˌæn natin habaŋ pˈiːnoʊpɹˈɑːsɛs ko aŋ iɲoŋ ˈɔːɹdɚ ŋajon!|0
+resampled-24k/mike-taglish-v1/wavs/cls091.wav|maluɡod po kamiŋ naɡpapasalamat sa iɲoŋ paɡtaŋkilik, haŋɡaŋ sa muli natiŋ paɡuusap bukas!|0
+resampled-24k/mike-taglish-v1/wavs/cls092.wav|θˈæŋk jˈuː vˈɛɹi mˈʌtʃ, jˈʊɹ ˈɔːɹdɚ ˈɪz əfˈɪʃəli ðˈə hiɡhliɡht ˈʌv mˈaɪ dˈeɪ!|0
+resampled-24k/mike-taglish-v1/wavs/cls093.wav|oʊkˈeɪ na oʊkˈeɪ na po lahat, maɾamiŋ salamat at maɡiŋat po kajo palaɡi!|0
+resampled-24k/mike-taglish-v1/wavs/cls094.wav|ɛndʒˈɔɪ ðˈə ɹˈɛst ˈʌv jˈʊɹ wˈiːk ˈænd θˈæŋk jˈuː fˈɔːɹ tɾustiŋ ˈaʊɚ tɛam!|0
+resampled-24k/mike-taglish-v1/wavs/cls095.wav|siɡɛ po sˈɜː, maɾamiŋ salamat po talaɡa at hˈæv ˈeɪ wˈʌndɚfəl dˈeɪ ahɛad!|0
+resampled-24k/mike-taglish-v1/wavs/cls096.wav|maɾamiŋ salamat po sa napakabilis niɲoŋ paɡtuɡon, isaŋ maɡandaŋ hapon po sa iɲo!|0
+resampled-24k/mike-taglish-v1/wavs/cls097.wav|ˈɪt wˈʌz absolutɛlj wˈʌndɚfəl assistiŋ jˈuː tədˈeɪ, ɡoodbjɛ ˈænd plˈiːz staj sˈeɪf alwajs!|0
+resampled-24k/mike-taglish-v1/wavs/cls098.wav|maɾamiŋ salamat po sa napakalakiŋ ˈɔːɹdɚ niɲo, ipapasa ko na po sa waɾɛhousɛ!|0
+resampled-24k/mike-taglish-v1/wavs/cls099.wav|ˈaɪ am ɛkstɹˈiːmli happj tˈuː hˈɛlp jˈuː pɹˈɑːsɛs ðˈɪs tɹænsˈækʃən, hˈæv fˈʌn tədˈeɪ!|0
+resampled-24k/mike-taglish-v1/wavs/cls100.wav|siɡɛ po, θˈæŋk jˈuː sˈoʊ mˈʌtʃ ɐɡˈɛn, babjɛ at maɡiŋat po kajo palaɡi!|0
+resampled-24k/mike-taglish-v1/wavs/dlv001.wav|pasɛnʃa na po, mɛdjo nadɛlaj aŋ ɾidɛɾ natin dahil sa malakas na ulan.|0
+resampled-24k/mike-taglish-v1/wavs/dlv002.wav|ˈaɪ sɪnsˈɪɹli ɐpˈɑːlədʒˌaɪz, bˈʌt pɹəvˈɪnʃəl ʃipmɛnʧ tˈeɪk ˈeɪ bit loŋɛɾ ðˈɪs wˈiːk.|0
+resampled-24k/mike-taglish-v1/wavs/dlv003.wav|sˈɑːɹi po talaɡa, hindi umabot sa kˈʌt ˈɔf aŋ ˈɔːɹdɚ nijo kahapon.|0
+resampled-24k/mike-taglish-v1/wavs/dlv004.wav|paumanhin po kuŋ hindi aɡad naupdatɛ aŋ tɹˈækɪŋ sˈɪstəm ŋ atiŋ kˈɜːɹiɚ.|0
+resampled-24k/mike-taglish-v1/wavs/dlv005.wav|wˈiː ˈɑːɹ vˈɛɹi sˈɑːɹi fˈɔːɹ ðˈə ˌʌnɛkspˈɛktᵻd dᵻlˈeɪ ˈɪn ˈaʊɚ dᵻlˈɪvɚɹi skˈɛdʒuːl tədˈeɪ.|0
+resampled-24k/mike-taglish-v1/wavs/dlv006.wav|naku, pasɛnʃa na po at naɡkaabɛɾja sa soɾtiŋ sˈɛntɚ kaninaŋ madaliŋ aɾaw.|0
+resampled-24k/mike-taglish-v1/wavs/dlv008.wav|ˈaɪ ɐpˈɑːlədʒˌaɪz fˈɔːɹ ðˈə ɪŋkənvˈiːnɪəns, jˈʊɹ pˈækɪdʒ wˈʌz ɾoutɛd tˈuː ðˈə wɾoŋ hub.|0
+resampled-24k/mike-taglish-v1/wavs/dlv009.wav|patawad po dahil mɛdjo nataɡalan aŋ paɡbalot namin sa iɲoŋ maŋa binili.|0
+resampled-24k/mike-taglish-v1/wavs/dlv010.wav|sˈɑːɹi tˈuː sˈeɪ, bˈʌt wˈiː kænˈɑːt dᵻlˈɪvɚ tˈuː ðˈæt spəsˈɪfɪk aɾɛa ɹˈaɪt nˈaʊ.|0
+resampled-24k/mike-taglish-v1/wavs/dlv011.wav|pasɛnʃa na po, nasiɾa daw po aŋ sasakjan ŋ amiŋ dᵻlˈɪvɚɹi tɛam.|0
+resampled-24k/mike-taglish-v1/wavs/dlv012.wav|wˈiː ɐpˈɑːlədʒˌaɪz ðˈæt jˈʊɹ ˈɔːɹdɚ dˈɪd nˈɑːt ɚɹˈaɪv ˈɔn ðˈə pɾomisɛd datɛ.|0
+resampled-24k/mike-taglish-v1/wavs/dlv013.wav|sˈɑːɹi po talaɡa, ˈaʊt ˈʌv kˈʌvɚɹɪdʒ aɾɛa po aŋ loʊkˈeɪʃən na biniɡaj niɲo.|0
+resampled-24k/mike-taglish-v1/wavs/dlv014.wav|paumanhin po, ŋunit kailaŋan po natiŋ iɹᵻskˈɛdʒuːl aŋ dᵻlˈɪvɚɹi paɾa bukas ŋ hapon.|0
+resampled-24k/mike-taglish-v1/wavs/dlv015.wav|ˈaɪ am ɛkstɹˈiːmli sˈɑːɹi, bˈʌt ðˈə kˈɜːɹiɚ ɾɛtuɾnɛd ðˈə pˈɑːɹsəl tˈuː ˈaʊɚ waɾɛhousɛ.|0
+resampled-24k/mike-taglish-v1/wavs/dlv016.wav|waɡ po kajoŋ maɡalala, tatawaɡ muna aŋ ɾidɛɾ baɡo sija pumunta dijan.|0
+resampled-24k/mike-taglish-v1/wavs/dlv017.wav|ɹˈɛst əʃˈʊɹd ðˈæt jˈʊɹ pˈækɪdʒ ˈɪz sˈeɪfli sᵻkjˈʊɹd insidɛ ˈaʊɚ bubblɛ wɾap.|0
+resampled-24k/mike-taglish-v1/wavs/dlv018.wav|makakaasa po kajoŋ ipapadala namin aɡad aŋ ɹᵻplˈeɪsmənt pˈɑːɹsəl niɲo bukas.|0
+resampled-24k/mike-taglish-v1/wavs/dlv019.wav|ˈaɪ wˈɪl pɛɾsonallj tɹˈæk ðˈɪs ʃipmɛnt until ˈɪt ɹˈiːtʃᵻz jˈʊɹ fɹˈʌnt dooɾ.|0
+resampled-24k/mike-taglish-v1/wavs/dlv020.wav|huwaɡ poŋ mabahala, siɡuɾado poŋ daɾatiŋ aŋ ˈɔːɹdɚ niɲo baɡo maɡwɛɛkɛnd.|0
+resampled-24k/mike-taglish-v1/wavs/dlv022.wav|sˈeɪf po aŋ iɲoŋ pˈækɪdʒ, binantajan ko po mismo aŋ paɡpˈæk nito.|0
+resampled-24k/mike-taglish-v1/wavs/dlv023.wav|iˈeɪ — updatɛ ko po kajo palaɡi kuŋ nasaan na aŋ iɲoŋ ˈɔːɹdɚ.|0
+resampled-24k/mike-taglish-v1/wavs/dlv025.wav|siɡuɾado poŋ tatawaɡ aŋ lədʒˈɪstɪks tɛam kapaɡ malapit na sila sa bahaj niɲo.|0
+resampled-24k/mike-taglish-v1/wavs/dlv026.wav|saɡot na po namin aŋ ʃˈɪpɪŋ fˈiː kuŋ sakaliŋ maɡkapɾoblɛma ulit sa kˈɜːɹiɚ.|0
+resampled-24k/mike-taglish-v1/wavs/dlv027.wav|ðˈə dɪspˈætʃ tɛam ˈɪz doiŋ ˈɛvɹɪθˌɪŋ ðˈeɪ kˈæn tˈuː dᵻlˈɪvɚ ˈɪt tədˈeɪ.|0
+resampled-24k/mike-taglish-v1/wavs/dlv028.wav|waɡ po kajoŋ maɡalala, babalik aŋ ɾidɛɾ bukas kuŋ wala kajo ŋajon.|0
+resampled-24k/mike-taglish-v1/wavs/dlv029.wav|nandito laŋ po kami paɾa asikasuhin aŋ iɲoŋ dᵻlˈɪvɚɹi kuŋ maj abɛɾja.|0
+resampled-24k/mike-taglish-v1/wavs/dlv030.wav|ˈaɪ pɹˈɑːmɪs tˈuː klˈoʊsli monitoɾ ðˈə tɹˈækɪŋ nˈʌmbɚ fˈɔːɹ jˈuː ðˈɪs ɛntiɾɛ wˈiːk.|0
+resampled-24k/mike-taglish-v1/wavs/dlv031.wav|ɡˈʊd nɛws po, nˈɑːpˈɪk ˈʌp na ŋ kˈɜːɹiɚ aŋ iɲoŋ pˈækɪdʒ kanina!|0
+resampled-24k/mike-taglish-v1/wavs/dlv032.wav|jˈʊɹ ˈaɪɾəm ˈɪz alɾɛadj ˈaʊt fˈɔːɹ dᵻlˈɪvɚɹi ˈænd wˈɪl ɚɹˈaɪv vˈɛɹi soon!|0
+resampled-24k/mike-taglish-v1/wavs/dlv033.wav|jɛhɛj, pasok po aŋ ˈɔːɹdɚ niɲo paɾa sa amiŋ fɹˈiː ʃˈɪpɪŋ pɾomo!|0
+resampled-24k/mike-taglish-v1/wavs/dlv034.wav|bukas na bukas din po aj matataŋɡap nijo na aŋ iɲoŋ pˈɑːɹsəl!|0
+resampled-24k/mike-taglish-v1/wavs/dlv035.wav|ðˈə dɹˈaɪvɚ wˈɪl ɚɹˈaɪv at jˈʊɹ addɾɛss ˈɪn lɛss than thiɾtj mˈɪnɪts!|0
+resampled-24k/mike-taglish-v1/wavs/dlv036.wav|sakto po aŋ datiŋ niɲo, ipapadala na namin ito mamajaŋ hapon mismo!|0
+resampled-24k/mike-taglish-v1/wavs/dlv037.wav|wˈiː upɡɾadɛd jˈʊɹ dᵻlˈɪvɚɹi tˈuː ɛkspɹˈɛs ʃˈɪpɪŋ fˈɔːɹ absolutɛlj nˈoʊ ˈɛkstɹə kˈɔst!|0
+resampled-24k/mike-taglish-v1/wavs/dlv038.wav|aŋ ɡaliŋ, nakaabot pa po tajo sa kˈʌt ˈɔf tˈaɪm ŋ kˈɜːɹiɚ ŋajon!|0
+resampled-24k/mike-taglish-v1/wavs/dlv039.wav|jɛs po, pwɛdɛ nijo naŋ kunin aŋ ˈaɪɾəm sa amiŋ pˈɪk ˈʌp point.|0
+resampled-24k/mike-taglish-v1/wavs/dlv040.wav|ˈaʊɚ dᵻlˈɪvɚɹi paɾtnɛɾ səksˈɛsfəli dɾoppɛd ˈɔf ðˈə pˈækɪdʒ at jˈʊɹ fɹˈʌnt ɡatɛ!|0
+resampled-24k/mike-taglish-v1/wavs/dlv041.wav|sulit na sulit po kasi libɾɛ na aŋ dᵻlˈɪvɚɹi papunta sa iɲo!|0
+resampled-24k/mike-taglish-v1/wavs/dlv042.wav|wow, aŋ bilis poŋ dumatiŋ ŋ pˈɑːɹsəl niɲo, nandijan na ɾaw aɡad!|0
+resampled-24k/mike-taglish-v1/wavs/dlv044.wav|pwɛdɛ po natiŋ ipadala aɡad ito vˈaɪə lˈælɐmˌuːv kuŋ naɡmamadali po kajo.|0
+resampled-24k/mike-taglish-v1/wavs/dlv045.wav|handa na po aŋ iɲoŋ pˈækɪdʒ at naɡhihintaj na laŋ sa ɾidɛɾ!|0
+resampled-24k/mike-taglish-v1/wavs/dlv046.wav|ðˈə ʃˈɪpɪŋ fˈiː ˈɪz kəmplˈiːtli wˈeɪvd sˈɪns jˈuː ˈɑːɹ ˈeɪ lojal kˈʌstəmɚ!|0
+resampled-24k/mike-taglish-v1/wavs/dlv047.wav|naku, malapit na malapit na po juŋ ɾidɛɾ sa mismoŋ bahaj niɲo!|0
+resampled-24k/mike-taglish-v1/wavs/dlv048.wav|madali laŋ po hanapin aŋ addɾɛss niɲo kaja mabilis po itoŋ makakaɾatiŋ.|0
+resampled-24k/mike-taglish-v1/wavs/dlv049.wav|ðˈə lˈoʊkəl kˈɜːɹiɚ dʒˈʌst kənfˈɜːmd ðˈæt jˈʊɹ ˈɔːɹdɚ ˈɪz ˈɔn ðˈə waj!|0
+resampled-24k/mike-taglish-v1/wavs/dlv051.wav|saktoŋsakto po, maj paɾatiŋ na ɾidɛɾ dito kaja isasabaj na namin ito!|0
+resampled-24k/mike-taglish-v1/wavs/dlv052.wav|wˈiː ˈɑːɹ happj tˈuː ɪnfˈɔːɹm jˈuː ðˈæt jˈʊɹ bˈɑːks ˈɪz ɹˈɛdi fˈɔːɹ dɪspˈætʃ!|0
+resampled-24k/mike-taglish-v1/wavs/dlv053.wav|oo naman po, pwɛdɛ kajoŋ maɡɹᵻkwˈɛst ŋ samɛ dˈeɪ dᵻlˈɪvɚɹi paɾa mabilis!|0
+resampled-24k/mike-taglish-v1/wavs/dlv054.wav|kumplɛto na po aŋ diːtˈeɪlz kaja ipapasa ko na aɡad sa lədʒˈɪstɪks tɛam.|0
+resampled-24k/mike-taglish-v1/wavs/dlv055.wav|jˈʊɹ spˈɛʃəl pˈækɪdʒ hˈæz əfˈɪʃəli lˈɛft ˈaʊɚ waɾɛhousɛ ˈænd ˈɪz tɹˈævəlɪŋ tˈuː jˈuː!|0
+resampled-24k/mike-taglish-v1/wavs/dlv056.wav|pwɛdɛ ko po baŋ makuha aŋ kumplɛtoŋ addɾɛss paɾa sa atiŋ dᵻlˈɪvɚɹi?|0
+resampled-24k/mike-taglish-v1/wavs/dlv057.wav|kˈaɪndli pɹəvˈaɪd jˈʊɹ ɛɡzˈækt housɛ nˈʌmbɚ ˈænd stɾɛɛt nˈeɪm fˈɔːɹ ðˈə ɾidɛɾ.|0
+resampled-24k/mike-taglish-v1/wavs/dlv058.wav|maɡkano po aŋ kaɾaniwaŋ ʃˈɪpɪŋ fˈiː papunta sa iɲoŋ pɾobinʃa?|0
+resampled-24k/mike-taglish-v1/wavs/dlv059.wav|kadalasan po aj inaabot ŋ tatloŋ aɾaw baɡo makaɾatiŋ sa iɲo.|0
+resampled-24k/mike-taglish-v1/wavs/dlv060.wav|wˈiː wˈɪl sɛnd jˈuː ðˈə tɹˈækɪŋ link thɾouɡh tˈɛkst mɛssaɡɛ latɛɾ tədˈeɪ.|0
+resampled-24k/mike-taglish-v1/wavs/dlv061.wav|maj landmaɾk po ba tajo malapit sa bahaj niɲo paɾa madaliŋ mahanap?|0
+resampled-24k/mike-taglish-v1/wavs/dlv062.wav|pɹəvˈɪnʃəl dᵻlˈɪvɚɹiz usuallj tˈeɪk about fˈaɪv tˈuː sˈɛvən bˈɪznəs dˈeɪz tˈuː ɚɹˈaɪv.|0
+resampled-24k/mike-taglish-v1/wavs/dlv063.wav|aŋ kˈɜːɹiɚ po natin paɾa sa ˈɔːɹdɚ na ito aj dʒˈeɪ ˈænd t.|0
+resampled-24k/mike-taglish-v1/wavs/dlv064.wav|itɹˈæk nijo na laŋ po sa wɛbsitɛ nila ɡamit aŋ ɹˈɛfɹəns nˈʌmbɚ.|0
+resampled-24k/mike-taglish-v1/wavs/dlv065.wav|ðˈə ɛstimatɛd dᵻlˈɪvɚɹi datɛ ˈɪz ˈɔn thuɾsdaj nˈɛkst wˈiːk ˈɪn ðˈə ˌæftɚnˈuːn.|0
+resampled-24k/mike-taglish-v1/wavs/dlv066.wav|pwɛdɛ po niɲoŋ piliin kuŋ kailan niɲo ɡustoŋ mataŋɡap aŋ iɲoŋ pˈækɪdʒ.|0
+resampled-24k/mike-taglish-v1/wavs/dlv067.wav|kapaɡ sa mɛtɾo manila laŋ po, kinabukasan aj nandijan na aɡad ito.|0
+resampled-24k/mike-taglish-v1/wavs/dlv068.wav|ðˈə dᵻlˈɪvɚɹi fˈiː vˈɛɹiz dɛpɛndiŋ ˈɔn ðˈə tˈoʊɾəl wɛiɡht ˈʌv jˈʊɹ itɛms.|0
+resampled-24k/mike-taglish-v1/wavs/dlv069.wav|ɡusto nijo po ba ŋ dooɾ tˈuː dooɾ dᵻlˈɪvɚɹi o bɹˈæntʃ pˈɪk ˈʌp?|0
+resampled-24k/mike-taglish-v1/wavs/dlv070.wav|pakisabi na laŋ po sa ɾidɛɾ kuŋ saan niɲo ɡustoŋ iwan aŋ bˈɑːks.|0
+resampled-24k/mike-taglish-v1/wavs/dlv071.wav|wˈiː paɾtnɛɾɛd wˈɪð ˌɛlbˌiːsˈiː tˈuː ɛnsuɾɛ fˈæstɚ ʃˈɪpɪŋ tˈuː ðˈə vˈɪseɪəz ɾɛɡion.|0
+resampled-24k/mike-taglish-v1/wavs/dlv072.wav|kajo po aŋ maɡbabajad ŋ ʃˈɪpɪŋ fˈiː diɾɛkta sa mismoŋ lˈælɐmˌuːv ɾidɛɾ.|0
+resampled-24k/mike-taglish-v1/wavs/dlv073.wav|aɾawaɾaw po kamiŋ naɡpapadala ŋ pˈækɪdʒᵻz tuwiŋ fˈɔːɹ pˌiːˈɛm.|0
+resampled-24k/mike-taglish-v1/wavs/dlv074.wav|plˈiːz mˈeɪk suɾɛ somɛonɛ ˈɪz at homɛ tˈuː ɹᵻsˈiːv ðˈə pˈækɪdʒ təmˈɑːɹoʊ.|0
+resampled-24k/mike-taglish-v1/wavs/dlv075.wav|kuŋ ɡusto nijo po, sa opisina niɲo na laŋ namin ito ipapadala.|0
+resampled-24k/mike-taglish-v1/wavs/dlv076.wav|ˈɪktʃˈɛk ko po sa sˈɪstəm kuŋ nasaan na aŋ iɲoŋ ˈɔːɹdɚ ŋajon.|0
+resampled-24k/mike-taglish-v1/wavs/dlv077.wav|ˈɪt looks lˈaɪk jˈʊɹ pˈɑːɹsəl ˈɪz stˈɪl stˈʌk at ðˈə sˈɛntɹəl soɾtiŋ hub.|0
+resampled-24k/mike-taglish-v1/wavs/dlv078.wav|iiwan na laŋ daw po ŋ ɾidɛɾ sa ɡuaɾd housɛ aŋ iɲoŋ pˈɑːɹsəl.|0
+resampled-24k/mike-taglish-v1/wavs/dlv079.wav|dalawaŋ bɛsɛs po maɡtataŋkaŋ maɡdᵻlˈɪvɚ aŋ kˈɜːɹiɚ baɡo ibalik sa amin.|0
+resampled-24k/mike-taglish-v1/wavs/dlv080.wav|wˈiː hiɡhlj ɹˌɛkəmˈɛnd standaɾd ʃˈɪpɪŋ ˈɪf jˈuː ˈɑːɹ nˈɑːt ˈɪn ˈeɪ ɾuʃ.|0
+resampled-24k/mike-taglish-v1/wavs/dlv081.wav|maj daɡdaɡ poŋ siŋil aŋ kˈɜːɹiɚ kapaɡ ˈaʊt ˈʌv town aŋ iɲoŋ addɾɛss.|0
+resampled-24k/mike-taglish-v1/wavs/dlv082.wav|pwɛdɛ ɾin po kajoŋ ɡumamit ŋ ɡɾab ɛkspɹˈɛs paɾa mas mabilis makaɾatiŋ.|0
+resampled-24k/mike-taglish-v1/wavs/dlv083.wav|ibabalot po namin ito naŋ maajos paɾa hindi masiɾa sa mahabaŋ bjahɛ.|0
+resampled-24k/mike-taglish-v1/wavs/dlv084.wav|ðˈə kˈɜːɹiɚ wˈɪl kˈɑːntækt jˈuː dᵻɹˈɛktli usiŋ ðˈə phonɛ nˈʌmbɚ jˈuː pɹəvˈaɪdᵻd.|0
+resampled-24k/mike-taglish-v1/wavs/dlv085.wav|nakadɛpɛndɛ po aŋ oɾas ŋ datiŋ sa ɾuta ŋ mismoŋ dᵻlˈɪvɚɹi ɾidɛɾ.|0
+resampled-24k/mike-taglish-v1/wavs/dlv086.wav|sa liŋo po aj walaŋ bjahɛ aŋ amiŋ lədʒˈɪstɪks paɾtnɛɾ.|0
+resampled-24k/mike-taglish-v1/wavs/dlv087.wav|ˈɔːl wɛɛkɛnd oɾdɛɾs wˈɪl bˈiː pɹˈɑːsɛst ˈænd ʃippɛd ˈaʊt ˈɔn mˈʌndeɪ mˈɔːɹnɪŋ.|0
+resampled-24k/mike-taglish-v1/wavs/dlv088.wav|pˈækitʃˈɛk po aŋ iɲoŋ ɛmail paɾa sa kumpiɾmaʃon ŋ iɲoŋ tɹˈækɪŋ nˈʌmbɚ.|0
+resampled-24k/mike-taglish-v1/wavs/dlv089.wav|kapaɡ bumaɡjo po, asahan po natin na maj kauntiŋ dᵻlˈeɪ sa bjahɛ.|0
+resampled-24k/mike-taglish-v1/wavs/dlv090.wav|ðˈə lˈoʊkəl bɹˈæntʃ wˈɪl handlɛ ðˈə fˈaɪnəl lɛɡ ˈʌv ðˈə dᵻlˈɪvɚɹi pɹˈɑːsɛs.|0
+resampled-24k/mike-taglish-v1/wavs/dlv091.wav|maaaɾi po niɲoŋ bajaɾan aŋ ʃˈɪpɪŋ fˈiː paɡdatiŋ ŋ ɾidɛɾ dijan.|0
+resampled-24k/mike-taglish-v1/wavs/dlv093.wav|ilaŋ kilomɛtɾo po aŋ lajo ŋ bahaj niɲo mula sa main hiɡhwaj?|0
+resampled-24k/mike-taglish-v1/wavs/dlv096.wav|aŋ bajad po sa ʃˈɪpɪŋ aj dɛpɛndɛ sa laki ŋ mismoŋ kahon.|0
+resampled-24k/mike-taglish-v1/wavs/dlv097.wav|dˈuː jˈuː wˈɔnt ˈʌs tˈuː lˈiːv ðˈə pˈækɪdʒ wˈɪð jˈʊɹ nˈɛkst dooɾ nɛiɡhboɾ?|0
+resampled-24k/mike-taglish-v1/wavs/dlv098.wav|papunta na po aŋ pˈækɪdʒ sa pinakamalapit na hub sa iɲoŋ luɡaɾ.|0
+resampled-24k/mike-taglish-v1/wavs/dlv099.wav|kailaŋan po ŋ piɾma niɲo baɡo ibiɡaj ŋ ɾidɛɾ aŋ iɲoŋ ˈaɪɾəm.|0
+resampled-24k/mike-taglish-v1/wavs/dlv100.wav|ðˈə dɪspˈætʃ sˈɛntɚ ˈɪz loʊkˈeɪɾᵻd ɹˈaɪt bɛsidɛ ˈaʊɚ main waɾɛhousɛ buildiŋ.|0
+resampled-24k/mike-taglish-v1/wavs/dlv101.wav|kuŋ wala po kajo sa bahaj, pwɛdɛ poŋ maɡiwan ŋ ˌɔːθɚɹᵻzˈeɪʃən lɛttɛɾ.|0
+resampled-24k/mike-taglish-v1/wavs/dlv102.wav|ipapadala ko po sa mɛssɛŋɛɾ aŋ skɹˈiːnʃɑːt ŋ ɾɛsibo mula sa kˈɜːɹiɚ.|0
+resampled-24k/mike-taglish-v1/wavs/dlv103.wav|pwɛdɛ po natin ipapˈɪk ˈʌp sa bɹˈæntʃ kuŋ mas paboɾ po sa iɲo.|0
+resampled-24k/mike-taglish-v1/wavs/dlv104.wav|jˈuː kˈæn tʃˈuːz jˈʊɹ pɹɪfˈɜːd dᵻlˈɪvɚɹi tˈaɪm slot dˈʊɹɹɪŋ ðˈə tʃˈɛkaʊt pɹˈɑːsɛs.|0
+resampled-24k/mike-taglish-v1/wavs/dlv105.wav|aŋ huliŋ updatɛ po sa sˈɪstəm aj nasa tɾansit pa ɾin aŋ pˈɑːɹsəl.|0
+resampled-24k/mike-taglish-v1/wavs/dlv106.wav|saaŋ baɾaŋaj po ɛksakto aŋ iɲoŋ lokaʃon paɾa mapin natin naŋ maajos?|0
+resampled-24k/mike-taglish-v1/wavs/dlv107.wav|mula po dito, ibabjahɛ po ijan ŋ kˈɜːɹiɚ papunta sa noɾtɛ.|0
+resampled-24k/mike-taglish-v1/wavs/dlv108.wav|ðˈə dᵻfˈɔlt ʃˈɪpɪŋ mɛthod wˈɪl tˈeɪk aɾound θɹˈiː tˈuː fˈɔːɹ woɾkiŋ dˈeɪz.|0
+resampled-24k/mike-taglish-v1/wavs/dlv109.wav|pakidoublɛ tʃˈɛk po aŋ zˈɪp kˈoʊd paɾa hindi maɡkamali ŋ ɾuta aŋ ɾidɛɾ.|0
+resampled-24k/mike-taglish-v1/wavs/dlv110.wav|ipapalaɡaj ko po sa kahon na fɹˈædʒəl paɾa mas maɡiŋat aŋ mˈæɡdɪdəlˌɪvɚ.|0
+resampled-24k/mike-taglish-v1/wavs/dlv111.wav|aabisuhan po kajo ŋ ɾidɛɾ kapaɡ malapit na sija sa iɲoŋ kanto.|0
+resampled-24k/mike-taglish-v1/wavs/dlv112.wav|ðˈə ʃˈɪpɪŋ timɛlinɛ bɛɡins ðˈə dˈeɪ ˈæftɚ jˈʊɹ pˈeɪmənt ˈɪz fˈʊli vˈɛɹᵻfˌaɪd.|0
+resampled-24k/mike-taglish-v1/wavs/dlv113.wav|sisiŋilin po kajo ŋ daɡdaɡ kuŋ ipapabaɡo niɲo aŋ addɾɛss ˈɔn ðˈə dˈeɪ.|0
+resampled-24k/mike-taglish-v1/wavs/dlv114.wav|isɛsɛpaɾatɛ po aŋ dalawaŋ itɛms dahil hindi sila kaʃa sa iisaŋ pˈaʊtʃ.|0
+resampled-24k/mike-taglish-v1/wavs/dlv115.wav|aŋ kˈʌt ˈɔf po natin paɾa maʃip ŋajon aj θɹˈiː pˌiːˈɛm.|0
+resampled-24k/mike-taglish-v1/wavs/dlv116.wav|plˈiːz vˈɛɹᵻfˌaɪ ˈɪf ðˈə dᵻlˈɪvɚɹi addɾɛss ɛntɛɾɛd ˈɔn jˈʊɹ ɐkˈaʊnt ˈɪz kɚɹˈɛkt.|0
+resampled-24k/mike-taglish-v1/wavs/dlv117.wav|hintajin nijo na laŋ po aŋ tˈɛkst ni ʃopɛɛ tuŋkol sa dᵻlˈɪvɚɹi niɲo.|0
+resampled-24k/mike-taglish-v1/wavs/dlv118.wav|isaŋ aɾaw laŋ po aŋ inaabot kapaɡ sa loob laŋ ŋ sijudad.|0
+resampled-24k/mike-taglish-v1/wavs/dlv119.wav|aŋ bjahɛ po ŋ baɾko aj tuwiŋ bijɛɾnɛs lamaŋ paɾa sa pɾobinʃa niɲo.|0
+resampled-24k/mike-taglish-v1/wavs/dlv120.wav|wˈiː kænˈɑːt pɹˈɑːsɛs dᵻlˈɪvɚɹiz tˈuː post ˈɑːfɪs bˈɑːksᵻz at ðˈɪs kˈɜːɹənt tˈaɪm.|0
+resampled-24k/mike-taglish-v1/wavs/dlv121.wav|maɡiwan na laŋ po kajo ŋ pambajad sa iɲoŋ kasama sa bahaj bukas.|0
+resampled-24k/mike-taglish-v1/wavs/dlv122.wav|kailaŋan po natin ŋ malinaw na landmaɾk paɾa hindi maliɡaw aŋ dɹˈaɪvɚ.|0
+resampled-24k/mike-taglish-v1/wavs/dlv123.wav|hihiŋi po ako ŋ updatɛ sa amiŋ lədʒˈɪstɪks tɛam mamajaŋ hapon.|0
+resampled-24k/mike-taglish-v1/wavs/dlv124.wav|intɛɾnational ʃˈɪpɪŋ takɛs ˈʌp tˈuː tˈuː wɛɛks dɛpɛndiŋ ˈɔn ðˈə kˈʌstəmz klˈɪɹəns.|0
+resampled-24k/mike-taglish-v1/wavs/dlv125.wav|ˈɪktʃˈɛk ko po kuŋ nakasakaj na aŋ iɲoŋ pˈækɪdʒ sa dᵻlˈɪvɚɹi vˈæn.|0
+resampled-24k/mike-taglish-v1/wavs/dlv126.wav|wala po tajoŋ maɡaɡawa sa dᵻlˈeɪ kuŋ aŋ pɾoblɛma aj sa kˈɜːɹiɚ mismoŋ.|0
+resampled-24k/mike-taglish-v1/wavs/dlv127.wav|bukas po aŋ amiŋ opisina paɾa sa maŋa ɡustoŋ maɡpˈɪk ˈʌp ŋ ˈɔːɹdɚ.|0
+resampled-24k/mike-taglish-v1/wavs/dlv128.wav|jˈʊɹ ʃˈɪpɪŋ addɾɛss mˈʌst ɛɡzˈæktli mˈætʃ jˈʊɹ billiŋ addɾɛss tˈuː pɹɪvˈɛnt fɹˈɔːd.|0
+resampled-24k/mike-taglish-v1/wavs/dlv129.wav|ipapadala po natin sa ˌɛlbˌiːsˈiː paɾa mas siɡuɾado kajoŋ makakaɾatiŋ naŋ liɡtas.|0
+resampled-24k/mike-taglish-v1/wavs/dlv130.wav|baɡo po natin ipabˈʊk, pˈækikənfˈɜːm muna aŋ ɛksaktoŋ sukat ŋ iɲoŋ kahon.|0
+resampled-24k/mike-taglish-v1/wavs/dlv131.wav|pwɛdɛ poŋ mˈɑːtɹˈæk aŋ ˈɔːɹdɚ ɡamit aŋ amiŋ əfˈɪʃəl mobilɛ ˌæplɪkˈeɪʃən.|0
+resampled-24k/mike-taglish-v1/wavs/dlv132.wav|jˈuː miɡht ɛkspˈiəɹɪəns ˈeɪ slˈaɪt dᵻlˈeɪ duɛ tˈuː ðˈə ʌpkˈʌmɪŋ national holidaj.|0
+resampled-24k/mike-taglish-v1/wavs/dlv133.wav|babalik po aŋ ɾidɛɾ kapaɡ hindi nija kajo nˈɑːkˈɑːntækt kaninaŋ umaɡa.|0
+resampled-24k/mike-taglish-v1/wavs/dlv134.wav|hati po kajo sa ʃˈɪpɪŋ fˈiː kuŋ dalawa aŋ naɡˈɔːɹdɚ sa iisaŋ bahaj.|0
+resampled-24k/mike-taglish-v1/wavs/dlv135.wav|aŋ pinakamalapit po na bɹˈæntʃ sa iɲo aj nasa kabilaŋ kanto laŋ.|0
+resampled-24k/mike-taglish-v1/wavs/dlv136.wav|dᵻlˈɪvɚɹiz ˈɑːɹ usuallj skˈɛdʒuːld bɛtwɛɛn ɛiɡht ˈɪn ðˈə mˈɔːɹnɪŋ ˈænd fˈaɪv ˌæftɚnˈuːn.|0
+resampled-24k/mike-taglish-v1/wavs/dlv138.wav|kasama po ba sa loob ŋ sˌʌbdᵻvˈɪʒən aŋ addɾɛss na biniɡaj niɲo?|0
+resampled-24k/mike-taglish-v1/wavs/dlv139.wav|maɡpapabiɡaj na laŋ po ako ŋ ɪnstɹˈʌkʃənz sa ɾidɛɾ kuŋ paano makapasok.|0
+resampled-24k/mike-taglish-v1/wavs/dlv140.wav|ˈeɪ vˈælɪd aɪdˈɛntɪfɪkˈeɪʃən kˈɑːɹd ˈɪz ɹᵻkwˈaɪɚd wˈɛn klˈeɪmɪŋ jˈʊɹ pˈækɪdʒ fɹˈʌm ðˈɛm.|0
+resampled-24k/mike-taglish-v1/wavs/dlv141.wav|isasama ko po aŋ mapa ŋ iɲoŋ bahaj paɾa hindi sila maliɡaw.|0
+resampled-24k/mike-taglish-v1/wavs/dlv142.wav|siɡuɾaduhin po niɲoŋ maj tao sa bahaj paɾa mataŋɡap aŋ iɲoŋ ˈɔːɹdɚ.|0
+resampled-24k/mike-taglish-v1/wavs/dlv143.wav|juŋ dᵻlˈɪvɚɹi paɾtnɛɾ po natin aŋ mˈæɡtitˈɛkst sa iɲo ŋ ɛksaktoŋ ɐmˈaʊnt.|0
+resampled-24k/mike-taglish-v1/wavs/dlv144.wav|ˈaʊɚ ʃˈɪpɪŋ ɾatɛs ˈɑːɹ stɹˈɪktli basɛd ˈɔn ðˈə standaɾd kˈɜːɹiɚ pɹˈaɪsɪŋ mˈeɪtɹɪks.|0
+resampled-24k/mike-taglish-v1/wavs/dlv145.wav|papunta na po aŋ amiŋ saɾiliŋ dɹˈaɪvɚ paɾa ihatid aŋ iɲoŋ binili.|0
+resampled-24k/mike-taglish-v1/wavs/dlv146.wav|aŋ bajad po paɾa sa ɾɛtuɾn ʃˈɪpɪŋ aj saɡutin na ŋ kˈʌstəmɚ.|0
+resampled-24k/mike-taglish-v1/wavs/dlv147.wav|dadaan po muna sa main hub aŋ iɲoŋ pˈækɪdʒ baɡo pumunta dijan.|0
+resampled-24k/mike-taglish-v1/wavs/dlv148.wav|plˈiːz allow twɛntj fˈɔːɹ ˈaʊɚz fˈɔːɹ ðˈə tɹˈækɪŋ sˈɪstəm tˈuː fˈʊli updatɛ.|0
+resampled-24k/mike-taglish-v1/wavs/dlv149.wav|kapaɡ umulan po naŋ malakas, ititiɡil muna ŋ ɾidɛɾ aŋ paɡdᵻlˈɪvɚ nija.|0
+resampled-24k/mike-taglish-v1/wavs/dlv150.wav|pwɛdɛ po niɲoŋ tawaɡan aŋ numɛɾo ŋ dɹˈaɪvɚ kapaɡ nandijan na sija.|0
+resampled-24k/mike-taglish-v1/wavs/eng001.wav|ɡˈʊd mˈɔːɹnɪŋ ˈænd θˈæŋk jˈuː fˈɔːɹ kˈɔːlɪŋ, mˈaɪ nˈeɪm ˈɪz saɾah spɛakiŋ.|0
+resampled-24k/mike-taglish-v1/wavs/eng002.wav|hˈaʊ maj ˈaɪ ɐsˈɪst jˈuː wˈɪð jˈʊɹ ˈɔːɹdɚ diːtˈeɪlz tədˈeɪ?|0
+resampled-24k/mike-taglish-v1/wavs/eng003.wav|plˈiːz hˈoʊld ðˈə lˈaɪn fˈɔːɹ ˈeɪ momɛnt whilɛ ˈaɪ tʃˈɛk ˈaʊɚ sˈɪstəm.|0
+resampled-24k/mike-taglish-v1/wavs/eng004.wav|θˈæŋk jˈuː fˈɔːɹ waitiŋ, ˈaɪ hˈæv səksˈɛsfəli ɹᵻtɹˈiːvd jˈʊɹ ɐkˈaʊnt ɹˈɛkɚdz.|0
+resampled-24k/mike-taglish-v1/wavs/eng005.wav|ˈaɪ am sˈoʊ sˈɑːɹi tˈuː ɪnfˈɔːɹm jˈuː ðˈæt ðˈə ˈaɪɾəm ˈɪz ˈaʊt ˈʌv stokk.|0
+resampled-24k/mike-taglish-v1/wavs/eng006.wav|wˈiː ɛkspˈɛkt ˈeɪ nɛw ʃipmɛnt tˈuː ɚɹˈaɪv bj mˈʌndeɪ mˈɔːɹnɪŋ.|0
+resampled-24k/mike-taglish-v1/wavs/eng007.wav|jɛs, wˈiː hˈæv plɛntj ˈʌv ɐvˈeɪləbəl ˈɪnvəntˌɔːɹi ˈɪn ðˈə mɛdium sˈaɪz.|0
+resampled-24k/mike-taglish-v1/wavs/eng008.wav|ðˈə tˈoʊɾəl pɹˈaɪs kˈʌmz ˈaʊt tˈuː ɛɡzˈæktli onɛ θˈaʊzənd fˈaɪv hˈʌndɹɪd pɛsos.|0
+resampled-24k/mike-taglish-v1/wavs/eng010.wav|wˈiː ˈɔfɚ fɹˈiː ʃˈɪpɪŋ fˈɔːɹ ˈɔːl oɾdɛɾs əbˈʌv fˈaɪv θˈaʊzənd pɛsos.|0
+resampled-24k/mike-taglish-v1/wavs/eng011.wav|jˈʊɹ pˈækɪdʒ wˈɪl bˈiː dᵻlˈɪvɚd ɹˈaɪt tˈuː jˈʊɹ fɹˈʌnt dooɾ təmˈɑːɹoʊ.|0
+resampled-24k/mike-taglish-v1/wavs/eng012.wav|ðˈə dᵻlˈɪvɚɹi ɾidɛɾ wˈɪl sɛnd jˈuː ˈeɪ tˈɛkst mɛssaɡɛ bᵻfˈɔːɹ ɚɹˈaɪvɪŋ.|0
+resampled-24k/mike-taglish-v1/wavs/eng013.wav|wˈiː ɐksˈɛpt pajmɛnʧ thɾouɡh dʒˈiː kˈæʃ, bank tɹˈænsfɜː, ˈænd kˈæʃ ˈɔn dᵻlˈɪvɚɹi.|0
+resampled-24k/mike-taglish-v1/wavs/eng014.wav|plˈiːz sɛnd ˈeɪ skɹˈiːnʃɑːt ˈʌv jˈʊɹ pˈeɪmənt ɹᵻsˈiːt tˈuː ˈaʊɚ ɛmail.|0
+resampled-24k/mike-taglish-v1/wavs/eng015.wav|ˈaɪ kəmplˈiːtli undɛɾstand jˈʊɹ kənsˈɜːn ɾɛɡaɾdiŋ ðˈə pɹˈaɪs ˈʌv ðˈɪs pɹˈɑːdʌkt.|0
+resampled-24k/mike-taglish-v1/wavs/eng016.wav|ɹˈɛst əʃˈʊɹd ðˈæt ˈaʊɚ itɛms ˈɑːɹ madɛ fɹˈʌm pɾɛmium kwˈɔlᵻɾi matɛɾials.|0
+resampled-24k/mike-taglish-v1/wavs/eng017.wav|tˈeɪk ˈɔːl ðˈə tˈaɪm jˈuː nˈiːd tˈuː θˈɪŋk about jˈʊɹ pˈɜːtʃɪs.|0
+resampled-24k/mike-taglish-v1/wavs/eng018.wav|lˈɛt mˈiː ɾɛad bˈæk jˈʊɹ kəmplˈiːt dᵻlˈɪvɚɹi addɾɛss tˈuː ɛnsuɾɛ ˈækjʊɹəsi.|0
+resampled-24k/mike-taglish-v1/wavs/eng019.wav|jˈʊɹ ˈɔːɹdɚ hˈæz bˈɪn kənfˈɜːmd ˈænd ˈɪz ɹˈɛdi fˈɔːɹ dɪspˈætʃ nˈaʊ.|0
+resampled-24k/mike-taglish-v1/wavs/eng020.wav|θˈæŋk jˈuː fˈɔːɹ ʃoppiŋ wˈɪð ˈʌs tədˈeɪ, hˈæv ˈeɪ wˈʌndɚfəl ˌæftɚnˈuːn ahɛad.|0
+resampled-24k/mike-taglish-v1/wavs/eng022.wav|maj ˈaɪ plˈiːz hˈæv jˈʊɹ fˈʊl nˈeɪm ˈænd jˈʊɹ ɹˈɛfɹəns nˈʌmbɚ?|0
+resampled-24k/mike-taglish-v1/wavs/eng023.wav|ˈaɪ wˈɪl tɹˈænsfɜː jˈʊɹ kˈɔːl tˈuː ˈaʊɚ lədʒˈɪstɪks dɛpaɾtmɛnt ɹˈaɪt nˈaʊ.|0
+resampled-24k/mike-taglish-v1/wavs/eng024.wav|ʌnfˈɔːɹtʃənətli, ðˈæt spəsˈɪfɪk kˈʌlɚ vˈɛɹiənt hˈæz bˈɪn dɪskəntˈɪnjuːd bj ðˈə suppliɛɾ.|0
+resampled-24k/mike-taglish-v1/wavs/eng025.wav|wˈiː kˈæn suɡɡɛst ˈæn ɔːltˈɜːnətˌɪv modɛl ðˈæt ˈɔfɚz similaɾ pˈaʊɚfəl fˈiːtʃɚz.|0
+resampled-24k/mike-taglish-v1/wavs/eng026.wav|ˈaʊɚ ɹˈɛkɚdz ʃow ðˈæt wˈiː hˈæv ɛɡzˈæktli fˈaɪv pˈiːsᵻz ɾɛmainiŋ lˈɛft.|0
+resampled-24k/mike-taglish-v1/wavs/eng027.wav|ðˈə standaɾd ʃˈɪpɪŋ fˈiː ˈɪz onɛ hˈʌndɹɪd pɛsos within mɛtɾo manila.|0
+resampled-24k/mike-taglish-v1/wavs/eng028.wav|pɹəvˈɪnʃəl dᵻlˈɪvɚɹiz usuallj tˈeɪk about θɹˈiː tˈuː fˈaɪv bˈɪznəs dˈeɪz.|0
+resampled-24k/mike-taglish-v1/wavs/eng029.wav|plˈiːz ɛnsuɾɛ somɛonɛ ˈɪz at homɛ tˈuː ɹᵻsˈiːv ðˈə pˈækɪdʒ təmˈɑːɹoʊ.|0
+resampled-24k/mike-taglish-v1/wavs/eng030.wav|wˈiː ɹᵻkwˈaɪɚ ˈeɪ fˈɪfti pɚsˈɛnt downpajmɛnt bᵻfˈɔːɹ staɾtiŋ jˈʊɹ kˈʌstəm ˈɔːɹdɚ.|0
+resampled-24k/mike-taglish-v1/wavs/eng031.wav|jˈʊɹ ɹᵻfˈʌnd ɹᵻkwˈɛst hˈæz bˈɪn səksˈɛsfəli pɹˈɑːsɛst bj ˈaʊɚ fˈaɪnæns dɛpaɾtmɛnt.|0
+resampled-24k/mike-taglish-v1/wavs/eng032.wav|ˈaɪ ɐpˈɑːlədʒˌaɪz fˈɔːɹ ðˈə bɹˈiːf dɪskənˈɛkʃən ˈɔn ˈaʊɚ phonɛ lˈaɪn ɛaɾliɛɾ.|0
+resampled-24k/mike-taglish-v1/wavs/eng033.wav|dˈuː nˈɑːt wˈʌɹi, ˈaɪ wˈɪl pɛɾsonallj monitoɾ jˈʊɹ ʃipmɛnt until ɚɹˈaɪvəl.|0
+resampled-24k/mike-taglish-v1/wavs/eng034.wav|fˈiːl fɹˈiː tˈuː kəmpˈɛɹ ˈaʊɚ pɹˈaɪsᵻz wˈɪð othɛɾ stoɾɛs ˈɪn town.|0
+resampled-24k/mike-taglish-v1/wavs/eng035.wav|wˈiː stand kəmplˈiːtli bɛhind ðˈə duɾabilitj ˈænd kwˈɔlᵻɾi ˈʌv ˈaʊɚ itɛms.|0
+resampled-24k/mike-taglish-v1/wavs/eng036.wav|lˈɛt mˈiː nˈoʊ ˈɪf jˈuː nˈiːd ˈɛni fˈɜːðɚ ɐsˈɪstəns wˈɪð aɲthiŋ ɛlsɛ.|0
+resampled-24k/mike-taglish-v1/wavs/eng037.wav|wˈiː ɐpɹˈiːʃɪˌeɪt jˈʊɹ pˈeɪʃəns whilɛ wˈiː ɪnvˈɛstᵻɡˌeɪɾᵻd ðˈə sˈɪstəm ɛɾɾoɾ tədˈeɪ.|0
+resampled-24k/mike-taglish-v1/wavs/eng038.wav|ˈaʊɚ bˈɪznəs ˈaʊɚz ˈɑːɹ fɹˈʌm ɛiɡht am until fˈaɪv pˌiːˈɛm dailj.|0
+resampled-24k/mike-taglish-v1/wavs/eng039.wav|jˈuː kˈæn ɹˈiːtʃ ˈʌs at zˈiəɹoʊ ninɛ onɛ sˈɛvən, θɹˈiː fˈɔːɹ fˈaɪv, sˈɪks sˈɛvən ɛiɡht ninɛ.|0
+resampled-24k/mike-taglish-v1/wavs/eng041.wav|ɡˈʊd ˌæftɚnˈuːn, wˈɛlkʌm bˈæk tˈuː ˈaʊɚ onlinɛ stˈɔːɹ sˈɜːvɪs sˈɛntɚ.|0
+resampled-24k/mike-taglish-v1/wavs/eng042.wav|kˈʊd jˈuː plˈiːz spɛll ˈaʊt jˈʊɹ lˈæst nˈeɪm fˈɔːɹ ˈaʊɚ ɹˈɛkɚdz?|0
+resampled-24k/mike-taglish-v1/wavs/eng043.wav|ˈaɪ am tʃˈɛkɪŋ ðˈə waɾɛhousɛ ˈɪnvəntˌɔːɹi fˈɔːɹ ðˈæt pɚtˈɪkjʊlɚ sˈaɪz nˈaʊ.|0
+resampled-24k/mike-taglish-v1/wavs/eng044.wav|wˈiː ɐpˈɑːlədʒˌaɪz fˈɔːɹ ˈɛni ɪŋkənvˈiːnɪəns kˈɔːzd bj ðˈə ˌʌnɛkspˈɛktᵻd ʃˈɪpɪŋ dᵻlˈeɪ.|0
+resampled-24k/mike-taglish-v1/wavs/eng045.wav|ðˈə upɡɾadɛd vˈɜːʒən ɪŋklˈuːdz ˈeɪ onɛ jˈɪɹ əfˈɪʃəl mˌænjuːfˈæktʃɚɹɚ waɾɾantj.|0
+resampled-24k/mike-taglish-v1/wavs/eng046.wav|ðˈæt ˈaɪɾəm ˈɪz kˈɜːɹəntli ˈɔn salɛ fˈɔːɹ ninɛ hˈʌndɹɪd ninɛtj pɛsos.|0
+resampled-24k/mike-taglish-v1/wavs/eng047.wav|ɛkspɹˈɛs dᵻlˈɪvɚɹi option ˈɪz ɐvˈeɪləbəl fˈɔːɹ ˈæn additional small sˈɜːvɪs fˈiː.|0
+resampled-24k/mike-taglish-v1/wavs/eng048.wav|plˈiːz vˈɛɹᵻfˌaɪ ðˈæt jˈʊɹ dᵻlˈɪvɚɹi addɾɛss diːtˈeɪlz ɛntɛɾɛd onlinɛ ˈɑːɹ kɚɹˈɛkt.|0
+resampled-24k/mike-taglish-v1/wavs/eng050.wav|ˈaɪ am fˈɑːloʊɪŋ ˈʌp ˈɔn jˈʊɹ pɛndiŋ ˈɪŋkwɚɹi fɹˈʌm jˈɛstɚdˌeɪ ˌæftɚnˈuːn.|0
+resampled-24k/mike-taglish-v1/wavs/eng051.wav|wˈʊd jˈuː lˈaɪk mˈiː tˈuː ɹɪzˈɜːv onɛ jˈuːnɪt fˈɔːɹ jˈuː tədˈeɪ?|0
+resampled-24k/mike-taglish-v1/wavs/eng052.wav|ɹˈɛst əʃˈʊɹd ðˈæt jˈʊɹ fˈiːdbæk hɛlps ˈʌs ɪmpɹˈuːv ˈaʊɚ dailj opɛɾations.|0
+resampled-24k/mike-taglish-v1/wavs/eng053.wav|hˈæv ˈeɪ wˈʌndɚfəl wɛɛkɛnd ahɛad ˈænd staj sˈeɪf wɛɹˈɛvɚ jˈuː ɡo.|0
+resampled-24k/mike-taglish-v1/wavs/eng054.wav|həlˈoʊ, θˈæŋk jˈuː fˈɔːɹ kˈɔːlɪŋ bˈæk tˈuː fˈaɪnəlˌaɪz jˈʊɹ pɛndiŋ tɹænsˈækʃən.|0
+resampled-24k/mike-taglish-v1/wavs/eng055.wav|plˈiːz allow mˈiː tˈuː mˈɪnɪts tˈuː ɡɛnɛɾatɛ jˈʊɹ əfˈɪʃəl sˈeɪlz ˈɪnvɔɪs.|0
+resampled-24k/mike-taglish-v1/wavs/eng056.wav|wˈiː sɪnsˈɪɹli ɐpˈɑːlədʒˌaɪz fˈɔːɹ ðˈə ɪŋkɚɹˈɛkt ˈaɪɾəm dᵻlˈɪvɚd tˈuː jˈʊɹ housɛ.|0
+resampled-24k/mike-taglish-v1/wavs/eng057.wav|wˈiː wˈɪl aɾɾaŋɛ ˈeɪ fɹˈiː ɹᵻplˈeɪsmənt pˈækɪdʒ pˈɪkʌp bj təmˈɑːɹoʊ mˈɔːɹnɪŋ.|0
+resampled-24k/mike-taglish-v1/wavs/eng058.wav|jˈʊɹ tɹˈækɪŋ nˈʌmbɚ wˈɪl bˈiː sɛnt vˈaɪə tˈɛkst mɛssaɡɛ vˈɛɹi ʃoɾtlj.|0
+resampled-24k/mike-taglish-v1/wavs/eng059.wav|plˈiːz lˈɛt ˈʌs nˈoʊ ˈɪf jˈuː nˈiːd ɹˌɛkəmɛndˈeɪʃənz fˈɔːɹ similaɾ pɹˈɑːdʌkts.|0
+resampled-24k/mike-taglish-v1/wavs/eng060.wav|θˈæŋk jˈuː fˈɔːɹ tʃˈuːzɪŋ ˈaʊɚ sˈɜːvɪsᵻz, ɡoodbjɛ ˈænd hˈæv ˈeɪ ɡɹˈeɪt dˈeɪ.|0
+resampled-24k/mike-taglish-v1/wavs/fup002.wav|həlˈoʊ po, naɡbabasakali laŋ kuŋ kailaŋan nijo pa ɾin juŋ kinowt namin kanina.|0
+resampled-24k/mike-taglish-v1/wavs/fup003.wav|dʒˈʌst fˈɑːloʊɪŋ ˈʌp ˈɔn jˈʊɹ pɹˈiːviəs ˈɪŋkwɚɹi ɾɛɡaɾdiŋ ˈaʊɚ bɛst sɛlliŋ pɹˈɑːdʌkt vˈɛɹiənts.|0
+resampled-24k/mike-taglish-v1/wavs/fup004.wav|kumusta po aŋ naɡiŋ ɛkspˈiəɹɪəns niɲo sa binili niɲoŋ ˈaɪɾəm nooŋ nakaɾaaŋ liŋɡo?|0
+resampled-24k/mike-taglish-v1/wavs/fup005.wav|naalala ko po na sabi nijo tatawaɡ kajo ŋajoŋ aɾaw paɾa sa dɛsiʃon nijo.|0
+resampled-24k/mike-taglish-v1/wavs/fup006.wav|wˈiː wantɛd tˈuː tʃˈɛk ˈɪf jˈuː hˈæv ˈɛni kwˈɛstʃənz about ðˈə kwoʊtˈeɪʃən sɛnt ɛaɾliɛɾ.|0
+resampled-24k/mike-taglish-v1/wavs/fup008.wav|baka po ɡusto niɲoŋ ituloj na aŋ paɡˈɔːɹdɚ habaŋ majɾoon pa kamiŋ stokk.|0
+resampled-24k/mike-taglish-v1/wavs/fup009.wav|tʃˈɛkɪŋ ˈɪn tˈuː sˈiː ˈɪf jˈuː nˈiːd ˈɛni fˈɜːðɚ ɐsˈɪstəns wˈɪð jˈʊɹ ɹˈiːsənt pˈɜːtʃɪs.|0
+resampled-24k/mike-taglish-v1/wavs/fup010.wav|tumatawaɡ po ako paɾa iɹᵻskˈɛdʒuːl aŋ atiŋ napaɡusapaŋ dᵻlˈɪvɚɹi datɛ kahapon.|0
+resampled-24k/mike-taglish-v1/wavs/fup011.wav|nˈɑːɹᵻsˈiːv ko po aŋ miss kˈɔːl niɲo kaja naɾito ako paɾa tumawaɡ pabalik.|0
+resampled-24k/mike-taglish-v1/wavs/fup012.wav|ˈaɪ am kˈɔːlɪŋ bˈæk tˈuː ɡˈɪv jˈuː ðˈə ɛɡzˈækt diːtˈeɪlz jˈuː ɹᵻkwˈɛstᵻd jˈɛstɚdˌeɪ ˌæftɚnˈuːn.|0
+resampled-24k/mike-taglish-v1/wavs/fup013.wav|sabi nijo po kasi aj tatawaɡ kajo mamaja paɾa sa kumpiɾmaʃon ŋ addɾɛss.|0
+resampled-24k/mike-taglish-v1/wavs/fup014.wav|nais ko laŋ po kamustahin kuŋ nakuha na niɲo naŋ maajos aŋ iɲoŋ pˈækɪdʒ.|0
+resampled-24k/mike-taglish-v1/wavs/fup016.wav|kuŋ buʃ po kajo ŋajon, kailan ko po kajo pwɛdɛŋ tawaɡan ulit paɾa ifˈɑːloʊ ˈʌp?|0
+resampled-24k/mike-taglish-v1/wavs/fup017.wav|maɡiiwan laŋ po ako ŋ mɛnsahɛ dahil mukhaŋ hindi po kajo ɐvˈeɪləbəl ŋajon.|0
+resampled-24k/mike-taglish-v1/wavs/fup018.wav|plˈiːz lˈɛt mˈiː nˈoʊ ˈɪf jˈuː wˈʊd lˈaɪk mˈiː tˈuː kˈɔːl bˈæk at ˈeɪ bɛttɛɾ tˈaɪm.|0
+resampled-24k/mike-taglish-v1/wavs/fup019.wav|susubukan ko po kajoŋ tawaɡan ulit bukas ŋ umaɡa paɾa sa iɲoŋ dɛsiʃon.|0
+resampled-24k/mike-taglish-v1/wavs/fup020.wav|ˈaɪ wˈɪl lˈiːv ˈeɪ mɛssaɡɛ wˈɪð jˈʊɹ kˈɑːliːɡ ɾɛɡaɾdiŋ ˈaʊɚ pɛndiŋ bˈɪznəs pɾoposal.|0
+resampled-24k/mike-taglish-v1/wavs/fup021.wav|maɡpapadala na laŋ po ako ŋ tˈɛkst mɛssaɡɛ sakaliŋ hindi ko kajo maabutaŋ onlinɛ.|0
+resampled-24k/mike-taglish-v1/wavs/fup022.wav|pasɛnʃa na po kuŋ nakakaistoɾbo ako sa iɲoŋ tɾabaho sa ɡanitoŋ oɾas ŋajon.|0
+resampled-24k/mike-taglish-v1/wavs/fup023.wav|ˈaɪ sɪnsˈɪɹli ɐpˈɑːlədʒˌaɪz fˈɔːɹ missiŋ jˈʊɹ kˈɔːl ɛaɾliɛɾ whilɛ ˈaɪ wˈʌz ˈɪn ˈeɪ mɛɛtiŋ.|0
+resampled-24k/mike-taglish-v1/wavs/fup024.wav|sˈɑːɹi po kuŋ napilitan akoŋ tawaɡan kajo ulit paɾa sa kulaŋ niɲoŋ dokumɛnto.|0
+resampled-24k/mike-taglish-v1/wavs/fup025.wav|paumanhin po sa istoɾbo, nais ko laŋ ivˈɛɹᵻfˌaɪ kuŋ natuloj aŋ iɲoŋ lakad.|0
+resampled-24k/mike-taglish-v1/wavs/fup027.wav|huwaɡ po kajoŋ maɡalala, hindi ko na po kajo kukulitin kapaɡ buʃ kajo.|0
+resampled-24k/mike-taglish-v1/wavs/fup028.wav|ɹˈɛst əʃˈʊɹd ðˈæt wˈiː onlj fˈɑːloʊ ˈʌp tˈuː ɛnsuɾɛ jˈʊɹ kəmplˈiːt sˌæɾɪsfˈækʃən wˈɪð ˈʌs.|0
+resampled-24k/mike-taglish-v1/wavs/fup029.wav|nandito laŋ po ako paɾa maɡɐsˈɪst sakaliŋ kailaŋanin nijo ulit aŋ amiŋ sɛɾbiʃo.|0
+resampled-24k/mike-taglish-v1/wavs/fup030.wav|tˈeɪk ˈɔːl ðˈə tˈaɪm jˈuː nˈiːd, ˈaɪ am dʒˈʌst tʃˈɛkɪŋ ˈɪn tˈuː ˈɔfɚ hˈɛlp.|0
+resampled-24k/mike-taglish-v1/wavs/fup031.wav|sakali poŋ maj kakilala kajoŋ naŋaŋailaŋan ŋ amiŋ pɾodukto, baka pwɛdɛ nijo kamiŋ iɾɛkomɛnda.|0
+resampled-24k/mike-taglish-v1/wavs/fup034.wav|wˈiː lˈʌv ɡˈɪvɪŋ spˈɛʃəl dˈɪskaʊnts tˈuː kˈʌstəmɚz hˈuː ɹᵻfˈɜː ðˈɛɹ fɹˈɛndz tˈuː ˈaʊɚ ʃˈɑːp.|0
+resampled-24k/mike-taglish-v1/wavs/fup035.wav|kuŋ nasijahan po kajo sa amiŋ sɛɾbiʃo, pwɛdɛ nijo kamiŋ ikuwɛnto sa iɲoŋ maŋa kaibiɡan.|0
+resampled-24k/mike-taglish-v1/wavs/fup036.wav|tumatawaɡ po ako paɾa kamustahin kuŋ kumusta aŋ naɡiŋ takbo ŋ iɲoŋ nɛɡoʃo.|0
+resampled-24k/mike-taglish-v1/wavs/fup037.wav|fˈɑːloʊɪŋ ˈʌp tˈuː sˈiː ˈɪf jˈuː hˈæd ˈeɪ tʃˈæns tˈuː ɹᵻvjˈuː ˈaʊɚ nɛw sˈɜːvɪs kˈæɾɐlˌɑːɡ.|0
+resampled-24k/mike-taglish-v1/wavs/fup038.wav|binabalikan ko laŋ po kajo tuŋkol sa tɛn pɚsˈɛnt na napaɡusapan natin.|0
+resampled-24k/mike-taglish-v1/wavs/fup039.wav|ˈaɪ am ɾɛtuɾniŋ jˈʊɹ missɛd kˈɔːl fɹˈʌm ɛaɾliɛɾ ðˈɪs mˈɔːɹnɪŋ, hˈaʊ kˈæn ˈaɪ hˈɛlp?|0
+resampled-24k/mike-taglish-v1/wavs/fup040.wav|nais ko laŋ poŋ itanoŋ kuŋ nˈɑːdᵻlˈɪvɚ na ba ŋ maajos aŋ iɲoŋ pˈækɪdʒ.|0
+resampled-24k/mike-taglish-v1/wavs/fup042.wav|wˈiː ˈɑːɹ fˈɑːloʊɪŋ ˈʌp ˈɔn jˈʊɹ pɛndiŋ ɹᵻkwˈɛst tˈuː tʃˈeɪndʒ ðˈə dᵻlˈɪvɚɹi addɾɛss diːtˈeɪlz.|0
+resampled-24k/mike-taglish-v1/wavs/fup043.wav|kailan po kaja kajo maɡkakaɾoon ŋ libɾɛŋ oɾas paɾa mapaɡusapan natin ito ulit?|0
+resampled-24k/mike-taglish-v1/wavs/fup044.wav|dʒˈʌst tʃˈɛkɪŋ ˈɪn tˈuː kənfˈɜːm ˈɪf jˈʊɹ ɪkwˈɪpmənt ˈɪz ɾunniŋ smoothlj ˈæftɚ ˈaʊɚ mˈeɪntənəns.|0
+resampled-24k/mike-taglish-v1/wavs/fup045.wav|tumawaɡ po ako paɾa ipaalala na maɡˈiːkspaɪɚ na aŋ iɲoŋ dˈɪskaʊnt vˈaʊtʃɚ bukas.|0
+resampled-24k/mike-taglish-v1/wavs/fup047.wav|ˈaɪ ɐpˈɑːlədʒˌaɪz fˈɔːɹ kˈɔːlɪŋ latɛ, bˈʌt ˈaɪ nɛɛdɛd ˈæn updatɛ ɾɛɡaɾdiŋ jˈʊɹ ʃipmɛnt.|0
+resampled-24k/mike-taglish-v1/wavs/fup048.wav|waɡ po kajoŋ maɡalala, hindi ko na po kajo kukulitin paɡkatapos nitoŋ tawaɡ.|0
+resampled-24k/mike-taglish-v1/wavs/fup050.wav|kuŋ maj maŋa kaibiɡan kajoŋ ɡustoŋ umoɾdɛɾ, pwɛdɛ nijo silaŋ papuntahin sa amiŋ pahina.|0
+resampled-24k/mike-taglish-v1/wavs/fup051.wav|naalala ko po na naɡhahanap kajo ŋ ɔːltˈɜːnətˌɪv, kaja tinatawaɡan ko kajo ŋajon.|0
+resampled-24k/mike-taglish-v1/wavs/fup052.wav|fˈɑːloʊɪŋ ˈʌp tˈuː sˈiː ˈɪf jˈuː stˈɪl ɹᵻkwˈaɪɚ ðˈə itɛms wˈiː ɹɪzˈɜːvd lˈæst wˈiːk.|0
+resampled-24k/mike-taglish-v1/wavs/fup053.wav|nais ko laŋ itanoŋ kuŋ pumasok na sa iɲoŋ isip aŋ alok namiŋ pɾɛʃo.|0
+resampled-24k/mike-taglish-v1/wavs/fup054.wav|tumatawaɡ ako paɾa iupdatɛ kajo na dumatiŋ na aŋ inaabaŋan niɲoŋ kulaj.|0
+resampled-24k/mike-taglish-v1/wavs/fup055.wav|ˈaɪ am fˈɑːloʊɪŋ ˈʌp ˈɔn jˈʊɹ fˈiːdbæk sˈoʊ wˈiː kˈæn ɪmpɹˈuːv ˈaʊɚ kˈʌstəmɚ sˈɜːvɪs.|0
+resampled-24k/mike-taglish-v1/wavs/fup056.wav|ɡusto ko laŋ po kamustahin kuŋ nasubukan nijo na aŋ baɡoŋ pɾoduktoŋ ipinadala namin.|0
+resampled-24k/mike-taglish-v1/wavs/fup057.wav|dʒˈʌst kˈɔːlɪŋ bˈæk tˈuː ɡˈɪv jˈuː ðˈə tɹˈækɪŋ nˈʌmbɚ fˈɔːɹ jˈʊɹ ɹᵻplˈeɪsmənt pˈækɪdʒ.|0
+resampled-24k/mike-taglish-v1/wavs/fup058.wav|sakali poŋ maj kənsˈɜːn kajo sa itɛms, pwɛdɛ nijo akoŋ tawaɡan anumaŋ oɾas.|0
+resampled-24k/mike-taglish-v1/wavs/fup059.wav|binabalikan ko po aŋ iɲoŋ mɛnsahɛ tuŋkol sa naɡkaabɛɾjaŋ paɡpapadala nooŋ isaŋ aɾaw.|0
+resampled-24k/mike-taglish-v1/wavs/fup060.wav|wˈiː ɐpɹˈiːʃɪˌeɪt jˈʊɹ tˈaɪm, plˈiːz lˈɛt ˈʌs nˈoʊ ˈɪf jˈuː hˈæv ˈɛni nɛw ɹᵻfˈɜːɹəlz.|0
+resampled-24k/mike-taglish-v1/wavs/grt001.wav|ɡˈʊd mˈɔːɹnɪŋ ðˈɛɹ! hˈaʊ kˈæn ˈaɪ hˈɛlp jˈuː tədˈeɪ?|0
+resampled-24k/mike-taglish-v1/wavs/grt002.wav|həlˈoʊ, θˈæŋk jˈuː fˈɔːɹ kˈɔːlɪŋ ˈaʊɚ ʃˈɑːp ðˈɪs ˌæftɚnˈuːn.|0
+resampled-24k/mike-taglish-v1/wavs/grt003.wav|θˈæŋk jˈuː fˈɔːɹ ɹˈiːtʃɪŋ ˈaʊt, mˈaɪ nˈeɪm ˈɪz anna.|0
+resampled-24k/mike-taglish-v1/wavs/grt004.wav|hˈaɪ ðˈɛɹ, wˈʌt kˈæn ˈaɪ dˈuː fˈɔːɹ jˈuː ɹˈaɪt nˈaʊ?|0
+resampled-24k/mike-taglish-v1/wavs/grt005.wav|wˈɛlkʌm bˈæk, maam — ˈɪt ˈɪz ɡɹˈeɪt tˈuː hˈɪɹ fɹˈʌm jˈuː ɐɡˈɛn.|0
+resampled-24k/mike-taglish-v1/wavs/grt006.wav|ɡˈʊd ˌæftɚnˈuːn! ˈɪz ðˈɪs jˈʊɹ fˈɜːst tˈaɪm oɾdɛɾiŋ wˈɪð ˈʌs?|0
+resampled-24k/mike-taglish-v1/wavs/grt007.wav|hˈaɪ ðˈɛɹ! hˈaʊ kˈæn ˈaɪ hˈɛlp jˈuː wˈɪð jˈʊɹ ˈɪŋkwɚɹiz?|0
+resampled-24k/mike-taglish-v1/wavs/grt009.wav|hˈaɪ sˈɜː, θˈæŋks fˈɔːɹ kˈɔːlɪŋ — hˈaʊ maj ˈaɪ hˈɛlp jˈuː?|0
+resampled-24k/mike-taglish-v1/wavs/grt010.wav|ˈaɪ am ɡlˈæd jˈuː kˈɔːld, hˈaʊ kˈæn wˈiː hˈɛlp?|0
+resampled-24k/mike-taglish-v1/wavs/grt011.wav|ɡˈʊd ˈiːvnɪŋ, θˈæŋk jˈuː fˈɔːɹ kˈɑːntæktɪŋ kˈʌstəmɚ sˈɜːvɪs!|0
+resampled-24k/mike-taglish-v1/wavs/grt012.wav|həlˈoʊ ðˈɛɹ, maam! ˈɑːɹ jˈuː lˈʊkɪŋ fˈɔːɹ ˈeɪ spəsˈɪfɪk ˈaɪɾəm?|0
+resampled-24k/mike-taglish-v1/wavs/grt013.wav|plˈiːz hˈoʊld ðˈə lˈaɪn fˈɔːɹ dʒˈʌst ˈeɪ momɛnt.|0
+resampled-24k/mike-taglish-v1/wavs/grt014.wav|maj ˈaɪ hˈæv jˈʊɹ fˈʊl nˈeɪm, plˈiːz?|0
+resampled-24k/mike-taglish-v1/wavs/grt016.wav|lˈɛt mˈiː pˈʊl ˈʌp jˈʊɹ ɐkˈaʊnt diːtˈeɪlz ɹˈaɪt nˈaʊ.|0
+resampled-24k/mike-taglish-v1/wavs/grt017.wav|kˈæn ˈaɪ ɡˈɛt jˈʊɹ ɾɛɡistɛɾɛd phonɛ nˈʌmbɚ, sˈɜː?|0
+resampled-24k/mike-taglish-v1/wavs/grt018.wav|kˈaɪndli hˈoʊld ˈɔn whilɛ ˈaɪ tʃˈɛk ðˈæt fˈɔːɹ jˈuː.|0
+resampled-24k/mike-taglish-v1/wavs/grt019.wav|dˈuː nˈɑːt wˈʌɹi, ˈaɪ wˈɪl fˈɪɡjɚ ðˈɪs ˈaʊt fˈɔːɹ jˈuː.|0
+resampled-24k/mike-taglish-v1/wavs/grt020.wav|ɹˈɛst əʃˈʊɹd, wˈiː ˈɑːɹ lˈʊkɪŋ into jˈʊɹ pɹˈiːviəs ˈɪŋkwɚɹi.|0
+resampled-24k/mike-taglish-v1/wavs/grt021.wav|maɡandaŋ umaɡa po! ako po si anna, paano ko kajo matutuluŋan ŋajon?|0
+resampled-24k/mike-taglish-v1/wavs/grt023.wav|maɡandaŋ aɾaw! wˈɛlkʌm po sa amiŋ ʃˈɑːp. ako pala si lˈiːzə, ano poŋ hanap natin?|0
+resampled-24k/mike-taglish-v1/wavs/grt024.wav|ɡˈʊd ˌæftɚnˈuːn po! si dʒˈɔɪ ito, paano ko masisiɡuɾoŋ maajos aŋ ˈɔːɹdɚ nijo ŋajon?|0
+resampled-24k/mike-taglish-v1/wavs/grt025.wav|həlˈoʊ, salamat sa paɡtawaɡ! ako si mɪʃˈɛl, maj ɡusto po ba kajoŋ iɪŋkwˈaɪɚ?|0
+resampled-24k/mike-taglish-v1/wavs/grt026.wav|ɡˈʊd mˈɔːɹnɪŋ! θˈæŋk jˈuː fˈɔːɹ ɹˈiːtʃɪŋ ˈaʊt tˈuː ˈʌs tədˈeɪ. hˈaʊ maj ˈaɪ ɐsˈɪst jˈuː?|0
+resampled-24k/mike-taglish-v1/wavs/grt027.wav|həlˈoʊ, wˈɛlkʌm tˈuː ˈaʊɚ kˈʌstəmɚ sˈɜːvɪs lˈaɪn. mˈaɪ nˈeɪm ˈɪz ɹˈiːkə, hˈaʊ kˈæn ˈaɪ hˈɛlp?|0
+resampled-24k/mike-taglish-v1/wavs/grt028.wav|maɡandaŋ hapon po sa iɲo. ano po aŋ maaaɾi koŋ maipaɡliŋkod ŋajoŋ aɾaw?|0
+resampled-24k/mike-taglish-v1/wavs/grt029.wav|salamat po sa iɲoŋ paɡtawaɡ. ako po si fˈeɪθ, paano ko kajo masisilbihan?|0
+resampled-24k/mike-taglish-v1/wavs/grt030.wav|hˈaɪ po! si kaɾɛn po ito, paano ko po maaassist aŋ kənsˈɜːn nijo tədˈeɪ?|0
+resampled-24k/mike-taglish-v1/wavs/grt031.wav|həlˈoʊ ˈænd maɡandaŋ umaɡa! dᵻvˈaɪn po spɛakiŋ, maj kailaŋan po ba tajoŋ itʃˈɛk?|0
+resampled-24k/mike-taglish-v1/wavs/grt033.wav|maɡandaŋ hapon! θˈæŋk jˈuː fˈɔːɹ tʃˈuːzɪŋ ˈaʊɚ stˈɔːɹ, bɛa po ito. ano poŋ sa atin?|0
+resampled-24k/mike-taglish-v1/wavs/grt034.wav|siɡɛ po, nakuha ko na aŋ diːtˈeɪlz. waɡ kajoŋ maɡalala, aajusin natin ijan.|0
+resampled-24k/mike-taglish-v1/wavs/grt035.wav|ˈaɪ undɛɾstand jˈʊɹ kənsˈɜːn po. hajaan nijo at tutuluŋan ko kajoŋ mˈɑːɹᵻzˈɑːlv ito.|0
+resampled-24k/mike-taglish-v1/wavs/grt036.wav|ɹˈɛst əʃˈʊɹd, ˈaɪ wˈɪl pɛɾsonallj look into ðˈɪs mattɛɾ fˈɔːɹ jˈuː ɹˈaɪt awaj.|0
+resampled-24k/mike-taglish-v1/wavs/grt037.wav|jˈuː ˈɑːɹ ˈɪn ɡˈʊd hands. lˈɛt mˈiː doublɛ tʃˈɛk ðˈæt ˌɪnfɚmˈeɪʃən tˈuː bˈiː absolutɛlj suɾɛ.|0
+resampled-24k/mike-taglish-v1/wavs/grt038.wav|pwɛdɛ ko po ba kajoŋ ihˈoʊld naŋ sandali paɾa mˈɑːvˈɛɹᵻfˌaɪ ko aŋ ɐkˈaʊnt nijo?|0
+resampled-24k/mike-taglish-v1/wavs/grt039.wav|sandali laŋ po, ˈɪktʃˈɛk ko laŋ sa sˈɪstəm kuŋ pumasok na aŋ bajad.|0
+resampled-24k/mike-taglish-v1/wavs/grt040.wav|pakihintaj po sa liɲa, titiŋnan ko laŋ po aŋ status ŋ dᵻlˈɪvɚɹi nijo.|0
+resampled-24k/mike-taglish-v1/wavs/grt041.wav|ihˈoʊld ko laŋ po kajo ŋ mabilis, ipapasok ko laŋ aŋ diːtˈeɪlz sa databasɛ.|0
+resampled-24k/mike-taglish-v1/wavs/grt042.wav|maaaɾi po baŋ maɡhintaj ŋ ilaŋ saɡlit habaŋ kinukuha ko aŋ iɲoŋ impoɾmaʃon?|0
+resampled-24k/mike-taglish-v1/wavs/grt043.wav|sandali po lamaŋ, ipapasa ko aŋ iɲoŋ tawaɡ sa tamaŋ dɛpaɾtamɛnto.|0
+resampled-24k/mike-taglish-v1/wavs/grt044.wav|plˈiːz allow mˈiː ˈeɪ bɹˈiːf momɛnt tˈuː pˈʊl ˈʌp jˈʊɹ ɹˈiːsənt tɹænsˈækʃən hˈɪstɚɹi.|0
+resampled-24k/mike-taglish-v1/wavs/grt046.wav|naku, pasɛnʃa na po sa paɡhihintaj. mɛdjo mataɡal laŋ po maɡload aŋ sˈɪstəm namin.|0
+resampled-24k/mike-taglish-v1/wavs/grt048.wav|pasɛnʃa na po, klˈoʊzd na aŋ amiŋ opisina ŋajon. pwɛdɛ po kajoŋ tumawaɡ bukas.|0
+resampled-24k/mike-taglish-v1/wavs/grt050.wav|həlˈoʊ po ulit! si kɹɪstˈiːn ito, ano poŋ additional na kailaŋan natiŋ itʃˈɛk?|0
+resampled-24k/mike-taglish-v1/wavs/grt051.wav|wˈɛlkʌm bˈæk po! salamat at tumawaɡ kajo ulit sa amin. tuloj po natin aŋ usapan.|0
+resampled-24k/mike-taglish-v1/wavs/grt052.wav|hˈaɪ, ɡˈʊd tˈuː hˈɪɹ fɹˈʌm jˈuː ɐɡˈɛn! paano ko po kajo matutuluŋan ðˈɪs tˈaɪm?|0
+resampled-24k/mike-taglish-v1/wavs/grt053.wav|həlˈoʊ ɐɡˈɛn! θˈæŋk jˈuː fˈɔːɹ kˈɔːlɪŋ bˈæk. lˈɛt ˈʌs pˈɪk ˈʌp ɹˈaɪt wˈɛɹ wˈiː lˈɛft ˈɔf.|0
+resampled-24k/mike-taglish-v1/wavs/grt054.wav|ɡˈʊd ˌæftɚnˈuːn! ˈɪt ˈɪz ˈeɪ plɛasuɾɛ tˈuː spɛak wˈɪð jˈuː ɐɡˈɛn tədˈeɪ. hˈaʊ kˈæn ˈaɪ hˈɛlp?|0
+resampled-24k/mike-taglish-v1/wavs/grt055.wav|maɡandaŋ umaɡa po! ako si nɪkˈoʊl, maj maitutuloŋ ba ako sa maŋa ˈɪŋkwɚɹiz nijo?|0
+resampled-24k/mike-taglish-v1/wavs/grt056.wav|həlˈoʊ, salamat sa paɡkˈɑːntækt sa amin! si hannah po ito, paano ko kajo maaassist?|0
+resampled-24k/mike-taglish-v1/wavs/grt057.wav|hˈaɪ po, maɡandaŋ aɾaw! kɐmˈiːl hˈɪɹ, ano poŋ kənsˈɜːn aŋ pwɛdɛ koŋ saɡutin ŋajon?|0
+resampled-24k/mike-taglish-v1/wavs/grt058.wav|ɡˈʊd dˈeɪ! wˈɛlkʌm po sa kˈʌstəmɚ suppoɾt natin. ako si maɾiɛ, anoŋ kailaŋan nila?|0
+resampled-24k/mike-taglish-v1/wavs/grt059.wav|maɡandaŋ hapon po! dʒˈeɪn po aŋ paŋalan ko, paano ko po kajo mapaɡsisilbihan?|0
+resampled-24k/mike-taglish-v1/wavs/grt060.wav|həlˈoʊ po! si saɾah pala ito, handaŋ tumuloŋ sa iɲoŋ maŋa katanuŋan.|0
+resampled-24k/mike-taglish-v1/wavs/grt061.wav|hˈaɪ, ɡˈʊd mˈɔːɹnɪŋ! maj ˈaɪ nˈoʊ kuŋ paano ko maaaddɾɛss aŋ kənsˈɜːn nijo ŋajon?|0
+resampled-24k/mike-taglish-v1/wavs/grt062.wav|maɡandaŋ aɾaw! salamat sa paɡpili sa amiŋ ʃˈɑːp, maj ˈɔːɹdɚ po ba kajoŋ ɪpˈɑːpəfˈɑːloʊ ˈʌp?|0
+resampled-24k/mike-taglish-v1/wavs/grt063.wav|wait laŋ po ha, kukunin ko laŋ aŋ ɹˈɛfɹəns nˈʌmbɚ na biniɡaj nijo.|0
+resampled-24k/mike-taglish-v1/wavs/grt064.wav|pwɛdɛ po baŋ mahiŋi aŋ buoŋ paŋalan nijo paɾa mˈɑːsˈɜːtʃ ko sa ɹˈɛkɚdz?|0
+resampled-24k/mike-taglish-v1/wavs/grt065.wav|siɡɛ po, itʃˈɛk ko muna kuŋ ɐvˈeɪləbəl pa aŋ ˈaɪɾəm baɡo tajo maɡpɹəsˈiːd.|0
+resampled-24k/mike-taglish-v1/wavs/grt066.wav|pakibiɡaj naman po aŋ ˈɔːɹdɚ id nijo paɾa mahanap ko aɡad sa sˈɪstəm.|0
+resampled-24k/mike-taglish-v1/wavs/grt067.wav|itɹˈænsfɜː ko laŋ po aŋ kˈɔːl sa amiŋ lədʒˈɪstɪks tɛam, hˈoʊld ðˈə lˈaɪn plˈiːz.|0
+resampled-24k/mike-taglish-v1/wavs/grt068.wav|plˈiːz staj ˈɔn ðˈə lˈaɪn whilɛ ˈaɪ vˈɛɹᵻfˌaɪ jˈʊɹ kˈɑːntækt diːtˈeɪlz ˈɪn ˈaʊɚ databasɛ.|0
+resampled-24k/mike-taglish-v1/wavs/grt069.wav|lˈɛt mˈiː kwˈɪkli tʃˈɛk ðˈə kˈɜːɹənt status ˈʌv jˈʊɹ ɹᵻkwˈɛst. onɛ momɛnt, plˈiːz.|0
+resampled-24k/mike-taglish-v1/wavs/grt070.wav|ˈaɪ wˈɪl plˈeɪs jˈuː ˈɔn ˈeɪ bɹˈiːf hˈoʊld tˈuː spɛak wˈɪð ˈaʊɚ dɪspˈætʃ tɛam.|0
+resampled-24k/mike-taglish-v1/wavs/grt071.wav|pakihintaj po muli sa liɲa, binubuksan ko lamaŋ aŋ iɲoŋ lumaŋ ɹˈɛkɚd.|0
+resampled-24k/mike-taglish-v1/wavs/grt072.wav|titiɡnan ko muna sa amiŋ listahan kuŋ kumpiɾmado na aŋ iɲoŋ naɡiŋ tɾansakʃon.|0
+resampled-24k/mike-taglish-v1/wavs/grt076.wav|dˈuː nˈɑːt wˈʌɹi, ˈaɪ wˈɪl tˈeɪk ownɛɾʃip ˈʌv ðˈɪs issuɛ ˈænd ɡˈɛt ˈɪt ɹᵻzˈɑːlvd fˈɔːɹ jˈuː.|0
+resampled-24k/mike-taglish-v1/wavs/grt077.wav|ˈaɪ kəmplˈiːtli undɛɾstand jˈʊɹ fɹʌstɹˈeɪʃən, ˈænd ˈaɪ am hˈɪɹ tˈuː mˈeɪk thiŋs ɹˈaɪt tədˈeɪ.|0
+resampled-24k/mike-taglish-v1/wavs/grt078.wav|aj, sˈɑːɹi po naputol aŋ tawaɡ natin kanina. saan po ba tajo huminto?|0
+resampled-24k/mike-taglish-v1/wavs/grt079.wav|pasɛnʃa na po kuŋ mɛdjo maiŋaj aŋ bˈækɡɹaʊnd, nandito kasi kami sa main ˈɑːfɪs.|0
+resampled-24k/mike-taglish-v1/wavs/grt080.wav|sˈɑːɹi po talaɡa fˈɔːɹ ðˈə ɪŋkənvˈiːnɪəns. aasikasuhin ko na po aɡad aŋ ɹᵻkwˈɛst nijo.|0
+resampled-24k/mike-taglish-v1/wavs/grt081.wav|naku, paumanhin po sa abala, tʃˈaɪntʃˈɛk ko pa ɾin po kasi aŋ sˈɪstəm haŋɡaŋ ŋajon.|0
+resampled-24k/mike-taglish-v1/wavs/grt082.wav|ˈaɪ ɐpˈɑːlədʒˌaɪz fˈɔːɹ ðˈə abɾupt dɪskənˈɛkʃən ɛaɾliɛɾ. lˈɛt mˈiː ɐsˈɪst jˈuː wˈɪð ðˈæt immɛdiatɛlj.|0
+resampled-24k/mike-taglish-v1/wavs/grt083.wav|humihiŋi po ako ŋ dispɛnsa dahil lampas na po sa woɾkiŋ ˈaʊɚz namin ŋajon.|0
+resampled-24k/mike-taglish-v1/wavs/grt084.wav|həlˈoʊ po, maɡandaŋ aɾaw! si tɹˈɪʃə po ito, anoŋ maitutuloŋ ko sa ˈɔːɹdɚ nijo?|0
+resampled-24k/mike-taglish-v1/wavs/grt085.wav|hˈaɪ ðˈɛɹ! θˈæŋk jˈuː fˈɔːɹ kˈɔːlɪŋ tədˈeɪ. ako po si kat, paano ko kajo masisilbihan?|0
+resampled-24k/mike-taglish-v1/wavs/grt086.wav|ɡˈʊd mˈɔːɹnɪŋ po! wˈɛlkʌm tˈuː ˈaʊɚ stˈɔːɹ, maj hinahanap po ba kajoŋ spəsˈɪfɪk na ˈaɪɾəm?|0
+resampled-24k/mike-taglish-v1/wavs/grt087.wav|maɡandaŋ hapon! ito po aŋ kˈʌstəmɚ sˈɜːvɪs natin, pwɛdɛ ko po baŋ malaman aŋ kənsˈɜːn nijo?|0
+resampled-24k/mike-taglish-v1/wavs/grt088.wav|salamat po sa paɡhihintaj, nahanap ko na aŋ iɲoŋ pɹˈoʊfaɪl sa amiŋ sˈɪstəm.|0
+resampled-24k/mike-taglish-v1/wavs/grt089.wav|θˈæŋk jˈuː fˈɔːɹ holdiŋ. ˈaɪ kˈæn sˈiː jˈʊɹ pɹˈiːviəs pˈɜːtʃɪsᵻz ɹˈaɪt hˈɪɹ ˈɔn mˈaɪ skɹˈiːn.|0
+resampled-24k/mike-taglish-v1/wavs/grt091.wav|inotɛ ko laŋ po aŋ sinabi nijo paɾa malinaw sa atiŋ dᵻlˈɪvɚɹi ɾidɛɾ.|0
+resampled-24k/mike-taglish-v1/wavs/grt092.wav|pwɛdɛ ko po baŋ ikənfˈɜːm aŋ iɲoŋ addɾɛss baɡo tajo maɡpɹəsˈiːd sa susunod na stɛp?|0
+resampled-24k/mike-taglish-v1/wavs/grt093.wav|lˈɛt mˈiː dʒˈʌst updatɛ jˈʊɹ kˈɑːntækt nˈʌmbɚ sˈoʊ ˈaʊɚ tɛam kˈæn ɹˈiːtʃ jˈuː pɾopɛɾlj.|0
+resampled-24k/mike-taglish-v1/wavs/grt094.wav|siɡuɾado po akoŋ maihahatid ito sa tamaŋ oɾas, waɡ po kajoŋ maɡalala.|0
+resampled-24k/mike-taglish-v1/wavs/grt095.wav|ɹˈɛst əʃˈʊɹd po na nˈɑːflˈæɡ na natin ito as pɾioɾitj dᵻlˈɪvɚɹi sa amiŋ kˈɜːɹiɚ.|0
+resampled-24k/mike-taglish-v1/wavs/grt096.wav|wˈiː ˈɑːɹ doiŋ ˈɛvɹɪθˌɪŋ wˈiː kˈæn tˈuː ˈɛkspədˌaɪt jˈʊɹ ˈɔːɹdɚ tədˈeɪ. plˈiːz dˈuː nˈɑːt wˈʌɹi.|0
+resampled-24k/mike-taglish-v1/wavs/grt097.wav|pasɛnʃa na po ulit sa dᵻlˈeɪ, ɡinaɡawa na po namin aŋ lahat ŋ paɾaan.|0
+resampled-24k/mike-taglish-v1/wavs/grt098.wav|sˈɑːɹi tˈuː kɛɛp jˈuː waitiŋ ˈɔn ðˈə lˈaɪn. ˈaɪ dʒˈʌst nɛɛdɛd tˈuː doublɛ tʃˈɛk jˈʊɹ diːtˈeɪlz.|0
+resampled-24k/mike-taglish-v1/wavs/grt100.wav|wˈɛlkʌm bˈæk po sa atiŋ lˈaɪn! ipaɡpatuloj na natin aŋ paɡpɹˈɑːsɛs ŋ iɲoŋ ɹᵻkwˈɛst.|0
+resampled-24k/mike-taglish-v1/wavs/obj001.wav|siɡɛ laŋ po, tˈeɪk jˈʊɹ tˈaɪm paɡisipan, nandito laŋ kami palaɡi!|0
+resampled-24k/mike-taglish-v1/wavs/obj002.wav|nˈoʊ pɾoblɛm at ˈɔːl, tˈeɪk as mˈʌtʃ tˈaɪm as jˈuː nˈiːd tˈuː dᵻsˈaɪd!|0
+resampled-24k/mike-taglish-v1/wavs/obj003.wav|balikan nijo laŋ po kami kapaɡ nakapaɡdɛsiʃon na kajoŋ tulujaŋ bumili.|0
+resampled-24k/mike-taglish-v1/wavs/obj005.wav|wˈiː wˈɪl ɡladlj wait fˈɔːɹ jˈuː wˈɛn jˈuː ˈɑːɹ ɹˈɛdi tˈuː ˈɔːɹdɚ.|0
+resampled-24k/mike-taglish-v1/wavs/obj006.wav|pasɛnʃa na po kuŋ mɛdjo mataas juŋ pɾɛʃo natin ŋajon.|0
+resampled-24k/mike-taglish-v1/wavs/obj007.wav|paumanhin po, ŋunit ijon na po aŋ pinakamababaŋ pɾɛʃo na amiŋ maibibiɡaj.|0
+resampled-24k/mike-taglish-v1/wavs/obj008.wav|ˈaɪ am tɾulj sˈɑːɹi ˈɪf ˈaʊɚ pɹˈaɪsɪŋ dˈʌz nˈɑːt fˈɪt jˈʊɹ kˈɜːɹənt budɡɛt.|0
+resampled-24k/mike-taglish-v1/wavs/obj009.wav|sˈɑːɹi po, hindi po talaɡa namin kaja tapatan aŋ pɾɛʃo ŋ iba.|0
+resampled-24k/mike-taglish-v1/wavs/obj010.wav|pasɛnʃa na po kuŋ naɡkapɾoblɛma kajo sa amin nooŋ nakaɾaan.|0
+resampled-24k/mike-taglish-v1/wavs/obj011.wav|wˈiː ɐpˈɑːlədʒˌaɪz ˈɪf jˈʊɹ pɹˈiːviəs ɛkspˈiəɹɪəns madɛ jˈuː hɛsitant tˈuː buj tədˈeɪ.|0
+resampled-24k/mike-taglish-v1/wavs/obj012.wav|naku, sˈɑːɹi po talaɡa, saɡad na po aŋ ibiniɡaj koŋ dˈɪskaʊnt sa iɲo.|0
+resampled-24k/mike-taglish-v1/wavs/obj013.wav|humihiŋi po ako ŋ tawad kuŋ hindi namin naabot aŋ inaasahan niɲo.|0
+resampled-24k/mike-taglish-v1/wavs/obj014.wav|ˈaɪ dɛɛplj ɐpˈɑːlədʒˌaɪz, bˈʌt wˈiː kænˈɑːt ˈɔfɚ ˈɛni fˈɜːðɚ dˈɪskaʊnts ɹˈaɪt nˈaʊ.|0
+resampled-24k/mike-taglish-v1/wavs/obj015.wav|sˈɑːɹi po kuŋ nadisappoint kajo sa kwˈɔlᵻɾi ŋ unaŋ ˈɔːɹdɚ niɲo.|0
+resampled-24k/mike-taglish-v1/wavs/obj016.wav|pasɛnʃa na po, wala po kamiŋ kˈæʃ ˈɔn dᵻlˈɪvɚɹi sa iɲoŋ luɡaɾ.|0
+resampled-24k/mike-taglish-v1/wavs/obj017.wav|ˈaɪ am sˈɑːɹi tˈuː hˈɪɹ jˈuː fˈiːl ðˈæt waj about ˈaʊɚ nɛw pɹˈɑːdʌkt.|0
+resampled-24k/mike-taglish-v1/wavs/obj018.wav|sˈɑːɹi po, naiintindihan ko kuŋ ɡusto nijo muna maɡhanap ŋ mas muɾa.|0
+resampled-24k/mike-taglish-v1/wavs/obj019.wav|patawad po kuŋ naɡaalaŋan kajo dahil sa maŋa nabasa niɲoŋ balita.|0
+resampled-24k/mike-taglish-v1/wavs/obj020.wav|wˈiː sɪnsˈɪɹli ɐpˈɑːlədʒˌaɪz fˈɔːɹ ˈɛni kənfjˈuːʒən ɾɛɡaɾdiŋ ðˈə ˈæktʃuːəl ʃˈɪpɪŋ fˈiː.|0
+resampled-24k/mike-taglish-v1/wavs/obj021.wav|pasɛnʃa na po kuŋ mɛdjo malajo aŋ pwɛsto namin sa iɲo.|0
+resampled-24k/mike-taglish-v1/wavs/obj022.wav|paumanhin, naiintindihan ko po na kailaŋan niɲo muna itoŋ paɡisipaŋ mabuti.|0
+resampled-24k/mike-taglish-v1/wavs/obj023.wav|ˈaɪ am sˈɑːɹi ˈɪf ðˈə ˈʌpfɹʌnt pˈeɪmənt ɹᵻkwˈaɪɚmənt ˈɪz ˈeɪ bit dˈɪfɪkəlt tədˈeɪ.|0
+resampled-24k/mike-taglish-v1/wavs/obj024.wav|sˈɑːɹi po kuŋ mukhaŋ skˈæm, pɛɾo lɛɡit po aŋ amiŋ onlinɛ ʃˈɑːp.|0
+resampled-24k/mike-taglish-v1/wavs/obj025.wav|pasɛnʃa na po talaɡa kuŋ hindi ko mabawasan aŋ ʃˈɪpɪŋ fˈiː.|0
+resampled-24k/mike-taglish-v1/wavs/obj026.wav|wˈiː ɐpˈɑːlədʒˌaɪz ˈɪf ˈaʊɚ itɛms sɛɛm mˈɔːɹ ɛkspˈɛnsɪv than ˈaʊɚ dᵻɹˈɛkt kəmpˈɛɾɪɾɚz.|0
+resampled-24k/mike-taglish-v1/wavs/obj027.wav|sˈɑːɹi po, stɹˈɪkt po kasi kami sa nˈoʊ ɹᵻfˈʌnd pˈɑːlɪsi kapaɡ nabuksan na.|0
+resampled-24k/mike-taglish-v1/wavs/obj028.wav|paumanhin po, sadjaŋ naɡtaas laŋ po talaɡa ŋ puhunan kaja ɡaɲan.|0
+resampled-24k/mike-taglish-v1/wavs/obj029.wav|ˈaɪ ɐpˈɑːlədʒˌaɪz, bˈʌt ðˈə pɾomo dˈɪskaʊnt kænˈɑːt bˈiː appliɛd tˈuː ðˈɪs ˈaɪɾəm.|0
+resampled-24k/mike-taglish-v1/wavs/obj030.wav|sˈɑːɹi po ha, ɡusto ko man kajo biɡjan ŋ dˈɪskaʊnt, bawal talaɡa.|0
+resampled-24k/mike-taglish-v1/wavs/obj031.wav|naiintindihan ko po, maɡusap muna kajo ŋ asawa niɲo baɡo kajo bumili.|0
+resampled-24k/mike-taglish-v1/wavs/obj032.wav|maaaɾi niɲoŋ basahin aŋ amiŋ maŋa ɹᵻvjˈuːz upaŋ kajo aj mas makasiɡuɾo.|0
+resampled-24k/mike-taglish-v1/wavs/obj033.wav|jˈuː kˈæn ɾɛad ˈaʊɚ kˈʌstəmɚ ɹᵻvjˈuːz ˈɔn fˈeɪsbʊk tˈuː vˈɛɹᵻfˌaɪ ˈaʊɚ stˈɔːɹ.|0
+resampled-24k/mike-taglish-v1/wavs/obj034.wav|kuŋ ɡusto nijo po, itaɡo ko muna juŋ ˈaɪɾəm haŋɡaŋ bukas.|0
+resampled-24k/mike-taglish-v1/wavs/obj035.wav|ipadadala ko po aŋ maŋa litɾato upaŋ makita niɲo aŋ kalidad.|0
+resampled-24k/mike-taglish-v1/wavs/obj036.wav|lˈɛt mˈiː sɛnd jˈuː ˈeɪ vˈɪdɪoʊ ˈʌv ðˈə ˈæktʃuːəl ˈaɪɾəm fˈɔːɹ jˈʊɹ ɹˈɛfɹəns.|0
+resampled-24k/mike-taglish-v1/wavs/obj037.wav|oʊkˈeɪ laŋ po kuŋ nˈɛkst wˈiːk na kajo ooɾdɛɾ, walaŋ pɾoblɛma.|0
+resampled-24k/mike-taglish-v1/wavs/obj038.wav|maaaɾi po kajoŋ bumisita sa amiŋ tindahan upaŋ makita niɲo naŋ pɛɾsonal.|0
+resampled-24k/mike-taglish-v1/wavs/obj039.wav|wˈiː undɛɾstand ˈɪf jˈuː wˈɔnt tˈuː kəmpˈɛɹ ˈaʊɚ pɹˈaɪsᵻz wˈɪð othɛɾ bɾands fˈɜːst.|0
+resampled-24k/mike-taglish-v1/wavs/obj040.wav|siɡɛ po, imɛssaɡɛ nijo na laŋ ako kapaɡ nakausap nijo na si mistɛɾ.|0
+resampled-24k/mike-taglish-v1/wavs/obj041.wav|nasa iɲo po aŋ huliŋ dɛsiʃon kuŋ itutuloj niɲo aŋ paɡbili ŋajon.|0
+resampled-24k/mike-taglish-v1/wavs/obj042.wav|plˈiːz tˈeɪk jˈʊɹ tˈaɪm tˈuː kənsˈɪdɚ ˈɪf ðˈɪs pˈɜːtʃɪs fˈɪts jˈʊɹ budɡɛt.|0
+resampled-24k/mike-taglish-v1/wavs/obj043.wav|wala po tajoŋ pilitan, kuŋ kailan laŋ kajo ɹˈɛdi, doon po tajo.|0
+resampled-24k/mike-taglish-v1/wavs/obj044.wav|ilalaɡaj ko muna sa iɲoŋ kˈɑːɹt paɾa hindi niɲo makalimutan mamaja.|0
+resampled-24k/mike-taglish-v1/wavs/obj045.wav|ˈɪt ˈɪz kəmplˈiːtli fˈaɪn ˈɪf jˈuː dᵻsˈaɪd tˈuː buj ðˈə ɔːltˈɜːnətˌɪv option instɛad.|0
+resampled-24k/mike-taglish-v1/wavs/obj047.wav|babalikan ko po kajo sa bijɛɾnɛs upaŋ malaman aŋ iɲoŋ huliŋ paʃa.|0
+resampled-24k/mike-taglish-v1/wavs/obj048.wav|fˈiːl fɹˈiː tˈuː ɛksplˈɔːɹ othɛɾ suppliɛɾs tˈuː sˈiː ðˈə pɹˈaɪs dˈɪfɹənsᵻz ɐvˈeɪləbəl.|0
+resampled-24k/mike-taglish-v1/wavs/obj049.wav|siɡɛ po, ibibiɡaj ko aŋ nˈʌmbɚ ko paɾa matawaɡan nijo ako aɡad.|0
+resampled-24k/mike-taglish-v1/wavs/obj050.wav|hihintajin ko po aŋ iɲoŋ tawaɡ kuŋ kailan niɲo ɡustoŋ umoɾdɛɾ.|0
+resampled-24k/mike-taglish-v1/wavs/obj051.wav|jˈuː kˈæn alwajs ɾɛtuɾn tˈuː ˈaʊɚ ʃˈɑːp wˈʌns jˈuː hˈæv madɛ jˈʊɹ dᵻsˈɪʒən.|0
+resampled-24k/mike-taglish-v1/wavs/obj052.wav|oʊkˈeɪ po, paɡisipan nijo munaŋ mabuti paɾa hindi kajo maɡhinajaŋ sa huli.|0
+resampled-24k/mike-taglish-v1/wavs/obj053.wav|makikita niɲo aŋ paɡkakaiba ŋ amiŋ pɾodukto kapaɡ hinawakan niɲo ito.|0
+resampled-24k/mike-taglish-v1/wavs/obj054.wav|ˈaɪ wˈɪl dˈɑːkjuːmənt jˈʊɹ fˈiːdbæk ɾɛɡaɾdiŋ ðˈə pɹˈaɪsɪŋ ˈʌv ðˈɪs spəsˈɪfɪk pɹˈɑːdʌkt.|0
+resampled-24k/mike-taglish-v1/wavs/obj055.wav|kuŋ naɡaalaŋan kajo, pwɛdɛ kajoŋ maɡˈɔːɹdɚ muna ŋ isa paɾa matɛst.|0
+resampled-24k/mike-taglish-v1/wavs/obj056.wav|waɡ kajoŋ maɡalala, onɛ hˈʌndɹɪd pɚsˈɛnt ɔːθˈɛntɪk po itoŋ ibinɛbɛnta namin sa iɲo.|0
+resampled-24k/mike-taglish-v1/wavs/obj057.wav|naiintindihan ko aŋ iɲoŋ paɡaalala, ŋunit sisiɡuɾaduhin koŋ maajos itoŋ makakaɾatiŋ.|0
+resampled-24k/mike-taglish-v1/wavs/obj058.wav|ˈaɪ undɛɾstand jˈʊɹ hɛsitation, bˈʌt ˈaɪ ɡuaɾantɛɛ ðˈɪs pɹˈɑːdʌkt wˈɪl mɛɛt jˈʊɹ ɛkspɪktˈeɪʃənz.|0
+resampled-24k/mike-taglish-v1/wavs/obj059.wav|siɡuɾado po kajoŋ sulit na sulit aŋ ibabajad nijo sa kwˈɔlᵻɾi nito.|0
+resampled-24k/mike-taglish-v1/wavs/obj060.wav|huwaɡ po kajoŋ matakot, maaasahan niɲo na totoo aŋ amiŋ sinasabi.|0
+resampled-24k/mike-taglish-v1/wavs/obj061.wav|ɹˈɛst əʃˈʊɹd ðˈæt ˈaʊɚ onlinɛ stˈɔːɹ hˈæz bˈɪn opɛɾatiŋ sˈeɪfli fˈɔːɹ θɹˈiː jɛaɾs.|0
+resampled-24k/mike-taglish-v1/wavs/obj062.wav|waɡ po kajoŋ maɡalala na mˈɑːskˈæm, maj fˈɪzɪkəl stˈɔːɹ po kami sa makati.|0
+resampled-24k/mike-taglish-v1/wavs/obj063.wav|makakaasa po kajo na hindi masasajaŋ aŋ iɲoŋ pɛɾa sa pɾoduktoŋ ito.|0
+resampled-24k/mike-taglish-v1/wavs/obj064.wav|plˈiːz dˈuː nˈɑːt wˈʌɹi, wˈiː ˈɔfɚ ˈeɪ monɛj bˈæk ɡuaɾantɛɛ ˈɪf ˈɪt fˈeɪlz.|0
+resampled-24k/mike-taglish-v1/wavs/obj065.wav|ɡaɾantisado poŋ maɡanda aŋ kwˈɔlᵻɾi nijan kaja hindi kajo maɡsisisi sa huli.|0
+resampled-24k/mike-taglish-v1/wavs/obj066.wav|nauunawaan ko po kuŋ bakit kajo naɡdududa, ŋunit libo na aŋ amiŋ paɾokjano.|0
+resampled-24k/mike-taglish-v1/wavs/obj067.wav|ˈaɪ kəmplˈiːtli undɛɾstand wˈaɪ jˈuː nˈiːd tˈuː θˈɪŋk about ˈɪt bᵻfˈɔːɹ pˈɜːtʃɪsɪŋ tədˈeɪ.|0
+resampled-24k/mike-taglish-v1/wavs/obj068.wav|waɡ po kajoŋ matakot maɡbajad onlinɛ, sᵻkjˈʊɹd po aŋ sˈɪstəm ŋ dʒˈiːkˈæʃ natin.|0
+resampled-24k/mike-taglish-v1/wavs/obj069.wav|handa po kamiŋ palitan aŋ pɾodukto kuŋ maj nakita kajoŋ siɾa paɡdatiŋ.|0
+resampled-24k/mike-taglish-v1/wavs/obj072.wav|huwaɡ kajoŋ maɡalala, tutuluŋan ko kajoŋ makatipid naŋ hindi isinasakɾipiʃo aŋ kalidad.|0
+resampled-24k/mike-taglish-v1/wavs/obj073.wav|ɹˈɛst əʃˈʊɹd, ðˈə hiɡhɛɾ pɹˈaɪs dᵻɹˈɛktli tɾanslatɛs tˈuː mˈʌtʃ bɛttɛɾ matɛɾial kwˈɔlᵻɾi.|0
+resampled-24k/mike-taglish-v1/wavs/obj074.wav|waɡ po kajoŋ maɡalaŋan, naɡpapadala po kami ŋ litɾato baɡo namin iʃip.|0
+resampled-24k/mike-taglish-v1/wavs/obj075.wav|makakatijak po kajo na aŋ bawat dɛtaljɛ ŋ ˈaɪɾəm aj amiŋ sinuɾi.|0
+resampled-24k/mike-taglish-v1/wavs/obj076.wav|wˈiː tɾulj vˈæljuː jˈʊɹ tɾust, sˈoʊ wˈiː onlj pɹəvˈaɪd ðˈə bɛst possiblɛ sˈɜːvɪs.|0
+resampled-24k/mike-taglish-v1/wavs/obj077.wav|hindi po tajo ɡaja ŋ iba na naɡpapadala ŋ maliŋ ˈaɪɾəm sa kˈʌstəmɚ.|0
+resampled-24k/mike-taglish-v1/wavs/obj078.wav|ipaŋaŋako ko po na mas maɡanda aŋ iɲoŋ maɡiɡiŋ kaɾanasan sa amin ŋajon.|0
+resampled-24k/mike-taglish-v1/wavs/obj079.wav|ˈaɪ pɹˈɑːmɪs jˈuː wˈɪl sˈiː ˈeɪ huɡɛ dˈɪfɹəns kəmpˈɛɹd tˈuː jˈʊɹ past suppliɛɾ.|0
+resampled-24k/mike-taglish-v1/wavs/obj080.wav|waɡ nijo na po maʃadoŋ isipin juŋ pɾɛʃo, maɡanda po talaɡa juŋ ˈaɪɾəm.|0
+resampled-24k/mike-taglish-v1/wavs/obj081.wav|huwaɡ po kajoŋ maŋamba, lɛɡal at ɾɛhistɾado po aŋ amiŋ maliit na nɛɡoʃo.|0
+resampled-24k/mike-taglish-v1/wavs/obj082.wav|plˈiːz fˈiːl kˈɑːnfɪdənt ˈɪn jˈʊɹ pˈɜːtʃɪs, wˈiː stand bj ˈaʊɚ pɹˈɑːdʌkt kwˈɔlᵻɾi ɛntiɾɛlj.|0
+resampled-24k/mike-taglish-v1/wavs/obj084.wav|asahan po niɲo na tutuluŋan ko kajo mula ŋajon haŋɡaŋ makuha aŋ pˈɑːɹsəl.|0
+resampled-24k/mike-taglish-v1/wavs/obj085.wav|dˈuː nˈɑːt wˈʌɹi about hiddɛn fˈiːz, ˈɛvɹɪθˌɪŋ ˈɪz fˈʊli dɛtailɛd ˈɔn jˈʊɹ ɹᵻsˈiːt.|0
+resampled-24k/mike-taglish-v1/wavs/obj087.wav|maniwala po kajo, malakiŋ ɡinhawa aŋ maibibiɡaj nito sa iɲoŋ pamilja.|0
+resampled-24k/mike-taglish-v1/wavs/obj088.wav|ˈaɪ undɛɾstand ˈɪt ˈɪz ˈæn ɪnvˈɛstmənt, bˈʌt ˈɪt wˈɪl sˈeɪv jˈuː monɛj ᵻvˈɛntʃuːəli.|0
+resampled-24k/mike-taglish-v1/wavs/obj089.wav|waɡ po kajoŋ mastɾɛss kuŋ hindi pa kajo suɾɛ, pwɛdɛ naman bukas na.|0
+resampled-24k/mike-taglish-v1/wavs/obj091.wav|wˈiː wˈɪl bˈiː ɹˈaɪt hˈɪɹ wɛnˈɛvɚ jˈuː ˈɑːɹ ɹˈɛdi tˈuː mˈeɪk ˈeɪ pˈɜːtʃɪs.|0
+resampled-24k/mike-taglish-v1/wavs/obj092.wav|iaassuɾɛ ko po sa iɲo na woɾth ˈɪt bawat piso na ilalabas niɲo.|0
+resampled-24k/mike-taglish-v1/wavs/obj093.wav|nakatitijak ako na maɡuɡustuhan din ŋ iɲoŋ asawa aŋ pɾoduktoŋ napili niɲo.|0
+resampled-24k/mike-taglish-v1/wavs/obj094.wav|ˈaɪ am kˈɑːnfɪdənt ðˈæt ðˈɪs ˈaɪɾəm wˈɪl sˈɑːlv ðˈə pɾoblɛm jˈuː dᵻskɹˈaɪbd ɛaɾliɛɾ.|0
+resampled-24k/mike-taglish-v1/wavs/obj095.wav|waɡ po kajoŋ kabahan sa onlinɛ pˈeɪmənt, iɾɛɾɛsibo po namin aɡad ijan.|0
+resampled-24k/mike-taglish-v1/wavs/obj096.wav|hajaan niɲoŋ ipakita ko kuŋ ɡaano kaɡanda aŋ ɡinamit na matɛɾjalɛs dito.|0
+resampled-24k/mike-taglish-v1/wavs/obj097.wav|jˈʊɹ pˈiːs ˈʌv mind ˈɪz ˈaʊɚ pɾioɾitj, sˈoʊ wˈiː tʃˈɛk ˈɛvɹi siŋlɛ bˈɑːks.|0
+resampled-24k/mike-taglish-v1/wavs/obj098.wav|kuŋ maj hɛsitation po kajo, pwɛdɛ tajoŋ maɡ vˈɪdɪoʊ kˈɔːl paɾa makita nijo.|0
+resampled-24k/mike-taglish-v1/wavs/obj099.wav|maiintindihan po niɲo kuŋ bakit ɡaɲan aŋ pɾɛʃo kapaɡ naɡamit niɲo na.|0
+resampled-24k/mike-taglish-v1/wavs/obj100.wav|wˈiː kəmplˈiːtli undɛɾstand ðˈə nˈiːd tˈuː kənsˈʌlt wˈɪð jˈʊɹ paɾtnɛɾ bᵻfˈɔːɹ bujiŋ aɲthiŋ.|0
+resampled-24k/mike-taglish-v1/wavs/obj101.wav|waɡ po maɡalala, maɾami na ɾin po kamiŋ naɡiŋ kˈʌstəmɚ dijan sa iɲo.|0
+resampled-24k/mike-taglish-v1/wavs/obj102.wav|sisiɡuɾaduhin ko poŋ hindi na mauulit aŋ paŋit niɲoŋ naɡiŋ kaɾanasan sa iba.|0
+resampled-24k/mike-taglish-v1/wavs/obj103.wav|ˈaɪ assuɾɛ jˈuː ðˈæt ˈaʊɚ kˈʌstəmɚ sˈɜːvɪs tɛam wˈɪl handlɛ ˈɛni fjˈuːtʃɚ issuɛs.|0
+resampled-24k/mike-taglish-v1/wavs/obj104.wav|lɛɡit na lɛɡit po kami, kaja waɡ po kajoŋ matakot maɡtɹænsˈækt ŋajon.|0
+resampled-24k/mike-taglish-v1/wavs/obj106.wav|plˈiːz bˈiː əʃˈʊɹd ðˈæt ðˈɪs modɛl ˈɪz hiɡhlj duɾablɛ ˈænd vˈɛɹi ɾɛliablɛ ˌoʊvɚɹˈɔːl.|0
+resampled-24k/mike-taglish-v1/wavs/obj107.wav|waɡ po kajoŋ maɡalala kuŋ mɛdjo pɹˈaɪsi, mas tataɡal naman po ito sa iɲo.|0
+resampled-24k/mike-taglish-v1/wavs/obj108.wav|sadjaŋ mas mahal laŋ po naŋ kaunti dahil mas makapal aŋ tɛlaŋ ɡinamit.|0
+resampled-24k/mike-taglish-v1/wavs/obj109.wav|wˈiː hˈæv thousands ˈʌv sˈæɾɪsfˌaɪd kˈʌstəmɚz hˈuː initiallj hˈæd ðˈə ɛɡzˈækt samɛ kənsˈɜːnz.|0
+resampled-24k/mike-taglish-v1/wavs/obj110.wav|naiintindihan ko po na mahalaɡa sa iɲo aŋ kwˈɔlᵻɾi, kaja ito aŋ pinipɾɛsɛnt ko.|0
+resampled-24k/mike-taglish-v1/wavs/obj111.wav|walaŋ pɾoblɛma kuŋ kailaŋan niɲoŋ maɡtanoŋ muna sa iɲoŋ maŋa kasama sa bahaj.|0
+resampled-24k/mike-taglish-v1/wavs/obj112.wav|ɹˈɛst əʃˈʊɹd, jˈuː kˈæn ɛasilj ɹˈiːtʃ ˈʌs ˈɪf jˈuː hˈæv kwˈɛstʃənz ˈæftɚ dᵻlˈɪvɚɹi.|0
+resampled-24k/mike-taglish-v1/wavs/obj114.wav|huwaɡ niɲoŋ isipin na skˈæm ito, naɡbabajad po kami ŋ tamaŋ buwis taontaon.|0
+resampled-24k/mike-taglish-v1/wavs/obj115.wav|ˈaɪ ɡuaɾantɛɛ ðˈæt ðˈə kˈʌlɚ ˈænd matɛɾial wˈɪl pˈɜːfɛktli mˈætʃ ðˈə pɹəvˈaɪdᵻd photos.|0
+resampled-24k/mike-taglish-v1/wavs/obj116.wav|waɡ po kajoŋ matakot, maj ɾɛtuɾn pˈɑːlɪsi tajo kuŋ hindi nijo maɡustuhan.|0
+resampled-24k/mike-taglish-v1/wavs/obj117.wav|kajo po aj amiŋ pinapahalaɡahan, kaja hindi namin kajo bibiɡuin sa kalidad.|0
+resampled-24k/mike-taglish-v1/wavs/obj118.wav|jˈuː ˈɑːɹ dˈɛfɪnətli ɡɛttiŋ ðˈə bɛst vˈæljuː fˈɔːɹ jˈʊɹ haɾd ɛaɾnɛd monɛj tədˈeɪ.|0
+resampled-24k/mike-taglish-v1/wavs/obj119.wav|kahit mas muɾa juŋ sa kabila, ɡaɾantisado namaŋ tataɡal itoŋ sa amiŋ ʃˈɑːp.|0
+resampled-24k/mike-taglish-v1/wavs/obj120.wav|hindi niɲo kailaŋaŋ maɡmadali, nandito lamaŋ ako kuŋ sakaliŋ handa na kajo.|0
+resampled-24k/mike-taglish-v1/wavs/obj121.wav|wˈiː kəmplˈiːtli stand bɛhind ˈaʊɚ pɹˈɑːdʌkt, ɛnsuɾiŋ ˈɛvɹi kˈʌstəmɚ ɡɛʧ ɛɡzˈæktli wˈʌt ðˈeɪ nˈiːd.|0
+resampled-24k/mike-taglish-v1/wavs/obj122.wav|waɡ po kajoŋ maɡalala, pwɛdɛ nijo itoŋ itʃˈɛk baɡo nijo ibiɡaj aŋ bajad.|0
+resampled-24k/mike-taglish-v1/wavs/obj123.wav|maiintindihan ko kuŋ ɡusto niɲo munaŋ maɡipon baɡo bumili ŋ malakiŋ ˈaɪɾəm.|0
+resampled-24k/mike-taglish-v1/wavs/obj124.wav|ˈɪt ˈɪz totallj undɛɾstandablɛ ˈɪf jˈuː nˈiːd ˈeɪ fjˈuː dˈeɪz tˈuː θˈɪŋk dɛɛplj.|0
+resampled-24k/mike-taglish-v1/wavs/obj125.wav|opo, mɛdjo mahal talaɡa, pɛɾo tiɡnan nijo naman po juŋ napakaɡandaŋ fˈɪnɪʃ nija.|0
+resampled-24k/mike-taglish-v1/wavs/obj126.wav|huwaɡ kajoŋ maɡalala kuŋ nakaɾanas kajo ŋ palpak na ˈɔːɹdɚ nooŋ maŋa nakaɾaan.|0
+resampled-24k/mike-taglish-v1/wavs/obj127.wav|ˈaɪ pɹˈɑːmɪs tˈuː ˌoʊvɚsˈiː jˈʊɹ ˈɔːɹdɚ pɛɾsonallj tˈuː ɛnsuɾɛ ˈɛvɹɪθˌɪŋ ɡoɛs smoothlj tədˈeɪ.|0
+resampled-24k/mike-taglish-v1/wavs/obj129.wav|asahan niɲo na mananatiliŋ maajos aŋ kondiʃon ŋ ˈaɪɾəm kahit paɡkatapos ŋ taon.|0
+resampled-24k/mike-taglish-v1/wavs/obj130.wav|ɹˈɛst əʃˈʊɹd, wˈiː stɹˈɪktli maintain hiɡh kwˈɔlᵻɾi kəntɹˈoʊl standaɾds bᵻfˈɔːɹ ʃˈɪpɪŋ ˈɛni pˈækɪdʒ.|0
+resampled-24k/mike-taglish-v1/wavs/obj131.wav|hindi po tajo manloloko, kaja waɡ po kajoŋ maɡalala sa iɲoŋ idɛdɛposito.|0
+resampled-24k/mike-taglish-v1/wavs/obj132.wav|makikita niɲo po na mas malinaw at dɛtaljado aŋ paɡkakaɡawa ŋ amiŋ pɾodukto.|0
+resampled-24k/mike-taglish-v1/wavs/obj133.wav|wˈiː fˈʊli undɛɾstand jˈʊɹ budɡɛt kənstɹˈeɪnts, wˈɪtʃ ˈɪz wˈaɪ wˈiː suɡɡɛst ðˈɪs ɔːltˈɜːnətˌɪv.|0
+resampled-24k/mike-taglish-v1/wavs/obj135.wav|naiintindihan ko po na mahiɾap maɡtiwala ŋajon, kaja handa akoŋ maɡbiɡaj ŋ patunaj.|0
+resampled-24k/mike-taglish-v1/wavs/obj136.wav|jˈuː kˈæn sˈeɪfli vˈɛɹᵻfˌaɪ ˈaʊɚ bˈɪznəs ɾɛɡistɾation ˈɪf jˈuː fˈiːl sliɡhtlj hɛsitant tədˈeɪ.|0
+resampled-24k/mike-taglish-v1/wavs/obj137.wav|waɡ nijo na poŋ isipin juŋ bad ɛkspˈiəɹɪəns nijo, iba po kami maɡalaɡa.|0
+resampled-24k/mike-taglish-v1/wavs/obj138.wav|naɾito po kami upaŋ maɡbiɡaj ŋ soluʃon sa iɲoŋ mataɡal na pɾoblɛma.|0
+resampled-24k/mike-taglish-v1/wavs/obj139.wav|dˈuː nˈɑːt wˈʌɹi, wˈiː alwajs pɹaɪˈɔːɹɪtˌaɪz ðˈə sˌæɾɪsfˈækʃən ˈʌv ˈaʊɚ lojal ɾɛtuɾniŋ kˈʌstəmɚz.|0
+resampled-24k/mike-taglish-v1/wavs/obj140.wav|paɡusapan nijo po muna, hindi naman po paubos aŋ stokk natin sa ŋajon.|0
+resampled-24k/mike-taglish-v1/wavs/obj141.wav|mas nakabubuti ŋa po na siɡuɾado kajo baɡo kajo maɡlabas ŋ iɲoŋ pɛɾa.|0
+resampled-24k/mike-taglish-v1/wavs/obj142.wav|ˈaɪ kəmplˈiːtli aɡɾɛɛ ðˈæt kwˈɔlᵻɾi ʃˈʊd nˈɛvɚ bˈiː kˈɑːmpɹəmˌaɪzd fˈɔːɹ ˈeɪ lowɛɾ pɹˈaɪs.|0
+resampled-24k/mike-taglish-v1/wavs/obj143.wav|waɡ po kajoŋ maɡalala, maɾami na kamiŋ natuluŋan na maj paɾɛhoŋ pɾoblɛma sa iɲo.|0
+resampled-24k/mike-taglish-v1/wavs/obj145.wav|wˈiː wˈɪl ɡladlj pɹəvˈaɪd ˈɔːl ðˈə nˈɛsᵻsɚɹi ˌɪnfɚmˈeɪʃən sˈoʊ jˈuː kˈæn dᵻsˈaɪd kˈʌmftəbli.|0
+resampled-24k/mike-taglish-v1/wavs/obj146.wav|siɡɛ po, tˈeɪk jˈʊɹ tˈaɪm maɡisip, walaŋ mawawala kuŋ titiŋintiŋin muna kajo ŋajon.|0
+resampled-24k/mike-taglish-v1/wavs/obj147.wav|huwaɡ po kajoŋ mahija na sabihin sa akin kuŋ hindi kaja ŋ badjɛt.|0
+resampled-24k/mike-taglish-v1/wavs/obj148.wav|ˈaɪ am kˈɑːnfɪdənt jˈuː wˈɪl fˈaɪnd ˈaʊɚ sˈɜːvɪsᵻz vˈæstli supɛɾioɾ tˈuː ðˈə kˌɑːmpətˈɪʃən.|0
+resampled-24k/mike-taglish-v1/wavs/obj149.wav|waɡ po kajoŋ mapɾɛssuɾɛ umoɾdɛɾ ŋajon, nandito laŋ kami pwɛdɛŋ balikan bukas.|0
+resampled-24k/mike-taglish-v1/wavs/obj150.wav|makakaasa po kajo na kahit bumili kajo o hindi, itutuɾiŋ namin kajoŋ mahalaɡa.|0
+resampled-24k/mike-taglish-v1/wavs/pay001.wav|ɡɹˈeɪt nɛws, pumasok na po aŋ iɲoŋ bajad sa amiŋ sˈɪstəm!|0
+resampled-24k/mike-taglish-v1/wavs/pay002.wav|jɛs po, pwɛdɛ kajoŋ maɡbajad ɡamit aŋ iɲoŋ dʒˈiːkˈæʃ o kaja maja.|0
+resampled-24k/mike-taglish-v1/wavs/pay003.wav|θˈæŋk jˈuː fˈɔːɹ sɛndiŋ ðˈə skɹˈiːnʃɑːt, ˈaɪ hˈæv kənfˈɜːmd jˈʊɹ pˈeɪmənt nˈaʊ.|0
+resampled-24k/mike-taglish-v1/wavs/pay005.wav|pˈɜːfɛkt! wˈiː səksˈɛsfəli pɹˈɑːsɛst jˈʊɹ onlinɛ tɹænsˈækʃən ˈeɪ fjˈuː mˈɪnɪts aɡo.|0
+resampled-24k/mike-taglish-v1/wavs/pay006.wav|siɡɛ po, isɛsɛnd ko na aŋ amiŋ kjˌuːˈɑːɹ kˈoʊd paɾa madali nijo iskˈæn.|0
+resampled-24k/mike-taglish-v1/wavs/pay007.wav|ajun, nakita ko na po aŋ iɲoŋ dɛposit sa amiŋ bank ɐkˈaʊnt.|0
+resampled-24k/mike-taglish-v1/wavs/pay008.wav|maɾamiŋ salamat po sa mabilis na paɡbabajad niɲo ŋ iɲoŋ balansɛ.|0
+resampled-24k/mike-taglish-v1/wavs/pay009.wav|jˈʊɹ kˈæʃ ˈɔn dᵻlˈɪvɚɹi ɹᵻkwˈɛst hˈæz bˈɪn ɐpɹˈuːvd ˈænd ɹˈɛdi tˈuː ɡo!|0
+resampled-24k/mike-taglish-v1/wavs/pay011.wav|oʊkˈeɪ na po aŋ pˈeɪmənt nijo, ipapˈæk na namin aŋ iɲoŋ ˈɔːɹdɚ.|0
+resampled-24k/mike-taglish-v1/wavs/pay012.wav|wˈiː ˈɑːɹ happj tˈuː kənfˈɜːm ðˈæt jˈʊɹ fˈaɪnəl bˈæləns ˈɪz kəmplˈiːtli sɛttlɛd.|0
+resampled-24k/mike-taglish-v1/wavs/pay013.wav|pwɛdɛ ɾin po tajoŋ kˈæʃ ˈɔn dᵻlˈɪvɚɹi kuŋ ijon aŋ mas madali.|0
+resampled-24k/mike-taglish-v1/wavs/pay014.wav|aŋ ɡaliŋ, pumasok aɡad juŋ pˈeɪmənt nijo kahit wɛɛkɛnd ŋajon!|0
+resampled-24k/mike-taglish-v1/wavs/pay015.wav|jˈʊɹ ɹᵻfˈʌnd hˈæz bˈɪn fˈʊli pɹˈɑːsɛst ˈænd kɹˈɛdɪɾᵻd bˈæk tˈuː jˈʊɹ wallɛt.|0
+resampled-24k/mike-taglish-v1/wavs/pay016.wav|nˈɑːɹᵻsˈiːv na po namin aŋ iɲoŋ ɾɛsibo kaja tuloj na aŋ tɹænsˈækʃən.|0
+resampled-24k/mike-taglish-v1/wavs/pay017.wav|maɡandaŋ balita po, kumplɛto na aŋ iɲoŋ huloɡ paɾa sa buwaŋ ito.|0
+resampled-24k/mike-taglish-v1/wavs/pay018.wav|jˈuː kˈæn dˈɛfɪnətli usɛ jˈʊɹ kɹˈɛdɪt kˈɑːɹd fˈɔːɹ ðˈɪs spəsˈɪfɪk pˈɜːtʃɪs tədˈeɪ!|0
+resampled-24k/mike-taglish-v1/wavs/pay019.wav|jɛs, tataŋɡapin po namin aŋ buoŋ bajad paɡdatiŋ ŋ ɾidɛɾ sa iɲo.|0
+resampled-24k/mike-taglish-v1/wavs/pay020.wav|klˈɪɹd na po aŋ iɲoŋ ɐkˈaʊnt kaja wala na kajoŋ aalalahanin.|0
+resampled-24k/mike-taglish-v1/wavs/pay021.wav|ˈɪt ˈɪz vˈɛɹi ɛaʃ tˈuː paj usiŋ ˈaʊɚ əfˈɪʃəl onlinɛ pˈeɪmənt link!|0
+resampled-24k/mike-taglish-v1/wavs/pay022.wav|sakto po aŋ iɲoŋ ibinajad kaja wala na poŋ sukli na kailaŋan.|0
+resampled-24k/mike-taglish-v1/wavs/pay023.wav|ajan, səksˈɛsfəl na po aŋ iɲoŋ dʒˈiːkˈæʃ tɹˈænsfɜː, salamat po naŋ maɾami!|0
+resampled-24k/mike-taglish-v1/wavs/pay024.wav|wˈiː ɡladlj ɐksˈɛpt mˈeɪdʒɚ dɛbit kˈɑːɹdz ˈɪf jˈuː pɹɪfˈɜː vˈɪzɪɾɪŋ ˈaʊɚ stˈɔːɹ.|0
+resampled-24k/mike-taglish-v1/wavs/pay025.wav|bajad na po aŋ lahat, kaja maɡhihintaj na laŋ kajo sa dᵻlˈɪvɚɹi!|0
+resampled-24k/mike-taglish-v1/wavs/pay026.wav|pasɛnʃa na po, pɛɾo naɡfˈeɪl kasi juŋ kɹˈɛdɪt kˈɑːɹd tɹænsˈækʃən niɲo.|0
+resampled-24k/mike-taglish-v1/wavs/pay027.wav|ˈaɪ am vˈɛɹi sˈɑːɹi, bˈʌt ðˈə bank ɹᵻdʒˈɛktᵻd jˈʊɹ onlinɛ tɹˈænsfɜː tədˈeɪ.|0
+resampled-24k/mike-taglish-v1/wavs/pay028.wav|patawad po, hindi po kasi namin nataŋɡap aŋ iɲoŋ pɹˈuːf ˈʌv pˈeɪmənt.|0
+resampled-24k/mike-taglish-v1/wavs/pay029.wav|sˈɑːɹi po talaɡa, hindi kami tumataŋɡap ŋ pɛɾsonal na ʧɛkɛ sa ŋajon.|0
+resampled-24k/mike-taglish-v1/wavs/pay030.wav|wˈiː ɐpˈɑːlədʒˌaɪz fˈɔːɹ ðˈə dᵻlˈeɪ ˈɪn pɹˈɑːsɛsɪŋ jˈʊɹ ɹᵻfˈʌnd ðˈɪs past wˈiːk.|0
+resampled-24k/mike-taglish-v1/wavs/pay031.wav|waɡ po kajoŋ maɡalala, ibabalik namin aŋ iɲoŋ pɛɾa sa laloŋ madaliŋ panahon.|0
+resampled-24k/mike-taglish-v1/wavs/pay032.wav|plˈiːz dˈuː nˈɑːt pˈænɪk, jˈʊɹ monɛj ˈɪz kəmplˈiːtli sˈeɪf ˈɪn ˈaʊɚ sˈɪstəm.|0
+resampled-24k/mike-taglish-v1/wavs/pay034.wav|ɹˈɛst əʃˈʊɹd ðˈæt wˈiː wˈɪl doublɛ tʃˈɛk ðˈə pˈeɪmənt ɡatɛwaj fˈɔːɹ jˈuː.|0
+resampled-24k/mike-taglish-v1/wavs/pay035.wav|babalik din po sa ɐkˈaʊnt niɲo aŋ nabawas na pɛɾa bukas.|0
+resampled-24k/mike-taglish-v1/wavs/pay036.wav|liɡtas po aŋ iɲoŋ bank diːtˈeɪlz dahil sᵻkjˈʊɹd aŋ amiŋ onlinɛ poɾtal.|0
+resampled-24k/mike-taglish-v1/wavs/pay037.wav|wˈiː wˈɪl mˈeɪk suɾɛ jˈuː ɹᵻsˈiːv ðˈə kɚɹˈɛkt tʃˈeɪndʒ upon dᵻlˈɪvɚɹi təmˈɑːɹoʊ.|0
+resampled-24k/mike-taglish-v1/wavs/pay038.wav|aasikasuhin ko po aɡad aŋ iɲoŋ ɹᵻfˈʌnd ɹᵻkwˈɛst paɾa hindi kajo maɡhintaj.|0
+resampled-24k/mike-taglish-v1/wavs/pay039.wav|siɡuɾado poŋ hindi kajo madodoblɛ ŋ tʃˈɑːɹdʒ sa iɲoŋ kɹˈɛdɪt kˈɑːɹd ŋajon.|0
+resampled-24k/mike-taglish-v1/wavs/pay040.wav|ˈaɪ ɡuaɾantɛɛ ðˈæt jˈʊɹ pˈeɪmənt issuɛ wˈɪl bˈiː ɹᵻzˈɑːlvd bj ðˈə ɛnd ˈʌv tədˈeɪ.|0
+resampled-24k/mike-taglish-v1/wavs/pay041.wav|kailaŋan po muna natiŋ maɡbajad ŋ downpajmɛnt baɡo umpisahan aŋ iɲoŋ pɹˈɑːdʒɛkt.|0
+resampled-24k/mike-taglish-v1/wavs/pay042.wav|plˈiːz sɛnd ˈeɪ kˈɑːpi ˈʌv ðˈə dɛposit slip tˈuː ˈaʊɚ ɛmail addɾɛss.|0
+resampled-24k/mike-taglish-v1/wavs/pay043.wav|aŋ natitiɾaŋ balansɛ po aj babajaɾan niɲo paɡdatiŋ ŋ iɲoŋ maŋa ɡamit.|0
+resampled-24k/mike-taglish-v1/wavs/pay045.wav|wˈiː ɹᵻkwˈaɪɚ ˈeɪ fˈɪfti pɚsˈɛnt initial dɛposit tˈuː kənfˈɜːm jˈʊɹ pɾɛ ˈɔːɹdɚ.|0
+resampled-24k/mike-taglish-v1/wavs/pay046.wav|maaaɾi po niɲoŋ ipadala aŋ bajad sa amiŋ opiʃal na bank ɐkˈaʊnt.|0
+resampled-24k/mike-taglish-v1/wavs/pay047.wav|tumataŋɡap po kami ŋ kˈæʃ ˈɔn dᵻlˈɪvɚɹi paɾa sa maŋa ˈɔːɹdɚ na ɡanito.|0
+resampled-24k/mike-taglish-v1/wavs/pay048.wav|jˈʊɹ mˈʌnθli billiŋ statɛmɛnt wˈɪl bˈiː sɛnt ˌɔːɾəmˈæɾɪkli tˈuː jˈʊɹ ɾɛɡistɛɾɛd ɛmail.|0
+resampled-24k/mike-taglish-v1/wavs/pay049.wav|pˈækitʃˈɛk po kuŋ tama aŋ ɐkˈaʊnt nˈeɪm baɡo niɲo isɛnd aŋ pɛɾa.|0
+resampled-24k/mike-taglish-v1/wavs/pay050.wav|aŋ huliŋ aɾaw po ŋ paɡbabajad aj sa susunod na bjɛɾnɛs pa.|0
+resampled-24k/mike-taglish-v1/wavs/pay051.wav|ˈaʊɚ sˈɪstəm ˌɔːɾəmˈæɾɪkli updatɛs jˈʊɹ ɐkˈaʊnt bˈæləns ˈæftɚ ˈɛvɹi səksˈɛsfəl onlinɛ pˈeɪmənt.|0
+resampled-24k/mike-taglish-v1/wavs/pay052.wav|kalahati po muna aŋ ibabajad nijo tapos juŋ kalahati aj sa katapusan.|0
+resampled-24k/mike-taglish-v1/wavs/pay053.wav|pwɛdɛ po kajoŋ maɡbajad sa kahit anoŋ bɹˈæntʃ ŋ baŋko na malapit.|0
+resampled-24k/mike-taglish-v1/wavs/pay054.wav|jˈuː kˈæn paj ðˈə ɾidɛɾ dᵻɹˈɛktli wˈɪð kˈæʃ wˈʌns jˈʊɹ pˈækɪdʒ ɚɹˈaɪvz.|0
+resampled-24k/mike-taglish-v1/wavs/pay055.wav|hihintajin po namin aŋ iɲoŋ ɾɛsibo baɡo namin ipadala aŋ iɲoŋ pˈɑːɹsəl.|0
+resampled-24k/mike-taglish-v1/wavs/pay057.wav|balɛ tˈuː θˈaʊzənd fˈaɪv hˈʌndɹɪd po aŋ kailaŋan niɲoŋ itɹˈænsfɜː sa amin.|0
+resampled-24k/mike-taglish-v1/wavs/pay058.wav|ðˈə ouʧtandiŋ bˈæləns mˈʌst bˈiː fˈʊli pˈeɪd bᵻfˈɔːɹ wˈiː ɾɛlɛasɛ ðˈə dˈɑːkjuːmənts.|0
+resampled-24k/mike-taglish-v1/wavs/pay059.wav|pwɛdɛ nijo poŋ isˈeɪv aŋ amiŋ nˈʌmbɚ paɾa sa maŋa susunod na bajad.|0
+resampled-24k/mike-taglish-v1/wavs/pay060.wav|taŋiŋ pɛɾa lamaŋ po aŋ tinataŋɡap ŋ amiŋ maŋa dᵻlˈɪvɚɹi ɾidɛɾ ŋajon.|0
+resampled-24k/mike-taglish-v1/wavs/pay061.wav|wˈiː stɹˈɪktli fˈɑːloʊ ˈeɪ nˈoʊ downpajmɛnt nˈoʊ pɹˈɑːsɛsɪŋ pˈɑːlɪsi fˈɔːɹ kˈʌstəm oɾdɛɾs.|0
+resampled-24k/mike-taglish-v1/wavs/pay062.wav|kapaɡ maja po aŋ ɡamit, ɾɛal tˈaɪm po pumapasok aŋ bajad niɲo.|0
+resampled-24k/mike-taglish-v1/wavs/pay063.wav|ipapadala ko po sa tˈɛkst aŋ bank diːtˈeɪlz paɾa hindi kajo malito.|0
+resampled-24k/mike-taglish-v1/wavs/pay064.wav|plˈiːz ˈɪndᵻkˌeɪt jˈʊɹ ˈɔːɹdɚ nˈʌmbɚ ˈɪn ðˈə ɾɛmaɾks sˈɛkʃən ˈʌv ðˈə tɹˈænsfɜː.|0
+resampled-24k/mike-taglish-v1/wavs/pay065.wav|kuŋ ɡusto nijo po aj ibank tɹˈænsfɜː na laŋ aŋ buoŋ halaɡa.|0
+resampled-24k/mike-taglish-v1/wavs/pay066.wav|nakadɛpɛndɛ po sa baŋko niɲo kuŋ maj kaɾaɡdaɡaŋ tʃˈɑːɹdʒ aŋ paɡsɛnd.|0
+resampled-24k/mike-taglish-v1/wavs/pay067.wav|jˈuː maj usɛ ˈaʊɚ pɹəvˈaɪdᵻd pˈeɪmənt link tˈuː sɛttlɛ jˈʊɹ ɾɛmainiŋ bˈæləns.|0
+resampled-24k/mike-taglish-v1/wavs/pay068.wav|ibawas nijo na laŋ po juŋ naunaŋ dɛposit sa iɲoŋ fˈaɪnəl bill.|0
+resampled-24k/mike-taglish-v1/wavs/pay069.wav|aŋ ɹᵻfˈʌnd po aj umaabot ŋ tatlo haŋɡaŋ limaŋ aɾaw baɡo makuha.|0
+resampled-24k/mike-taglish-v1/wavs/pay070.wav|ˈeɪ sˈɜːvɪs fˈiː ˈʌv twɛntj pɛsos appliɛs fˈɔːɹ ˈoʊvɚ ðˈə kˈaʊntɚ tɹænsˈækʃənz.|0
+resampled-24k/mike-taglish-v1/wavs/pay071.wav|pakisiɡuɾado po na tama aŋ ɹˈɛfɹəns nˈʌmbɚ na ilalaɡaj niɲo sa fˈɔːɹm.|0
+resampled-24k/mike-taglish-v1/wavs/pay072.wav|wala pa po kasi sa sˈɪstəm namin aŋ binajad niɲo kahapon ŋ hapon.|0
+resampled-24k/mike-taglish-v1/wavs/pay074.wav|kuŋ hindi po ɡumana aŋ dʒˈiːkˈæʃ, subukan po natiŋ ɡamitin aŋ maja.|0
+resampled-24k/mike-taglish-v1/wavs/pay075.wav|idadaɡdaɡ po namin aŋ utaŋ niɲo sa iɲoŋ susunod na billiŋ sˈaɪkəl.|0
+resampled-24k/mike-taglish-v1/wavs/pay076.wav|jˈuː hˈæv ɛɡzˈæktli θɹˈiː dˈeɪz tˈuː kəmplˈiːt ðˈə pˈeɪmənt fˈɔːɹ ðˈɪs ɹˌɛzɚvˈeɪʃən.|0
+resampled-24k/mike-taglish-v1/wavs/pay077.wav|tataŋɡapin po ba ŋ ɾidɛɾ aŋ ɛksaktoŋ bajad o kailaŋan niɲo ŋ sukli?|0
+resampled-24k/mike-taglish-v1/wavs/pay078.wav|ifˈɔːɹwɚd ko laŋ po sa ɐkˈaʊntɪŋ aŋ iɲoŋ ɾɛsibo paɾa mˈɑːvˈɛɹᵻfˌaɪ nila.|0
+resampled-24k/mike-taglish-v1/wavs/pay080.wav|paɡkatapos nijo poŋ maɡbajad, maɡmɛssaɡɛ laŋ po aɡad kajo sa amiŋ pˈeɪdʒ.|0
+resampled-24k/mike-taglish-v1/wavs/pay081.wav|bawal po aŋ installmɛnt plan paɾa sa maŋa pɾoduktoŋ nakasalɛ na ŋajon.|0
+resampled-24k/mike-taglish-v1/wavs/pay083.wav|hindi po kami tumataŋɡap ŋ ʧɛkɛ, kˈæʃ o kaja onlinɛ tɹˈænsfɜː lamaŋ.|0
+resampled-24k/mike-taglish-v1/wavs/pay084.wav|maɡɾɛɾɛplj po aŋ amiŋ sˈɪstəm kapaɡ nˈɑːkənfˈɜːm na aŋ iɲoŋ naɡiŋ tɾansakʃon.|0
+resampled-24k/mike-taglish-v1/wavs/pay085.wav|ðˈə pˈeɪmənt ɡatɛwaj ˈɪz undɛɾɡoiŋ skˈɛdʒuːld mˈeɪntənəns fˈɔːɹ ðˈə nˈɛkst tˈuː ˈaʊɚz.|0
+resampled-24k/mike-taglish-v1/wavs/pay086.wav|kuŋ naɡfˈeɪl po aŋ tɹˈænsfɜː, pˈækitʃˈɛk muna aŋ bˈæləns ŋ iɲoŋ ɐkˈaʊnt.|0
+resampled-24k/mike-taglish-v1/wavs/pay087.wav|pˈækipˈɪktʃɚ — ˈæn po naŋ malinaw aŋ ɾɛsibo paɾa mabasa namin aŋ ɹˈɛfɹəns nˈʌmbɚ.|0
+resampled-24k/mike-taglish-v1/wavs/pay088.wav|wˈiː kænˈɑːt ɾɛlɛasɛ ðˈə ˈaɪɾəm until ðˈə post datɛd tʃˈɛk ˈɪz fˈʊli klˈɪɹd.|0
+resampled-24k/mike-taglish-v1/wavs/pay089.wav|tatloŋ buwan po niɲoŋ huhuluɡan aŋ iɲoŋ kinuha na pˈækɪdʒ sa amin.|0
+resampled-24k/mike-taglish-v1/wavs/pay090.wav|kapaɡ kˈɑːɹd po aŋ ɡamit, maj daɡdaɡ na bank tʃˈɑːɹdʒ na fˈaɪv pɚsˈɛnt.|0
+resampled-24k/mike-taglish-v1/wavs/pay091.wav|plˈiːz ɹᵻvjˈuː ðˈə pˈeɪmənt ɪnstɹˈʌkʃənz sɛnt tˈuː jˈʊɹ ɛmail jˈɛstɚdˌeɪ ˌæftɚnˈuːn.|0
+resampled-24k/mike-taglish-v1/wavs/pay092.wav|siɡɛ po, ɪpˈɑːpəkˈænsəl ko muna aŋ unaŋ ˈɔːɹdɚ dahil sa fˈeɪld pˈeɪmənt.|0
+resampled-24k/mike-taglish-v1/wavs/pay093.wav|ipapasok po namin aŋ iɲoŋ ɹᵻfˈʌnd pabalik sa iɲoŋ ɡinamit na kɹˈɛdɪt kˈɑːɹd.|0
+resampled-24k/mike-taglish-v1/wavs/pay094.wav|ˈɪf jˈuː tʃˈuːz kˈæʃ ˈɔn dᵻlˈɪvɚɹi, plˈiːz pɾɛpaɾɛ ðˈə ɛɡzˈækt ɐmˈaʊnt bᵻfˈɔːɹhænd.|0
+resampled-24k/mike-taglish-v1/wavs/pay095.wav|maaaɾi po niɲoŋ ipadala sa anumaŋ pɛɾa padala na malapit sa iɲo.|0
+resampled-24k/mike-taglish-v1/wavs/pay096.wav|paɾa po mˈɑːpɹˈɑːsɛs aŋ ɹᵻfˈʌnd, kailaŋan namin aŋ iɲoŋ buoŋ bank diːtˈeɪlz.|0
+resampled-24k/mike-taglish-v1/wavs/pay097.wav|wˈʌns ðˈə downpajmɛnt ˈɪz ɹᵻsˈiːvd, wˈiː wˈɪl bɛɡin pɹədˈʌkʃən ˈɔn jˈʊɹ ˈɔːɹdɚ.|0
+resampled-24k/mike-taglish-v1/wavs/pay098.wav|ivˈɛɹᵻfˌaɪ ko laŋ sa baŋko kuŋ pumasok na juŋ ʧɛkɛ na idinɛposito niɲo.|0
+resampled-24k/mike-taglish-v1/wavs/pay099.wav|hindi na po kajo sisiŋilin ŋ amiŋ ɾidɛɾ dahil bajad na po ito.|0
+resampled-24k/mike-taglish-v1/wavs/pay100.wav|jˈʊɹ ɐkˈaʊnt wˈɪl bˈiː tɛmpoɾaɾilj suspɛndɛd ˈɪf ðˈə mˈʌnθli duɛ ɾɛmains unpaid.|0
+resampled-24k/mike-taglish-v1/wavs/prc001.wav|naku, swɛɾtɛ po kajo kasi nakasalɛ po tajo ŋajon ŋ twɛntj pɚsˈɛnt!|0
+resampled-24k/mike-taglish-v1/wavs/prc002.wav|wˈiː kˈɜːɹəntli hˈæv ˈæn ɐmˈeɪzɪŋ buj onɛ tˈeɪk onɛ pɾomo tədˈeɪ!|0
+resampled-24k/mike-taglish-v1/wavs/prc003.wav|ɡˈʊd nɛws po, pasok juŋ ˈɔːɹdɚ nijo sa fɹˈiː ʃˈɪpɪŋ natin!|0
+resampled-24k/mike-taglish-v1/wavs/prc004.wav|onɛ θˈaʊzənd pɛsos na laŋ po kuŋ bibilhin nijo ŋajon.|0
+resampled-24k/mike-taglish-v1/wavs/prc006.wav|jˈuː kˈæn sˈeɪv fˈaɪv hˈʌndɹɪd pɛsos ˈɪf jˈuː pˈɜːtʃɪs ðˈə bundlɛ nˈaʊ.|0
+resampled-24k/mike-taglish-v1/wavs/prc007.wav|tamaŋtama po, maj dˈɪskaʊnt kami na tɛn pɚsˈɛnt paɾa sa maŋa nɛw kˈʌstəmɚz.|0
+resampled-24k/mike-taglish-v1/wavs/prc008.wav|sulit na sulit po ito dahil libɾɛ na ɾin aŋ pæɡpˈɑːpədᵻlˈɪvɚ.|0
+resampled-24k/mike-taglish-v1/wavs/prc009.wav|jɛs po! maɡiɡiŋ sˈɪks hˈʌndɹɪd na laŋ po sija dahil sa pɾomo kˈoʊd.|0
+resampled-24k/mike-taglish-v1/wavs/prc010.wav|ðˈə dɪskˈaʊntᵻd tˈoʊɾəl kˈʌmz ˈaʊt tˈuː ɛɡzˈæktli onɛ θˈaʊzənd fˈaɪv hˈʌndɹɪd pɛsos.|0
+resampled-24k/mike-taglish-v1/wavs/prc011.wav|swɛɾtɛ po niɲo, naɡɛkstˈɛnd kami ŋ flˈæʃ salɛ haŋɡaŋ mamajaŋ ɡabi!|0
+resampled-24k/mike-taglish-v1/wavs/prc012.wav|makakakuha po kajo ŋ fɹˈiːbi kuŋ aabot ŋ tˈuː θˈaʊzənd aŋ bibilhin nijo.|0
+resampled-24k/mike-taglish-v1/wavs/prc013.wav|wˈiː wˈɪl ˌɔːɾəmˈæɾɪkli applj ðˈə fˈɪfti pɚsˈɛnt dˈɪskaʊnt upon tʃˈɛkaʊt!|0
+resampled-24k/mike-taglish-v1/wavs/prc014.wav|sobɾaŋ baba na po ŋ pɾɛʃo natin dijan kumpaɾa sa iba.|0
+resampled-24k/mike-taglish-v1/wavs/prc015.wav|aŋ ɡanda po ŋ timiŋ nijo, naɡbaɡsakpɾɛʃo po kami kahapon.|0
+resampled-24k/mike-taglish-v1/wavs/prc016.wav|jˈuː ˈɑːɹ ˈɪn lˈʌk, ðˈɪs ˈaɪɾəm ˈɪz ˈɔn klˈɪɹəns fˈɔːɹ θɹˈiː hˈʌndɹɪd pɛsos.|0
+resampled-24k/mike-taglish-v1/wavs/prc017.wav|nakapɾomo po tajo na lɛss fˈɪfti pɛsos sa bawat additional na piɾaso.|0
+resampled-24k/mike-taglish-v1/wavs/prc018.wav|kapaɡ kumuha kajo ŋ dalawa, maj libɾɛ na po kajoŋ isa!|0
+resampled-24k/mike-taglish-v1/wavs/prc021.wav|boŋɡa po aŋ dˈɪskaʊnt nijo ɾito dahil suki na po kajo.|0
+resampled-24k/mike-taglish-v1/wavs/prc022.wav|ðˈə fˈaɪnəl pɹˈaɪs wˈɪl onlj bˈiː ninɛ hˈʌndɹɪd ninɛtj ninɛ pɛsos.|0
+resampled-24k/mike-taglish-v1/wavs/prc023.wav|jɛs, θɹˈiː hˈʌndɹɪd na laŋ po aŋ babajaɾan nijo paɾa dijan.|0
+resampled-24k/mike-taglish-v1/wavs/prc024.wav|naku, sakto po dahil maj pˈɑːvˈaʊtʃɚ pa po tajo sa iɲo!|0
+resampled-24k/mike-taglish-v1/wavs/prc026.wav|waɡ po kajoŋ maɡalala, wala poŋ hiddɛn tʃˈɑːɹdʒᵻz juŋ bɾɛakdown natin.|0
+resampled-24k/mike-taglish-v1/wavs/prc028.wav|sulit po aŋ ibabajad nijo dahil paŋmataɡalan aŋ kalidad ŋ pɾodukto natin.|0
+resampled-24k/mike-taglish-v1/wavs/prc031.wav|naiintindihan ko po, kaja biniɡjan ko na kajo ŋ pinakamababaŋ pɾɛʃo.|0
+resampled-24k/mike-taglish-v1/wavs/prc033.wav|siɡuɾado po kajoŋ hindi kajo luɡɛ sa binajaɾan nijo paɾa sa ˈaɪɾəm na ito.|0
+resampled-24k/mike-taglish-v1/wavs/prc034.wav|hajaan nijo po, itototal ko ulit paɾa makita nijo na tama aŋ kˌɑːmpjuːtˈeɪʃən.|0
+resampled-24k/mike-taglish-v1/wavs/prc035.wav|jˈuː hˈæv mˈaɪ woɾd, ðˈɛɹ ˈɑːɹ nˈoʊ additional fˈiːz upon dᵻlˈɪvɚɹi.|0
+resampled-24k/mike-taglish-v1/wavs/prc036.wav|makakaasa po kajo na ito na po aŋ fˈaɪnəl at totooŋ pɾɛʃo.|0
+resampled-24k/mike-taglish-v1/wavs/prc037.wav|wˈiː wˈɪl mˈætʃ ðˈə kəmpˈɛɾɪɾɚ pɹˈaɪs dʒˈʌst tˈuː ɡˈɪv jˈuː ðˈə bɛst dɛal.|0
+resampled-24k/mike-taglish-v1/wavs/prc039.wav|ibibiɡaj ko na po sa iɲo aŋ wholɛsalɛ pɹˈaɪs paɾa makatipid kajo.|0
+resampled-24k/mike-taglish-v1/wavs/prc040.wav|ðˈə waɾɾantj kˈʌvɚɹɪdʒ makɛs ðˈə ˈɛkstɹə kˈɔst kəmplˈiːtli woɾth jˈʊɹ pˈiːs ˈʌv mind.|0
+resampled-24k/mike-taglish-v1/wavs/prc041.wav|tɾanspaɾɛnt po kami sa lahat ŋ addons kaja waɡ po kajoŋ maɡatubiliŋ maɡtanoŋ.|0
+resampled-24k/mike-taglish-v1/wavs/prc043.wav|wˈiː kˈæn sˈɜːʔn̩li woɾk ˈaʊt ˈeɪ pˈeɪmənt skˈɛdʒuːl ðˈæt fˈɪts jˈʊɹ budɡɛt.|0
+resampled-24k/mike-taglish-v1/wavs/prc044.wav|paŋako po, hindi po tataas ijan kahit abutin tajo ŋ nˈɛkst wˈiːk.|0
+resampled-24k/mike-taglish-v1/wavs/prc045.wav|ɹˈɛst əʃˈʊɹd ðˈæt ðˈə kwoʊtˈeɪʃən ˈɪz lˈɑːkt ˈɪn fˈɔːɹ thiɾtj dˈeɪz.|0
+resampled-24k/mike-taglish-v1/wavs/prc046.wav|pasɛnʃa na po, pɛɾo fˈɪkst pɹˈaɪs na po kasi ijan talaɡa.|0
+resampled-24k/mike-taglish-v1/wavs/prc047.wav|ˈaɪ am ɾɛallj sˈɑːɹi, bˈʌt ðˈə pɾomotional pɛɾiod ɛndɛd ɛɡzˈæktli at midniɡht.|0
+resampled-24k/mike-taglish-v1/wavs/prc048.wav|paumanhin po, hindi po namin kaja tapatan aŋ pɾɛʃo ŋ kabilaŋ tindahan.|0
+resampled-24k/mike-taglish-v1/wavs/prc049.wav|sˈɑːɹi po talaɡa, tumaas na po kasi aŋ siŋil sa amin ŋ suppliɛɾ.|0
+resampled-24k/mike-taglish-v1/wavs/prc051.wav|naku po, pasɛnʃa na dahil hindi na po vˈælɪd juŋ biniɡaj niɲoŋ vˈaʊtʃɚ kˈoʊd.|0
+resampled-24k/mike-taglish-v1/wavs/prc053.wav|patawad po, wala po kasi kamiŋ installmɛnt option paɾa dijan sa ŋajon.|0
+resampled-24k/mike-taglish-v1/wavs/prc054.wav|sˈɑːɹi po ah, pɛɾo saɡad na po aŋ dˈɪskaʊnt na maibibiɡaj ko dijan.|0
+resampled-24k/mike-taglish-v1/wavs/prc055.wav|wˈiː ɐpˈɑːlədʒˌaɪz fˈɔːɹ ðˈə kənfjˈuːʒən, ðˈə lowɛɾ pɹˈaɪs wˈʌz fˈɔːɹ ˈeɪ dˈɪfɹənt sˈaɪz.|0
+resampled-24k/mike-taglish-v1/wavs/prc056.wav|aŋ ɾɛɡulaɾ pɹˈaɪs po ŋ ˈaɪɾəm na ijan aj ɛiɡht hˈʌndɹɪd pɛsos.|0
+resampled-24k/mike-taglish-v1/wavs/prc057.wav|ðˈə tˈoʊɾəl ɐmˈaʊnt duɛ ˈɪz θɹˈiː θˈaʊzənd fˈaɪv hˈʌndɹɪd pɛsos.|0
+resampled-24k/mike-taglish-v1/wavs/prc059.wav|balɛ aabot po lahat ŋ onɛ θˈaʊzənd fˈɪfti pɛsos.|0
+resampled-24k/mike-taglish-v1/wavs/prc060.wav|ðˈə ɾɛtail pɹˈaɪs fˈɔːɹ onɛ jˈuːnɪt ˈɪz ɛɡzˈæktli ɛiɡht hˈʌndɹɪd pɛsos.|0
+resampled-24k/mike-taglish-v1/wavs/prc061.wav|maj daɡdaɡ po na fˈɪfti pɛsos paɾa sa atiŋ spˈɛʃəl pˈækɪdʒɪŋ.|0
+resampled-24k/mike-taglish-v1/wavs/prc062.wav|sa kˌɑːmpjuːtˈeɪʃən po natin, naɡkakahalaɡa ito ŋ sˈɛvən θˈaʊzənd lahatlahat.|0
+resampled-24k/mike-taglish-v1/wavs/prc063.wav|ðˈæt wˈɪl bˈiː fˈɔːɹ hˈʌndɹɪd pɛsos pɛɾ skwˈɛɹ mɛtɛɾ, ɪŋklˈuːdɪŋ laboɾ.|0
+resampled-24k/mike-taglish-v1/wavs/prc065.wav|ðˈə ɛstimatɛd tˈoʊɾəl ˈɪz ɾouɡhlj fˈɪftiːn θˈaʊzənd pɛsos bᵻfˈɔːɹ ˈɛni tˈæksᵻz.|0
+resampled-24k/mike-taglish-v1/wavs/prc067.wav|ipadadala ko po sa iɲo aŋ kumplɛtoŋ bɾɛakdown ŋ maŋa babajaɾan nijo.|0
+resampled-24k/mike-taglish-v1/wavs/prc068.wav|wˈiː tʃˈɑːɹdʒ ˈeɪ standaɾd flˈæt ɾatɛ ˈʌv onɛ hˈʌndɹɪd pɛsos fˈɔːɹ mɛtɾo manila ʃˈɪpɪŋ.|0
+resampled-24k/mike-taglish-v1/wavs/prc069.wav|juŋ nakalaɡaj po sa ɾɛsibo aj aŋ mismoŋ halaɡa na hinihiŋi namin.|0
+resampled-24k/mike-taglish-v1/wavs/prc070.wav|balɛ juŋ downpajmɛnt po natin aj fˈɪfti pɚsˈɛnt ŋ tˈoʊɾəl pɹˈaɪs.|0
+resampled-24k/mike-taglish-v1/wavs/prc071.wav|lˈɛt mˈiː pˈʊl ˈʌp ðˈə ɛɡzˈækt kwoʊtˈeɪʃən wˈiː sɛnt jˈuː lˈæst tuɛsdaj.|0
+resampled-24k/mike-taglish-v1/wavs/prc073.wav|aŋ minimum spɛnd po paɾa makaɐvˈeɪl ŋ pɾomo aj tˈuː θˈaʊzənd pɛsos.|0
+resampled-24k/mike-taglish-v1/wavs/prc074.wav|fˈɔːɹ pˈɜːtʃɪsᵻz əbˈʌv fˈaɪv θˈaʊzənd, wˈiː ˌɔːɾəmˈæɾɪkli wˈeɪv ðˈə dᵻlˈɪvɚɹi fˈiː ɛntiɾɛlj.|0
+resampled-24k/mike-taglish-v1/wavs/prc076.wav|babasahin ko po aŋ ˈaɪɾəmˌaɪzd bɾɛakdown paɾa malinaw sa atin aŋ kˌɑːmpjuːtˈeɪʃən.|0
+resampled-24k/mike-taglish-v1/wavs/prc077.wav|ðˈə basɛ kˈɔst ˈɪz aɾound tˈuː hˈʌndɹɪd pɛsos, bˈʌt ˈɪt dɛpɛnds ˈɔn ðˈə dɛsiɡn.|0
+resampled-24k/mike-taglish-v1/wavs/prc078.wav|kapaɡ umoɾdɛɾ po kajo ŋ hiɡit sa sampu, bibiɡjan ko kajo ŋ wholɛsalɛ ɾatɛ.|0
+resampled-24k/mike-taglish-v1/wavs/prc079.wav|aŋ huliŋ pɾɛʃo na biniɡaj sa amin paɾa dijan aj θɹˈiː hˈʌndɹɪd.|0
+resampled-24k/mike-taglish-v1/wavs/prc080.wav|wˈiː ɐksˈɛpt bulk oɾdɛɾs staɾtiŋ at fˈɪfti pˈiːsᵻz fˈɔːɹ ˈeɪ lowɛɾ pɹˈaɪs point.|0
+resampled-24k/mike-taglish-v1/wavs/prc081.wav|wala po tajoŋ tubo dijan dahil bɛntapaluɡi na po natin ijan.|0
+resampled-24k/mike-taglish-v1/wavs/prc082.wav|kuŋ idadaɡdaɡ po natin juŋ ɐksˈɛsɚɹiz, aabot po tajo ŋ fˈaɪv θˈaʊzənd.|0
+resampled-24k/mike-taglish-v1/wavs/prc083.wav|ðˈə pɾomotion spəsˈɪfɪkli appliɛs tˈuː kˈæʃ pajmɛnʧ madɛ within ðˈɪs wˈiːk.|0
+resampled-24k/mike-taglish-v1/wavs/prc084.wav|maɡkakaiba po aŋ pɾɛʃo dɛpɛndɛ sa sˈaɪz at kulaj na mapipili niɲo.|0
+resampled-24k/mike-taglish-v1/wavs/prc085.wav|siniŋil po kajo ŋ ˈɛkstɹə dahil naɡɹᵻkwˈɛst po kajo ŋ ɛkspɹˈɛs dᵻlˈɪvɚɹi.|0
+resampled-24k/mike-taglish-v1/wavs/prc086.wav|plˈiːz ɹᵻvjˈuː ðˈə ɐtˈætʃt kwˈoʊt tˈuː sˈiː ðˈə lˈaɪn bj lˈaɪn tʃˈɑːɹdʒᵻz.|0
+resampled-24k/mike-taglish-v1/wavs/prc087.wav|onɛ θˈaʊzənd ɛiɡht hˈʌndɹɪd po aŋ nakikita koŋ tˈoʊɾəl dito sa sˈɪstəm.|0
+resampled-24k/mike-taglish-v1/wavs/prc088.wav|aŋ pɾomo kˈoʊd na sinasabi nijo po aj paɾa sa fˈɜːst tˈaɪm bujɛɾs lamaŋ.|0
+resampled-24k/mike-taglish-v1/wavs/prc090.wav|kapaɡ pinaɡsama po natin aŋ dalawaŋ itɛms, onɛ θˈaʊzənd po aŋ aabutin.|0
+resampled-24k/mike-taglish-v1/wavs/prc091.wav|libɾɛ na po aŋ paɡassɛmblɛ nijan, kasama na po sa binajaɾan nijo.|0
+resampled-24k/mike-taglish-v1/wavs/prc092.wav|ˈaʊɚ pɹˈaɪsɪŋ tiɛɾs ˈɑːɹ basɛd ˈɔn ðˈə vˈɑːljuːm ˈʌv jˈʊɹ mˈʌnθli oɾdɛɾs.|0
+resampled-24k/mike-taglish-v1/wavs/prc093.wav|aŋ hinihiŋi laŋ po namin ŋajon aj juŋ kalahati paɾa umpisahan aŋ tɾabaho.|0
+resampled-24k/mike-taglish-v1/wavs/prc094.wav|nakadɛpɛndɛ po aŋ ʃˈɪpɪŋ ɾatɛ natin sa biɡat ŋ mismoŋ pˈækɪdʒ niɲo.|0
+resampled-24k/mike-taglish-v1/wavs/prc095.wav|sˈeɪlz tˈæks ˈɪz alɾɛadj kəmpjˈuːɾᵻd into ðˈə fˈaɪnəl ɐmˈaʊnt jˈuː sˈiː ðˈɛɹ.|0
+resampled-24k/mike-taglish-v1/wavs/prc097.wav|babalik po sa noɾmal pɹˈaɪs aŋ ˈaɪɾəm kapaɡ natapos na aŋ buwan na ito.|0
+resampled-24k/mike-taglish-v1/wavs/prc098.wav|ðˈə standaɾd kwoʊtˈeɪʃən ˈɪz vˈælɪd fˈɔːɹ onlj fˈɔːɹtiːn dˈeɪz fɹˈʌm ðˈə datɛ issuɛd.|0
+resampled-24k/mike-taglish-v1/wavs/prc099.wav|fˈɔːɹ hˈʌndɹɪd sˈɛvənti fˈaɪv pɛsos po aŋ ɛksaktoŋ halaɡa.|0
+resampled-24k/mike-taglish-v1/wavs/prc101.wav|ðˈɛɹ ˈɪz ˈeɪ small pɹˈɑːsɛsɪŋ fˈiː ˈʌv fˈɪfti pɛsos fˈɔːɹ kˈɑːɹd tɹænsˈækʃənz.|0
+resampled-24k/mike-taglish-v1/wavs/prc102.wav|aŋ biniɡaj po sa akiŋ pɾɛʃo ŋ suppliɛɾ aj tumaas kaja naɡɐdʒˈʌst kami.|0
+resampled-24k/mike-taglish-v1/wavs/prc103.wav|nakahiwalaj po sa ɾɛsibo aŋ bajad paɾa sa paɡdᵻlˈɪvɚ ŋ ɡamit.|0
+resampled-24k/mike-taglish-v1/wavs/prc104.wav|wˈiː dˈuː nˈɑːt ɹᵻkwˈaɪɚ ˈɛni downpajmɛnt fˈɔːɹ itɛms ˈʌndɚ onɛ θˈaʊzənd pɛsos.|0
+resampled-24k/mike-taglish-v1/wavs/prc106.wav|maɡiɡiŋ doblɛ po aŋ babajaɾan nijo kuŋ dalawaŋ sɛt aŋ kukunin.|0
+resampled-24k/mike-taglish-v1/wavs/prc107.wav|jˈʊɹ ˈɪnvɔɪs ʃows ˈeɪ pɛndiŋ bˈæləns ˈʌv ɛɡzˈæktli fˈɔːɹ hˈʌndɹɪd thiɾtj pɛsos.|0
+resampled-24k/mike-taglish-v1/wavs/prc108.wav|ibabawas po natin juŋ fˈaɪv hˈʌndɹɪd ɡaliŋ sa una niɲoŋ binajaɾan.|0
+resampled-24k/mike-taglish-v1/wavs/prc110.wav|jˈuː wˈɪl nˈoʊɾɪs ˈeɪ minoɾ pɹˈaɪs dˈɪfɹəns kəmpˈɛɹd tˈuː ˈaʊɚ fˈɪzɪkəl stˈɔːɹ.|0
+resampled-24k/mike-taglish-v1/wavs/prc111.wav|fˈɪfti pɚsˈɛnt po muna aŋ kailaŋan natiŋ idɛposito baɡo natin ipɹˈɑːsɛs.|0
+resampled-24k/mike-taglish-v1/wavs/prc112.wav|juŋ susunod na pˈeɪmənt nijo po aj nakaskˈɛdʒuːl sa katapusan ŋ buwan.|0
+resampled-24k/mike-taglish-v1/wavs/prc113.wav|ðˈə kˈɜːɹənt maɾkɛt pɹˈaɪs fˈɔːɹ ðˈæt matɛɾial ˈɪz kwˈaɪt hiɡh ðˈɪs sɛason.|0
+resampled-24k/mike-taglish-v1/wavs/prc114.wav|nakadɛpɛndɛ po talaɡa sa lajo ŋ iɲoŋ addɾɛss aŋ babajaɾan sa kˈɜːɹiɚ.|0
+resampled-24k/mike-taglish-v1/wavs/prc115.wav|kapaɡ tinotal po natin kasama juŋ dˈɪskaʊnt, pumatak po ŋ tˈuː θˈaʊzənd.|0
+resampled-24k/mike-taglish-v1/wavs/prc116.wav|wˈiː kˈæn pɹəvˈaɪd ˈeɪ dɛtailɛd bɾɛakdown sˈoʊ jˈuː kˈæn tʃˈɛk ˈɛvɹi siŋlɛ ˈaɪɾəm.|0
+resampled-24k/mike-taglish-v1/wavs/prc117.wav|pwɛdɛ po natiŋ alisin juŋ addons kuŋ ɡusto nijo makatipid naŋ kaunti.|0
+resampled-24k/mike-taglish-v1/wavs/prc118.wav|hindi na po kami naniniŋil ŋ ˈɛkstɹə paɾa sa maŋa simplɛŋ altɛɾations.|0
+resampled-24k/mike-taglish-v1/wavs/prc119.wav|ðˈə dˈɪskaʊnt kˈuːpɑːn wˈɪl ɛkspˈaɪɚ ɛɡzˈæktli at midniɡht ˈɔn fɹˈaɪdeɪ.|0
+resampled-24k/mike-taglish-v1/wavs/prc120.wav|balɛ twɛntj pɛsos laŋ naman po aŋ nadaɡdaɡ kaja hindi maʃadoŋ mabiɡat.|0
+resampled-24k/mike-taglish-v1/wavs/prc121.wav|ˈɪktʃˈɛk ko muna kuŋ maɡkano na aŋ inabot ŋ pinaɡsamasamaŋ ˈɔːɹdɚ nijo.|0
+resampled-24k/mike-taglish-v1/wavs/prc122.wav|jˈʊɹ tˈoʊɾəl bill kˈʌmz ˈaʊt tˈuː ɛɡzˈæktli sˈɛvən θˈaʊzənd ɛiɡht hˈʌndɹɪd pɛsos.|0
+resampled-24k/mike-taglish-v1/wavs/prc123.wav|aŋ puhunan laŋ po namin dijan aj halos kalahati ŋ bɛntahan ŋajon.|0
+resampled-24k/mike-taglish-v1/wavs/prc124.wav|paɡ lumampas po kajo sa oɾas, maj panibaɡoŋ tʃˈɑːɹdʒ na po tajo.|0
+resampled-24k/mike-taglish-v1/wavs/prc126.wav|nakuha nijo po ijan sa mas muɾaŋ halaɡa dahil sa pɾomo nuŋ nakaɾaaŋ liŋo.|0
+resampled-24k/mike-taglish-v1/wavs/prc127.wav|bukod po doon sa ˈaɪɾəm, maɡbabajad din po kajo paɾa sa mismoŋ bˈɑːks.|0
+resampled-24k/mike-taglish-v1/wavs/prc128.wav|plˈiːz ɹᵻfˈɜː tˈuː ðˈə sˈɛkənd pˈeɪdʒ ˈʌv ðˈə kwˈoʊt fˈɔːɹ ðˈə pɹˈaɪsɪŋ tɛɾms.|0
+resampled-24k/mike-taglish-v1/wavs/prc129.wav|kapaɡ binawasan po natin ŋ dalawaŋ piɾaso, mas bababa po aŋ tˈoʊɾəl niɲo.|0
+resampled-24k/mike-taglish-v1/wavs/prc130.wav|aŋ nakalista po ɾito na bajaɾin aj θɹˈiː hˈʌndɹɪd sˈɪksti pɛsos.|0
+resampled-24k/mike-taglish-v1/wavs/prc131.wav|ðˈə pɾomotional pɹˈaɪs ˈɪz stɹˈɪktli limitɛd tˈuː onɛ pˈɜːtʃɪs pɛɾ kˈʌstəmɚ tədˈeɪ.|0
+resampled-24k/mike-taglish-v1/wavs/prc132.wav|isɛsɛnd ko po juŋ əfˈɪʃəl kwoʊtˈeɪʃən sa ɛmail niɲo paɡkatapos ŋ tawaɡ.|0
+resampled-24k/mike-taglish-v1/wavs/prc134.wav|wˈiː hiɡhlj ɹˌɛkəmˈɛnd bujiŋ ðˈə sɛt instɛad ˈʌv ɡɛttiŋ ˌɪndᵻvˈɪdʒuːəl pˈiːsᵻz.|0
+resampled-24k/mike-taglish-v1/wavs/prc135.wav|wala na po tajoŋ maɡaɡawa sa pɾɛʃo kasi sˈɪstəm ɡɛnɛɾatɛd na po ijan.|0
+resampled-24k/mike-taglish-v1/wavs/prc136.wav|bawat isaŋ mɛtɾo po ŋ tɛla aj naɡkakahalaɡa ŋ ninɛtj pɛsos.|0
+resampled-24k/mike-taglish-v1/wavs/prc137.wav|fˈɔːɹ ˈeɪ mˈɔːɹ ˈækjʊɹət ɛstimatɛ, ˈaɪ nˈiːd tˈuː nˈoʊ ðˈə spəsˈɪfɪk modɛl fˈɜːst.|0
+resampled-24k/mike-taglish-v1/wavs/prc138.wav|titiɡnan ko laŋ kuŋ tama ba aŋ nˈaɪpˈʌntʃ ko na halaɡa sa iɲo.|0
+resampled-24k/mike-taglish-v1/wavs/prc139.wav|mula po ŋajon, naɡtaas na po ŋ sampuŋ piso aŋ pɾɛʃo ŋ suppliɛɾ.|0
+resampled-24k/mike-taglish-v1/wavs/prc140.wav|wˈiː ˈɑːɹ kˈɜːɹəntli updatiŋ ˈaʊɚ pɹˈaɪs list tˈuː ɹᵻflˈɛkt ðˈə nɛw sɛasonal ɾatɛs.|0
+resampled-24k/mike-taglish-v1/wavs/prc142.wav|nakaˈɪndᵻkˌeɪt po ɾito na nabajaɾan nijo na juŋ downpajmɛnt na onɛ θˈaʊzənd.|0
+resampled-24k/mike-taglish-v1/wavs/prc143.wav|ðˈə ɾɛmainiŋ bˈæləns mˈʌst bˈiː klˈɪɹd bᵻfˈɔːɹ wˈiː ɾɛlɛasɛ ðˈə fˈaɪnəl pɹˈɑːdʌkt.|0
+resampled-24k/mike-taglish-v1/wavs/prc144.wav|aŋ kˌɑːmpjuːtˈeɪʃən po nito aj basɛ sa dami ŋ kinuha niɲoŋ pɾodukto kanina.|0
+resampled-24k/mike-taglish-v1/wavs/prc145.wav|kapaɡ inalis ko po ito, maɡiɡiŋ θɹˈiː θˈaʊzənd na laŋ aŋ babajaɾan nijo.|0
+resampled-24k/mike-taglish-v1/wavs/prc146.wav|wˈiː hˈæv ˈeɪ standaɾd pɹˈaɪsɪŋ mˈeɪtɹɪks ðˈæt appliɛs tˈuː ˈɔːl ˈaʊɚ pɹəvˈɪnʃəl distɾibutoɾs.|0
+resampled-24k/mike-taglish-v1/wavs/prc147.wav|ilalaɡaj ko po bilaŋ dˈɪskaʊnt juŋ naipon niɲoŋ poinʧ sa iɲoŋ lojaltj kˈɑːɹd.|0
+resampled-24k/mike-taglish-v1/wavs/prc148.wav|babawasan ko na laŋ po ŋ bɛntɛ pɛsos dahil mɛdjo mataɡal po kajoŋ naɡhintaj.|0
+resampled-24k/mike-taglish-v1/wavs/prc149.wav|plˈiːz notɛ ðˈæt pɹˈaɪsᵻz ˈɑːɹ sˈʌbdʒɛkt tˈuː tʃˈeɪndʒ wɪðˈaʊt pɾioɾ nˈoʊɾɪs nˈɛkst mˈʌnθ.|0
+resampled-24k/mike-taglish-v1/wavs/prc150.wav|pumatak po ŋ fˈɔːɹ θˈaʊzənd, kasama na po juŋ dᵻlˈɪvɚɹi at tˈæksᵻz.|0
+resampled-24k/mike-taglish-v1/wavs/prd001.wav|pasɛnʃa na po, naubos na po kasi juŋ ˈaɪɾəm kahapon.|0
+resampled-24k/mike-taglish-v1/wavs/prd003.wav|sˈɑːɹi po talaɡa, ˈaʊt ˈʌv stokk na juŋ kulaj na ɡusto nijo.|0
+resampled-24k/mike-taglish-v1/wavs/prd004.wav|naku, ubos na po aŋ mɛdium natin paɾa dijan sa damit.|0
+resampled-24k/mike-taglish-v1/wavs/prd005.wav|wˈiː ɐpˈɑːlədʒˌaɪz, bˈʌt ðˈə ʃipmɛnt fˈɔːɹ ðˈæt pɹˈɑːdʌkt ɡot dɛlajɛd.|0
+resampled-24k/mike-taglish-v1/wavs/prd006.wav|pasɛnʃa na ha, huliŋ piɾaso na pala juŋ nabɛnta kaninaŋ umaɡa.|0
+resampled-24k/mike-taglish-v1/wavs/prd007.wav|sˈɑːɹi po, pɛɾo nˈɛkst wˈiːk pa po aŋ datiŋ ŋ baɡoŋ stˈɑːks.|0
+resampled-24k/mike-taglish-v1/wavs/prd008.wav|ˈaɪ ɐpˈɑːlədʒˌaɪz, wˈiː dˈuː nˈɑːt hˈæv ˈɛni laɾɡɛ sˈaɪzᵻz lˈɛft tədˈeɪ.|0
+resampled-24k/mike-taglish-v1/wavs/prd009.wav|naku, pasɛnʃa na po at wala na tajoŋ stokk sa bodɛɡa.|0
+resampled-24k/mike-taglish-v1/wavs/prd010.wav|sˈɑːɹi talaɡa, sold ˈaʊt na po aŋ pɾomo ˈaɪɾəm na ijan.|0
+resampled-24k/mike-taglish-v1/wavs/prd011.wav|paumanhin po, hindi pa po kami nˈækɐkˌæpæɡɹᵻstˈɑːk ŋ vˈɛɹiənt na ijon.|0
+resampled-24k/mike-taglish-v1/wavs/prd012.wav|ʌnfˈɔːɹtʃənətli, ðˈæt spəsˈɪfɪk dɛsiɡn ˈɪz nˈoʊ loŋɛɾ ɐvˈeɪləbəl ˈɪn ˈaʊɚ ˈɪnvəntˌɔːɹi.|0
+resampled-24k/mike-taglish-v1/wavs/prd013.wav|naku po, ubos na ubos na po talaɡa juŋ bɛst sɛllɛɾ natin.|0
+resampled-24k/mike-taglish-v1/wavs/prd014.wav|sˈɑːɹi fˈɔːɹ ðˈə ɪŋkənvˈiːnɪəns, bˈʌt wˈiː dɪskəntˈɪnjuːd ðˈæt ˈaɪɾəm lˈæst mˈʌnθ.|0
+resampled-24k/mike-taglish-v1/wavs/prd015.wav|pasɛnʃa na, mɛdjo mataɡal pa baɡo maɡɹᵻstˈɑːk nijan sa suppliɛɾ.|0
+resampled-24k/mike-taglish-v1/wavs/prd017.wav|sˈɑːɹi po, puɾo small na laŋ aŋ natiɾa sa ˈɪnvəntˌɔːɹi namin.|0
+resampled-24k/mike-taglish-v1/wavs/prd018.wav|naku, pasɛnʃa na po, ˈaʊt ˈʌv stokk na juŋ hinahanap niɲo.|0
+resampled-24k/mike-taglish-v1/wavs/prd019.wav|paumanhin po, pɛɾo mataɡal pa po aŋ susunod na datiŋ ŋ matɛɾjalɛs.|0
+resampled-24k/mike-taglish-v1/wavs/prd020.wav|wˈiː dɛɛplj ɐpˈɑːlədʒˌaɪz, bˈʌt ðˈæt ˈaɪɾəm ˈɪz kəmplˈiːtli sold ˈaʊt ɹˈaɪt nˈaʊ.|0
+resampled-24k/mike-taglish-v1/wavs/prd021.wav|jɛs po! ɐvˈeɪləbəl pa juŋ ˈaɪɾəm at ɹˈɛdi fˈɔːɹ ʃˈɪpɪŋ na.|0
+resampled-24k/mike-taglish-v1/wavs/prd024.wav|jɛs! kaʃa po dijan aŋ malakiŋ sˈaɪz, maɡanda po aŋ fˈɪt nijan.|0
+resampled-24k/mike-taglish-v1/wavs/prd025.wav|pˈɜːfɛkt tʃˈɔɪs! ðˈæt ˈaɪɾəm ˈɪz onɛ ˈʌv ˈaʊɚ bɛst sɛllɛɾs ðˈɪs wˈiːk.|0
+resampled-24k/mike-taglish-v1/wavs/prd026.wav|oo naman po, sobɾaŋ ɡanda ŋ kwˈɔlᵻɾi ŋ matɛɾjalɛs na ɡinamit dijan.|0
+resampled-24k/mike-taglish-v1/wavs/prd027.wav|ɐvˈeɪləbəl po aŋ ɾɛd ˈænd bluɛ, ano poŋ kulaj aŋ ɡusto niɲo?|0
+resampled-24k/mike-taglish-v1/wavs/prd028.wav|wˈiː hˈæv plɛntj ˈʌv stokk ɐvˈeɪləbəl fˈɔːɹ ðˈæt spəsˈɪfɪk vˈɛɹiənt tədˈeɪ!|0
+resampled-24k/mike-taglish-v1/wavs/prd029.wav|jɛs po, sakto dahil kakadatiŋ laŋ ŋ maŋa baɡoŋ stˈɑːks natin kanina.|0
+resampled-24k/mike-taglish-v1/wavs/prd030.wav|dˈɛfɪnətli! ðˈə nɛw vˈɜːʒən hˈæz mˈʌtʃ bɛttɛɾ fˈiːtʃɚz than ðˈə old onɛ.|0
+resampled-24k/mike-taglish-v1/wavs/prd032.wav|opo, mɛɾon po tajoŋ stokk nijan kaja pwɛdɛ nijo naŋ maoɾdɛɾ.|0
+resampled-24k/mike-taglish-v1/wavs/prd033.wav|ɡɹˈeɪt nɛws! wˈiː stˈɪl hˈæv ˈeɪ fjˈuː pˈiːsᵻz lˈɛft ˈɪn ðˈə stˈɑːkɹuːm.|0
+resampled-24k/mike-taglish-v1/wavs/prd034.wav|jɛs po, baɡaj na baɡaj po sa iɲo juŋ kulaj na ijon.|0
+resampled-24k/mike-taglish-v1/wavs/prd035.wav|wˈiː kˈæn sˈɜːʔn̩li sɛt asidɛ onɛ pˈiːs fˈɔːɹ jˈuː ɹˈaɪt nˈaʊ!|0
+resampled-24k/mike-taglish-v1/wavs/prd038.wav|absolutɛlj! ðˈə fˈæbɹɪk ˈɪz vˈɛɹi sˈɔft ˈænd kˈʌmftəbəl fˈɔːɹ dailj wɛaɾ.|0
+resampled-24k/mike-taglish-v1/wavs/prd039.wav|jɛs po, ɐvˈeɪləbəl aŋ lahat ŋ sˈaɪzᵻz mula small haŋɡaŋ ˈɛkstɹə laɾɡɛ.|0
+resampled-24k/mike-taglish-v1/wavs/prd040.wav|wˈiː ˈɑːɹ fˈʊli stˈɑːkt, sˈoʊ jˈuː kˈæn ˈɔːɹdɚ as maɲ as jˈuː wˈɔnt!|0
+resampled-24k/mike-taglish-v1/wavs/prd041.wav|ˈɪktʃˈɛk ko muna sa likod, waɡ kajoŋ maɡalala, baka mɛɾon pa.|0
+resampled-24k/mike-taglish-v1/wavs/prd042.wav|lˈɛt mˈiː doublɛ tʃˈɛk ðˈə bˈækɹuːm fˈɔːɹ jˈuː, dʒˈʌst tˈuː bˈiː absolutɛlj suɾɛ.|0
+resampled-24k/mike-taglish-v1/wavs/prd043.wav|hahanapan ko po kajo ŋ maɡandaŋ ɔːltˈɜːnətˌɪv kuŋ sakaliŋ wala na ito.|0
+resampled-24k/mike-taglish-v1/wavs/prd044.wav|waɡ po kajoŋ maɡalala, maɡkakaɾoon po ulit tajo nijan bukas ŋ hapon.|0
+resampled-24k/mike-taglish-v1/wavs/prd045.wav|ˈaɪ wˈɪl mˈeɪk suɾɛ tˈuː ɹɪzˈɜːv ðˈə nˈɛkst ɐvˈeɪləbəl jˈuːnɪt dʒˈʌst fˈɔːɹ jˈuː.|0
+resampled-24k/mike-taglish-v1/wavs/prd046.wav|aŋ pinaɡkaiba laŋ po nila aj juŋ sˈaɪz at juŋ kulaj.|0
+resampled-24k/mike-taglish-v1/wavs/prd047.wav|ðˈə pɾɛmium vˈɜːʒən ɪŋklˈuːdz additional ɐksˈɛsɚɹiz insidɛ ðˈə bˈɑːks.|0
+resampled-24k/mike-taglish-v1/wavs/prd048.wav|pwɛdɛ po natiŋ palitan ŋ ibaŋ kulaj kuŋ oʊkˈeɪ laŋ sa iɲo.|0
+resampled-24k/mike-taglish-v1/wavs/prd049.wav|mas malaki po ŋ kaunti juŋ baɡoŋ modɛl kumpaɾa sa luma.|0
+resampled-24k/mike-taglish-v1/wavs/prd050.wav|lˈɛt mˈiː tʃˈɛk ðˈə ˈɪnvəntˌɔːɹi sˈɪstəm tˈuː sˈiː ðˈə ɛɡzˈækt kwˈɔntᵻɾi lˈɛft.|0
+resampled-24k/mike-taglish-v1/wavs/prd051.wav|juŋ mɛdium po natin aj kaʃa sa maŋa maj waistlinɛ na thiɾtj.|0
+resampled-24k/mike-taglish-v1/wavs/prd052.wav|dalawaŋ vˈɛɹiənts po aŋ ɐvˈeɪləbəl, isaŋ mattɛ tapos isaŋ ɡlosʃ aŋ fˈɪnɪʃ.|0
+resampled-24k/mike-taglish-v1/wavs/prd053.wav|ðˈə ˈaɪɾəm kˈʌmz wˈɪð ˈeɪ kəmplˈiːt sɛt ˈʌv ɐtˈætʃmənts ˈænd ˈeɪ manual.|0
+resampled-24k/mike-taglish-v1/wavs/prd054.wav|titiɡnan ko muna sa bodɛɡa kuŋ maj natitiɾa pa tajoŋ malalakiŋ sˈaɪzᵻz.|0
+resampled-24k/mike-taglish-v1/wavs/prd055.wav|mas mabiɡat po juŋ isaŋ ˈaɪɾəm kasi jaɾi po ijon sa bakal.|0
+resampled-24k/mike-taglish-v1/wavs/prd056.wav|wˈiː onlj hˈæv ðˈə standaɾd sˈaɪz lˈɛft ˈɪn ˈaʊɚ kˈɜːɹənt displaj aɾɛa.|0
+resampled-24k/mike-taglish-v1/wavs/prd057.wav|kuŋ ɡusto nijo po, itoŋ kabilaŋ bɾand na laŋ aŋ kunin niɲo.|0
+resampled-24k/mike-taglish-v1/wavs/prd058.wav|paɾɛho laŋ po sila ŋ fˈiːtʃɚz, naɡkaiba laŋ talaɡa sa bɾand nˈeɪm.|0
+resampled-24k/mike-taglish-v1/wavs/prd059.wav|ðˈə bluɛ onɛ ˈɪz sliɡhtlj laɾɡɛɾ than ðˈə blˈæk vˈɛɹiənt jˈuː sᵻlˈɛktᵻd.|0
+resampled-24k/mike-taglish-v1/wavs/prd060.wav|maj ˈɔn stokk po tajo ŋajon, pɛɾo tatloŋ piɾaso na laŋ aŋ natitiɾa.|0
+resampled-24k/mike-taglish-v1/wavs/prd061.wav|ˈɪktʃˈɛk ko laŋ saɡlit kuŋ dumatiŋ na juŋ dᵻlˈɪvɚɹi mula sa suppliɛɾ.|0
+resampled-24k/mike-taglish-v1/wavs/prd062.wav|limitado na laŋ po aŋ dami ŋ pɾodukto natin sa ŋajon.|0
+resampled-24k/mike-taglish-v1/wavs/prd063.wav|ˈaʊɚ ɹˈɛkɚdz ʃow ðˈæt wˈiː hˈæv ɛɡzˈæktli fˈaɪv pˈiːsᵻz ɾɛmainiŋ ˈɪn stokk.|0
+resampled-24k/mike-taglish-v1/wavs/prd064.wav|kadalasan po aj nˈɛkst wˈiːk pa mˈæɡɚɹᵻstˈɑːk ŋ maŋa ubos na itɛms.|0
+resampled-24k/mike-taglish-v1/wavs/prd065.wav|wala na poŋ laɾɡɛ, pɛɾo maj ˈɛkstɹə laɾɡɛ pa po tajoŋ nakataɡo.|0
+resampled-24k/mike-taglish-v1/wavs/prd066.wav|both itɛms pɚfˈɔːɹm vˈɛɹi wɛll, bˈʌt ðˈeɪ hˈæv dˈɪfɹənt taɾɡɛt ˈɔːdiənsᵻz.|0
+resampled-24k/mike-taglish-v1/wavs/prd067.wav|ɡusto nijo po baŋ subukan juŋ ibaŋ vˈɛɹiənt na ɐvˈeɪləbəl sa atin?|0
+resampled-24k/mike-taglish-v1/wavs/prd069.wav|plˈiːz ɡˈɪv mˈiː ˈeɪ momɛnt tˈuː manuallj ɪnspˈɛkt ðˈə itɛms ˈɔn ðˈə ʃˈɛlf.|0
+resampled-24k/mike-taglish-v1/wavs/prd070.wav|paɾa po sa pɾoduktoŋ ito, kailaŋan po natin ŋ pɾɛoɾdɛɾ ŋ dalawaŋ aɾaw.|0
+resampled-24k/mike-taglish-v1/wavs/prd071.wav|haŋɡaŋ limaŋ piɾaso laŋ po aŋ pwɛdɛ natiŋ bilhin pɛɾ kˈʌstəmɚ.|0
+resampled-24k/mike-taglish-v1/wavs/prd072.wav|ðˈə ɛɡzˈækt mɛasuɾɛmɛnʧ ˈɑːɹ listɛd ɹˈaɪt ðˈɛɹ ˈɔn ðˈə pɹˈɑːdʌkt pˈækɪdʒɪŋ.|0
+resampled-24k/mike-taglish-v1/wavs/prd073.wav|ɐvˈeɪləbəl po sija ˈɪn blˈæk, whitɛ, ʧaka nˈeɪvi bluɛ paɾa sa kulaj.|0
+resampled-24k/mike-taglish-v1/wavs/prd074.wav|standaɾd sˈaɪz po sija, kaja hindi na kailaŋan paŋ maɡɐdʒˈʌst ŋ sukat.|0
+resampled-24k/mike-taglish-v1/wavs/prd075.wav|wˈiː suɡɡɛst takiŋ ðˈə upɡɾadɛd modɛl ˈɪf jˈuː nˈiːd hiɡhɛɾ kəpˈæsᵻɾi.|0
+resampled-24k/mike-taglish-v1/wavs/prd076.wav|juŋ battɛɾj lˈaɪf po nito aj umaabot ŋ waloŋ oɾas na tulojtuloj.|0
+resampled-24k/mike-taglish-v1/wavs/prd077.wav|ˈɪktʃˈɛk ko muna kuŋ maj naitabi pa kami ɡaliŋ sa lˈæst ʃipmɛnt.|0
+resampled-24k/mike-taglish-v1/wavs/prd078.wav|ˈaʊɚ stokk ˈɪz kwˈaɪt low ɹˈaɪt nˈaʊ, sˈoʊ ˈɪt miɡht sɛll ˈaʊt fˈæst.|0
+resampled-24k/mike-taglish-v1/wavs/prd080.wav|mas mabilis po uminit juŋ baɡoŋ labas na modɛl kumpaɾa doon sa luma.|0
+resampled-24k/mike-taglish-v1/wavs/prd081.wav|wˈiː ɹᵻstˈɑːk ˈaʊɚ ʃˈɛlvz ˈɛvɹi mˈʌndeɪ mˈɔːɹnɪŋ, aɾound ninɛ əklˈɑːk.|0
+resampled-24k/mike-taglish-v1/wavs/prd082.wav|hindi po sija pwɛdɛ sa labas, paŋindooɾ usɛ laŋ po talaɡa sija.|0
+resampled-24k/mike-taglish-v1/wavs/prd083.wav|dalawaŋ taon po aŋ waɾɾantj nijan mula naŋ bilhin nijo sa amin.|0
+resampled-24k/mike-taglish-v1/wavs/prd084.wav|plˈiːz notɛ ðˈæt ðˈə ˈæktʃuːəl kˈʌlɚ miɡht bˈiː sliɡhtlj daɾkɛɾ ˈɪn pɛɾson.|0
+resampled-24k/mike-taglish-v1/wavs/prd085.wav|paɡkatapos po nito maubos, phasɛ ˈaʊt na po aŋ buoŋ pɹˈɑːdʌkt lˈaɪn.|0
+resampled-24k/mike-taglish-v1/wavs/prd086.wav|susubukan ko poŋ hanapin sa sˈɪstəm kuŋ maj papaɾatiŋ na baɡoŋ stˈɑːks.|0
+resampled-24k/mike-taglish-v1/wavs/prd087.wav|ðˈə ɔːltˈɜːnətˌɪv option ˈɪz dʒˈʌst as ɡˈʊd, bˈʌt sliɡhtlj mˈɔːɹ ɛkspˈɛnsɪv.|0
+resampled-24k/mike-taglish-v1/wavs/prd088.wav|maj kasama na po itoŋ fɹˈiːbi kapaɡ binili nijo aŋ buoŋ sɛt.|0
+resampled-24k/mike-taglish-v1/wavs/prd089.wav|iba po kasi aŋ amoj nuŋ oɾiɡinal doon sa baɡoŋ fˌɔːɹmjʊlˈeɪʃən nila.|0
+resampled-24k/mike-taglish-v1/wavs/prd090.wav|wˈiː ˈɑːɹ kˈɜːɹəntli vˈɛɹᵻfˌaɪɪŋ ˈɪf ðˈə distɾibutoɾ kˈæn sɛnd ˈʌs mˈɔːɹ ˈɪnvəntˌɔːɹi.|0
+resampled-24k/mike-taglish-v1/wavs/prd091.wav|balɛ apat na piɾaso na laŋ po aŋ kaʃa sa isaŋ pˈaʊtʃ.|0
+resampled-24k/mike-taglish-v1/wavs/prd092.wav|maɡkaiba po aŋ matɛɾial na ɡinamit dito kaja mas mahal sija naŋ kaunti.|0
+resampled-24k/mike-taglish-v1/wavs/prd093.wav|ˈaɪ wˈɪl hˈæv tˈuː kˈɔːl ðˈə waɾɛhousɛ tˈuː kənfˈɜːm ˈɪf ðˈeɪ hˈæv mˈɔːɹ.|0
+resampled-24k/mike-taglish-v1/wavs/prd095.wav|oɾiɡinal po itoŋ ˈaɪɾəm namin at ɡaliŋ mismo sa əfˈɪʃəl na suppliɛɾ.|0
+resampled-24k/mike-taglish-v1/wavs/prd096.wav|ðˈə mˈæksɪməm wɛiɡht limit fˈɔːɹ ðˈɪs pɚtˈɪkjʊlɚ modɛl ˈɪz fˈɪfti kiloɡɾams.|0
+resampled-24k/mike-taglish-v1/wavs/prd097.wav|tiŋnan ko po sa kabilaŋ bɹˈæntʃ natin kuŋ mɛɾon silaŋ stokk nijan.|0
+resampled-24k/mike-taglish-v1/wavs/prd098.wav|paɾɛpaɾɛho laŋ po aŋ pɾɛʃo nila, kahit ano pa poŋ kulaj aŋ piliin.|0

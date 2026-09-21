@@ -11,6 +11,8 @@
  * wording is configured — Pitch adapts to the caller at runtime.
  */
 
+const path = require("path");
+
 require("dotenv").config({ override: true });
 
 function bool(value, fallback = false) {
@@ -24,6 +26,7 @@ function int(value, fallback) {
 }
 
 const { resolveBrainProvider, readConfig } = require("./runtime-config");
+const runtimeConfig = readConfig();
 
 const config = {
   // Master feature flag. Pitch never affects Closer or Brandee when off.
@@ -101,8 +104,10 @@ const config = {
 
   openai: {
     apiKey: process.env.OPENAI_API_KEY || "",
-    realtimeModel: process.env.PITCH_REALTIME_MODEL || "gpt-realtime",
-    voice: process.env.PITCH_VOICE || "marin",
+    realtimeModel: runtimeConfig.openaiRealtime?.model
+      || process.env.PITCH_REALTIME_MODEL || "gpt-realtime",
+    voice: runtimeConfig.openaiRealtime?.voice
+      || process.env.PITCH_VOICE || "marin",
   },
 
   gemini: {
@@ -112,10 +117,11 @@ const config = {
     // force an STT->TTS chain, which is forbidden.
     // 3.1-flash-live measured 637ms to first audio vs 9515ms for
     // 2.5-flash-native-audio. On a phone call that gap is the whole product.
-    liveModel: process.env.PITCH_GEMINI_LIVE_MODEL || "gemini-3.1-flash-live-preview",
+    liveModel: runtimeConfig.geminiLive?.model
+      || process.env.PITCH_GEMINI_LIVE_MODEL || "gemini-3.1-flash-live-preview",
     // Prebuilt voice name only. There is deliberately no language setting.
     // The AI Studio Pitch tab overrides this; env is the fallback.
-    voice: (readConfig().geminiLive || {}).voice
+    voice: runtimeConfig.geminiLive?.voice
       || process.env.PITCH_GEMINI_VOICE || "Aoede",
     // Plain text model for SMS. Live/native-audio models bill at audio rates,
     // which would be absurd for typed messages.
@@ -130,11 +136,36 @@ const config = {
     // Speech-to-text is local whisper.cpp by default. It must not set a
     // language; Taglish/Tagalog/English are inferred from the audio.
     whisperUrl: process.env.PITCH_LOCAL_WHISPER_URL || "http://127.0.0.1:8080/inference",
-    whisperModel: process.env.PITCH_LOCAL_WHISPER_MODEL || "whisper-1",
+    whisperModel: runtimeConfig.local?.whisperModel
+      || process.env.PITCH_LOCAL_WHISPER_MODEL || "whisper-1",
+    whisperLanguage: runtimeConfig.local?.whisperLanguage
+      || process.env.PITCH_LOCAL_WHISPER_LANGUAGE || "auto",
     // Text reasoning model. Separate from Live because this path already has
     // audio handled by Whisper/VoxCPM2.
-    geminiTextModel: process.env.PITCH_LOCAL_GEMINI_TEXT_MODEL ||
+    brainProvider: runtimeConfig.local?.brainProvider
+      || process.env.PITCH_LOCAL_BRAIN_PROVIDER || "gemini",
+    geminiTextModel: runtimeConfig.local?.geminiTextModel
+      || process.env.PITCH_LOCAL_GEMINI_TEXT_MODEL ||
       process.env.PITCH_GEMINI_TEXT_MODEL || "gemini-3.5-flash-lite",
+    openaiTextModel: runtimeConfig.local?.openaiTextModel
+      || process.env.PITCH_LOCAL_OPENAI_TEXT_MODEL || "gpt-4.1-mini",
+    piperVoice: runtimeConfig.local?.piperVoice || "",
+    piperSpeakerId: runtimeConfig.local?.piperSpeakerId ?? null,
+    piperLengthScale: Number.isFinite(Number(runtimeConfig.local?.piperLengthScale))
+      ? Number(runtimeConfig.local.piperLengthScale) : 1.0,
+    piperNoiseScale: Number.isFinite(Number(runtimeConfig.local?.piperNoiseScale))
+      ? Number(runtimeConfig.local.piperNoiseScale) : 0.667,
+    piperGreetingCacheDir: process.env.PITCH_PIPER_GREETING_CACHE_DIR
+      || path.join(__dirname, "..", "..", "local-runtime", "pitch-greetings"),
+    greetingText: runtimeConfig.local?.greetingText
+      || process.env.PITCH_PIPER_GREETING_TEXT
+      || "Hello, this is Pitch, your AI sales and support staff. How can I help you today?",
+    greetingStartDelayMs: Number.isFinite(Number(runtimeConfig.local?.greetingStartDelayMs))
+      ? Number(runtimeConfig.local.greetingStartDelayMs)
+      : int(process.env.PITCH_PIPER_GREETING_START_DELAY_MS, 250),
+
+    ttsEngine: runtimeConfig.local?.ttsEngine
+      || process.env.PITCH_LOCAL_TTS_ENGINE || "piper",
 
     // Local TTS endpoint. The name is historical — this now points at Piper
     // (port 9891) by default, not VoxCPM2, which never fit on this hardware.
@@ -144,6 +175,19 @@ const config = {
     voxcpmUrl: process.env.PITCH_VOXCPM2_URL || "http://127.0.0.1:9891/",
     voxcpmVoice: process.env.PITCH_VOXCPM2_VOICE || "",
     voxcpmSampleRate: int(process.env.PITCH_VOXCPM2_SAMPLE_RATE, 24000),
+
+    // ZONOS2 local TTS. Used when ttsEngine="zonos2".
+    zonos2Url: runtimeConfig.local?.zonos2Url
+      || process.env.PITCH_ZONOS2_URL || "http://127.0.0.1:1919/tts/generate",
+    zonos2SpeakerId: runtimeConfig.local?.zonos2SpeakerId
+      || process.env.PITCH_ZONOS2_SPEAKER_ID || "",
+    zonos2SessionId: runtimeConfig.local?.zonos2SessionId
+      || process.env.PITCH_ZONOS2_SESSION_ID || "",
+    zonos2Seed: int(runtimeConfig.local?.zonos2Seed ?? process.env.PITCH_ZONOS2_SEED, 12),
+    zonos2Speed: Number.isFinite(Number(runtimeConfig.local?.zonos2Speed ?? process.env.PITCH_ZONOS2_SPEED))
+      ? Number(runtimeConfig.local?.zonos2Speed ?? process.env.PITCH_ZONOS2_SPEED) : 0.85,
+    zonos2MaxTokens: int(runtimeConfig.local?.zonos2MaxTokens ?? process.env.PITCH_ZONOS2_MAX_TOKENS, 700),
+
     requestTimeoutMs: int(process.env.PITCH_LOCAL_REQUEST_TIMEOUT_MS, 20000),
     temperature: Number.isFinite(Number(process.env.PITCH_LOCAL_TEMPERATURE))
       ? Number(process.env.PITCH_LOCAL_TEMPERATURE) : 0.75,

@@ -43,11 +43,12 @@ const CURRENCY = "PHP";
 
 const BUSINESS_IDENTITY = {
   brandName: process.env.BUSINESS_BRAND_NAME || "AIStaff",
-  legalName: process.env.BUSINESS_LEGAL_NAME || "AIStaff Solutions Corporation",
-  registrationNumber: process.env.BUSINESS_REGISTRATION_NUMBER || "To be provided after verification",
-  registeredAddress: process.env.BUSINESS_REGISTERED_ADDRESS || "To be provided after verification",
+  legalName: process.env.BUSINESS_LEGAL_NAME || "AIStaff Business Solutions Corporation",
+  registrationNumber: process.env.BUSINESS_REGISTRATION_NUMBER || "SEC Reg. No. 2026070258298-20",
+  taxIdentificationNumber: process.env.BUSINESS_TIN || "011-006-174-00000",
+  registeredAddress: process.env.BUSINESS_REGISTERED_ADDRESS || "Blk 30-32, 2nd Floor, RMBC Bldg., Cabrera Road cor. Magnolia Lane, Glenrose Subdivision, Dolores (Pob.), Taytay, Rizal 1920, Philippines",
   supportEmail: process.env.SUPPORT_EMAIL || "support@aistaff.click",
-  supportMobile: process.env.SUPPORT_MOBILE || "+63 900 000 0000",
+  supportMobile: process.env.SUPPORT_MOBILE || "+63 976 627 7634",
   website: process.env.APP_URL || process.env.APP_PUBLIC_URL || "https://aistaff.click",
   businessHours: process.env.BUSINESS_HOURS || "Monday to Friday, 9:00 AM to 6:00 PM Philippine Time"
 };

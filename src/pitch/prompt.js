@@ -25,6 +25,8 @@ const ANONYMOUS_CALLER_IDS = new Set([
   "withheld", "unavailable", "null", "0",
 ]);
 
+const { buildPiperLanguageGuidance } = require("./voice-language");
+
 function int(value, fallback) {
   const n = Number.parseInt(value, 10);
   return Number.isFinite(n) ? n : fallback;
@@ -82,33 +84,26 @@ already in front of you is what makes an assistant feel like a form.
  * Gemini Live is native speech-to-speech: it can say Taglish, so the prompt
  * lets it match the caller freely — which is what Filipino callers expect.
  *
- * The local pipeline ends in Piper, and Piper phonemizes through espeak-ng,
- * which has NO Tagalog rules. Telling the brain to reply in Taglish there is
- * asking for output the voice physically cannot pronounce; it comes out as
- * mangled English phonemes. Until a Tagalog voice is trained, the local
- * pipeline must stay in English — this is an engine limit, not a style choice.
+ * The local pipeline ends in Piper. Piper must only speak the language of the
+ * selected voice; that final limit is appended at runtime from the Pitch panel.
  */
 function buildLanguageSection(pipeline) {
   if (pipeline === "local") {
     return `
-## Language — English only on this line
+## Language — local Piper voice
 
-Reply in English, always, even when the caller speaks Tagalog or Taglish.
-The voice on this line cannot pronounce Tagalog, so a Taglish reply would
-reach the caller as noise.
+Understand the caller as flexibly as the text brain can: English, Tagalog,
+Taglish, or another language. Do not announce or discuss language unless the
+caller asks.
 
-- Never announce this, apologise for it, or discuss what language you are
-  using. Just speak English.
-- Keep the English simple, warm and Philippine-natural — the plain English a
-  Filipino customer service agent would use, not American idiom.
-- You still UNDERSTAND Tagalog and Taglish perfectly. Answer the substance of
-  what they asked; only your own words are constrained.
+- Your spoken reply must follow the selected Piper voice language. Pitch adds
+  that exact selected-voice rule at runtime.
+- If the selected voice is English, understand Tagalog or Taglish but reply in
+  English only.
+- If the selected voice is Gab Filipino Taglish, reply in natural English,
+  Tagalog, or Taglish based on the caller.
 - Say numbers, prices, dates and times the way a Filipino speaker would say
   them out loud.
-- Do NOT use the word "po" at all on this line. Not "Yes po", not "Sige po",
-  not "Goodbye po", not "Certainly po". A frequency limit was tried and the
-  word still leaked into every closing, so the rule is absolute: zero.
-  Courtesy comes from warmth and from "sir"/"ma'am", not from "po".
 - Address the caller as "sir" or "ma'am" only when you know which. Never say
   "sir or ma'am" or "ma'am or sir" — if you do not know, use neither.
 - Do not repeat their name in every turn. Once when you learn it is plenty.`;
@@ -144,7 +139,7 @@ discuss what language you are using; just use it.
  * edit it in AI Studio.
  *
  * Three sections are NOT editable because they are decided at call time:
- *   - Language: depends on the ENGINE (Piper cannot pronounce Tagalog).
+ *   - Language: depends on the ENGINE and local voice.
  *   - Caller ID: depends on what the INVITE presented for this call.
  *   - SMS: depends on whether send_sms is wired for this deployment.
  * Those are appended by assembleInstructions() on top of whatever body is live.
@@ -202,8 +197,22 @@ read on which fits.
 - If asked whether you are a real person, say plainly that you are an AI
   assistant. Never claim to be human. Do not volunteer it unprompted in a way
   that derails the conversation, but never deny it.
+- In demo or role-play calls, the caller may pretend to book a restaurant
+  table, hotel room, appointment, or similar scenario to test how Pitch thinks.
+  Play that scenario forward naturally. Ask the next useful detail: date,
+  time, number of people, room type, table preference, or reminder wording.
+  Do not get stuck saying AIStaff is not that business, and do not keep asking
+  for a contact number unless the caller asks for SMS, callback, or follow-up.
+- For demo scenarios, you may give a tentative operational answer such as
+  having a table for two or a room available this afternoon, then continue
+  collecting the next detail. Keep it clearly conversational and never turn it
+  into a final real-world booking confirmation.
 - Do not invent facts about the business: no prices, no availability, no
   schedules, no policies, no addresses that you were not given.
+- Do not say you are checking, pulling up, looking up, reserving, holding, or
+  confirming anything unless a real tool or the business knowledge in this
+  prompt gives you that answer. If you cannot actually check it, say that
+  plainly and offer to take details for a colleague to follow up.
 - If you do not know something, say you will have someone follow up, or offer
   to take their details. Guessing on a phone call is worse than admitting a
   gap, because the caller will act on what you say.
@@ -257,7 +266,7 @@ function buildSeed({ pipeline, smsEnabled }) {
     buildBody({ businessName: "{{business_name}}", agentName: "{{agent_name}}" }),
     buildLanguageSection(pipeline),
     "\n## The caller's number\n",
-    buildCallerIdGuidance("{{caller_number}}"),
+    "{{caller_id_guidance}}",
     smsEnabled ? buildSmsSection() : "",
     `
 ## What you know about this business
@@ -277,8 +286,17 @@ never get different answers.
   ].join("\n").trim();
 }
 
+function normalizePromptForPipeline(text, pipeline) {
+  if (pipeline !== "local") return String(text || "");
+  return String(text || "").replace(
+    /## Language[\s\S]*?(?=\n## The caller's number)/,
+    `${buildLanguageSection("local")}\n`
+  );
+}
+
 const PROMPT_KEYS = {
   "gemini-live": "pitch_system_gemini",
+  "openai-realtime": "pitch_system_openai",
   local: "pitch_system_local",
 };
 
@@ -288,9 +306,30 @@ function fillVariables(text, { businessName, agentName, callerId, knowledge }) {
   return String(text || "")
     .replace(/\{\{\s*business_name\s*\}\}/g, businessName || "this business")
     .replace(/\{\{\s*agent_name\s*\}\}/g, agentName || "Pitch")
+    .replace(/\{\{\s*caller_id_guidance\s*\}\}/g, buildCallerIdGuidance(number))
     .replace(/\{\{\s*caller_number\s*\}\}/g, number || "not presented")
     .replace(/\{\{\s*knowledge_base\s*\}\}/g,
       knowledge || "(No knowledge base entries yet. Say a colleague will follow up rather than guessing.)");
+}
+
+function buildInstructions({
+  businessName = "AIStaff",
+  agentName = "Pitch",
+  callerId,
+  pipeline = "gemini-live",
+  smsEnabled = false,
+  piperVoice,
+} = {}) {
+  let text = fillVariables(normalizePromptForPipeline(buildSeed({ pipeline, smsEnabled }), pipeline), {
+    businessName,
+    agentName,
+    callerId,
+    knowledge: "",
+  });
+  if (pipeline === "local") {
+    text = `${text}\n\n${buildPiperLanguageGuidance(piperVoice)}`;
+  }
+  return text;
 }
 
 const PROMPT_CACHE_MS = 30000;
@@ -399,9 +438,10 @@ async function loadInstructions({ businessName, agentName, callerId, smsEnabled,
   if (!text || String(text).trim().length < 20) {
     text = buildSeed({ pipeline, smsEnabled });
   }
+  text = normalizePromptForPipeline(text, pipeline);
 
   const tenant = await loadTenantContext();
-  return fillVariables(text, {
+  const filled = fillVariables(text, {
     // The tenant record wins over the env fallback: the business name belongs
     // to the company, not to this process's configuration.
     businessName: tenant.businessName || businessName,
@@ -409,13 +449,20 @@ async function loadInstructions({ businessName, agentName, callerId, smsEnabled,
     callerId,
     knowledge: tenant.knowledge,
   });
+  if (pipeline === "local") {
+    const voice = require("./runtime-config").readConfig().local?.piperVoice;
+    return `${filled}\n\n${buildPiperLanguageGuidance(voice)}`;
+  }
+  return filled;
 }
 
 function clearPitchPromptCache() { promptCache.clear(); }
 
 module.exports = {
   PROMPT_KEYS,
+  buildInstructions,
   buildSeed,
+  normalizePromptForPipeline,
   fillVariables,
   loadInstructions,
   ensurePitchPrompts,

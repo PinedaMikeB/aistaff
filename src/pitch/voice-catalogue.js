@@ -36,6 +36,45 @@ const GENDER = {
 
 const QUALITY_ORDER = { low: 0, medium: 1, high: 2 };
 
+const CUSTOM_VOICES = [
+  {
+    key: "gab_taglish_epoch29",
+    name: "Gab epoch 29",
+    language: "fil_PH",
+    languageName: "Filipino Taglish",
+    country: "Philippines",
+    quality: "custom",
+    gender: "female",
+    numSpeakers: 1,
+    speakerIds: null,
+    custom: true,
+  },
+  {
+    key: "gab_taglish_epoch59",
+    name: "Gab epoch 59",
+    language: "fil_PH",
+    languageName: "Filipino Taglish",
+    country: "Philippines",
+    quality: "custom",
+    gender: "female",
+    numSpeakers: 1,
+    speakerIds: null,
+    custom: true,
+  },
+  {
+    key: "gab_taglish_epoch119",
+    name: "Gab epoch 119",
+    language: "fil_PH",
+    languageName: "Filipino Taglish",
+    country: "Philippines",
+    quality: "custom",
+    gender: "female",
+    numSpeakers: 1,
+    speakerIds: null,
+    custom: true,
+  },
+];
+
 function loadIndex() {
   try {
     return JSON.parse(fs.readFileSync(INDEX_PATH, "utf8"));
@@ -65,7 +104,14 @@ function installedVoices() {
 function listVoices({ language = null, gender = null } = {}) {
   const index = loadIndex();
   const installed = installedVoices();
-  const out = [];
+  const out = CUSTOM_VOICES
+    .filter((v) => !language || v.language === language)
+    .filter((v) => !gender || v.gender === gender)
+    .map((v) => ({
+      ...v,
+      installed: installed.has(v.key),
+      downloadPath: null,
+    }));
 
   for (const [key, meta] of Object.entries(index)) {
     const lang = meta.language || {};
@@ -103,6 +149,17 @@ function listVoices({ language = null, gender = null } = {}) {
 function listLanguages() {
   const index = loadIndex();
   const map = new Map();
+  for (const voice of CUSTOM_VOICES) {
+    if (!map.has(voice.language)) {
+      map.set(voice.language, {
+        code: voice.language,
+        name: voice.languageName,
+        country: voice.country,
+        voices: 0,
+      });
+    }
+    map.get(voice.language).voices += 1;
+  }
   for (const meta of Object.values(index)) {
     const lang = meta.language || {};
     if (!lang.code) continue;

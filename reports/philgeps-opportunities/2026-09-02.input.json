@@ -1,0 +1,185 @@
+{
+  "title": "PHILGEPS + UNGM OPPORTUNITY BRIEFING",
+  "date_iso": "2026-09-02",
+  "date_long": "September 2, 2026",
+  "report_dir": "/Volumes/Wotg Drive Mike/GitHub/AIStaff/reports/philgeps-opportunities",
+  "executive_summary": {
+    "philgeps_opportunities_scanned": 102,
+    "ungm_opportunities_scanned": 21,
+    "new_relevant_opportunities": 1,
+    "source_access_notes": "PhilGEPS official public category pages were checked live on September 2, 2026 and the first visible page for each scoped category was reviewed, followed by direct official-notice rechecks for tracked and newly surfaced candidates. UNGM public search and notice pages were scanned live through the repo runtime; no login-gated sources were used."
+  },
+  "best_opportunities": [
+    {
+      "match_rating": "STRONG MATCH",
+      "score": 8,
+      "source": "PhilGEPS",
+      "project": "Database portal to support continuous operation, maintenance and upgrade of the GAD database portal",
+      "procuring_entity": "City of Tanauan, Batangas",
+      "reference_number": "13220191",
+      "abc": "PHP 850,000.00",
+      "deadline": "September 7, 2026 1:00 AM (PHT)",
+      "procurement_method": "Negotiated Procurement - Small Value Procurement (Sec. 34) / RFQ",
+      "why_fit": "This is the clearest new live fit from today’s PhilGEPS scan because the official abstract explicitly covers system development and enhancement, hosting, security, database management, backup, maintenance, technical support, training, and user support for an existing government portal.",
+      "important_requirements": [
+        "Official PhilGEPS public notice showed status Active when checked on September 2, 2026",
+        "Official abstract lists GAD Data Base Portal Phase II with system development and enhancement, workflow diagram, infrastructure and hosting, security and data protection, database management and backup, maintenance and technical support, compliance updates, training, and emergency support",
+        "Procurement mode shown publicly is Negotiated Procurement - Small Value Procurement (Sec. 34)",
+        "Public notice shows Solicitation Number CGT-Goods-2026-410 and ABC PHP 850,000.00",
+        "Official public contact shown in the notice: Aprilene Agojo Natanauan, Admin Officer II, aprilenen@yahoo.com, tel. +63-43-728 ext. 9837",
+        "Public abstract does not clearly state the required PhilGEPS membership level, submission packaging, or prior-project threshold"
+      ],
+      "risks_or_blockers": [
+        "The public notice shows Delivery Period 0 Day/s while the description lists a substantial system-enhancement scope, so the official fields are internally inconsistent",
+        "No public line-item breakdown or openly accessible RFQ attachment was visible from the abstract page, so user counts, modules, acceptance criteria, and migration scope still need confirmation",
+        "Because it is still classified as Goods, the buyer may expect a more formal supply-style submission package even though the real work looks service-led"
+      ],
+      "recommended_next_action": "Request the RFQ or TOR immediately and confirm whether the 0 Day/s delivery field is a posting error, what Phase II already includes, the hosting environment, user load, security/privacy obligations, and whether Red PhilGEPS registration is acceptable.",
+      "official_link": "https://notices.philgeps.gov.ph/GEPSNONPILOT/Tender/SplashBidNoticeAbstractUI.aspx?menuIndex=3&refID=13220191&DirectFrom=OpenOpp&Type=category&BusCatID=10",
+      "published": "September 2, 2026"
+    },
+    {
+      "match_rating": "POSSIBLE MATCH",
+      "score": 6,
+      "source": "PhilGEPS",
+      "project": "Procurement of One (1) Lot Webhosting and maintenance of Dagupan City Website",
+      "procuring_entity": "City of Dagupan - Pangasinan",
+      "reference_number": "13219327",
+      "abc": "PHP 120,000.00",
+      "deadline": "September 2, 2026 12:00 PM (PHT)",
+      "procurement_method": "Negotiated Procurement - Small Value Procurement (Sec. 34)",
+      "why_fit": "This is still a direct AIStaff-style website operations opportunity under a simple small-value route, and it remains in-scope today because the official notice was still Active during the September 2, 2026 recheck and closes the same day.",
+      "important_requirements": [
+        "Official PhilGEPS public notice still showed status Active when rechecked on September 2, 2026",
+        "Public notice shows Solicitation Number 286-5N-26, category Services, classification Goods, ABC PHP 120,000.00, and delivery period 30 Day/s",
+        "Public abstract states webhosting and maintenance of dagupan.gov.ph with renewal and one warranty language",
+        "Official public contact shown in the notice: Monette T. De Venecia, BAC Secretariat Member, asi_aaron@yahoo.com, tel. +63-75-5154780",
+        "The public abstract still does not expose the detailed eligibility checklist, PhilGEPS membership level, or incumbent-transition conditions"
+      ],
+      "risks_or_blockers": [
+        "The word renewal still suggests incumbent advantage or an existing hosting arrangement that may not be easy to replace quickly",
+        "The public abstract remains too thin to confirm infrastructure scope, CMS stack, backups, security duties, content maintenance expectations, or support hours",
+        "The deadline is noon on September 2, 2026, so it is only actionable immediately if the RFQ package can be obtained at once"
+      ],
+      "recommended_next_action": "Request the RFQ package immediately and verify whether this is a straightforward renewal, whether a new supplier can assume the hosting stack cleanly, and who controls the domain, hosting account, backups, and CMS credentials.",
+      "official_link": "https://notices.philgeps.gov.ph/GEPSNONPILOT/Tender/SplashBidNoticeAbstractUI.aspx?menuIndex=3&refID=13219327&DirectFrom=OpenOpp&Type=category&BusCatID=23",
+      "published": "August 30, 2026"
+    }
+  ],
+  "urgent_deadlines": [
+    {
+      "source": "PhilGEPS",
+      "project": "Procurement of One (1) Lot Webhosting and maintenance of Dagupan City Website",
+      "procuring_entity": "City of Dagupan - Pangasinan",
+      "reference_number": "13219327",
+      "deadline": "September 2, 2026 12:00 PM (PHT)",
+      "note": "Carry-forward direct-fit item. The official notice was still Active on September 2, 2026, but the public abstract is sparse and the same-day deadline leaves almost no preparation margin.",
+      "official_link": "https://notices.philgeps.gov.ph/GEPSNONPILOT/Tender/SplashBidNoticeAbstractUI.aspx?menuIndex=3&refID=13219327&DirectFrom=OpenOpp&Type=category&BusCatID=23"
+    }
+  ],
+  "not_recommended": [
+    {
+      "source": "PhilGEPS",
+      "project": "Supply and Installation of Centralized Municipal Government System of LGU Alaminos, Laguna",
+      "procuring_entity": "Municipality of Alaminos, Laguna",
+      "reference_number": "13201016",
+      "reason": "The title is relevant, but the public abstract exposes only attached documents for scope, the route is full public bidding, the value is PHP 3.85M, and the requirement appears broad enough to favor a more established municipal-systems integrator with stronger government delivery history.",
+      "official_link": "https://notices.philgeps.gov.ph/GEPSNONPILOT/Tender/SplashBidNoticeAbstractUI.aspx?menuIndex=3&refID=13201016&DirectFrom=OpenOpp&Type=category&BusCatID=10"
+    },
+    {
+      "source": "PhilGEPS",
+      "project": "SUBSCRIPTION TO WEBSITE APPLICATION DEVELOPMENT TOOLS FOR THE PROVINCIAL GOVERNMENT OF CAVITE’S WEBSITE UPGRADE",
+      "procuring_entity": "Province of Cavite",
+      "reference_number": "13215555",
+      "reason": "This is mainly a branded tool and plugin subscription purchase. Even though the public notice allows Red PhilGEPS membership below PHP 1M, it still reads as a procurement of named software/services and warranty-backed supply rather than a custom AIStaff implementation or managed-service engagement.",
+      "official_link": "https://notices.philgeps.gov.ph/GEPSNONPILOT/Tender/SplashBidNoticeAbstractUI.aspx?menuIndex=3&refID=13215555&DirectFrom=OpenOpp&Type=category&BusCatID=10"
+    },
+    {
+      "source": "PhilGEPS",
+      "project": "SUPPLY, DELIVERY, INSTALLATION, COMMISSIONING AND TESTING OF MANAGED VOICE SOLUTION FOR THE ESTABLISHMENT OF A 911 EMERGENCY CONTACT CENTER (EMERGENCY HOTLINE) IN NARRA, PALAWAN",
+      "procuring_entity": "Municipality of Narra, Palawan",
+      "reference_number": "13211883",
+      "reason": "The voice/contact-center theme is attractive, but the official abstract requires a similar contract worth at least 50% of the ABC, paid bidding documents, bid security, and a larger telecom-style implementation that is too infrastructure-heavy for AIStaff’s current profile.",
+      "official_link": "https://notices.philgeps.gov.ph/GEPSNONPILOT/Tender/SplashBidNoticeAbstractUI.aspx?menuIndex=3&refID=13211883&DirectFrom=OpenOpp&Type=category&BusCatID=37"
+    },
+    {
+      "source": "UNGM",
+      "project": "SDP-011-2026 Chatbot de salud financiera",
+      "procuring_entity": "UNDP Mexico",
+      "reference_number": "UNDP-MEX-00615",
+      "reason": "This is the closest direct chatbot fit in today’s UNGM scan, but it is Spanish-language, Mexico-specific, and aimed at mobility-related financial-health inquiries in Mexico. It does not meet today’s priority for English-language opportunities with realistic first-entry delivery conditions for AIStaff.",
+      "official_link": "https://www.ungm.org/Public/Notice/312623"
+    },
+    {
+      "source": "UNGM",
+      "project": "Provision of CRM Solution support and maintenance services for Salesforce application",
+      "procuring_entity": "UNOCHA Geneva",
+      "reference_number": "EOIUNOCHA24654",
+      "reason": "The CRM theme is relevant, but the public UNGM notice explicitly calls for recognized Salesforce expertise including Nonprofit Cloud consultant certification, which is a material qualification blocker for AIStaff today.",
+      "official_link": "https://www.ungm.org/Public/Notice/312399"
+    },
+    {
+      "source": "UNGM",
+      "project": "Development of Muncipal Information System (MIS)",
+      "procuring_entity": "UNDP Syria",
+      "reference_number": "UNDP-SYR-00680",
+      "reason": "The work is relevant on paper, but it is a multi-municipality Syria MIS build with local delivery, localization, and institutional-complexity risk that is not a realistic first UN pursuit for AIStaff.",
+      "official_link": "https://www.ungm.org/Public/Notice/312901"
+    },
+    {
+      "source": "UNGM",
+      "project": "Project Management Information System tool",
+      "procuring_entity": "WMO",
+      "reference_number": "RFP 2641-26",
+      "reason": "This requires a prime integrator for end-to-end PMIS provisioning, Oracle Fusion and Microsoft 365 integration, migration, training, change management, and SLA-backed support. That is too enterprise-heavy for AIStaff’s current positioning.",
+      "official_link": "https://www.ungm.org/Public/Notice/307308"
+    }
+  ],
+  "todays_recommendation": {
+    "best_opportunity": "Database portal to support continuous operation, maintenance and upgrade of the GAD database portal (PhilGEPS Ref 13220191) is the best opportunity to pursue on September 2, 2026 because it is new today, service-compatible with AIStaff’s systems and support capabilities, and more realistic for a small supplier than the broader public-bidding municipal-system notice.",
+    "documents_to_prepare": [
+      "Current PhilGEPS registration and annexes",
+      "Mayor's or Business Permit and SEC registration",
+      "Notarized Omnibus Sworn Statement with proof of signatory authority",
+      "Latest annual income tax return and recent business tax returns if required by the RFQ",
+      "Capability sheet focused on portal development, hosting, security, backup, technical support, AI-assisted helpdesk, and workflow automation",
+      "Short implementation note covering hosting ownership, security controls, backup and restore, change management, training, and support SLAs"
+    ],
+    "clarifications_to_request": [
+      "For Tanauan: whether the posted Delivery Period 0 Day/s is an encoding error or whether another official schedule controls",
+      "For Tanauan: the actual Phase II module list, user count, hosting environment, backup responsibilities, security/privacy requirements, and acceptance criteria",
+      "For Tanauan: whether Red PhilGEPS registration is acceptable for this small-value procurement",
+      "For Dagupan: whether the requirement is a simple renewal with an incumbent or a competitive opening for a new hosting and maintenance supplier",
+      "For Dagupan: who controls the domain, hosting account, CMS stack, backups, and current support credentials"
+    ]
+  },
+  "source_urls_checked": [
+    "https://notices.philgeps.gov.ph/GEPSNONPILOT/Tender/SplashOpportunitiesSearchUI.aspx?BusCatID=10&ClickFrom=OpenOpp&menuIndex=3&type=category",
+    "https://notices.philgeps.gov.ph/GEPSNONPILOT/Tender/SplashOpportunitiesSearchUI.aspx?BusCatID=43&ClickFrom=OpenOpp&menuIndex=3&type=category",
+    "https://notices.philgeps.gov.ph/GEPSNONPILOT/Tender/SplashOpportunitiesSearchUI.aspx?BusCatID=37&ClickFrom=OpenOpp&menuIndex=3&type=category",
+    "https://notices.philgeps.gov.ph/GEPSNONPILOT/Tender/SplashOpportunitiesSearchUI.aspx?BusCatID=23&ClickFrom=OpenOpp&menuIndex=3&type=category",
+    "https://notices.philgeps.gov.ph/GEPSNONPILOT/Tender/SplashOpportunitiesSearchUI.aspx?BusCatID=17&ClickFrom=OpenOpp&menuIndex=3&type=category",
+    "https://notices.philgeps.gov.ph/GEPSNONPILOT/Tender/SplashOpportunitiesSearchUI.aspx?BusCatID=157&ClickFrom=OpenOpp&menuIndex=3&type=category",
+    "https://notices.philgeps.gov.ph/GEPSNONPILOT/Tender/SplashBidNoticeAbstractUI.aspx?menuIndex=3&refID=13220191&DirectFrom=OpenOpp&Type=category&BusCatID=10",
+    "https://notices.philgeps.gov.ph/GEPSNONPILOT/Tender/SplashBidNoticeAbstractUI.aspx?menuIndex=3&refID=13219327&DirectFrom=OpenOpp&Type=category&BusCatID=23",
+    "https://notices.philgeps.gov.ph/GEPSNONPILOT/Tender/SplashBidNoticeAbstractUI.aspx?menuIndex=3&refID=13201016&DirectFrom=OpenOpp&Type=category&BusCatID=10",
+    "https://notices.philgeps.gov.ph/GEPSNONPILOT/Tender/SplashBidNoticeAbstractUI.aspx?menuIndex=3&refID=13215555&DirectFrom=OpenOpp&Type=category&BusCatID=10",
+    "https://notices.philgeps.gov.ph/GEPSNONPILOT/Tender/SplashBidNoticeAbstractUI.aspx?menuIndex=3&refID=13211883&DirectFrom=OpenOpp&Type=category&BusCatID=37",
+    "https://www.ungm.org/Public/Notice",
+    "https://www.ungm.org/Public/Notice/Search",
+    "https://www.ungm.org/Public/Notice/312623",
+    "https://www.ungm.org/Public/Notice/312399",
+    "https://www.ungm.org/Public/Notice/312901",
+    "https://www.ungm.org/Public/Notice/307308",
+    "https://www.ungm.org/Public/Notice/312141",
+    "https://www.ungm.org/Public/Notice/311934"
+  ],
+  "notes": [
+    "PhilGEPS was checked only through official public pages. No login, CAPTCHA bypass, or restricted bid-document access was attempted.",
+    "Today's PhilGEPS scan reviewed the first visible public page for the six scoped categories, totaling 102 visible listings, then directly rechecked tracked and newly surfaced official notice pages.",
+    "UNGM was checked through the official public search and notice pages using the repo runtime. No login-gated source was used.",
+    "No new UNGM notice survived today's realism filter strongly enough for BEST OPPORTUNITIES. The previously reported UNDRR creative-services EOI (UNGM Notice 312141) was rechecked but omitted because it is unchanged from prior runs and does not close within the next three days.",
+    "The previously reported CCP website hosting RFQ (PhilGEPS Ref 13217867) was not carried forward because its September 1, 2026 deadline is already in the past relative to this September 2, 2026 run.",
+    "No bids were submitted, no registrations were created, and no procurement emails were sent. This run is research and reporting only."
+  ]
+}

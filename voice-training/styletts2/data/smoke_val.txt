@@ -1,0 +1,24 @@
+resampled-24k/mike-taglish-v1/wavs/cls085.wav|maɾamiŋ salamat po sa iɲoŋ paŋunawa at pasɛnʃa, iŋat po kajo palaɡi dijan!|0
+resampled-24k/mike-taglish-v1/wavs/dlv043.wav|jˈuː wˈɪl ɹᵻsˈiːv ˈeɪ tˈɛkst mɛssaɡɛ wˈʌns ðˈə ɾidɛɾ ˈɪz nɛaɾbj tədˈeɪ!|0
+resampled-24k/mike-taglish-v1/wavs/fup001.wav|napaɡisipan nijo na po ba juŋ tuŋkol sa inalok ko sa iɲoŋ ˈaɪɾəm?|0
+resampled-24k/mike-taglish-v1/wavs/fup032.wav|ˈɪf jˈuː nˈoʊ aɲonɛ ɛlsɛ lˈʊkɪŋ fˈɔːɹ ˈaʊɚ sˈɜːvɪsᵻz, wˈiː wˈʊd dɛɛplj ɐpɹˈiːʃɪˌeɪt ɹᵻfˈɜːɹəlz.|0
+resampled-24k/mike-taglish-v1/wavs/grt008.wav|ɡˈʊd dˈeɪ! wˈʌt kˈæn ˈaɪ ɐsˈɪst jˈuː wˈɪð ɹˈaɪt nˈaʊ?|0
+resampled-24k/mike-taglish-v1/wavs/grt015.wav|dʒˈʌst tʃˈɛkɪŋ ˈɪf jˈuː kˈæn stˈɪl hˈɪɹ mˈiː klˈɪɹli?|0
+resampled-24k/mike-taglish-v1/wavs/grt022.wav|hˈaɪ, θˈæŋk jˈuː fˈɔːɹ kˈɔːlɪŋ! si ɡɹˈeɪs po ito, ano poŋ maitutuloŋ ko sa iɲo?|0
+resampled-24k/mike-taglish-v1/wavs/grt032.wav|ɡˈʊd dˈeɪ po! ako si aŋɛl. ɹˈɛdi na po akoŋ tuluŋan kajo sa ˈɔːɹdɚ nijo.|0
+resampled-24k/mike-taglish-v1/wavs/obj046.wav|pwɛdɛ nijo po itʃˈɛk aŋ amiŋ ʃopɛɛ stˈɔːɹ paɾa sa mas maɾamiŋ ɹᵻvjˈuːz.|0
+resampled-24k/mike-taglish-v1/wavs/obj086.wav|alam ko poŋ naɡaalinlaŋan kajo sa ŋajon, kaja andito ako paɾa maɡpaliwanaɡ.|0
+resampled-24k/mike-taglish-v1/wavs/obj090.wav|huwaɡ po kajoŋ maɡalala kuŋ kailaŋan niɲo pa ŋ oɾas upaŋ maɡpaʃa.|0
+resampled-24k/mike-taglish-v1/wavs/obj105.wav|makakaasa kajoŋ hindi namin sasajaŋin aŋ tiwalaŋ ibinibiɡaj niɲo sa amiŋ tindahan.|0
+resampled-24k/mike-taglish-v1/wavs/obj134.wav|hajaan nijo po, ɡaɡawin ko aŋ lahat paɾa maɡiŋ sulit aŋ ibabajad nijo.|0
+resampled-24k/mike-taglish-v1/wavs/prc029.wav|ɡaɾantisado po na aŋ siniŋil ko laŋ aj juŋ nakalaɡaj sa ɾɛsibo.|0
+resampled-24k/mike-taglish-v1/wavs/prc030.wav|plˈiːz dˈuː nˈɑːt wˈʌɹi, ðˈə installation fˈiː ˈɪz alɾɛadj ɪŋklˈuːdᵻd ˈɪn ðˈæt ɐmˈaʊnt.|0
+resampled-24k/mike-taglish-v1/wavs/prc042.wav|siɡɛ po, aajusin ko aŋ pɾɛʃo paɾa pasok sa budɡɛt na sinabi nijo.|0
+resampled-24k/mike-taglish-v1/wavs/prc066.wav|kuŋ babawasan ŋ tɛn pɚsˈɛnt, maɡiɡiŋ ninɛ hˈʌndɹɪd na laŋ po sija.|0
+resampled-24k/mike-taglish-v1/wavs/prc075.wav|kasama na po sa pɾɛʃoŋ ijan aŋ isaŋ taon na waɾɾantj ŋ pɾodukto.|0
+resampled-24k/mike-taglish-v1/wavs/prc096.wav|idadaɡdaɡ ko na laŋ po ba juŋ bubblɛ wɾap na bɛntɛ pɛsos?|0
+resampled-24k/mike-taglish-v1/wavs/prc133.wav|hahatiin po natin sa dalawaŋ huloɡ aŋ iɲoŋ kabuuaŋ bajaɾin.|0
+resampled-24k/mike-taglish-v1/wavs/prc141.wav|isasama ko na po sa ˈɪnvɔɪs juŋ hiniŋi niɲoŋ libɾɛŋ papɛɾ baɡ.|0
+resampled-24k/mike-taglish-v1/wavs/prd023.wav|opo, mɛɾon pa po tajoŋ tatloŋ piɾaso na natitiɾa sa stˈɔːɹ.|0
+resampled-24k/mike-taglish-v1/wavs/prd036.wav|sakto po aŋ datiŋ niɲo, naɡɹᵻstˈɑːk po kami kaninaŋ umaɡa laŋ.|0
+resampled-24k/mike-taglish-v1/wavs/prd037.wav|opo, sikat na sikat po aŋ pɾoduktoŋ ijan sa amiŋ maŋa mamimili.|0

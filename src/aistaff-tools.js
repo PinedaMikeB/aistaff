@@ -213,7 +213,7 @@ async function makeQuotationDraftTool(session, { companyId, psid, pageId } = {})
     budget: session.weeklyInquiries || null,
     urgency: session.sendsQuotations || null,
     lead_status: "qualified",
-    lead_score: session.weeklyInquiries ? "hot" : "warm",
+    lead_score: "hot",
     quotation_ready: true
   };
 

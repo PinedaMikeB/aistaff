@@ -1,1 +1,32 @@
-<!doctype html><html lang="en"><head><meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" /><title>Contact Us | AIStaff</title><meta name="description" content="Contact AIStaff for AIChat Sales Agent pricing, onboarding, support, and billing questions." /><link rel="stylesheet" href="/style.css" /></head><body class="commerce-page"><main class="policy-page"><h1>Contact Us</h1><p>For sales, onboarding, billing, cancellation, refund, or support concerns, contact AIStaff through the details below.</p><ul><li>Email: support@aistaff.click</li><li>Mobile: +63 900 000 0000</li><li>Website: https://aistaff.click</li><li>Business hours: Monday to Friday, 9:00 AM to 6:00 PM Philippine Time</li></ul><p>Please include your order number, company name, and registered email address when asking about an existing subscription.</p><p><a href="/support/">Open support information</a></p></main></body></html>
+<!doctype html><html lang="en"><head><meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" /><title>Contact Us | AIStaff</title><meta name="description" content="Contact AIStaff for AIChat Sales Agent pricing, onboarding, support, and billing questions." /><link rel="stylesheet" href="/style.css" /></head><body class="commerce-page"><main class="policy-page"><h1>Contact Us</h1><form id="contactForm" class="contact-form"><input required name="person" placeholder="Full name" /><input required type="email" name="email" placeholder="Email" /><input required name="mobile" placeholder="Mobile number" /><input name="company" placeholder="Company / organization (optional)" /><input name="page" placeholder="Website or Facebook Page (optional)" style="grid-column: 1 / -1;" /><textarea required name="message" placeholder="How can we help?"></textarea><button class="button button-primary" type="submit">Send message</button><p id="contactFormSuccess" class="success-message" hidden>Thank you — we've received your message and will get back to you soon.</p></form><p>For sales, onboarding, billing, cancellation, refund, or support concerns, contact AIStaff through the details below.</p><ul><li>Registered business name: AIStaff Business Solutions Corporation</li><li>SEC Company Registration No.: 2026070258298-20</li><li>BIR TIN: 011-006-174-00000</li><li>Business address: Blk 30-32, 2nd Floor, RMBC Bldg., Cabrera Road cor. Magnolia Lane, Glenrose Subdivision, Dolores (Pob.), Taytay, Rizal 1920, Philippines</li><li>Email: support@aistaff.click</li><li>Mobile: +63 976 627 7634 (0976 627 7634)</li><li>Website: https://aistaff.click</li><li>Business hours: Monday to Friday, 9:00 AM to 6:00 PM Philippine Time</li></ul><p>Please include your order number, company name, and registered email address when asking about an existing subscription.</p><p><a href="/support/">Open support information</a></p></main><script>
+(function () {
+  var form = document.getElementById('contactForm');
+  if (!form) return;
+  form.addEventListener('submit', async function (event) {
+    event.preventDefault();
+    var data = Object.fromEntries(new FormData(event.currentTarget));
+    try {
+      var res = await fetch('/api/public/audit-request', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          company: data.company || 'Not provided',
+          person: data.person,
+          mobile: data.mobile,
+          email: data.email,
+          page: data.page || 'Not provided',
+          business: null,
+          inquiries: null,
+          quotations: null,
+          message: ('[CONTACT PAGE] ' + (data.message || '')).trim()
+        })
+      });
+      if (!res.ok) throw new Error('Could not send your message. Please try again or email support@aistaff.click directly.');
+      document.getElementById('contactFormSuccess').hidden = false;
+      form.reset();
+    } catch (err) {
+      alert(err.message || 'Could not send your message. Please try again or email support@aistaff.click directly.');
+    }
+  });
+})();
+</script><div id="site-footer-root"></div><script src="/js/site-footer.js" defer></script></body></html>

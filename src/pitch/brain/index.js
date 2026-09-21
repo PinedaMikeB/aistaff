@@ -49,6 +49,7 @@ function createBrain({ callerId, tools } = {}) {
     case "local-pipeline":
       return new LocalPipelineBrain({
         geminiApiKey: config.gemini.apiKey,
+        openaiApiKey: config.openai.apiKey,
         localConfig: config.localPipeline,
         businessName: shared.businessName,
         agentName: shared.agentName,

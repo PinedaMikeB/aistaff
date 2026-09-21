@@ -1,6 +1,7 @@
 require("dotenv").config({ override: true });
 
 const crypto = require("crypto");
+const fs = require("fs");
 const path = require("path");
 const express = require("express");
 const helmet = require("helmet");
@@ -19,7 +20,13 @@ const {
   setSessionCookie,
   clearSessionCookie
 } = require("./auth");
-const { generateSalesReply, quotationReady } = require("./ai");
+const {
+  generateSalesReply,
+  quotationReady,
+  DEFAULT_LEAD_QUALIFICATION_RULES,
+  leadQualificationRules,
+  leadUpdateDataForAi
+} = require("./ai");
 const { verifyMessengerSignature, handleMessengerWebhook, sendMessengerText } = require("./messenger-webhook");
 const { generateAistaffDemoReply, getAistaffSession } = require("./aistaff-demo");
 const {
@@ -74,6 +81,13 @@ const {
 } = require("./payments");
 const { createCheckoutLink } = require("./checkout-link");
 const { stepsForPack, suggestPack, INDUSTRY_PACKS, VALIDITY_OPTIONS } = require("./intake-steps");
+const {
+  attachRecentEventsToLead,
+  buildFunnelSummary,
+  normalizeTrackingBody,
+  recordWebsiteEvent,
+  sourceLabelFor
+} = require("./lead-attribution");
 /** Words per knowledge base entry. Sent to the client so the counter and the
  *  server enforce exactly the same number — two copies drift. */
 const INTAKE_WORD_LIMIT = 3000;
@@ -301,6 +315,46 @@ app.use(cookieParser());
 // without REQUIRING login. Must come after cookieParser.
 app.use("/api/public/brandee", attachUserIfPresent);
 app.use(morgan("dev"));
+
+// Server-side footer include.
+// public/js/site-footer.js fetches public/partials/footer.html and injects it
+// client-side — great for a single source of truth, but it means a scanner
+// that reads raw HTML without running JavaScript (some KYC/compliance
+// crawlers do this) would see an empty <div id="site-footer-root"></div> and
+// miss the business registration info, address, and policy links on every
+// page except the few that also state them in the page body. This
+// middleware inlines the same footer.html server-side before the response
+// goes out, so the footer is present in the raw HTML too. The client-side
+// script still runs afterward, finds no #site-footer-root left to replace
+// (it's already a <footer> element), and quietly no-ops — no double footer.
+const PUBLIC_DIR = path.join(__dirname, "..", "public");
+let footerPartialCache = null;
+function getFooterPartial() {
+  if (footerPartialCache === null) {
+    try {
+      footerPartialCache = fs.readFileSync(path.join(PUBLIC_DIR, "partials", "footer.html"), "utf8").trim();
+    } catch {
+      footerPartialCache = "";
+    }
+  }
+  return footerPartialCache;
+}
+app.use((req, res, next) => {
+  if (req.method !== "GET" && req.method !== "HEAD") return next();
+  const urlPath = decodeURIComponent(req.path);
+  if (urlPath.includes("..") || urlPath.startsWith("/api/") || urlPath.startsWith("/admin")) return next();
+  const filePath = urlPath.endsWith(".html")
+    ? path.join(PUBLIC_DIR, urlPath)
+    : path.join(PUBLIC_DIR, urlPath.endsWith("/") ? urlPath : urlPath + "/", "index.html");
+  fs.readFile(filePath, "utf8", (err, html) => {
+    if (err || !html.includes('id="site-footer-root"')) return next();
+    const footer = getFooterPartial();
+    if (!footer) return next();
+    res.set("Content-Type", "text/html; charset=utf-8");
+    res.send(html.replace('<div id="site-footer-root"></div>', footer));
+  });
+});
+
 app.use(express.static(path.join(__dirname, "..", "public"), {
   setHeaders(res, filePath) {
     // intake-wizard.js added 2026-08-17. Without it the file was served with
@@ -427,6 +481,68 @@ function requireFinance(req, res, next) {
 
 function decimalNumber(value) {
   return Number(value || 0);
+}
+
+function looksLikeMissingAttributionSchema(error) {
+  const message = String(error?.message || "");
+  return error?.code === "P2021"
+    || error?.code === "P2022"
+    || (
+      /website_events|source_channel|source_label|visitor_id|touch_count|utm_campaign|landing_page|test_event_code|lead_qualification_status|lead_qualification_reason|lead_next_action/i.test(message)
+      && /does not exist|unknown|column|table|relation/i.test(message)
+    );
+}
+
+const leadListBaseSelect = {
+  id: true,
+  company_id: true,
+  conversation_id: true,
+  customer_name: true,
+  mobile_number: true,
+  email: true,
+  company_name: true,
+  location: true,
+  service_needed: true,
+  budget: true,
+  urgency: true,
+  notes: true,
+  lead_status: true,
+  lead_score: true,
+  lead_qualification_status: true,
+  lead_qualification_reason: true,
+  lead_qualification_confidence: true,
+  lead_next_action: true,
+  quotation_ready: true,
+  assigned_to: true,
+  follow_up_date: true,
+  created_at: true,
+  updated_at: true,
+  assigned_user: { select: { name: true, email: true } },
+  conversation: { select: { channel: true, intent: true, last_message_at: true } }
+};
+
+function withEmptyAttribution(lead) {
+  return {
+    ...lead,
+    source_channel: null,
+    source_label: null,
+    source_url: null,
+    landing_page: null,
+    referrer: null,
+    utm_source: null,
+    utm_medium: null,
+    utm_campaign: null,
+    utm_content: null,
+    utm_term: null,
+    fbclid: null,
+    gclid: null,
+    visitor_id: null,
+    first_seen_at: null,
+    last_touch_at: null,
+    touch_count: 0,
+    website_events: [],
+    attribution_schema_available: false
+  };
 }
 
 function serializeCart(cart) {
@@ -810,6 +926,36 @@ async function maybeCreateQuotationDraft({ companyId, lead, conversationId, prep
       prepared_by: preparedBy
     }
   });
+}
+
+const CLOSED_LEAD_STATUSES = ["lost", "unqualified", "spam"];
+
+function activeLeadReportingWhere(companyId, extra = {}) {
+  return {
+    AND: [
+      {
+        company_id: companyId,
+        lead_status: { notIn: CLOSED_LEAD_STATUSES },
+        lead_qualification_status: "lead"
+      },
+      {
+        NOT: {
+          AND: [
+            {
+              OR: [
+                { source_channel: "facebook_messenger" },
+                { conversation: { is: { channel: "facebook_messenger" } } }
+              ]
+            },
+            { mobile_number: null },
+            { email: null },
+            { conversation: { is: { contact_number: null } } }
+          ]
+        }
+      },
+      extra
+    ].filter((part) => part && Object.keys(part).length)
+  };
 }
 
 app.get("/api/health", asyncHandler(async (req, res) => {
@@ -1257,7 +1403,9 @@ app.post("/api/public/audit-request", asyncHandler(async (req, res) => {
     business: z.string().optional().nullable(),
     inquiries: z.string().optional().nullable(),
     quotations: z.string().optional().nullable(),
-    message: z.string().optional().nullable()
+    message: z.string().optional().nullable(),
+    visitorId: z.string().trim().min(8).max(100).regex(/^[a-zA-Z0-9_-]+$/).optional().nullable(),
+    tracking: z.record(z.any()).optional().nullable()
   }).parse(req.body);
 
   const companyId = await getDefaultCompanyId();
@@ -1295,7 +1443,7 @@ app.post("/api/public/audit-request", asyncHandler(async (req, res) => {
     }
   });
 
-  await prisma.lead.create({
+  let lead = await prisma.lead.create({
     data: {
       company_id: companyId,
       conversation_id: conversation.id,
@@ -1309,9 +1457,35 @@ app.post("/api/public/audit-request", asyncHandler(async (req, res) => {
       urgency: body.quotations,
       notes: body.message,
       lead_status: "new",
-      lead_score: "warm"
+      lead_score: "warm",
+      lead_qualification_status: "lead",
+      lead_qualification_reason: "Website audit form submitted with contact and business details.",
+      lead_qualification_confidence: 100,
+      lead_next_action: "Review audit request and contact the prospect.",
+      source_channel: "website_audit",
+      source_label: body.tracking ? sourceLabelFor(body.tracking) : "Website audit form",
+      source_url: body.tracking?.page_url || null,
+      landing_page: body.tracking?.source_page || null,
+      referrer: body.tracking?.referrer || null,
+      utm_source: body.tracking?.utm_source || null,
+      utm_medium: body.tracking?.utm_medium || null,
+      utm_campaign: body.tracking?.utm_campaign || null,
+      utm_content: body.tracking?.utm_content || null,
+      utm_term: body.tracking?.utm_term || null,
+      fbclid: body.tracking?.fbclid || null,
+      gclid: body.tracking?.gclid || null,
+      visitor_id: body.visitorId || null
     }
   });
+  if (body.visitorId) {
+    lead = await attachRecentEventsToLead(prisma, {
+      companyId,
+      leadId: lead.id,
+      conversationId: conversation.id,
+      visitorId: body.visitorId,
+      fallback: { ...(body.tracking || {}), source_channel: "website_audit" }
+    }).catch(() => null) || lead;
+  }
 
   buildPresenceSnapshot({ facebookInput: body.page, requestedPageName: body.company })
     .then(async (snapshot) => {
@@ -1355,6 +1529,7 @@ app.post("/api/public/site-chat", asyncHandler(async (req, res) => {
 
   const body = z.object({
     visitorId: z.string().trim().min(8).max(80).regex(/^[a-zA-Z0-9_-]+$/).optional(),
+    tracking: z.record(z.any()).optional().nullable(),
     messages: z.array(z.object({
       role: z.enum(["user", "assistant"]),
       content: z.string().min(1).max(2000)
@@ -1426,6 +1601,19 @@ app.post("/api/public/site-chat", asyncHandler(async (req, res) => {
         conversation_id: conversation.id,
         customer_name: visitorLabel,
         service_needed: "AIStaff website chat inquiry",
+        source_channel: "website_chat",
+        source_label: body.tracking ? sourceLabelFor(body.tracking) : "Website chat",
+        source_url: body.tracking?.page_url || null,
+        landing_page: body.tracking?.source_page || null,
+        referrer: body.tracking?.referrer || null,
+        utm_source: body.tracking?.utm_source || null,
+        utm_medium: body.tracking?.utm_medium || null,
+        utm_campaign: body.tracking?.utm_campaign || null,
+        utm_content: body.tracking?.utm_content || null,
+        utm_term: body.tracking?.utm_term || null,
+        fbclid: body.tracking?.fbclid || null,
+        gclid: body.tracking?.gclid || null,
+        visitor_id: visitorId,
         notes: [
           "Source: AIStaff website chat widget",
           `Website visitor ID: ${visitorId}`,
@@ -1435,6 +1623,13 @@ app.post("/api/public/site-chat", asyncHandler(async (req, res) => {
       }
     });
   }
+  await attachRecentEventsToLead(prisma, {
+    companyId,
+    leadId: lead.id,
+    conversationId: conversation.id,
+    visitorId,
+    fallback: { ...(body.tracking || {}), source_channel: "website_chat" }
+  }).catch((error) => console.warn("[site-chat] attribution link failed:", error.message));
 
   let ai;
   try {
@@ -1460,9 +1655,7 @@ app.post("/api/public/site-chat", asyncHandler(async (req, res) => {
     where: { id: lead.id },
     data: {
       ...ai.leadPatch,
-      lead_score: ai.leadScore,
-      quotation_ready: ai.quotationReady,
-      lead_status: ai.quotationReady ? "quotation_ready" : "contacted"
+      ...leadUpdateDataForAi(lead.lead_status, ai)
     }
   });
 
@@ -1973,6 +2166,7 @@ const loginRateLimiter = createRateLimiter({ windowMs: 15 * 60 * 1000, max: 10 }
 const forgotByIpRateLimiter = createRateLimiter({ windowMs: 60 * 60 * 1000, max: 10 });
 const forgotByEmailRateLimiter = createRateLimiter({ windowMs: 60 * 60 * 1000, max: 5 });
 const resetRateLimiter = createRateLimiter({ windowMs: 15 * 60 * 1000, max: 10 });
+const websiteAnalyticsRateLimiter = createRateLimiter({ windowMs: 60 * 1000, max: 180 });
 
 function clientIp(req) {
   return req.ip || req.headers["x-forwarded-for"] || "unknown";
@@ -3102,7 +3296,9 @@ app.post("/api/public/demo/decision", asyncHandler(async (req, res) => {
     preferredTime: optionalText(40),
     preferredSchedule: optionalText(200),
     reasons: z.array(z.string().trim().min(1).max(160)).max(12).optional().default([]),
-    notes: optionalText(3000)
+    notes: optionalText(3000),
+    visitorId: optionalText(100),
+    tracking: z.record(z.any()).optional().nullable()
   }).parse(req.body);
 
   const session = await prisma.demoSession.findUnique({ where: { id: body.sessionId } });
@@ -3251,9 +3447,35 @@ app.post("/api/public/demo/decision", asyncHandler(async (req, res) => {
       notes,
       lead_status: actionMeta.status,
       lead_score: actionMeta.score,
-      quotation_ready: body.action === "purchase_now"
+      lead_qualification_status: "lead",
+      lead_qualification_reason: `Public demo action: ${body.action.replaceAll("_", " ")} with contact details.`,
+      lead_qualification_confidence: 100,
+      lead_next_action: body.action === "purchase_now" ? "Send or confirm payment instructions." : "Follow up on demo decision.",
+      quotation_ready: body.action === "purchase_now",
+      source_channel: "public_demo",
+      source_label: body.tracking ? sourceLabelFor(body.tracking) : "Closer public demo",
+      source_url: body.tracking?.page_url || null,
+      landing_page: body.tracking?.source_page || null,
+      referrer: body.tracking?.referrer || null,
+      utm_source: body.tracking?.utm_source || null,
+      utm_medium: body.tracking?.utm_medium || null,
+      utm_campaign: body.tracking?.utm_campaign || null,
+      utm_content: body.tracking?.utm_content || null,
+      utm_term: body.tracking?.utm_term || null,
+      fbclid: body.tracking?.fbclid || null,
+      gclid: body.tracking?.gclid || null,
+      visitor_id: body.visitorId || null
     }
   });
+  if (body.visitorId) {
+    await attachRecentEventsToLead(prisma, {
+      companyId,
+      leadId: lead.id,
+      conversationId: conversation.id,
+      visitorId: body.visitorId,
+      fallback: { ...(body.tracking || {}), source_channel: "public_demo" }
+    }).catch((error) => console.warn("[demo] attribution link failed:", error.message));
+  }
 
   let booking = null;
   if (body.action === "book_consultation") {
@@ -3391,10 +3613,25 @@ app.get("/api/auth/me", requireAuth, asyncHandler(async (req, res) => {
   res.json({ user: req.user, company });
 }));
 
+app.post("/api/public/analytics/track", asyncHandler(async (req, res) => {
+  const clean = normalizeTrackingBody(req.body || {});
+  if (!clean) return res.status(204).end();
+  if (!websiteAnalyticsRateLimiter.check(clean.visitorId).allowed) return res.status(204).end();
+  await recordWebsiteEvent(prisma, {
+    companyId: AISTAFF_INTERNAL_COMPANY_ID,
+    req,
+    body: req.body || {}
+  }).catch((error) => {
+    console.warn("[analytics] event not saved:", error.message);
+  });
+  res.status(204).end();
+}));
+
 app.get("/api/dashboard", requireAuth, asyncHandler(async (req, res) => {
   const start = new Date();
   start.setHours(0, 0, 0, 0);
   const [
+    activeLeads,
     leadsToday,
     hotLeads,
     quotationReady,
@@ -3403,20 +3640,36 @@ app.get("/api/dashboard", requireAuth, asyncHandler(async (req, res) => {
     pendingFollowUps,
     recentConversations
   ] = await Promise.all([
-    prisma.lead.count({ where: { company_id: req.companyId, created_at: { gte: start } } }),
-    prisma.lead.count({ where: { company_id: req.companyId, lead_score: "hot" } }),
-    prisma.lead.count({ where: { company_id: req.companyId, quotation_ready: true } }),
-    prisma.quotation.count({ where: { company_id: req.companyId, status: "pending_approval" } }),
+    prisma.lead.count({ where: activeLeadReportingWhere(req.companyId) }),
+    prisma.lead.count({ where: activeLeadReportingWhere(req.companyId, { created_at: { gte: start } }) }),
+    prisma.lead.count({ where: activeLeadReportingWhere(req.companyId, { lead_score: "hot" }) }),
+    prisma.lead.count({ where: activeLeadReportingWhere(req.companyId, { lead_status: { in: ["quote_sent", "quotation_ready"] } }) }),
+    prisma.quotation.count({
+      where: {
+        company_id: req.companyId,
+        status: "pending_approval",
+        lead: { is: activeLeadReportingWhere(req.companyId) }
+      }
+    }),
     prisma.conversation.count({ where: { company_id: req.companyId, needs_human: true } }),
-    prisma.followUp.count({ where: { company_id: req.companyId, status: "pending" } }),
+    prisma.followUp.count({
+      where: {
+        company_id: req.companyId,
+        status: "pending",
+        lead: { is: activeLeadReportingWhere(req.companyId) }
+      }
+    }),
     prisma.conversation.findMany({
       where: { company_id: req.companyId },
       orderBy: { last_message_at: "desc" },
       take: 8,
-      include: { messages: { orderBy: { created_at: "desc" }, take: 1 } }
+      include: {
+        messages: { orderBy: { created_at: "desc" }, take: 1 },
+        leads: { orderBy: { created_at: "desc" }, take: 1 }
+      }
     })
   ]);
-  res.json({ leadsToday, hotLeads, quotationReady, pendingApprovals, needsHuman, pendingFollowUps, recentConversations });
+  res.json({ activeLeads, leadsToday, hotLeads, quotationReady, pendingApprovals, needsHuman, pendingFollowUps, recentConversations });
 }));
 
 app.get("/api/company", requireAuth, asyncHandler(async (req, res) => {
@@ -3440,6 +3693,36 @@ app.put("/api/company", requireAuth, asyncHandler(async (req, res) => {
 
 app.get("/api/settings", requireAuth, asyncHandler(async (req, res) => {
   res.json(await prisma.companySetting.findUnique({ where: { company_id: req.companyId } }));
+}));
+
+app.get("/api/settings/lead-qualification", requireAuth, asyncHandler(async (req, res) => {
+  const settings = await prisma.companySetting.findUnique({ where: { company_id: req.companyId } });
+  res.json({
+    rules: leadQualificationRules(settings),
+    defaults: DEFAULT_LEAD_QUALIFICATION_RULES
+  });
+}));
+
+app.put("/api/settings/lead-qualification", requireAuth, asyncHandler(async (req, res) => {
+  const rules = z.object({
+    mode: z.enum(["ai_decides", "suggest_only", "human_approval"]).default("ai_decides"),
+    sourceProfiles: z.record(z.object({
+      label: z.string().trim().min(1).max(80),
+      leadCriteria: z.array(z.string().trim().min(3).max(300)).max(20).default([]),
+      notLeadCriteria: z.array(z.string().trim().min(3).max(300)).max(20).default([])
+    })).default({}),
+    leadCriteria: z.array(z.string().trim().min(3).max(300)).max(20).default([]),
+    notLeadCriteria: z.array(z.string().trim().min(3).max(300)).max(20).default([]),
+    temperatures: z.record(z.string().trim().max(500)).default({}),
+    pipelineStages: z.record(z.string().trim().max(500)).default({}),
+    defaultInstruction: z.string().trim().max(4000).default("")
+  }).parse(req.body || {});
+  const settings = await prisma.companySetting.update({
+    where: { company_id: req.companyId },
+    data: { lead_qualification_rules: rules }
+  });
+  clearAistaffAiConfigCache();
+  res.json({ ok: true, rules: leadQualificationRules(settings) });
 }));
 
 app.put("/api/settings", requireAuth, asyncHandler(async (req, res) => {
@@ -5199,11 +5482,102 @@ app.post("/api/conversations/:id/handoff", requireAuth, asyncHandler(async (req,
 }));
 
 app.get("/api/leads", requireAuth, asyncHandler(async (req, res) => {
-  res.json(await prisma.lead.findMany({
-    where: { company_id: req.companyId },
-    orderBy: { updated_at: "desc" },
-    include: { assigned_user: { select: { name: true, email: true } } }
-  }));
+  try {
+    return res.json(await prisma.lead.findMany({
+      where: { company_id: req.companyId },
+      orderBy: { updated_at: "desc" },
+      include: {
+        assigned_user: { select: { name: true, email: true } },
+        conversation: { select: { channel: true, intent: true, last_message_at: true } },
+        website_events: { orderBy: { created_at: "desc" }, take: 6 }
+      }
+    }));
+  } catch (error) {
+    if (!looksLikeMissingAttributionSchema(error)) throw error;
+    const rows = await prisma.lead.findMany({
+      where: { company_id: req.companyId },
+      orderBy: { updated_at: "desc" },
+      select: leadListBaseSelect
+    });
+    return res.json(rows.map(withEmptyAttribution));
+  }
+}));
+
+app.get("/api/leads/analytics-summary", requireAuth, asyncHandler(async (req, res) => {
+  const dateOnly = z.string().regex(/^\d{4}-\d{2}-\d{2}$/);
+  const query = z.object({
+    from: dateOnly.optional(),
+    to: dateOnly.optional(),
+    includeTestEvents: z.enum(["true", "false"]).optional().default("false")
+  }).parse(req.query || {});
+  const startRange = query.from ? new Date(`${query.from}T00:00:00.000+08:00`) : new Date(Date.now() - 30 * 24 * 60 * 60 * 1000);
+  const endRange = query.to ? new Date(`${query.to}T23:59:59.999+08:00`) : new Date();
+  const rangeWhere = { gte: startRange, lte: endRange };
+  const excludeTestEvents = query.includeTestEvents !== "true";
+  const eventRangeWhere = {
+    company_id: req.companyId,
+    created_at: rangeWhere,
+    ...(excludeTestEvents ? {
+      NOT: [
+        { test_event_code: { not: null } },
+        { page_url: { contains: "test_event_code" } },
+        { source_page: { contains: "test_event_code" } }
+      ]
+    } : {})
+  };
+  const startToday = new Date();
+  startToday.setHours(0, 0, 0, 0);
+  const [visitsToday, events7Days, linkedEvents7Days, recentEvents, campaigns, funnelEvents, leadCount] = await Promise.all([
+    prisma.websiteEvent.count({
+      where: { company_id: req.companyId, event_name: "PageView", created_at: { gte: startToday } }
+    }),
+    prisma.websiteEvent.count({
+      where: eventRangeWhere
+    }),
+    prisma.websiteEvent.count({
+      where: { ...eventRangeWhere, lead_id: { not: null } }
+    }),
+    prisma.websiteEvent.findMany({
+      where: eventRangeWhere,
+      orderBy: { created_at: "desc" },
+      take: 8,
+      select: { event_name: true, source_page: true, utm_source: true, utm_campaign: true, created_at: true }
+    }),
+    prisma.websiteEvent.groupBy({
+      by: ["utm_campaign"],
+      where: { ...eventRangeWhere, utm_campaign: { not: null } },
+      _count: { _all: true },
+      orderBy: { _count: { utm_campaign: "desc" } },
+      take: 5
+    }),
+    prisma.websiteEvent.findMany({
+      where: eventRangeWhere,
+      orderBy: { created_at: "desc" },
+      take: 1000,
+      select: { event_name: true, visitor_id: true, created_at: true }
+    }),
+    prisma.lead.count({ where: { company_id: req.companyId, lead_qualification_status: "lead", created_at: rangeWhere } })
+  ]);
+  const days = Math.max(1, Math.ceil((endRange - startRange) / (24 * 60 * 60 * 1000)));
+  res.json({
+    visitsToday,
+    events7Days,
+    linkedEvents7Days,
+    recentEvents,
+    funnelWindowDays: days,
+    funnelRange: {
+      from: startRange.toISOString().slice(0, 10),
+      to: endRange.toISOString().slice(0, 10),
+      includeTestEvents: !excludeTestEvents
+    },
+    funnel: buildFunnelSummary(funnelEvents, leadCount),
+    leadDefinition: {
+      crm: "A lead is a saved customer opportunity in AIStaff's leads table, tied to a company and conversation.",
+      pixel: "The Meta Pixel Lead event fires when a demo visitor submits purchase interest or books a consultation.",
+      notLead: "Page views, demo starts, package clicks, and checkout starts are funnel steps, but not saved leads by themselves."
+    },
+    campaigns: campaigns.map((item) => ({ name: item.utm_campaign, count: item._count._all }))
+  });
 }));
 
 app.get("/api/leads/:id", requireAuth, asyncHandler(async (req, res) => {
@@ -5212,7 +5586,8 @@ app.get("/api/leads/:id", requireAuth, asyncHandler(async (req, res) => {
     include: {
       conversation: { include: { messages: { orderBy: { created_at: "asc" } }, human_handoffs: true } },
       quotations: { orderBy: { created_at: "desc" }, include: { items: true } },
-      follow_ups: { orderBy: { due_date: "asc" } }
+      follow_ups: { orderBy: { due_date: "asc" } },
+      website_events: { orderBy: { created_at: "desc" }, take: 30 }
     }
   });
   if (!lead) return res.status(404).json({ error: "Lead not found" });
@@ -5220,8 +5595,31 @@ app.get("/api/leads/:id", requireAuth, asyncHandler(async (req, res) => {
 }));
 
 app.put("/api/leads/:id", requireAuth, asyncHandler(async (req, res) => {
-  const data = { ...req.body };
-  if (data.follow_up_date) data.follow_up_date = new Date(data.follow_up_date);
+  const allowed = [
+    "customer_name", "company_name", "mobile_number", "email", "location",
+    "service_needed", "budget", "urgency", "notes", "lead_status",
+    "lead_score", "lead_next_action", "follow_up_date", "source_label", "utm_campaign"
+  ];
+  const data = Object.fromEntries(Object.entries(req.body || {}).filter(([key]) => allowed.includes(key)));
+  if (Object.prototype.hasOwnProperty.call(data, "follow_up_date")) {
+    data.follow_up_date = data.follow_up_date ? new Date(data.follow_up_date) : null;
+  }
+  const existing = await prisma.lead.findFirst({ where: { id: req.params.id, company_id: req.companyId } });
+  if (!existing) return res.status(404).json({ error: "Lead not found" });
+  const nextStatus = String(data.lead_status || existing.lead_status || "").toLowerCase();
+  if (["unqualified", "spam"].includes(nextStatus)) {
+    data.lead_qualification_status = "inquiry_only";
+    data.lead_qualification_reason = nextStatus === "spam"
+      ? "Manually marked as spam by staff."
+      : "Manually moved to Unqualified by staff.";
+    data.lead_qualification_confidence = 100;
+    data.lead_score = "cold";
+    data.quotation_ready = false;
+  } else if (data.lead_status && existing.lead_qualification_status !== "lead") {
+    data.lead_qualification_status = "lead";
+    data.lead_qualification_reason = "Manually moved into the sales pipeline by staff.";
+    data.lead_qualification_confidence = 100;
+  }
   // scoreLead() removed 2026-08-18 — it was English keyword matching. When a
   // human edits a lead by hand, their edit stands; the score is only
   // recalculated by the model on the next customer message. quotation_ready is
@@ -5229,7 +5627,9 @@ app.put("/api/leads/:id", requireAuth, asyncHandler(async (req, res) => {
   const questions = await prisma.qualificationQuestion.findMany({
     where: { company_id: req.companyId, active: true }
   });
-  data.quotation_ready = quotationReady(data, questions);
+  if (!["unqualified", "spam"].includes(nextStatus)) {
+    data.quotation_ready = quotationReady({ ...existing, ...data }, questions);
+  }
   const lead = await prisma.lead.update({ where: { id: req.params.id, company_id: req.companyId }, data });
   await maybeCreateQuotationDraft({ companyId: req.companyId, lead, conversationId: lead.conversation_id, preparedBy: req.user.id });
   res.json(lead);
@@ -5807,7 +6207,7 @@ app.post("/api/demo/inbound-message", requireAuth, asyncHandler(async (req, res)
   const ai = await generateSalesReply({ companyId: req.companyId, conversationId: conversation.id, message: body.message });
   const updatedLead = await prisma.lead.update({
     where: { id: lead.id },
-    data: { ...ai.leadPatch, lead_score: ai.leadScore, quotation_ready: ai.quotationReady, lead_status: ai.quotationReady ? "quotation_ready" : "contacted" }
+    data: { ...ai.leadPatch, ...leadUpdateDataForAi(lead.lead_status, ai) }
   });
   await prisma.message.create({ data: { company_id: req.companyId, conversation_id: conversation.id, sender_type: "ai", sender_id: "ai_sales_assistant", message_text: ai.reply, ai_generated: true } });
   await maybeCreateQuotationDraft({ companyId: req.companyId, lead: updatedLead, conversationId: conversation.id, preparedBy: req.user.id });
@@ -5825,6 +6225,42 @@ app.get("/admin", (req, res) => {
 // ---------------------------------------------------------------------
 app.use("/api/superadmin", require("./admin/routes"));
 mountSuperAdminPages(app);
+
+function deletionConfirmationCode(req) {
+  return crypto
+    .createHash("sha256")
+    .update(String(req.body?.signed_request || req.ip || "aistaff-data-deletion"))
+    .digest("hex")
+    .slice(0, 16);
+}
+
+app.get(["/data-deletion", "/data-deletion/"], (req, res) => {
+  const baseUrl = getAppUrl(req);
+  res.status(200).type("html").send(`<!doctype html>
+<html lang="en">
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Data Deletion | AIStaff</title></head>
+<body><main><h1>Data Deletion</h1><p>To request deletion of AIStaff account, Messenger, or website inquiry data, email support@aistaff.click. We will confirm the request and process deletion according to our privacy policy.</p><p><a href="${baseUrl}/privacy/">Privacy Policy</a></p></main></body>
+</html>`);
+});
+
+app.post(["/data-deletion", "/data-deletion/"], (req, res) => {
+  res.status(200).json({
+    url: `${getAppUrl(req)}/privacy/`,
+    confirmation_code: deletionConfirmationCode(req)
+  });
+});
+
+app.get(["/deauthorize", "/deauthorize/"], (req, res) => {
+  res.status(200).type("html").send(`<!doctype html>
+<html lang="en">
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Deauthorize | AIStaff</title></head>
+<body><main><h1>Deauthorize AIStaff</h1><p>AIStaff accepts Facebook deauthorization callbacks at this URL. For help, email support@aistaff.click.</p></main></body>
+</html>`);
+});
+
+app.post(["/deauthorize", "/deauthorize/"], (req, res) => {
+  res.status(200).json({ ok: true });
+});
 
 app.get("/privacy", (req, res) => {
   res.sendFile(path.join(__dirname, "..", "public", "privacy", "index.html"));

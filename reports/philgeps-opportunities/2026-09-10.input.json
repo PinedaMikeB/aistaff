@@ -1,0 +1,195 @@
+{
+  "title": "PHILGEPS + UNGM OPPORTUNITY BRIEFING",
+  "date_iso": "2026-09-10",
+  "date_long": "September 10, 2026",
+  "executive_summary": {
+    "philgeps_opportunities_scanned": 105,
+    "ungm_opportunities_scanned": 15,
+    "new_relevant_opportunities": 2,
+    "source_access_notes": "Official PhilGEPS public category listings and shortlisted notice abstracts were checked successfully through the external runtime after sandbox DNS failed. Official UNGM public search returned 15 unique active listings and notice details. No login, CAPTCHA, MFA, paywall, or restricted access was bypassed.",
+    "bid_count": 0,
+    "high_priority_review_count": 1,
+    "review_count": 1,
+    "skip_count": 7
+  },
+  "best_opportunities": [
+    {
+      "source": "PhilGEPS",
+      "match_rating": "STRONG MATCH",
+      "score": 9,
+      "project": "Website Hosting and Technical Support Services for the Encyclopedia of Philippine Art Digital Edition",
+      "procuring_entity": "Cultural Center of the Philippines",
+      "reference_number": "13234016",
+      "abc": "PHP 617,000.00",
+      "deadline": "September 14, 2026 5:00 PM (PHT)",
+      "procurement_method": "Negotiated Procurement - Small Value Procurement (Sec. 34); RFQ",
+      "published": "September 10, 2026",
+      "country": "Philippines",
+      "why_fit": "Direct fit for AIStaff's website operations, hosting, technical support, integrations, and ongoing managed-service capability. The SVP RFQ, post-award document model, and email submission are unusually accessible to a new small supplier.",
+      "project_summary": "One lot of website hosting and technical support for the Encyclopedia of Philippine Art Digital Edition. The public abstract links a detailed RFQ and identifies email and manual submission routes.",
+      "important_requirements": [
+        "Submit the signed quotation and comply with the detailed linked RFQ/RFP specifications and terms.",
+        "Post-award documents: valid Business/Mayor's Permit, PhilGEPS registration, notarized Omnibus Sworn Statement and proof of signing authority, latest CY 2025 annual ITR, and business tax returns for at least the last six months.",
+        "Submission is due to glycidas.penaranda@culturalcenter.gov.ph and pmd@culturalcenter.gov.ph or the CCP Procurement Management Division by the deadline.",
+        "Public contact: Regie Zapanta Profeta, (02) 8551-0039, regie.profeta@culturalcenter.gov.ph."
+      ],
+      "risks_or_blockers": [
+        "The abstract says Delivery Period: 0 days, which conflicts with an ongoing hosting/support service and must be clarified from the detailed RFQ.",
+        "Hosting architecture, migration scope, traffic/storage, security, uptime SLA, backup/DR, support hours, incumbent access, and contract term must be verified in the linked RFQ before pricing.",
+        "Only four calendar days remain, so a bid/no-bid decision and technical review are needed today."
+      ],
+      "how_we_could_qualify": [
+        "AIStaff can bid directly if its current business, tax, PhilGEPS, and OSS documents are ready.",
+        "Use a managed cloud-hosting partner only if the RFQ requires certifications or infrastructure beyond AIStaff's present credentials."
+      ],
+      "recommended_next_action": "Download and review the publicly linked RFQ today, confirm the service term and technical baseline with CCP, then prepare a compliant signed quotation and support plan for email submission before September 14.",
+      "official_link": "https://notices.philgeps.gov.ph/GEPSNONPILOT/Tender/SplashBidNoticeAbstractUI.aspx?menuIndex=3&refID=13234016&DirectFrom=OpenOpp&Type=category&BusCatID=10"
+    },
+    {
+      "source": "PhilGEPS",
+      "match_rating": "POSSIBLE MATCH",
+      "score": 7.5,
+      "project": "Consulting Services for the New BCDA Website Design and Development",
+      "procuring_entity": "Bases Conversion and Development Authority",
+      "reference_number": "13236203",
+      "abc": "PHP 6,500,000.00",
+      "deadline": "Header: October 30, 2026 9:00 AM (PHT); eligibility/shortlisting documents: September 30, 2026 9:00 AM (PHT)",
+      "procurement_method": "Public Bidding; Consulting Services; competitive selection using Quality-Based Evaluation/Selection",
+      "published": "September 10, 2026",
+      "country": "Philippines",
+      "why_fit": "The core work directly matches AIStaff's custom web systems, UX, content integration, dashboards, and AI-enabled public-information services. The budget and eight-month term support a substantial implementation.",
+      "project_summary": "Design and develop BCDA's new website under a consulting-services engagement, starting with eligibility and shortlisting before technical and financial proposals.",
+      "important_requirements": [
+        "Eligibility/shortlisting documents are due September 30 at the BCDA receiving area or through permitted online submission.",
+        "Shortlisting considers firm and key-staff experience, personnel qualifications, and current workload; new firms may rely on principal and key-staff experience.",
+        "Bidding is restricted to Filipino citizens/entities meeting the stated 60% Filipino ownership rule.",
+        "Bid security is required; bidding documents cost PHP 10,000; the project uses Quality-Based Evaluation/Selection.",
+        "Public procurement contact: Tina Rose R. Villa, (02) 8575-1789, bac-csec@bcda.gov.ph."
+      ],
+      "risks_or_blockers": [
+        "The notice header closes October 30, but the description requires shortlisting documents by September 30; both dates govern different stages and must not be treated as interchangeable.",
+        "Full consulting public bidding, bid security, paid documents, shortlist competition, personnel credentials, workload disclosure, and prior experience make this substantially harder for a new firm than an SVP RFQ.",
+        "The detailed TOR and evaluation weights must be obtained before confirming AIStaff can meet all staffing and experience thresholds."
+      ],
+      "how_we_could_qualify": [
+        "Lead with the individual experience and portfolios of AIStaff's principals and proposed key staff, which the notice explicitly allows for new firms.",
+        "Consider a compliant joint venture or experienced web-development partner only after checking the TOR and shortlist rules."
+      ],
+      "recommended_next_action": "Attend or review the September 18 pre-eligibility conference, obtain the bidding documents/TOR, and perform a strict eligibility gap assessment before paying the document fee or assembling the September 30 shortlist submission.",
+      "official_link": "https://notices.philgeps.gov.ph/GEPSNONPILOT/Tender/SplashBidNoticeAbstractUI.aspx?menuIndex=3&refID=13236203&DirectFrom=OpenOpp&Type=category&BusCatID=43"
+    }
+  ],
+  "urgent_deadlines": [
+    {
+      "source": "PhilGEPS",
+      "project": "Procurement of Archiving System",
+      "procuring_entity": "Municipality of Aguilar, Pangasinan",
+      "reference_number": "13229588",
+      "deadline": "September 11, 2026 1:00 PM (PHT)",
+      "days_remaining": 1,
+      "note": "Previously reported possible match remains Active and unchanged. It is a PHP 400,000 Small Value Procurement RFQ, but the public abstract still leaves the software, equipment, scanning, migration, eligibility, and submission scope inside an unavailable purchase request; do not price without it.",
+      "official_link": "https://notices.philgeps.gov.ph/GEPSNONPILOT/Tender/SplashBidNoticeAbstractUI.aspx?menuIndex=3&refID=13229588&DirectFrom=OpenOpp&Type=category&BusCatID=23"
+    }
+  ],
+  "not_recommended": [
+    {
+      "source": "PhilGEPS",
+      "project": "Establishment/Updating of the San Juan GAD Database Application System",
+      "procuring_entity": "City of San Juan",
+      "reference_number": "13233965",
+      "reason": "The database theme is relevant, but the PHP 1.69M public bid is framed as supplies and equipment, requires a similar completed contract worth at least 50% of ABC for non-expendable goods, and leaves the actual software/equipment split in a login-gated attachment. Not realistic without proof of a matching contract and the full bill of quantities.",
+      "official_link": "https://notices.philgeps.gov.ph/GEPSNONPILOT/Tender/SplashBidNoticeAbstractUI.aspx?menuIndex=3&refID=13233965&DirectFrom=OpenOpp&Type=category&BusCatID=10"
+    },
+    {
+      "source": "PhilGEPS",
+      "project": "Photo Documentation Services for the City Mayor's Office",
+      "procuring_entity": "City of Ormoc, Leyte",
+      "reference_number": "13234518",
+      "reason": "Accessible PHP 1M SVP RFQ, but it requires on-site photographers, videographers, drone footage, and coverage of 15-18 Ormoc events within a 15-day delivery period. This is a physical production-crew engagement rather than Brandee's AI content workflow.",
+      "official_link": "https://notices.philgeps.gov.ph/GEPSNONPILOT/Tender/SplashBidNoticeAbstractUI.aspx?menuIndex=3&refID=13234518&DirectFrom=OpenOpp&Type=category&BusCatID=23"
+    },
+    {
+      "source": "PhilGEPS",
+      "project": "Live coverage/streaming and multimedia services for La Union Surfing Break and Paskuhan Village",
+      "procuring_entity": "Municipality of Bacnotan, La Union",
+      "reference_number": "13234808",
+      "reason": "The multimedia terms are superficially relevant, but the PHP 800,000 full public bid bundles physical lights/sounds rental and live event operations and explicitly requires at least three years of similar contracts. AIStaff lacks the required equipment/production track record as a direct bidder.",
+      "official_link": "https://notices.philgeps.gov.ph/GEPSNONPILOT/Tender/SplashBidNoticeAbstractUI.aspx?menuIndex=3&refID=13234808&DirectFrom=OpenOpp&Type=category&BusCatID=23"
+    },
+    {
+      "source": "UNGM",
+      "project": "Development of Municipal Information System",
+      "procuring_entity": "UNDP Syria",
+      "reference_number": "UNDP-SYR-00680 / UNGM 312901",
+      "reason": "Technically relevant and Basic-registration accessible, but it is a multi-municipality Syria implementation through UNDP Quantum, with local-context, delivery, security, and proposal burdens that are disproportionate for AIStaff; it closes September 13 at 09:00 GMT-4.",
+      "official_link": "https://www.ungm.org/Public/Notice/312901"
+    },
+    {
+      "source": "UNGM",
+      "project": "Company to Conduct Integrated Assessment of Information Systems",
+      "procuring_entity": "UNDP Moldova",
+      "reference_number": "UNDP-MDA-01088 / UNGM 311934",
+      "reason": "This is a specialist national transport-agency information-systems assessment with a large structured RFP package and Quantum submission due September 11. It is assessment/governance consulting rather than an accessible AIStaff implementation opportunity.",
+      "official_link": "https://www.ungm.org/Public/Notice/311934"
+    },
+    {
+      "source": "UNGM",
+      "project": "SaaS platform for technical-scientific-educational content production",
+      "procuring_entity": "PAHO Brazil",
+      "reference_number": "RFP # 03-2026 / UNGM 313371",
+      "reason": "The notice is unchanged. It is Portuguese-language, Brazil-focused, and seeks an existing specialized multi-country health-content SaaS product rather than a small custom build.",
+      "official_link": "https://www.ungm.org/Public/Notice/313371"
+    },
+    {
+      "source": "UNGM",
+      "project": "Modern Loan Management Information System",
+      "procuring_entity": "UNRWA",
+      "reference_number": "RFPS-3626000021-(MM) / UNGM 309505",
+      "reason": "The listing still shows September 14 while its description previously stated an August 24 proposal deadline. That unresolved inconsistency, enterprise lending complexity, and separate In-Tend submission path make it unsuitable.",
+      "official_link": "https://www.ungm.org/Public/Notice/309505"
+    }
+  ],
+  "todays_recommendation": {
+    "best_opportunity": "Pursue PhilGEPS Ref 13234016, CCP's PHP 617,000 Website Hosting and Technical Support Services RFQ. It is the clearest service fit and the most accessible procurement path, but the detailed RFQ needs immediate technical and commercial review.",
+    "documents_to_prepare": [
+      "Signed CCP quotation/RFQ response and itemized technical-commercial offer",
+      "Current Business/Mayor's Permit and PhilGEPS registration/organization ID",
+      "BIR Form 2303, latest CY 2025 annual ITR, and the last six months of applicable business tax returns",
+      "Notarized Omnibus Sworn Statement and notarized Secretary's Certificate or other proof of signing authority",
+      "AIStaff company profile, website/hosting portfolio, hosting architecture, migration plan, security and backup plan, uptime/support SLA, and support-team CVs",
+      "For BCDA only: key-staff portfolios, applicable experience matrix, workload/capacity certification, ownership/eligibility proof, and bid-security plan"
+    ],
+    "clarifications_to_request": [
+      "CCP: confirm contract/service term because the public abstract says Delivery Period: 0 days; confirm hosting platform constraints, migration scope, current stack, traffic/storage, backup/DR, uptime, cybersecurity, support hours, renewal/exit obligations, and whether all linked RFQ files are final.",
+      "BCDA: confirm the separate September 30 shortlisting deadline versus October 30 bid deadline, required PhilGEPS registration level, shortlist scoring weights, minimum firm/key-staff experience, permitted online format, TOR scope, and bid-security requirements.",
+      "Aguilar: obtain the purchase request immediately and confirm software versus hardware, scanning labor, data migration, on-site work, hosting, user count, eligibility documents, and submission method before the September 11 deadline."
+    ]
+  },
+  "source_urls_checked": [
+    "https://notices.philgeps.gov.ph/GEPSNONPILOT/Tender/SplashOpportunitiesSearchUI.aspx?BusCatID=10&ClickFrom=OpenOpp&menuIndex=3&type=category",
+    "https://notices.philgeps.gov.ph/GEPSNONPILOT/Tender/SplashOpportunitiesSearchUI.aspx?BusCatID=43&ClickFrom=OpenOpp&menuIndex=3&type=category",
+    "https://notices.philgeps.gov.ph/GEPSNONPILOT/Tender/SplashOpportunitiesSearchUI.aspx?BusCatID=37&ClickFrom=OpenOpp&menuIndex=3&type=category",
+    "https://notices.philgeps.gov.ph/GEPSNONPILOT/Tender/SplashOpportunitiesSearchUI.aspx?BusCatID=23&ClickFrom=OpenOpp&menuIndex=3&type=category",
+    "https://notices.philgeps.gov.ph/GEPSNONPILOT/Tender/SplashOpportunitiesSearchUI.aspx?BusCatID=17&ClickFrom=OpenOpp&menuIndex=3&type=category",
+    "https://notices.philgeps.gov.ph/GEPSNONPILOT/Tender/SplashOpportunitiesSearchUI.aspx?BusCatID=157&ClickFrom=OpenOpp&menuIndex=3&type=category",
+    "https://notices.philgeps.gov.ph/GEPSNONPILOT/Tender/SplashBidNoticeAbstractUI.aspx?menuIndex=3&refID=13234016&DirectFrom=OpenOpp&Type=category&BusCatID=10",
+    "https://notices.philgeps.gov.ph/GEPSNONPILOT/Tender/SplashBidNoticeAbstractUI.aspx?menuIndex=3&refID=13236203&DirectFrom=OpenOpp&Type=category&BusCatID=43",
+    "https://notices.philgeps.gov.ph/GEPSNONPILOT/Tender/SplashBidNoticeAbstractUI.aspx?menuIndex=3&refID=13233965&DirectFrom=OpenOpp&Type=category&BusCatID=10",
+    "https://notices.philgeps.gov.ph/GEPSNONPILOT/Tender/SplashBidNoticeAbstractUI.aspx?menuIndex=3&refID=13234518&DirectFrom=OpenOpp&Type=category&BusCatID=23",
+    "https://notices.philgeps.gov.ph/GEPSNONPILOT/Tender/SplashBidNoticeAbstractUI.aspx?menuIndex=3&refID=13234808&DirectFrom=OpenOpp&Type=category&BusCatID=23",
+    "https://notices.philgeps.gov.ph/GEPSNONPILOT/Tender/SplashBidNoticeAbstractUI.aspx?menuIndex=3&refID=13229588&DirectFrom=OpenOpp&Type=category&BusCatID=23",
+    "https://www.ungm.org/Public/Notice/Search",
+    "https://www.ungm.org/Public/Notice/312901",
+    "https://www.ungm.org/Public/Notice/311934",
+    "https://www.ungm.org/Public/Notice/313371",
+    "https://www.ungm.org/Public/Notice/309505"
+  ],
+  "notes": [
+    "PhilGEPS count is the 105 visible first-page listings across the six requested official public category pages: 20 each in Information Technology, Consulting Services, Communication Equipment and Parts, Services, and Office Equipment, plus 5 in Advertising Agency Services.",
+    "UNGM count is 15 unique active notices returned by the official public notice search across the configured AIStaff keyword set. No new or materially updated UNGM notice met the realistic-pursuit threshold versus the prior report history.",
+    "Official PhilGEPS abstracts were opened for each qualified lead, plausible rejected lead, and urgent carry-forward. Public source status, budget, method, deadline, duration, description, document-request count, and contact details were checked where shown.",
+    "The CCP abstract publicly links a Google Docs RFQ; its existence and abstract summary were referenced, but no paid or restricted document was downloaded.",
+    "San Juan's detailed attachment and Aguilar's purchase request were not publicly accessible from the logged-out abstract. Their missing scope is treated as a blocker rather than inferred.",
+    "The BCDA notice has a stage-date inconsistency requiring care: the header closing date is October 30, while eligibility/shortlisting documents are due September 30."
+  ]
+}

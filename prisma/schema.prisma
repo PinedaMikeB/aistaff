@@ -36,6 +36,7 @@ model Company {
   qualification_questions QualificationQuestion[]
   conversations      Conversation[]
   messages           Message[]
+  website_events     WebsiteEvent[]
   subscriptions      Subscription[]
   leads              Lead[]
   quotation_templates QuotationTemplate[]
@@ -129,6 +130,7 @@ model CompanySetting {
   quotation_requires_admin_approval Boolean  @default(true)
   notify_email                      String?
   ai_custom_instructions            String?  @db.Text
+  lead_qualification_rules          Json?
   /// Intake wizard state: { industryPack, currentStep, completed: [stepId],
   /// skipped: [stepId] }. Progress must survive leaving the page — an owner
   /// who loses six steps of typing does not come back.
@@ -388,6 +390,7 @@ model Conversation {
   bookings         Booking[]
   human_handoffs   HumanHandoff[]
   ai_logs          AiLog[]
+  website_events   WebsiteEvent[]
   source_orders     Order[]        @relation("OrderSourceConversation")
 
   @@unique([company_id, psid])
@@ -433,7 +436,27 @@ model Lead {
   notes             String?
   lead_status       String       @default("new")
   lead_score        String       @default("cold")
+  lead_qualification_status String @default("unknown")
+  lead_qualification_reason String? @db.Text
+  lead_qualification_confidence Int?
+  lead_next_action  String?
   quotation_ready   Boolean      @default(false)
+  source_channel    String?
+  source_label      String?
+  source_url        String?
+  landing_page      String?
+  referrer          String?
+  utm_source        String?
+  utm_medium        String?
+  utm_campaign      String?
+  utm_content       String?
+  utm_term          String?
+  fbclid            String?
+  gclid             String?
+  visitor_id        String?
+  first_seen_at     DateTime?
+  last_touch_at     DateTime?
+  touch_count       Int          @default(0)
   assigned_to       String?
   follow_up_date    DateTime?
   created_at        DateTime     @default(now())
@@ -444,8 +467,48 @@ model Lead {
   quotations        Quotation[]
   follow_ups        FollowUp[]
   bookings          Booking[]
+  website_events    WebsiteEvent[]
 
+  @@index([company_id, source_channel])
+  @@index([company_id, utm_campaign])
+  @@index([company_id, visitor_id])
   @@map("leads")
+}
+
+model WebsiteEvent {
+  id              String        @id @default(uuid())
+  company_id      String
+  lead_id         String?
+  conversation_id String?
+  visitor_id      String
+  session_id      String?
+  event_name      String
+  source_page     String?
+  page_url        String?
+  path            String?
+  referrer        String?
+  utm_source      String?
+  utm_medium      String?
+  utm_campaign    String?
+  utm_content     String?
+  utm_term        String?
+  fbclid          String?
+  gclid           String?
+  test_event_code String?
+  ip_hash         String?
+  user_agent      String?
+  metadata        Json?
+  created_at      DateTime      @default(now())
+  company         Company       @relation(fields: [company_id], references: [id], onDelete: Cascade)
+  lead            Lead?         @relation(fields: [lead_id], references: [id], onDelete: SetNull)
+  conversation    Conversation? @relation(fields: [conversation_id], references: [id], onDelete: SetNull)
+
+  @@index([company_id, created_at])
+  @@index([company_id, visitor_id])
+  @@index([company_id, test_event_code])
+  @@index([lead_id, created_at])
+  @@index([conversation_id, created_at])
+  @@map("website_events")
 }
 
 model QuotationTemplate {

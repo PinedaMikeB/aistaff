@@ -46,7 +46,7 @@ class OpenAiRealtimeBrain extends EventEmitter {
       agentName: this.agentName,
       callerId: this.callerId,
       smsEnabled: (this.tools || []).some((t) => t.name === "send_sms"),
-      pipeline: "gemini-live",
+      pipeline: "openai-realtime",
     });
 
     const url = `wss://api.openai.com/v1/realtime?model=${encodeURIComponent(this.model)}`;

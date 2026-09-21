@@ -36,8 +36,8 @@ Switch in **AI Studio → Pitch**. Setting saved to
 | Path | speech ↔ speech | whisper → Gemini text → Piper |
 | Latency | ~500 ms | ~1.4 s |
 | TTS cost/call | ≈ ₱1.30 | ≈ ₱0.02 |
-| Taglish | native | **English only** (see below) |
-| Voice | 8 Google prebuilt | any Piper `.onnx` |
+| Taglish | native | Gab Taglish model |
+| Voice | 8 Google prebuilt | Piper `.onnx`; currently Gab epoch 59 |
 
 Local services: whisper.cpp `:8080`, Piper `:9891`.
 
@@ -58,10 +58,15 @@ runs only to seed an empty database or as a fallback if Postgres is down
 mid-call.
 
 Variables filled at call time: `{{business_name}}`, `{{agent_name}}`,
-`{{caller_number}}`, `{{knowledge_base}}`.
+`{{caller_id_guidance}}`, `{{caller_number}}`, `{{knowledge_base}}`.
 
 **Pitch and Closer share the knowledge base, never the prompt.** Same facts
 both channels; behaviour on a phone has nothing in common with Messenger.
+
+Local prompt warning: after Gab was trained, the database still had an older
+`pitch_system_local` revision saying "English only on this line." If Pitch says
+it understands Tagalog but can only answer in English, check the active
+`prompt_revisions` row first, not just `src/pitch/prompt.js`.
 
 ---
 

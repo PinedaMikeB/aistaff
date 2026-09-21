@@ -2,13 +2,27 @@
 
 const test = require("node:test");
 const assert = require("node:assert");
+const fs = require("fs");
+const os = require("os");
+const path = require("path");
 
 const codec = require("../src/pitch/rtp/codec");
 const { resample, int16ToBuffer, bufferToInt16 } = require("../src/pitch/audio/resample");
 const { parseSdp, buildSdp } = require("../src/pitch/sip/sdp");
 const { RtpSession, SAMPLES_PER_FRAME } = require("../src/pitch/rtp/session");
 const { buildInstructions, normalizeCallerId } = require("../src/pitch/prompt");
-const { LocalPipelineBrain, pcmRms, writeWavBuffer, readWavPcm16 } = require("../src/pitch/brain/local-pipeline");
+const { piperVoiceLanguage } = require("../src/pitch/voice-language");
+const {
+  LocalPipelineBrain,
+  pcmRms,
+  writeWavBuffer,
+  readWavPcm16,
+  isWhisperPromptEcho,
+  sanitizeLocalReply,
+  bookingScenarioReply,
+  isGpt5Model,
+  usesOpenAiResponsesApi,
+} = require("../src/pitch/brain/local-pipeline");
 
 function tone(n = 160, freq = 440, amp = 12000, rate = 8000) {
   const out = new Int16Array(n);
@@ -61,6 +75,73 @@ test("local pipeline WAV writer/reader preserves PCM and sample rate", () => {
   assert.deepStrictEqual(Array.from(parsed.pcm), Array.from(pcm));
 });
 
+test("local pipeline uses a cached Piper greeting without calling the text brain", async () => {
+  let generated = 0;
+  let synthesized = 0;
+  let synthesizedText = "";
+  const dir = fs.mkdtempSync(path.join(os.tmpdir(), "pitch-greeting-"));
+
+  class StubBrain extends LocalPipelineBrain {
+    async _generateReply() {
+      generated++;
+      return { reply: "This should not run.", modelMs: 1, provider: "stub" };
+    }
+
+    async _synthesize(text) {
+      synthesized++;
+      synthesizedText = text;
+      return tone(640, 220, 5000, 8000);
+    }
+  }
+
+  const brain = new StubBrain({
+    openaiApiKey: "test-openai",
+    geminiApiKey: "test-gemini",
+    localConfig: {
+      piperVoice: "en_US-ryan-high",
+      piperGreetingCacheDir: dir,
+      greetingText: "Pitch custom opening from settings.",
+      greetingStartDelayMs: 0,
+      piperLengthScale: 1,
+      piperNoiseScale: 0.667,
+      voxcpmSampleRate: 24000,
+    },
+    businessName: "AIStaff",
+    agentName: "Pitch",
+    callerId: "+639171234567",
+  });
+
+  await brain._prepareGreeting();
+  assert.strictEqual(generated, 0);
+  assert.strictEqual(synthesized, 1);
+  assert.strictEqual(
+    synthesizedText,
+    "Pitch custom opening from settings."
+  );
+  assert.ok(fs.readdirSync(dir).some((file) => /greeting-.*\.wav$/.test(file)));
+
+  let audio = null;
+  let transcript = "";
+  brain.on("audio", (pcm) => { audio = pcm; });
+  brain.on("transcript", ({ role, text }) => {
+    if (role === "pitch") transcript = text;
+  });
+  brain.greet();
+  await new Promise((resolve) => setTimeout(resolve, 0));
+
+  assert.ok(audio?.length > 0);
+  assert.match(transcript, /Pitch custom opening from settings/);
+  assert.strictEqual(generated, 0);
+});
+
+test("local OpenAI text brain uses GPT-5 completion token field", () => {
+  assert.strictEqual(isGpt5Model("gpt-5-mini"), true);
+  assert.strictEqual(isGpt5Model("gpt-5.1"), true);
+  assert.strictEqual(isGpt5Model("gpt-4.1-mini"), false);
+  assert.strictEqual(usesOpenAiResponsesApi("gpt-5.6-luna"), true);
+  assert.strictEqual(usesOpenAiResponsesApi("gpt-5-mini"), false);
+});
+
 test("local pipeline prompt keeps only the configured recent history turns", () => {
   const brain = new LocalPipelineBrain({
     openaiApiKey: "test-openai",
@@ -93,6 +174,84 @@ test("local pipeline prompt keeps only the configured recent history turns", () 
   assert.ok(prompt.includes("recent pitch two"));
   assert.ok(prompt.includes("recent caller three"));
   assert.ok(prompt.includes("Prefer 15 to 30 spoken words"));
+  assert.ok(prompt.includes("testing a demo scenario"));
+  assert.ok(prompt.includes("restaurant table booking"));
+});
+
+test("local pipeline ignores whisper prompt echo transcripts", () => {
+  assert.strictEqual(
+    isWhisperPromptEcho("Transcribe natural Filipino Taglish, Tagalog, or English exactly as spoken."),
+    true
+  );
+  assert.strictEqual(isWhisperPromptEcho("Can I reserve a table for two?"), false);
+});
+
+test("local pipeline replaces unsafe live-call replies", () => {
+  assert.strictEqual(
+    sanitizeLocalReply("I only speak English on this line.", "Can you speak Tagalog?"),
+    "Opo, pwede po akong mag-Tagalog o Taglish. Ano po ang kailangan ninyo?"
+  );
+  assert.strictEqual(
+    sanitizeLocalReply("Yes, I understand Tagalog, though I will answer you in English.", "Tagalog."),
+    "Opo, pwede po akong mag-Tagalog o Taglish. Ano po ang kailangan ninyo?"
+  );
+  assert.ok(
+    sanitizeLocalReply("Just to clarify, this is AIStaff, so we are an office rather than a restaurant.", "Can I reserve a table for two at your restaurant?")
+      .includes("table for two")
+  );
+});
+
+test("selected Piper voice controls the spoken language", () => {
+  const englishPrompt = buildInstructions({
+    pipeline: "local",
+    piperVoice: "en_US-ryan-high",
+  });
+  assert.match(englishPrompt, /selected Piper voice is en_US-ryan-high/i);
+  assert.match(englishPrompt, /spoken reply must be English only/i);
+  assert.doesNotMatch(englishPrompt, /local Gab voice/i);
+
+  const taglishPrompt = buildInstructions({
+    pipeline: "local",
+    piperVoice: "gab_taglish_epoch59",
+  });
+  assert.match(taglishPrompt, /Filipino Taglish voice/i);
+  assert.match(taglishPrompt, /reply naturally in Tagalog or\s+Taglish/i);
+
+  assert.strictEqual(
+    sanitizeLocalReply(
+      "I only speak English on this line.",
+      "Can you speak Tagalog?",
+      [],
+      piperVoiceLanguage("en_US-ryan-high")
+    ),
+    "I can understand Tagalog, but this selected voice speaks English. How can I help?"
+  );
+});
+
+test("local pipeline continues demo booking scenarios instead of looping", () => {
+  assert.match(
+    bookingScenarioReply("I want to reserve a table for two at your restaurant."),
+    /table for two/i
+  );
+  assert.match(
+    bookingScenarioReply("Do you have a romantic corner by the window?", [
+      { role: "caller", text: "I want to reserve a table for two at your restaurant." },
+      { role: "pitch", text: "Sure po, table for two. Anong oras po kayo darating?" },
+    ]),
+    /corner by the window/i
+  );
+  assert.match(
+    bookingScenarioReply("This afternoon.", [
+      { role: "caller", text: "I am booking at the hotel." },
+    ]),
+    /available rooms/i
+  );
+  assert.match(
+    sanitizeLocalReply("Would you like someone from the team to call you back?", "This afternoon.", [
+      { role: "caller", text: "I am booking at the hotel." },
+    ]),
+    /available rooms/i
+  );
 });
 
 test("SDP parses an AIO100-style offer and prefers G.711", () => {

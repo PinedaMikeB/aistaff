@@ -41,3 +41,4 @@ local-runtime/
 
 # Customer-uploaded media. Real files, not source — kept out of git.
 public/media/
+voice-training/piper/archives/*.tgz
