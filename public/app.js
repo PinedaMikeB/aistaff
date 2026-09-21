@@ -151,7 +151,547 @@ function statusPill(value) {
 
 function scorePill(value) {
   const safe = value || "cold";
-  return `<span class="score ${safe}">${safe}</span>`;
+  return `<span class="score ${safe}">${temperatureLabel(safe)}</span>`;
+}
+
+const CLOSED_LEAD_STATUSES = new Set(["lost", "unqualified", "spam"]);
+const ACTIVE_LEAD_STAGES = ["new", "learning_demo", "quote_sent", "follow_up_negotiation", "payment_pending", "won"];
+const MOVE_LEAD_STAGES = [...ACTIVE_LEAD_STAGES, "lost", "unqualified"];
+const LEAD_STAGE_COPY = {
+  new: "Worth following up",
+  learning_demo: "Details, demo, consult, site visit, or assessment",
+  quote_sent: "Price, package, proposal, or offer was sent",
+  follow_up_negotiation: "Waiting for answer, approval, or changes",
+  payment_pending: "Customer said yes; payment is next",
+  won: "Paid, booked, or accepted"
+};
+
+function temperatureLabel(value) {
+  const labels = { cold: "Cold", warm: "Warm", hot: "Hot" };
+  return labels[String(value || "").toLowerCase()] || "Cold";
+}
+
+function leadName(lead) {
+  return lead?.customer_name || lead?.company_name || "Unknown lead";
+}
+
+function normalizedLeadStatus(lead) {
+  return String(lead?.lead_status || "new").toLowerCase();
+}
+
+function isClosedLead(lead) {
+  return CLOSED_LEAD_STATUSES.has(normalizedLeadStatus(lead));
+}
+
+function leadHasContactDetail(lead, conversation = null) {
+  return Boolean(lead?.mobile_number || lead?.email || conversation?.contact_number);
+}
+
+function isMessengerLead(lead, conversation = null) {
+  const source = String(lead?.source_channel || lead?.conversation?.channel || conversation?.channel || "").toLowerCase();
+  return source === "facebook_messenger";
+}
+
+function qualificationStatus(lead) {
+  return String(lead?.lead_qualification_status || "unknown").toLowerCase();
+}
+
+function qualificationReason(lead, fallback = "AI did not find enough buyer proof") {
+  return String(lead?.lead_qualification_reason || fallback).trim();
+}
+
+function isTrackedLead(lead) {
+  if (!lead) return false;
+  const status = normalizedLeadStatus(lead);
+  if (qualificationStatus(lead) === "inquiry_only") return false;
+  if (status === "unqualified" || status === "spam") return false;
+  if (isMessengerLead(lead) && !leadHasContactDetail(lead)) return false;
+  if (qualificationStatus(lead) === "lead") return true;
+  return false;
+}
+
+function conversationLeadState(conversation) {
+  const lead = conversation?.leads?.[0];
+  if (!lead) return { isLead: false, reason: "No buyer proof" };
+  if (isMessengerLead(lead, conversation) && !leadHasContactDetail(lead, conversation)) {
+    return { isLead: false, reason: "Needs mobile or email before sales follow-up" };
+  }
+  if (qualificationStatus(lead) === "lead") return { isLead: true, reason: qualificationReason(lead, "AI classified this as a lead") };
+  return { isLead: false, reason: qualificationReason(lead) };
+}
+
+function conversationLeadPill(conversation) {
+  const state = conversationLeadState(conversation);
+  if (!state.isLead) return `<span class="lead-state no-lead inquiry-proof"><b>Inquiry only</b><small>${escapeHtml(state.reason)}</small></span>`;
+  return `<span class="lead-state lead-confirmed inquiry-proof"><b>Lead proof</b><small>${escapeHtml(state.reason)}</small></span>`;
+}
+
+function leadStatusPill(lead) {
+  if (!lead || !isTrackedLead(lead)) return `<span class="lead-state no-lead"><b>Inquiry only</b><small>Needs proof</small></span>`;
+  if (isClosedLead(lead)) return `<span class="lead-state lead-closed"><b>Lead</b><small>${escapeHtml(pipelineLabel(lead.lead_status))}</small></span>`;
+  return `<span class="lead-state lead-${escapeHtml(String(lead.lead_score || "cold").toLowerCase())}"><b>Lead</b><small>${escapeHtml(temperatureLabel(lead.lead_score))}</small></span>`;
+}
+
+function pipelineLabel(value) {
+  const labels = {
+    new: "New",
+    contacted: "Contacted",
+    qualified: "Qualified",
+    learning_demo: "Learning / Demo",
+    quote_sent: "Quote Sent",
+    quotation_ready: "Quote Sent",
+    appointment: "Appointment",
+    follow_up_negotiation: "Follow-up / Negotiation",
+    negotiation: "Follow-up / Negotiation",
+    payment_pending: "Payment Pending",
+    won: "Won",
+    lost: "Lost",
+    unqualified: "Unqualified",
+    spam: "Spam"
+  };
+  return labels[String(value || "").toLowerCase()] || String(value || "New").replaceAll("_", " ");
+}
+
+function selectField(name, label, value, options) {
+  const current = String(value || "");
+  return `<label>${label}<select name="${name}">${options.map(([optionValue, text]) => (
+    `<option value="${escapeHtml(optionValue)}" ${current === optionValue ? "selected" : ""}>${escapeHtml(text)}</option>`
+  )).join("")}</select></label>`;
+}
+
+function currentLeadReportView() {
+  const view = new URLSearchParams(location.search).get("view") || "active";
+  return ["active", "won", "lost", "all"].includes(view) ? view : "active";
+}
+
+function leadReportTabs(active, counts) {
+  const tabs = [
+    ["active", "Active", counts.active],
+    ["won", "Won", counts.won],
+    ["lost", "Lost", counts.lost],
+    ["all", "All", counts.all]
+  ];
+  return `<nav class="subnav lead-report-tabs">${tabs.map(([view, label, count]) => (
+    `<a class="${active === view ? "active" : ""}" href="${adminPath("leads")}?view=${view}">${label}<b>${count}</b></a>`
+  )).join("")}</nav>`;
+}
+
+function activePipelineRows(rows) {
+  return rows.filter((lead) => !["lost", "unqualified", "spam"].includes(normalizedLeadStatus(lead)));
+}
+
+function stageTabLabel(stage) {
+  const labels = {
+    new: "New",
+    learning_demo: "Learning / Demo",
+    quote_sent: "Quote Sent",
+    follow_up_negotiation: "Follow-up",
+    payment_pending: "Payment",
+    won: "Won"
+  };
+  return labels[stage] || pipelineLabel(stage);
+}
+
+function renderCrmModelStrip() {
+  return `
+    <section class="crm-model-strip">
+      <article><small>Inquiry</small><b>Every conversation</b><span>Messenger, web chat, form, phone, or demo touch.</span></article>
+      <article><small>Lead</small><b>Worth pursuing</b><span>A real buyer fit with need, intent, or enough details for follow-up.</span></article>
+      <article><small>Temperature</small><b>Cold / Warm / Hot</b><span>Readiness of the lead, not the inquiry itself.</span></article>
+      <article><small>Pipeline</small><b>New to Won/Lost</b><span>The current sales step after the lead is qualified.</span></article>
+    </section>`;
+}
+
+function renderInquirySummary(rows) {
+  const total = rows.length;
+  const linked = rows.filter((row) => conversationLeadState(row).isLead).length;
+  const handoff = rows.filter((row) => row.needs_human).length;
+  const open = rows.filter((row) => !["closed", "resolved"].includes(String(row.status || "").toLowerCase())).length;
+  return `
+    <div class="crm-summary-bar">
+      <span><b>${total}</b> inquiries</span>
+      <span><b>${linked}</b> became leads</span>
+      <span><b>${open}</b> open</span>
+      <span><b>${handoff}</b> need human</span>
+    </div>`;
+}
+
+function renderInquiryGuide() {
+  return `
+    <section class="inquiry-guide" aria-label="Inquiry rules">
+      <div><small>Inquiry</small><b>Every message</b><span>Questions, greetings, price checks, and simple interest stay here.</span></div>
+      <div><small>Lead proof</small><b>Ready for sales</b><span>Contact, company + need, demo request, quote request, or payment action.</span></div>
+      <div><small>Temperature</small><b>Leads page only</b><span>Cold, Warm, and Hot describe real leads, not raw inquiries.</span></div>
+    </section>`;
+}
+
+function renderLeadPipelineSummary(rows) {
+  const stageCounts = ACTIVE_LEAD_STAGES.map((stage) => ({
+    stage,
+    count: rows.filter((lead) => normalizedLeadStatus(lead) === stage).length
+  }));
+  return `
+    <div class="lead-pipeline-strip">
+      ${stageCounts.map(({ stage, count }) => `
+        <article>
+          <small>${escapeHtml(pipelineLabel(stage))}</small>
+          <b>${count}</b>
+        </article>`).join("")}
+    </div>`;
+}
+
+function shortText(value, fallback = "", max = 84) {
+  const text = String(value || fallback || "").trim();
+  if (text.length <= max) return text;
+  return `${text.slice(0, max - 1).trim()}...`;
+}
+
+function nextActionForLead(lead) {
+  if (lead.lead_next_action) return lead.lead_next_action;
+  const status = normalizedLeadStatus(lead);
+  if (status === "won") return "Customer history";
+  if (status === "lost") return "Review lost reason";
+  if (status === "unqualified" || status === "spam") return "Closed";
+  if (lead.quotation_ready || status === "quotation_ready" || status === "quote_sent") return "Follow up quotation";
+  if (status === "learning_demo" || status === "appointment") return "Guide demo or assessment";
+  if (status === "follow_up_negotiation" || status === "negotiation") return "Follow decision or changes";
+  if (status === "payment_pending") return "Send or confirm payment";
+  if (lead.follow_up_date) return `Follow up ${new Date(lead.follow_up_date).toLocaleDateString("en-PH", { month: "short", day: "numeric" })}`;
+  if (lead.lead_score === "hot") return "Contact now";
+  if (lead.lead_score === "warm") return "Keep qualifying";
+  return "Collect fit details";
+}
+
+function renderLeadIdentity(lead) {
+  const contact = [lead.mobile_number, lead.email].filter(Boolean).join(" / ");
+  return `
+    <div class="lead-identity">
+      ${rowLink("leads", lead.id, leadName(lead))}
+      ${contact ? `<small>${escapeHtml(contact)}</small>` : `<small>No contact saved yet</small>`}
+    </div>`;
+}
+
+function leadProofText(lead, conversation = null) {
+  if (isMessengerLead(lead, conversation) && !leadHasContactDetail(lead, conversation)) {
+    return "Needs contact detail. Name or need found, but no mobile/email is saved.";
+  }
+  return qualificationReason(lead, "Lead proof saved by AI");
+}
+
+function inquiryProofKind(conversation) {
+  const lead = conversation?.leads?.[0];
+  const reason = qualificationReason(lead, "").toLowerCase();
+  const intent = String(conversation?.intent || "").toLowerCase();
+  if (!conversationLeadState(conversation).isLead) {
+    if (reason.includes("no reply") || reason.includes("did not reply")) return "no_reply";
+    if (lead && isMessengerLead(lead, conversation) && !leadHasContactDetail(lead, conversation)) return "needs_contact";
+    return "inquiry_only";
+  }
+  if (!leadHasContactDetail(lead, conversation)) return "needs_contact";
+  if (reason.includes("payment") || intent.includes("payment") || intent.includes("checkout")) return "payment";
+  if (reason.includes("demo") || reason.includes("quote") || reason.includes("quotation") || intent.includes("demo") || intent.includes("quote")) return "demo_quote";
+  return "lead";
+}
+
+function inquirySearchText(conversation) {
+  const lead = conversation?.leads?.[0] || {};
+  const latest = conversation?.messages?.[0]?.message_text || "";
+  return [
+    conversation?.customer_name,
+    conversation?.psid,
+    conversation?.contact_number,
+    conversation?.channel,
+    conversation?.status,
+    conversation?.intent,
+    latest,
+    lead.customer_name,
+    lead.company_name,
+    lead.mobile_number,
+    lead.email,
+    lead.location,
+    lead.service_needed,
+    lead.lead_qualification_reason
+  ].filter(Boolean).join(" ").toLowerCase();
+}
+
+function moveLeadSelect(lead) {
+  const current = normalizedLeadStatus(lead);
+  return `
+    <label class="lead-move-control">
+      <span>Move</span>
+      <select class="lead-card-move" data-lead-id="${escapeHtml(lead.id)}">
+        ${MOVE_LEAD_STAGES.map((stage) => (
+          `<option value="${escapeHtml(stage)}" ${current === stage ? "selected" : ""}>${escapeHtml(pipelineLabel(stage))}</option>`
+        )).join("")}
+      </select>
+    </label>`;
+}
+
+function renderLeadCard(lead) {
+  const source = lead.source_label || lead.source_channel || lead.conversation?.channel || "Source TBD";
+  const proof = leadProofText(lead);
+  return `
+    <article class="lead-kanban-card lead-card-${escapeHtml(String(lead.lead_score || "cold").toLowerCase())}" draggable="true" data-lead-id="${escapeHtml(lead.id)}">
+      <div class="lead-card-top">
+        <div>
+          <a href="${adminPath("leads", lead.id)}">${escapeHtml(leadName(lead))}</a>
+          <small>${escapeHtml(lead.company_name || "Company TBD")}</small>
+        </div>
+        ${scorePill(lead.lead_score)}
+      </div>
+      <p>${escapeHtml(shortText(lead.service_needed, "Need TBD", 92))}</p>
+      <div class="lead-card-meta">
+        <span>${escapeHtml(shortText(source, "Source TBD", 34))}</span>
+        <span>${escapeHtml(fmtDate(lead.updated_at || lead.created_at))}</span>
+      </div>
+      <div class="lead-card-proof">${escapeHtml(shortText(proof, "Lead proof saved", 110))}</div>
+      <div class="lead-card-next">${escapeHtml(shortText(nextActionForLead(lead), "Follow up", 72))}</div>
+      <div class="lead-card-actions">
+        <a class="button button-soft" href="${adminPath("leads", lead.id)}">Review</a>
+        ${moveLeadSelect(lead)}
+      </div>
+    </article>`;
+}
+
+function renderLeadKanban(rows) {
+  const grouped = Object.fromEntries(ACTIVE_LEAD_STAGES.map((stage) => [
+    stage,
+    rows.filter((lead) => {
+      const status = normalizedLeadStatus(lead);
+      if (stage === "quote_sent") return status === "quote_sent" || status === "quotation_ready";
+      if (stage === "learning_demo") return status === "learning_demo" || status === "appointment";
+      if (stage === "follow_up_negotiation") return status === "follow_up_negotiation" || status === "negotiation";
+      return status === stage;
+    })
+  ]));
+  return `
+    <div class="lead-stage-tabs" role="tablist" aria-label="Lead stages">
+      ${ACTIVE_LEAD_STAGES.map((stage, index) => `
+        <button type="button" class="${index === 0 ? "active" : ""}" data-kanban-stage-tab="${escapeHtml(stage)}">${escapeHtml(stageTabLabel(stage))}<b>${grouped[stage].length}</b></button>
+      `).join("")}
+    </div>
+    <div class="lead-kanban-board">
+      ${ACTIVE_LEAD_STAGES.map((stage, index) => `
+        <section class="lead-kanban-column ${index === 0 ? "mobile-active" : ""}" data-kanban-stage="${escapeHtml(stage)}">
+          <header>
+            <div>
+              <h3>${escapeHtml(pipelineLabel(stage))}</h3>
+              <p>${escapeHtml(LEAD_STAGE_COPY[stage] || "Current sales step")}</p>
+            </div>
+            <b>${grouped[stage].length}</b>
+          </header>
+          <div class="lead-kanban-list">
+            ${grouped[stage].length ? grouped[stage].map(renderLeadCard).join("") : `<div class="lead-kanban-empty">No leads here yet</div>`}
+          </div>
+        </section>
+      `).join("")}
+    </div>`;
+}
+
+function renderLeadTable(rows, view) {
+  if (!rows.length) return `<p class="muted">No ${escapeHtml(view)} lead records yet. Inquiries stay in the inbox until there is buyer fit, intent, or enough contact detail to follow up.</p>`;
+  return `<div class="table-wrap"><table>
+    <thead><tr><th>Lead</th><th>Source / activity</th><th>Fit / need</th><th>Pipeline</th><th>Temperature</th><th>Next action</th><th>Owner</th></tr></thead>
+    <tbody>${rows.map((lead) => `
+      <tr>
+        <td>${renderLeadIdentity(lead)}</td>
+        <td>${sourceCell(lead)}</td>
+        <td><div class="lead-fit-cell"><b>${escapeHtml(lead.company_name || "Company TBD")}</b><span>${escapeHtml(lead.service_needed || "Need TBD")}</span></div></td>
+        <td><div class="lead-stage-cell">${statusPill(normalizedLeadStatus(lead))}<small>${escapeHtml(pipelineLabel(lead.lead_status))}</small></div></td>
+        <td>${scorePill(lead.lead_score)}</td>
+        <td><span class="lead-next-action">${escapeHtml(nextActionForLead(lead))}</span></td>
+        <td>${lead.assigned_user?.name || "Unassigned"}</td>
+      </tr>`).join("")}</tbody>
+  </table></div>`;
+}
+
+function eventLabel(value) {
+  const labels = {
+    PageView: "visited",
+    ViewContent: "viewed offer",
+    AIStaffDemoBuildClick: "started demo build",
+    AIStaffDemoBuilt: "built demo",
+    AIStaffDemoDecisionClick: "clicked demo decision",
+    AIStaffDemoPricingIntent: "viewed pricing from demo",
+    AIStaffDemoFeedback: "left demo feedback",
+    AIStaffPricingPlanClick: "clicked package",
+    AIStaffPricingAddToCartIntent: "package intent",
+    AIStaffQRPhCheckoutClick: "clicked QRPh checkout",
+    AIStaffQRPhCheckoutPrepared: "checkout prepared",
+    AIStaffQRPhCheckoutResume: "resumed checkout",
+    AIStaffQRPhCheckoutError: "checkout error",
+    AIStaffCheckoutPending: "checkout pending",
+    AIStaffCheckoutFailed: "checkout failed",
+    AIStaffCheckoutViewed: "viewed checkout status",
+    Lead: "became lead",
+    AddToCart: "selected plan",
+    InitiateCheckout: "started checkout",
+    AddPaymentInfo: "payment prepared",
+    Purchase: "paid",
+    WebsiteChatOpened: "opened chat",
+    WebsiteChatMessageSent: "sent chat"
+  };
+  return labels[value] || String(value || "activity").replaceAll("_", " ");
+}
+
+function sourceCell(lead) {
+  const events = lead.website_events || [];
+  const source = lead.source_label || lead.source_channel || lead.conversation?.channel || "Unknown source";
+  const campaign = lead.utm_campaign || lead.utm_source || "";
+  const landing = lead.landing_page || lead.source_url || "";
+  const last = events[0];
+  return `
+    <div class="lead-source-cell">
+      <strong>${escapeHtml(source)}</strong>
+      ${campaign ? `<span>${escapeHtml(campaign)}</span>` : ""}
+      ${landing ? `<small>${escapeHtml(landing)}</small>` : ""}
+      <em>${Number(lead.touch_count || events.length || 0)} touch${Number(lead.touch_count || events.length || 0) === 1 ? "" : "es"}${last ? ` · ${escapeHtml(eventLabel(last.event_name))}` : ""}</em>
+    </div>`;
+}
+
+function leadActivityList(lead) {
+  const events = lead.website_events || [];
+  if (!events.length) return `<p class="muted">No website or ad-source activity linked yet.</p>`;
+  return `<div class="lead-activity-list">${events.map((event) => `
+    <article>
+      <b>${escapeHtml(eventLabel(event.event_name))}</b>
+      <span>${fmtDate(event.created_at)}</span>
+      <small>${escapeHtml(event.source_page || event.path || event.page_url || "Unknown page")}</small>
+      ${(event.utm_campaign || event.utm_source) ? `<em>${escapeHtml([event.utm_source, event.utm_campaign].filter(Boolean).join(" / "))}</em>` : ""}
+    </article>`).join("")}</div>`;
+}
+
+function funnelPrimaryCount(stage) {
+  if (!stage) return 0;
+  if (stage.key === "lead") return Number(stage.savedLeadCount ?? stage.eventCount ?? 0);
+  return Number(stage.visitorCount || stage.eventCount || 0);
+}
+
+function isoDateInputValue(value = new Date()) {
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) return "";
+  date.setMinutes(date.getMinutes() - date.getTimezoneOffset());
+  return date.toISOString().slice(0, 10);
+}
+
+function defaultFunnelRange() {
+  const to = new Date();
+  const from = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000);
+  return { from: isoDateInputValue(from), to: isoDateInputValue(to), includeTestEvents: false };
+}
+
+function currentFunnelRange() {
+  const params = new URLSearchParams(location.search);
+  const defaults = defaultFunnelRange();
+  return {
+    from: params.get("funnel_from") || defaults.from,
+    to: params.get("funnel_to") || defaults.to,
+    includeTestEvents: params.get("include_test_events") === "true"
+  };
+}
+
+function funnelAnalyticsPath() {
+  const range = currentFunnelRange();
+  const params = new URLSearchParams({
+    from: range.from,
+    to: range.to,
+    includeTestEvents: String(range.includeTestEvents)
+  });
+  return `/api/leads/analytics-summary?${params.toString()}`;
+}
+
+function funnelRangeLabel(analytics) {
+  const range = analytics?.funnelRange || currentFunnelRange();
+  if (!range.from || !range.to) return `last ${Number(analytics?.funnelWindowDays || 30)} days`;
+  return `${range.from} to ${range.to}${range.includeTestEvents ? " incl. tests" : ""}`;
+}
+
+function renderFunnelDateFilter(analytics) {
+  const range = analytics?.funnelRange || currentFunnelRange();
+  return `
+    <form id="funnelRangeForm" class="funnel-date-filter">
+      <label>From<input type="date" name="from" value="${escapeHtml(range.from || "")}" /></label>
+      <label>To<input type="date" name="to" value="${escapeHtml(range.to || "")}" /></label>
+      <label class="funnel-test-toggle"><input type="checkbox" name="includeTestEvents" ${range.includeTestEvents ? "checked" : ""} /> Include tests</label>
+      <button class="button button-soft" type="submit">Apply</button>
+    </form>`;
+}
+
+function renderLeadFunnel(analytics, rows = []) {
+  const leadDefinition = analytics?.leadDefinition || {
+    crm: "A lead is a saved customer opportunity in AIStaff, tied to a company and conversation.",
+    pixel: "The Meta Pixel Lead event fires only after a high-intent demo action.",
+    notLead: "Views, demo starts, package clicks, and checkout starts are funnel steps, not saved leads by themselves."
+  };
+  if (!analytics?.funnel?.length) {
+    return `
+      <section class="panel lead-funnel-panel">
+        <div class="panel-header">
+          <div>
+            <h2>Pixel Funnel</h2>
+            <p class="muted">Choose campaign dates to exclude old testing data.</p>
+          </div>
+          ${renderFunnelDateFilter(analytics)}
+        </div>
+        <div class="lead-definition-grid">
+          <article><small>AIStaff lead</small><strong>${escapeHtml(leadDefinition.crm)}</strong></article>
+          <article><small>Meta Pixel Lead</small><strong>${escapeHtml(leadDefinition.pixel)}</strong></article>
+          <article><small>Not counted as Lead</small><strong>${escapeHtml(leadDefinition.notLead)}</strong></article>
+        </div>
+      </section>`;
+  }
+
+  const maxCount = Math.max(1, ...analytics.funnel.map(funnelPrimaryCount));
+  const savedLeads = Array.isArray(rows)
+    ? rows.length
+    : Number(analytics.funnel.find((stage) => stage.key === "lead")?.savedLeadCount || 0);
+  const pixelLeads = Number(analytics.funnel.find((stage) => stage.key === "lead")?.eventCount || 0);
+  return `
+    <section class="panel lead-funnel-panel">
+      <div class="panel-header">
+        <div>
+          <h2>Pixel Funnel</h2>
+          <p class="muted">${escapeHtml(funnelRangeLabel(analytics))}</p>
+        </div>
+        ${renderFunnelDateFilter(analytics)}
+      </div>
+      <div class="lead-definition-grid">
+        <article><small>AIStaff lead</small><strong>${escapeHtml(leadDefinition.crm)}</strong></article>
+        <article><small>Meta Pixel Lead</small><strong>${escapeHtml(leadDefinition.pixel)}</strong></article>
+        <article><small>Not counted as Lead</small><strong>${escapeHtml(leadDefinition.notLead)}</strong></article>
+      </div>
+      <div class="lead-funnel-track">
+        ${analytics.funnel.map((stage, index) => {
+          const count = funnelPrimaryCount(stage);
+          const width = Math.max(8, Math.round((count / maxCount) * 100));
+          return `
+            <article class="lead-funnel-step">
+              <div class="lead-funnel-top">
+                <span>${index + 1}</span>
+                <b>${escapeHtml(stage.label)}</b>
+                <strong>${count.toLocaleString("en-PH")}</strong>
+              </div>
+              <div class="lead-funnel-bar"><i style="width:${width}%"></i></div>
+              <p>${escapeHtml(stage.definition)}</p>
+              <small>${escapeHtml((stage.eventNames || []).join(", "))}</small>
+            </article>`;
+        }).join("")}
+      </div>
+      <div class="lead-funnel-reconcile">
+        <span><b>${savedLeads}</b> saved lead rows</span>
+        <span><b>${pixelLeads}</b> Pixel Lead events</span>
+        <span><b>${Number(analytics.linkedEvents7Days || 0)}</b> linked touches in range</span>
+      </div>
+    </section>`;
+}
+
+function renderLeadsLoadError(error) {
+  return `
+    <section class="panel">
+      <div class="panel-header"><h2>Leads could not load</h2>${statusPill("needs_human")}</div>
+      <p class="muted">The lead rows are probably not gone. The app could not read them from the database/API.</p>
+      <div class="code-panel">${escapeHtml(error?.message || "Request failed")}</div>
+    </section>`;
 }
 
 function adminPath(route = "dashboard", id = null) {
@@ -177,11 +717,19 @@ function rowLink(route, id, text) {
 }
 
 function setMode(mode, panel = "login") {
-  $("[data-public].site-header").hidden = mode !== "public";
-  $("#publicSite").hidden = mode !== "public";
-  $("[data-public].site-footer").hidden = mode !== "public";
-  $("#adminApp").hidden = mode !== "admin";
-  $("#loginPage").hidden = mode !== "login";
+  const publicHeader = $("[data-public].site-header");
+  const publicSite = $("#publicSite");
+  const publicFooter = $("[data-public].site-footer");
+  const footerMount = $("#site-footer-root");
+  const adminApp = $("#adminApp");
+  const loginPage = $("#loginPage");
+
+  if (publicHeader) publicHeader.hidden = mode !== "public";
+  if (publicSite) publicSite.hidden = mode !== "public";
+  if (publicFooter) publicFooter.hidden = mode !== "public";
+  if (footerMount) footerMount.hidden = mode !== "public";
+  if (adminApp) adminApp.hidden = mode !== "admin";
+  if (loginPage) loginPage.hidden = mode !== "login";
   // The login shell hosts three panels: sign in, request a reset, set a new
   // password. All must work BEFORE authentication, so they live here rather
   // than behind the session gate below.
@@ -200,6 +748,7 @@ function renderAdminNav(active) {
   $("#adminNav").innerHTML = visibleNavItems().map(([key, label]) => (
     `<a class="${active === key ? "active" : ""}" href="${adminPath(key)}"><span>${label[0]}</span>${label}</a>`
   )).join("");
+  closeAdminMenu();
 
   // Signed-in identity, so it is never ambiguous which account you are in.
   const box = $("#sidebarUser");
@@ -226,6 +775,25 @@ function renderAdminNav(active) {
   }
 }
 
+function closeAdminMenu() {
+  const app = $("#adminApp");
+  const toggle = $("#adminMenuToggle");
+  if (!app || !toggle) return;
+  app.classList.remove("menu-open");
+  toggle.setAttribute("aria-expanded", "false");
+  toggle.setAttribute("aria-label", "Open admin menu");
+}
+
+function toggleAdminMenu() {
+  const app = $("#adminApp");
+  const toggle = $("#adminMenuToggle");
+  if (!app || !toggle) return;
+  const isOpen = !app.classList.contains("menu-open");
+  app.classList.toggle("menu-open", isOpen);
+  toggle.setAttribute("aria-expanded", String(isOpen));
+  toggle.setAttribute("aria-label", isOpen ? "Close admin menu" : "Open admin menu");
+}
+
 async function loadSession() {
   try {
     const session = await api("/api/auth/me");
@@ -250,9 +818,9 @@ async function dashboardView() {
   $("#adminContent").innerHTML = `
     <div class="admin-grid">
       <section class="metrics">
-        <article class="metric-card"><small>Leads today</small><strong>${data.leadsToday}</strong></article>
-        <article class="metric-card"><small>Hot leads</small><strong>${data.hotLeads}</strong></article>
-        <article class="metric-card"><small>Quotation-ready</small><strong>${data.quotationReady}</strong></article>
+        <article class="metric-card"><small>Active leads</small><strong>${data.activeLeads ?? data.leadsToday}</strong></article>
+        <article class="metric-card"><small>Active hot leads</small><strong>${data.hotLeads}</strong></article>
+        <article class="metric-card"><small>Quote sent</small><strong>${data.quotationReady}</strong></article>
         <article class="metric-card"><small>Pending approvals</small><strong>${data.pendingApprovals}</strong></article>
         <article class="metric-card"><small>Needs human</small><strong>${data.needsHuman}</strong></article>
         <article class="metric-card"><small>Pending follow-ups</small><strong>${data.pendingFollowUps}</strong></article>
@@ -265,12 +833,12 @@ async function dashboardView() {
         <div class="panel-header"><h2>Recent conversations</h2><a class="button button-soft" href="${adminPath("conversations")}">Review all inquiries</a></div>
         <div class="table-wrap">
           <table>
-            <thead><tr><th>Customer</th><th>Intent</th><th>Score</th><th>Needs Human</th><th>Last Message</th></tr></thead>
+            <thead><tr><th>Customer</th><th>Intent</th><th>Lead?</th><th>Needs Human</th><th>Last Message</th></tr></thead>
             <tbody>${data.recentConversations.map((c) => `
               <tr>
                 <td>${rowLink("conversations", c.id, c.customer_name || c.psid)}</td>
                 <td>${c.intent || "qualifying"}</td>
-                <td>${scorePill(c.lead_score)}</td>
+                <td>${conversationLeadPill(c)}</td>
                 <td>${c.needs_human ? statusPill("handoff") : statusPill(c.status)}</td>
                 <td>${c.messages?.[0]?.message_text || "No messages yet"}</td>
               </tr>`).join("")}</tbody>
@@ -299,11 +867,149 @@ function copyButton(label = "Copy") {
 function settingsTabs(active = "") {
   const tabs = [
     ["", "General"],
+    ["lead-qualification", "Lead Qualification"],
     ["facebook-page-connection", "Facebook Page Connection"]
   ];
   return `<nav class="subnav">${tabs.map(([slug, label]) => (
     `<a class="${active === slug ? "active" : ""}" href="${adminPath("settings", slug || null)}">${label}</a>`
   )).join("")}</nav>`;
+}
+
+function ruleCheckbox(name, item, checked) {
+  const id = `${name}-${Math.random().toString(36).slice(2)}`;
+  return `
+    <label class="rule-check" for="${id}">
+      <input id="${id}" type="checkbox" name="${name}" value="${escapeHtml(item)}" ${checked ? "checked" : ""} />
+      <span>${escapeHtml(item)}</span>
+    </label>`;
+}
+
+function uniqueRules(...groups) {
+  return [...new Set(groups.flat().filter(Boolean))];
+}
+
+function renderRuleChecklist(name, rules, defaults) {
+  const selected = new Set(rules || []);
+  const items = uniqueRules(defaults || [], rules || []);
+  return items.map((item) => ruleCheckbox(name, item, selected.has(item))).join("");
+}
+
+function collectChecked(form, name) {
+  return [...form.querySelectorAll(`input[name="${name}"]:checked`)].map((input) => input.value.trim()).filter(Boolean);
+}
+
+function collectExtraLines(form, name) {
+  return String(new FormData(form).get(name) || "").split("\n").map((line) => line.trim()).filter(Boolean);
+}
+
+function sourceProfileOptions(rules = {}, defaults = {}) {
+  const profiles = { ...(defaults.sourceProfiles || {}), ...(rules.sourceProfiles || {}) };
+  return Object.entries(profiles).map(([key, profile]) => ({
+    key,
+    label: profile?.label || sourceProfileLabel(key),
+    leadCriteria: profile?.leadCriteria || [],
+    notLeadCriteria: profile?.notLeadCriteria || []
+  }));
+}
+
+function sourceProfileLabel(key) {
+  return String(key || "default").split("_").map((part) => (
+    part.charAt(0).toUpperCase() + part.slice(1)
+  )).join(" ");
+}
+
+function renderSourceProfileEditor(profile, defaults = {}, rules = {}) {
+  const defaultProfile = defaults.sourceProfiles?.[profile.key] || {};
+  const ruleProfile = rules.sourceProfiles?.[profile.key] || {};
+  const leadRules = ruleProfile.leadCriteria || profile.leadCriteria || [];
+  const notLeadRules = ruleProfile.notLeadCriteria || profile.notLeadCriteria || [];
+  return `
+    <div class="source-profile-editor" data-source-profile="${escapeHtml(profile.key)}">
+      <div class="source-profile-head">
+        <div>
+          <strong>${escapeHtml(profile.label)}</strong>
+          <span>${profile.key === "facebook_messenger"
+            ? "Strict for click-only Messenger traffic"
+            : profile.key === "website_demo"
+              ? "Use for site forms, demo actions, and assessments"
+              : profile.key === "checkout_payment"
+                ? "Use for checkout starts, payment links, and proof"
+                : "Fallback when the source is unclear"}</span>
+        </div>
+      </div>
+      <div class="source-profile-grid">
+        <div>
+          <h4>Lead proof for this source</h4>
+          <div class="rule-check-grid tight">${renderRuleChecklist(`source_${profile.key}_leadCriteria`, leadRules, defaultProfile.leadCriteria || [])}</div>
+          <label class="full compact-label">Add source lead rules
+            <textarea name="source_${profile.key}_extraLeadCriteria" rows="2" placeholder="One rule per line"></textarea>
+          </label>
+        </div>
+        <div>
+          <h4>Keep as inquiry only</h4>
+          <div class="rule-check-grid tight">${renderRuleChecklist(`source_${profile.key}_notLeadCriteria`, notLeadRules, defaultProfile.notLeadCriteria || [])}</div>
+          <label class="full compact-label">Add source not-lead rules
+            <textarea name="source_${profile.key}_extraNotLeadCriteria" rows="2" placeholder="One rule per line"></textarea>
+          </label>
+        </div>
+      </div>
+    </div>`;
+}
+
+function collectSourceProfiles(form, profiles) {
+  return Object.fromEntries(profiles.map((profile) => [
+    profile.key,
+    {
+      label: profile.label,
+      leadCriteria: uniqueRules(
+        collectChecked(form, `source_${profile.key}_leadCriteria`),
+        collectExtraLines(form, `source_${profile.key}_extraLeadCriteria`)
+      ),
+      notLeadCriteria: uniqueRules(
+        collectChecked(form, `source_${profile.key}_notLeadCriteria`),
+        collectExtraLines(form, `source_${profile.key}_extraNotLeadCriteria`)
+      )
+    }
+  ]));
+}
+
+function leadRulesPromptPreview(rules = {}) {
+  const leadCriteria = rules.leadCriteria || [];
+  const notLeadCriteria = rules.notLeadCriteria || [];
+  const temperatures = rules.temperatures || {};
+  const pipelineStages = rules.pipelineStages || {};
+  const sourceProfiles = Object.entries(rules.sourceProfiles || {});
+  return [
+    "You are the CRM lead qualification assistant.",
+    "",
+    "Decide if the conversation is a real sales lead or inquiry only.",
+    "Use the matching source profile first, then the global rules.",
+    "",
+    "Source profiles:",
+    ...(sourceProfiles.length ? sourceProfiles.flatMap(([key, profile]) => [
+      `- ${profile.label || sourceProfileLabel(key)} (${key})`,
+      `  Lead proof: ${(profile.leadCriteria || []).join(" | ") || "Use global lead proof."}`,
+      `  Inquiry only: ${(profile.notLeadCriteria || []).join(" | ") || "Use global not-lead rules."}`
+    ]) : ["- Default: Use global rules."]),
+    "",
+    "Count as Lead when:",
+    ...(leadCriteria.length ? leadCriteria.map((item) => `- ${item}`) : ["- The customer gives clear buying proof."]),
+    "",
+    "Do Not Count as Lead when:",
+    ...(notLeadCriteria.length ? notLeadCriteria.map((item) => `- ${item}`) : ["- The customer has no clear buyer proof."]),
+    "",
+    "Temperature:",
+    `- Cold: ${temperatures.cold || "Possible buyer but early."}`,
+    `- Warm: ${temperatures.warm || "Meaningful interest."}`,
+    `- Hot: ${temperatures.hot || "Ready-to-buy behavior."}`,
+    "",
+    "Pipeline:",
+    ...Object.entries(pipelineStages).map(([key, value]) => `- ${pipelineLabel(key)}: ${value}`),
+    "",
+    rules.defaultInstruction || "Be strict. If unsure, keep it as Inquiry only and explain what proof is missing.",
+    "",
+    "Return: status, reason, confidence, temperature, stage, next_action, missing_info."
+  ].join("\n");
 }
 
 function bindCopyButtons(root = document) {
@@ -759,40 +1465,84 @@ async function conversationsView() {
   setTitle("Inquiries");
   const rows = await api("/api/conversations");
   $("#adminContent").innerHTML = `
-    <section class="panel">
+    <div class="inquiry-workspace">
+    ${renderInquiryGuide()}
+    ${renderInquirySummary(rows)}
+    <section class="panel inquiry-panel">
       <div class="panel-header">
         <div>
-          <h2>Messenger inquiry review</h2>
-          <p class="muted">Full conversation history is stored in Postgres and loaded through the API — not from the browser directly.</p>
+          <h2>Inquiry inbox</h2>
+          <p class="muted">Every message stays here. Only real buyer opportunities move into Leads.</p>
         </div>
         <button class="button button-soft" id="simulateBtn">Simulate inquiry</button>
       </div>
-      ${rows.length ? `<div class="table-wrap"><table>
-        <thead><tr><th>Customer</th><th>Channel</th><th>Status</th><th>Intent</th><th>Score</th><th>Messages</th><th>Last message</th><th></th></tr></thead>
+      <div class="inquiry-filterbar">
+        <label class="inquiry-search">Search
+          <input id="inquirySearchInput" type="search" placeholder="Search name, number, message, intent..." />
+        </label>
+        <label>Lead proof
+          <select id="inquiryProofFilter">
+            <option value="all">All inquiries</option>
+            <option value="lead">Lead proof</option>
+            <option value="inquiry_only">Inquiry only</option>
+            <option value="needs_contact">Needs contact</option>
+            <option value="no_reply">No reply after AI</option>
+            <option value="demo_quote">Demo / quote proof</option>
+            <option value="payment">Payment proof</option>
+          </select>
+        </label>
+        <span id="inquiryFilterCount">${rows.length} shown</span>
+      </div>
+      ${rows.length ? `<div class="table-wrap inquiry-table-wrap"><table class="inquiry-table">
+        <thead><tr><th>Customer</th><th>Channel</th><th>Inbox</th><th>Intent</th><th>Latest message</th><th>Lead proof</th><th></th></tr></thead>
         <tbody>${rows.map((c) => `
-          <tr>
-            <td>${rowLink("conversations", c.id, c.customer_name || c.psid)}</td>
-            <td>${c.channel}</td>
-            <td>${c.needs_human ? statusPill("handoff") : statusPill(c.status)}</td>
-            <td>${c.intent || "qualifying"}</td>
-            <td>${scorePill(c.lead_score)}</td>
-            <td>${c._count?.messages ?? c.messages?.length ?? 0}</td>
-            <td>${escapeHtml(c.messages?.[0]?.message_text || "")}</td>
-            <td><a class="button button-soft" href="${adminPath("conversations", c.id)}">Review thread</a></td>
+          <tr data-inquiry-row data-proof="${escapeHtml(inquiryProofKind(c))}" data-search="${escapeHtml(inquirySearchText(c))}">
+            <td data-label="Customer">${rowLink("conversations", c.id, c.customer_name || c.psid)}</td>
+            <td data-label="Channel"><span class="inquiry-channel">${escapeHtml(String(c.channel || "unknown").replaceAll("_", " "))}</span></td>
+            <td data-label="Inbox">${c.needs_human ? statusPill("handoff") : statusPill(c.status)}</td>
+            <td data-label="Intent"><span class="inquiry-intent">${escapeHtml(c.intent || "qualifying")}</span></td>
+            <td data-label="Latest message"><div class="lead-message-cell"><b>${c._count?.messages ?? c.messages?.length ?? 0} message${Number(c._count?.messages ?? c.messages?.length ?? 0) === 1 ? "" : "s"}</b><small>${escapeHtml(c.messages?.[0]?.message_text || "No message preview")}</small></div></td>
+            <td data-label="Lead proof">${conversationLeadPill(c)}</td>
+            <td data-label="Action"><a class="button button-soft inquiry-review-btn" href="${adminPath("conversations", c.id)}">Review</a></td>
           </tr>`).join("")}</tbody>
       </table></div>` : `<p class="muted">No inquiries yet. Send a message to your AIStaff Facebook Page or click Simulate inquiry.</p>`}
-    </section>`;
+    </section>
+    </div>`;
   $("#simulateBtn").onclick = simulateInquiry;
+  bindInquiryFilters();
+}
+
+function bindInquiryFilters() {
+  const searchInput = $("#inquirySearchInput");
+  const proofSelect = $("#inquiryProofFilter");
+  const count = $("#inquiryFilterCount");
+  const rows = [...document.querySelectorAll("[data-inquiry-row]")];
+  const apply = () => {
+    const query = String(searchInput?.value || "").trim().toLowerCase();
+    const proof = proofSelect?.value || "all";
+    let shown = 0;
+    rows.forEach((row) => {
+      const matchesSearch = !query || String(row.dataset.search || "").includes(query);
+      const matchesProof = proof === "all" || row.dataset.proof === proof;
+      const visible = matchesSearch && matchesProof;
+      row.hidden = !visible;
+      if (visible) shown += 1;
+    });
+    if (count) count.textContent = `${shown} shown`;
+  };
+  if (searchInput) searchInput.oninput = apply;
+  if (proofSelect) proofSelect.onchange = apply;
 }
 
 async function conversationDetailView(id) {
   setTitle("Inquiry Review");
   const c = await api(`/api/conversations/${id}`);
   const lead = c.leads?.[0];
+  const trackedLead = conversationLeadState(c).isLead;
   $("#adminContent").innerHTML = `
     <div class="review-toolbar">
       <a class="button button-soft" href="${adminPath("conversations")}">← All inquiries</a>
-      ${lead ? `<a class="button button-soft" href="${adminPath("leads", lead.id)}">Open lead record</a>` : ""}
+      ${trackedLead ? `<a class="button button-soft" href="${adminPath("leads", lead.id)}">Open lead record</a>` : ""}
     </div>
     <div class="split review-layout">
       <section class="panel">
@@ -818,16 +1568,20 @@ async function conversationDetailView(id) {
           <div><dt>Channel</dt><dd>${escapeHtml(c.channel)}</dd></div>
           <div><dt>Status</dt><dd>${c.needs_human ? statusPill("handoff") : statusPill(c.status)}</dd></div>
           <div><dt>Intent</dt><dd>${escapeHtml(c.intent || "qualifying")}</dd></div>
-          <div><dt>Lead score</dt><dd>${scorePill(c.lead_score)}</dd></div>
+          <div><dt>Lead proof</dt><dd>${conversationLeadPill(c)}</dd></div>
           <div><dt>Started</dt><dd>${fmtDate(c.created_at)}</dd></div>
           <div><dt>Last message</dt><dd>${fmtDate(c.last_message_at)}</dd></div>
         </dl>
-        ${lead ? `<div class="review-lead-card">
+        ${trackedLead ? `<div class="review-lead-card">
           <h3>Linked lead</h3>
-          <p><b>${escapeHtml(lead.customer_name || "Unknown")}</b></p>
+          ${renderLeadIdentity(lead)}
+          <p>${leadStatusPill(lead)} ${statusPill(normalizedLeadStatus(lead))}</p>
+          <p class="muted">Next: ${escapeHtml(nextActionForLead(lead))}</p>
           <p>${escapeHtml(lead.company_name || "Company TBD")}</p>
-          <p>${escapeHtml(lead.mobile_number || "No mobile")} · ${escapeHtml(lead.email || "No email")}</p>
-        </div>` : ""}
+        </div>` : `<div class="review-lead-card">
+          <h3>Not a lead yet</h3>
+          <p class="muted">Keep it in Inquiries until they provide contact details, company and need, demo or checkout intent, or a clear start request.</p>
+        </div>`}
         <div class="actions-row">
           <button class="button button-danger" id="handoffBtn">Trigger Human Handoff</button>
         </div>
@@ -842,35 +1596,167 @@ async function conversationDetailView(id) {
 
 async function leadsView() {
   setTitle("Leads");
-  const rows = await api("/api/leads");
+  const [leadResult, analytics] = await Promise.all([
+    api("/api/leads").then((rows) => ({ rows, error: null })).catch((error) => ({ rows: [], error })),
+    api(funnelAnalyticsPath()).catch(() => null)
+  ]);
+  const allRows = leadResult.rows;
+  const view = currentLeadReportView();
+  const trackedRows = allRows.filter(isTrackedLead);
+  const pipelineRows = activePipelineRows(trackedRows);
+  const counts = {
+    active: pipelineRows.length,
+    won: trackedRows.filter((lead) => normalizedLeadStatus(lead) === "won").length,
+    lost: trackedRows.filter((lead) => normalizedLeadStatus(lead) === "lost").length,
+    all: trackedRows.length
+  };
+  const rows = trackedRows.filter((lead) => {
+    if (view === "won") return normalizedLeadStatus(lead) === "won";
+    if (view === "lost") return normalizedLeadStatus(lead) === "lost";
+    if (view === "all") return true;
+    return !["lost", "unqualified", "spam"].includes(normalizedLeadStatus(lead));
+  });
+  if (leadResult.error) {
+    $("#adminContent").innerHTML = renderCrmModelStrip() + renderLeadFunnel(analytics, rows) + renderLeadsLoadError(leadResult.error);
+    bindFunnelRangeForm();
+    return;
+  }
+  const withTracking = rows.filter((lead) => lead.source_label || lead.visitor_id || (lead.website_events || []).length).length;
+  const hot = rows.filter((lead) => lead.lead_score === "hot").length;
+  const campaigns = new Set(rows.map((lead) => lead.utm_campaign).filter(Boolean));
+  const hiddenInquiries = allRows.length - trackedRows.length;
   $("#adminContent").innerHTML = `
-    <section class="panel">
-      <div class="panel-header"><h2>Facebook inquiry CRM</h2><span>${rows.length} leads</span></div>
-      <div class="table-wrap"><table>
-        <thead><tr><th>Customer</th><th>Company</th><th>Location</th><th>Service Needed</th><th>Urgency</th><th>Score</th><th>Quotation Ready</th><th>Follow-up</th><th>Assigned To</th></tr></thead>
-        <tbody>${rows.map((lead) => `
-          <tr>
-            <td>${rowLink("leads", lead.id, lead.customer_name || "Unknown")}</td>
-            <td>${lead.company_name || "TBD"}</td>
-            <td>${lead.location || "TBD"}</td>
-            <td>${lead.service_needed || "TBD"}</td>
-            <td>${lead.urgency || "TBD"}</td>
-            <td>${scorePill(lead.lead_score)}</td>
-            <td>${lead.quotation_ready ? statusPill("quotation_ready") : "No"}</td>
-            <td>${fmtDate(lead.follow_up_date)}</td>
-            <td>${lead.assigned_user?.name || "Unassigned"}</td>
-          </tr>`).join("")}</tbody>
-      </table></div>
-    </section>`;
+    ${leadReportTabs(view, counts)}
+    ${rows.some((lead) => lead.attribution_schema_available === false) ? `
+      <section class="panel lead-schema-warning">
+        <b>Attribution migration pending</b>
+        <p>Existing leads are visible, but source trail fields and website event links are unavailable until the database migration for pixel attribution is applied.</p>
+      </section>` : ""}
+    <section class="panel lead-workbench">
+      <div class="panel-header lead-workbench-head">
+        <div>
+          <h2>${escapeHtml(view === "active" ? "Active leads" : `${view.charAt(0).toUpperCase()}${view.slice(1)} leads`)}</h2>
+          <p class="muted">${view === "active" ? "Drag cards or use Move to update the stage." : "Review saved lead records."}</p>
+        </div>
+        <span>${rows.length} shown${hiddenInquiries ? ` · ${hiddenInquiries} inquiry-only` : ""}</span>
+      </div>
+      <div class="lead-insight-strip">
+        <span><b>${hot}</b> hot</span>
+        <span><b>${withTracking}</b> with source trail</span>
+        <span><b>${campaigns.size}</b> campaign${campaigns.size === 1 ? "" : "s"}</span>
+        ${analytics ? `<span><b>${analytics.visitsToday}</b> visits today</span>` : ""}
+        ${analytics ? `<span><b>${analytics.linkedEvents7Days}</b> linked touches in range</span>` : ""}
+      </div>
+      ${analytics?.campaigns?.length ? `<div class="lead-campaign-strip">${analytics.campaigns.map((campaign) => `<span>${escapeHtml(campaign.name)} <b>${campaign.count}</b></span>`).join("")}</div>` : ""}
+      ${view === "active" ? renderLeadKanban(rows) : renderLeadTable(rows, view)}
+    </section>
+    ${view === "active" ? `<section class="lead-context-row">${renderCrmModelStrip()}${renderLeadFunnel(analytics, trackedRows)}</section>` : `${renderCrmModelStrip()}${renderLeadFunnel(analytics, trackedRows)}`}`;
+  bindFunnelRangeForm();
+  bindLeadKanban();
+}
+
+function bindFunnelRangeForm() {
+  const form = $("#funnelRangeForm");
+  if (!form) return;
+  form.onsubmit = (event) => {
+    event.preventDefault();
+    const data = new FormData(form);
+    const params = new URLSearchParams(location.search);
+    const from = String(data.get("from") || "");
+    const to = String(data.get("to") || "");
+    if (from) params.set("funnel_from", from); else params.delete("funnel_from");
+    if (to) params.set("funnel_to", to); else params.delete("funnel_to");
+    if (data.get("includeTestEvents")) params.set("include_test_events", "true");
+    else params.delete("include_test_events");
+    history.replaceState(null, "", `${location.pathname}?${params.toString()}`);
+    leadsView();
+  };
+}
+
+async function moveLeadToStage(leadId, stage) {
+  if (!leadId || !MOVE_LEAD_STAGES.includes(stage)) return;
+  await api(`/api/leads/${encodeURIComponent(leadId)}`, {
+    method: "PUT",
+    body: { lead_status: stage }
+  });
+  toast(`Moved to ${pipelineLabel(stage)}`);
+  leadsView();
+}
+
+function bindLeadKanban() {
+  document.querySelectorAll(".lead-card-move").forEach((select) => {
+    select.onchange = async (event) => {
+      const control = event.currentTarget;
+      control.disabled = true;
+      try {
+        await moveLeadToStage(control.dataset.leadId, control.value);
+      } catch (error) {
+        toast(error.message || "Could not move lead");
+        control.disabled = false;
+      }
+    };
+  });
+
+  document.querySelectorAll(".lead-kanban-card[draggable='true']").forEach((card) => {
+    card.ondragstart = (event) => {
+      event.dataTransfer.setData("text/plain", card.dataset.leadId || "");
+      event.dataTransfer.effectAllowed = "move";
+      card.classList.add("dragging");
+    };
+    card.ondragend = () => card.classList.remove("dragging");
+  });
+
+  document.querySelectorAll(".lead-kanban-column").forEach((column) => {
+    column.ondragover = (event) => {
+      event.preventDefault();
+      column.classList.add("drag-over");
+    };
+    column.ondragleave = () => column.classList.remove("drag-over");
+    column.ondrop = async (event) => {
+      event.preventDefault();
+      column.classList.remove("drag-over");
+      const leadId = event.dataTransfer.getData("text/plain");
+      await moveLeadToStage(leadId, column.dataset.kanbanStage);
+    };
+  });
+
+  const stageTabs = document.querySelectorAll("[data-kanban-stage-tab]");
+  stageTabs.forEach((button) => {
+    button.onclick = () => {
+      const stage = button.dataset.kanbanStageTab;
+      stageTabs.forEach((tab) => tab.classList.toggle("active", tab === button));
+      document.querySelectorAll(".lead-kanban-column").forEach((column) => {
+        column.classList.toggle("mobile-active", column.dataset.kanbanStage === stage);
+      });
+    };
+  });
 }
 
 async function leadDetailView(id) {
   setTitle("Lead Detail");
   const lead = await api(`/api/leads/${id}`);
+  const missingContact = isMessengerLead(lead, lead.conversation) && !leadHasContactDetail(lead, lead.conversation);
   $("#adminContent").innerHTML = `
     <div class="split">
       <section class="panel">
-        <div class="panel-header"><h2>${lead.customer_name || "Lead"}</h2>${scorePill(lead.lead_score)}</div>
+        <div class="panel-header"><h2>${lead.customer_name || "Lead"}</h2>${leadStatusPill(lead)}</div>
+        <div class="lead-detail-actions">
+          ${lead.conversation_id ? `<a class="button button-soft" href="${adminPath("conversations", lead.conversation_id)}">Open original inquiry</a>` : ""}
+          ${missingContact ? `<span class="lead-contact-warning">Missing mobile/email</span>` : ""}
+        </div>
+        ${missingContact ? `<div class="lead-review-warning">
+          <b>Needs contact detail before sales follow-up</b>
+          <p>This came from Messenger, but no mobile number or email is saved. Verify the original inquiry before keeping it in Active Leads.</p>
+        </div>` : ""}
+        <div class="lead-proof-note">
+          <small>AI lead proof</small>
+          <span>${escapeHtml(leadProofText(lead, lead.conversation))}</span>
+        </div>
+        <div class="lead-detail-summary">
+          <span><small>Temperature</small>${scorePill(lead.lead_score)}</span>
+          <span><small>Pipeline</small>${statusPill(normalizedLeadStatus(lead))}</span>
+          <span><small>Next action</small><b>${escapeHtml(nextActionForLead(lead))}</b></span>
+        </div>
         <form id="leadForm" class="form-grid">
           ${field("customer_name", "Customer name", lead.customer_name)}
           ${field("company_name", "Company", lead.company_name)}
@@ -880,11 +1766,41 @@ async function leadDetailView(id) {
           ${field("service_needed", "Service needed", lead.service_needed)}
           ${field("budget", "Budget", lead.budget)}
           ${field("urgency", "Urgency", lead.urgency)}
-          ${field("lead_status", "Lead status", lead.lead_status)}
+          ${selectField("lead_status", "Pipeline stage", lead.lead_status, [
+            ["new", "New Lead"],
+            ["learning_demo", "Learning / Demo"],
+            ["quote_sent", "Quote Sent"],
+            ["follow_up_negotiation", "Follow-up / Negotiation"],
+            ["payment_pending", "Payment Pending"],
+            ["won", "Won"],
+            ["lost", "Lost"],
+            ["unqualified", "Unqualified"],
+            ["spam", "Spam"]
+          ])}
+          ${selectField("lead_score", "Temperature", lead.lead_score, [
+            ["cold", "Cold"],
+            ["warm", "Warm"],
+            ["hot", "Hot"]
+          ])}
           ${field("follow_up_date", "Follow-up date", lead.follow_up_date ? lead.follow_up_date.slice(0, 10) : "", "date")}
+          ${field("source_label", "Source", lead.source_label)}
+          ${field("utm_campaign", "Campaign", lead.utm_campaign)}
+          ${field("lead_next_action", "Next action", lead.lead_next_action)}
           <label class="full">Notes<textarea name="notes">${lead.notes || ""}</textarea></label>
           <button class="button button-primary full" type="submit">Save Lead</button>
         </form>
+      </section>
+      <section class="panel">
+        <div class="panel-header"><h2>Source activity</h2><span>${Number(lead.touch_count || lead.website_events?.length || 0)} touch${Number(lead.touch_count || lead.website_events?.length || 0) === 1 ? "" : "es"}</span></div>
+        <dl class="detail-grid">
+          <div><dt>Channel</dt><dd>${escapeHtml(lead.source_channel || lead.conversation?.channel || "TBD")}</dd></div>
+          <div><dt>Landing page</dt><dd>${escapeHtml(lead.landing_page || "TBD")}</dd></div>
+          <div><dt>UTM source</dt><dd>${escapeHtml(lead.utm_source || "TBD")}</dd></div>
+          <div><dt>UTM medium</dt><dd>${escapeHtml(lead.utm_medium || "TBD")}</dd></div>
+          <div><dt>First seen</dt><dd>${fmtDate(lead.first_seen_at)}</dd></div>
+          <div><dt>Last touch</dt><dd>${fmtDate(lead.last_touch_at)}</dd></div>
+        </dl>
+        ${leadActivityList(lead)}
       </section>
       <section class="panel">
         <div class="panel-header"><h2>Linked quotation drafts</h2><a class="button button-soft" href="${adminPath("quotations")}">Open Quotations</a></div>
@@ -2140,9 +3056,174 @@ async function facebookPageConnectionView() {
   }
 }
 
+async function leadQualificationSettingsView() {
+  setTitle("Lead Qualification");
+  const { rules, defaults } = await api("/api/settings/lead-qualification");
+  const temperatures = { ...(defaults.temperatures || {}), ...(rules.temperatures || {}) };
+  const pipelineStages = { ...(defaults.pipelineStages || {}), ...(rules.pipelineStages || {}) };
+  const sourceProfiles = sourceProfileOptions(rules, defaults);
+  const previewRules = {
+    ...defaults,
+    ...rules,
+    temperatures,
+    pipelineStages,
+    sourceProfiles: Object.fromEntries(sourceProfiles.map((profile) => [profile.key, profile]))
+  };
+
+  $("#adminContent").innerHTML = `
+    ${settingsTabs("lead-qualification")}
+    <div class="settings-stack">
+      <section class="panel lead-rules-panel">
+        <div class="panel-header">
+          <div>
+            <h2>AI Lead Qualification</h2>
+            <p class="muted settings-lede">Teach Closer what should become a sales lead. The AI decides from the conversation, then saves a reason staff can read.</p>
+          </div>
+        </div>
+        <form id="leadRulesForm" class="lead-rules-form">
+          <label class="full">AI decision mode
+            <select name="mode">
+              <option value="ai_decides" ${rules.mode === "ai_decides" ? "selected" : ""}>AI decides and updates CRM</option>
+            </select>
+          </label>
+
+          <div class="lead-rule-section source-rule-section">
+            <div class="source-rule-toolbar">
+              <div>
+                <h3>Source Rules</h3>
+                <p class="muted">Pick where the inquiry came from, then teach the AI what proof is enough for that source.</p>
+              </div>
+              <label>Source
+                <select id="sourceProfileSelect" name="sourceProfile">
+                  ${sourceProfiles.map((profile) => (
+                    `<option value="${escapeHtml(profile.key)}">${escapeHtml(profile.label)}</option>`
+                  )).join("")}
+                </select>
+              </label>
+            </div>
+            <div id="sourceProfileEditors">
+              ${sourceProfiles.map((profile) => renderSourceProfileEditor(profile, defaults, rules)).join("")}
+            </div>
+          </div>
+
+          <div class="lead-rule-section">
+            <h3>Count as Lead</h3>
+            <p class="muted">Select the proof that means this person is worth sales follow-up.</p>
+            <div class="rule-check-grid">${renderRuleChecklist("leadCriteria", rules.leadCriteria, defaults.leadCriteria)}</div>
+            <label class="full">Add your own lead rules
+              <textarea name="extraLeadCriteria" rows="3" placeholder="One rule per line"></textarea>
+            </label>
+          </div>
+
+          <div class="lead-rule-section">
+            <h3>Do Not Count as Lead</h3>
+            <p class="muted">These stay in Inquiries, even if the customer tapped a Facebook quick question.</p>
+            <div class="rule-check-grid">${renderRuleChecklist("notLeadCriteria", rules.notLeadCriteria, defaults.notLeadCriteria)}</div>
+            <label class="full">Add your own not-lead rules
+              <textarea name="extraNotLeadCriteria" rows="3" placeholder="One rule per line"></textarea>
+            </label>
+          </div>
+
+          <div class="lead-rule-section">
+            <h3>Temperature</h3>
+            <div class="form-grid">
+              <label>Cold<textarea name="temp_cold" rows="3">${escapeHtml(temperatures.cold || "")}</textarea></label>
+              <label>Warm<textarea name="temp_warm" rows="3">${escapeHtml(temperatures.warm || "")}</textarea></label>
+              <label>Hot<textarea name="temp_hot" rows="3">${escapeHtml(temperatures.hot || "")}</textarea></label>
+            </div>
+          </div>
+
+          <div class="lead-rule-section">
+            <h3>Pipeline Stages</h3>
+            <div class="form-grid">
+              <label>New Lead<textarea name="stage_new" rows="2">${escapeHtml(pipelineStages.new || "")}</textarea></label>
+              <label>Learning / Demo<textarea name="stage_learning_demo" rows="2">${escapeHtml(pipelineStages.learning_demo || "")}</textarea></label>
+              <label>Quote Sent<textarea name="stage_quote_sent" rows="2">${escapeHtml(pipelineStages.quote_sent || "")}</textarea></label>
+              <label>Follow-up / Negotiation<textarea name="stage_follow_up_negotiation" rows="2">${escapeHtml(pipelineStages.follow_up_negotiation || "")}</textarea></label>
+              <label>Payment Pending<textarea name="stage_payment_pending" rows="2">${escapeHtml(pipelineStages.payment_pending || "")}</textarea></label>
+              <label>Won<textarea name="stage_won" rows="2">${escapeHtml(pipelineStages.won || "")}</textarea></label>
+            </div>
+          </div>
+
+          <label class="full">Extra instruction to AI
+            <textarea name="defaultInstruction" rows="5">${escapeHtml(rules.defaultInstruction || "")}</textarea>
+          </label>
+
+          <div class="lead-rule-section lead-rules-preview">
+            <div>
+              <h3>Live AI prompt</h3>
+              <p class="muted">This is the instruction shape Closer uses on the next customer reply.</p>
+            </div>
+            <pre>${escapeHtml(leadRulesPromptPreview(previewRules))}</pre>
+            ${copyButton("Copy prompt")}
+          </div>
+
+          <div class="actions-row">
+            <button class="button button-primary" type="submit">Save Lead Rules</button>
+            <button class="button button-soft" type="button" id="resetLeadRulesBtn">Reset to defaults</button>
+          </div>
+        </form>
+      </section>
+    </div>`;
+
+  const sourceSelect = $("#sourceProfileSelect");
+  const showSourceProfile = () => {
+    const active = sourceSelect?.value || sourceProfiles[0]?.key || "default";
+    document.querySelectorAll("[data-source-profile]").forEach((panel) => {
+      panel.hidden = panel.dataset.sourceProfile !== active;
+    });
+  };
+  if (sourceSelect) {
+    sourceSelect.onchange = showSourceProfile;
+    showSourceProfile();
+  }
+  bindCopyButtons($("#adminContent"));
+
+  $("#leadRulesForm").onsubmit = async (event) => {
+    event.preventDefault();
+    const form = event.currentTarget;
+    const data = new FormData(form);
+    const body = {
+      mode: data.get("mode") || "ai_decides",
+      sourceProfiles: collectSourceProfiles(form, sourceProfiles),
+      leadCriteria: uniqueRules(collectChecked(form, "leadCriteria"), collectExtraLines(form, "extraLeadCriteria")),
+      notLeadCriteria: uniqueRules(collectChecked(form, "notLeadCriteria"), collectExtraLines(form, "extraNotLeadCriteria")),
+      temperatures: {
+        cold: data.get("temp_cold") || "",
+        warm: data.get("temp_warm") || "",
+        hot: data.get("temp_hot") || ""
+      },
+      pipelineStages: {
+        new: data.get("stage_new") || "",
+        learning_demo: data.get("stage_learning_demo") || "",
+        quote_sent: data.get("stage_quote_sent") || "",
+        follow_up_negotiation: data.get("stage_follow_up_negotiation") || "",
+        payment_pending: data.get("stage_payment_pending") || "",
+        won: data.get("stage_won") || "",
+        lost: pipelineStages.lost || defaults.pipelineStages?.lost || "",
+        unqualified: pipelineStages.unqualified || defaults.pipelineStages?.unqualified || ""
+      },
+      defaultInstruction: data.get("defaultInstruction") || ""
+    };
+    await api("/api/settings/lead-qualification", { method: "PUT", body });
+    toast("Lead qualification rules saved");
+    leadQualificationSettingsView();
+  };
+  $("#resetLeadRulesBtn").onclick = async () => {
+    if (!window.confirm("Reset lead qualification rules to the default AIStaff version?")) return;
+    await api("/api/settings/lead-qualification", { method: "PUT", body: defaults });
+    toast("Lead qualification rules reset");
+    leadQualificationSettingsView();
+  };
+}
+
 async function settingsView(tab = "") {
   if (tab === "facebook-page-connection") {
     await facebookPageConnectionView();
+    return;
+  }
+  if (tab === "lead-qualification") {
+    await leadQualificationSettingsView();
     return;
   }
 
@@ -2492,7 +3573,9 @@ if ($("#auditForm")) {
           business: data.business || null,
           inquiries: data.inquiries || null,
           quotations: data.quotations || null,
-          message: data.message || null
+          message: data.message || null,
+          visitorId: window.aiStaffVisitorId || null,
+          tracking: window.aiStaffAttributionPayload ? window.aiStaffAttributionPayload({ source_page: window.location.pathname }) : null
         }
       });
       $("#auditSuccess").hidden = false;
@@ -2593,6 +3676,21 @@ if ($("#logoutBtn")) {
 }
 
 if ($("#demoMessageBtn")) $("#demoMessageBtn").onclick = simulateInquiry;
+if ($("#adminMenuToggle")) $("#adminMenuToggle").onclick = toggleAdminMenu;
+if ($("#adminNav")) {
+  $("#adminNav").addEventListener("click", (event) => {
+    if (event.target.closest("a")) closeAdminMenu();
+  });
+}
+document.addEventListener("click", (event) => {
+  const app = $("#adminApp");
+  if (!app || !app.classList.contains("menu-open")) return;
+  if (event.target.closest(".admin-sidebar")) return;
+  closeAdminMenu();
+});
+document.addEventListener("keydown", (event) => {
+  if (event.key === "Escape") closeAdminMenu();
+});
 
 window.addEventListener("popstate", routeHandler);
 window.addEventListener("hashchange", routeHandler);
@@ -2611,12 +3709,35 @@ async function pitchStudioView() {
   const svc = state.services;
 
   const dot = (ok) => `<span style="color:${ok ? "#3ecf8e" : "#e05252"}">●</span>`;
+  const langForVoice = (key) => {
+    if (String(key || "").startsWith("gab_taglish_")) return "fil_PH";
+    const m = String(key || "").match(/^([a-z]{2}_[A-Z]{2})-/);
+    return m ? m[1] : "en_US";
+  };
+  const selectedLang = langForVoice(cfg.local.piperVoice);
   const langOpts = state.languages.map((l) =>
-    `<option value="${l.code}"${l.code === "en_US" ? " selected" : ""}>${escapeHtml(l.name)} — ${l.code} (${l.voices})</option>`).join("");
+    `<option value="${l.code}"${l.code === selectedLang ? " selected" : ""}>${escapeHtml(l.name)} — ${l.code} (${l.voices})</option>`).join("");
   const whisperOpts = state.whisperModels.map((m) =>
     `<option value="${m.name}"${m.name === cfg.local.whisperModel ? " selected" : ""}>${m.name} (${m.sizeMB} MB)</option>`).join("");
+  const modelListOptions = (list, selected) => {
+    const rows = [...(list || [])];
+    if (selected && !rows.some((m) => m.model === selected)) rows.unshift({ model: selected, label: "Saved custom" });
+    return rows.map((m) =>
+      `<option value="${escapeHtml(m.model)}">${escapeHtml(m.label || m.model)}</option>`).join("");
+  };
+  const pitchModels = state.pitchModels || {};
+  const geminiLiveModelOpts = modelListOptions(pitchModels.geminiLive, cfg.geminiLive?.model);
+  const openaiRealtimeModelOpts = modelListOptions(pitchModels.openaiRealtime, cfg.openaiRealtime?.model);
+  const localGeminiModelOpts = modelListOptions(pitchModels.localText?.gemini, cfg.local.geminiTextModel);
+  const localOpenAiModelOpts = modelListOptions(pitchModels.localText?.openai, cfg.local.openaiTextModel);
+  const openAiModelFetch = state.modelFetch?.openai;
+  const openAiModelNote = openAiModelFetch
+    ? `<p class="muted" style="font-size:12px;margin-top:8px">${openAiModelFetch.live
+      ? `OpenAI models loaded from your API key.`
+      : `Using fallback OpenAI suggestions: ${escapeHtml(openAiModelFetch.error || "model list unavailable")}`}</p>`
+    : "";
 
-  const PIPE_LABEL = { "gemini-live": "Gemini Live", local: "Local (Piper)" };
+  const PIPE_LABEL = { "gemini-live": "Gemini Live", "openai-realtime": "OpenAI Realtime", local: "Local (Piper)" };
   const drifted = state.runningPipeline && state.runningPipeline !== cfg.pipeline;
   const driftBanner = drifted ? `
       <section class="panel" style="border-left:4px solid #e0a33e;background:#fffaf0">
@@ -2651,7 +3772,7 @@ async function pitchStudioView() {
 
       <section class="panel">
         <div class="panel-header"><h2>Pipeline</h2></div>
-        <p class="muted settings-lede">Which engine answers calls. Gemini Live is speech-to-speech with native Taglish and emotion. Local runs whisper &rarr; text brain &rarr; Piper on this machine — far cheaper, slightly slower, English only until the Taglish voice is trained.</p>
+        <p class="muted settings-lede">Which engine answers calls. Live engines are speech-to-speech. Local runs whisper &rarr; selected text brain &rarr; Piper; Piper speaks only the selected voice language.</p>
         <table class="data-table">
           <thead><tr><th></th><th>Pipeline</th><th>TTS cost / call</th><th>Latency</th><th>Taglish</th><th>Emotion</th></tr></thead>
           <tbody>
@@ -2661,9 +3782,14 @@ async function pitchStudioView() {
               <td>≈ ₱1.30</td><td>~500 ms</td><td>Native</td><td>Native affect</td>
             </tr>
             <tr>
+              <td><input type="radio" name="pipeline" value="openai-realtime" id="pipeOpenAI"${cfg.pipeline === "openai-realtime" ? " checked" : ""}></td>
+              <td><label for="pipeOpenAI"><b>2 — OpenAI Realtime</b><br><span class="muted">premium tier</span></label></td>
+              <td>premium</td><td>~500 ms</td><td>Native</td><td>Native affect</td>
+            </tr>
+            <tr>
               <td><input type="radio" name="pipeline" value="local" id="pipeLocal"${cfg.pipeline === "local" ? " checked" : ""}></td>
-              <td><label for="pipeLocal"><b>2 — Local (Piper)</b><br><span class="muted">standard tier</span></label></td>
-              <td>≈ ₱0.02</td><td>~1.3 s</td><td>After training</td><td>Speaker slots</td>
+              <td><label for="pipeLocal"><b>3 — Local (Piper)</b><br><span class="muted">standard tier</span></label></td>
+              <td>≈ ₱0.02</td><td>~1.3 s</td><td>Voice language only</td><td>Speaker slots</td>
             </tr>
           </tbody>
         </table>
@@ -2675,36 +3801,67 @@ async function pitchStudioView() {
       </section>
 
       <section class="panel" id="geminiPanel">
-        <div class="panel-header"><h2>Gemini Live voice</h2></div>
+        <div class="panel-header"><h2>Gemini Live</h2></div>
         <p class="muted settings-lede">Google's prebuilt voices. There is no custom voice and no language setting — the model matches whatever the caller speaks, including mid-sentence Taglish. Changing this needs a restart.</p>
         <div class="form-grid">
+          <label>Model<input list="geminiLiveModelList" id="geminiLiveModel" value="${escapeHtml(cfg.geminiLive?.model || "")}" maxlength="120"></label>
+          <datalist id="geminiLiveModelList">${geminiLiveModelOpts}</datalist>
           <label>Voice<select id="geminiVoice">${(state.geminiVoices || []).map((v) =>
             `<option value="${v.name}"${v.name === (cfg.geminiLive && cfg.geminiLive.voice) ? " selected" : ""}>${v.name} — ${v.gender}, ${v.note}</option>`).join("")}</select></label>
         </div>
         <p class="muted" style="font-size:12px;margin-top:10px">No preview available — Gemini voices are only produced during a live call. Change it, restart, and ring the number to hear it.</p>
       </section>
 
-      <section class="panel" id="piperPanel">
-        <div class="panel-header"><h2>Piper voice</h2></div>
+      <section class="panel" id="openaiPanel">
+        <div class="panel-header"><h2>OpenAI Realtime</h2></div>
+        <p class="muted settings-lede">OpenAI's speech-to-speech voice engine for Pitch. This is separate from Closer and normal AI usage.</p>
         <div class="form-grid">
+          <label>Model<input list="openaiRealtimeModelList" id="openaiRealtimeModel" value="${escapeHtml(cfg.openaiRealtime?.model || "")}" maxlength="120"></label>
+          <datalist id="openaiRealtimeModelList">${openaiRealtimeModelOpts}</datalist>
+          <label>Voice<input type="text" id="openaiRealtimeVoice" value="${escapeHtml(cfg.openaiRealtime?.voice || "marin")}" maxlength="40"></label>
+        </div>
+        ${openAiModelNote}
+      </section>
+
+      <section class="panel" id="piperPanel">
+        <div class="panel-header"><h2>Local Piper</h2></div>
+        <div class="form-grid">
+          <label>Text brain<select id="localBrainProvider">
+            <option value="gemini"${cfg.local.brainProvider !== "openai" ? " selected" : ""}>Gemini</option>
+            <option value="openai"${cfg.local.brainProvider === "openai" ? " selected" : ""}>OpenAI</option>
+          </select></label>
+          <label>Gemini brain model<input list="localGeminiModelList" id="localGeminiTextModel" value="${escapeHtml(cfg.local.geminiTextModel || "")}" maxlength="120"></label>
+          <datalist id="localGeminiModelList">${localGeminiModelOpts}</datalist>
+          <label>OpenAI brain model<input list="localOpenAiModelList" id="localOpenAiTextModel" value="${escapeHtml(cfg.local.openaiTextModel || "")}" maxlength="120"></label>
+          <datalist id="localOpenAiModelList">${localOpenAiModelOpts}</datalist>
           <label>Language<select id="voiceLang">${langOpts}</select></label>
           <label>Gender<select id="voiceGender">
-            <option value="">All</option>
-            <option value="female" selected>Female</option>
+            <option value="" selected>All</option>
+            <option value="female">Female</option>
             <option value="male">Male</option>
           </select></label>
           <label>Whisper model<select id="whisperModel">${whisperOpts}</select></label>
           <label>Speech rate <span class="muted" id="lsVal">${cfg.local.piperLengthScale}</span>
             <input type="range" id="lengthScale" min="0.6" max="1.6" step="0.05" value="${cfg.local.piperLengthScale}">
           </label>
+          <label>Volume <span class="muted" id="volVal">${cfg.local.piperVolumeDb ?? -5} dB</span>
+            <input type="range" id="volumeDb" min="-12" max="3" step="1" value="${cfg.local.piperVolumeDb ?? -5}">
+          </label>
+          <label>Greeting delay <span class="muted" id="greetingDelayVal">${cfg.local.greetingStartDelayMs ?? 250} ms</span>
+            <input type="range" id="greetingStartDelayMs" min="0" max="1000" step="50" value="${cfg.local.greetingStartDelayMs ?? 250}">
+          </label>
+          <label class="full">Opening greeting
+            <textarea id="greetingText" rows="3" maxlength="500">${escapeHtml(cfg.local.greetingText || "Hello, this is Pitch, your AI sales and support staff. How can I help you today?")}</textarea>
+          </label>
         </div>
+        ${openAiModelNote}
         <div id="voiceList" class="muted" style="margin-top:14px">Loading voices…</div>
       </section>
 
       <section class="panel" id="previewPanel">
         <div class="panel-header"><h2>Preview</h2></div>
         <label class="full">Test line
-          <input type="text" id="previewText" value="Good afternoon! Thank you for calling. How can I help you today?" maxlength="300">
+          <input type="text" id="previewText" value="${escapeHtml(cfg.local.greetingText || "Hello, this is Pitch, your AI sales and support staff. How can I help you today?")}" maxlength="300">
         </label>
         <div style="display:flex;gap:10px;align-items:center;margin-top:10px;flex-wrap:wrap">
           <button class="button button-soft" id="previewBtn">Play preview</button>
@@ -2718,7 +3875,7 @@ async function pitchStudioView() {
           <h2>Pitch instructions — ${PIPE_LABEL[prompt.pipeline]}${prompt.active ? ` · v${prompt.active.version} live` : ""}</h2>
           <span class="muted">${prompt.active ? `saved ${new Date(prompt.active.created_at).toLocaleString()} by ${escapeHtml(prompt.active.created_by || "seed")}` : ""}</span>
         </div>
-        <p class="muted settings-lede">The <b>complete</b> prompt for this pipeline — nothing is added from code. Each pipeline has its own, because the language rules differ: Gemini Live can speak Taglish, Piper cannot. Switch the pipeline above to edit the other one. Three variables are filled at call time: <code>{{business_name}}</code>, <code>{{agent_name}}</code>, <code>{{caller_number}}</code>.</p>
+        <p class="muted settings-lede">Pitch-only prompt for this pipeline. Runtime caller ID and selected Piper voice-language limits are added by Pitch. Switch the pipeline above to edit the other one. Three variables are filled at call time: <code>{{business_name}}</code>, <code>{{agent_name}}</code>, <code>{{caller_number}}</code>.</p>
         <form id="pitchPromptForm" class="form-grid">
           <label class="full">Instructions
             <textarea name="content" rows="22" spellcheck="false">${escapeHtml(prompt.active ? prompt.active.content : "")}</textarea>
@@ -2795,6 +3952,8 @@ async function pitchStudioView() {
             <td>${v.numSpeakers > 1 ? v.numSpeakers : "—"}</td>
             <td>${v.installed
               ? `<button class="button button-soft" data-play="${v.key}">Listen</button>`
+              : v.custom
+                ? `<span class="muted">Restore model</span>`
               : `<button class="button button-soft" data-install="${v.key}">Download</button>`}</td>
           </tr>`).join("")}
         </tbody>
@@ -2841,9 +4000,11 @@ async function pitchStudioView() {
   // Only show the panel that belongs to the selected pipeline — Piper voices
   // are meaningless on Gemini Live and vice versa.
   function syncPanels() {
-    const isLocal = document.querySelector('input[name="pipeline"]:checked').value === "local";
+    const pipeline = document.querySelector('input[name="pipeline"]:checked').value;
+    const isLocal = pipeline === "local";
     $("#piperPanel").hidden = !isLocal;
-    $("#geminiPanel").hidden = isLocal;
+    $("#geminiPanel").hidden = pipeline !== "gemini-live";
+    $("#openaiPanel").hidden = pipeline !== "openai-realtime";
     $("#previewPanel").hidden = !isLocal;
   }
   document.querySelectorAll('input[name="pipeline"]').forEach((el) => {
@@ -2914,12 +4075,25 @@ async function pitchStudioView() {
     return {
       pipeline: document.querySelector('input[name="pipeline"]:checked').value,
       bargeInEnabled: $("#bargeIn").checked,
-      geminiLive: { voice: $("#geminiVoice").value },
+      geminiLive: {
+        model: $("#geminiLiveModel").value,
+        voice: $("#geminiVoice").value,
+      },
+      openaiRealtime: {
+        model: $("#openaiRealtimeModel").value,
+        voice: $("#openaiRealtimeVoice").value,
+      },
       local: {
+        brainProvider: $("#localBrainProvider").value,
+        geminiTextModel: $("#localGeminiTextModel").value,
+        openaiTextModel: $("#localOpenAiTextModel").value,
         ttsEngine: "piper",
         piperVoice: selectedVoice,
         whisperModel: $("#whisperModel").value,
         piperLengthScale: Number($("#lengthScale").value),
+        piperVolumeDb: Number($("#volumeDb").value),
+        greetingText: $("#greetingText").value,
+        greetingStartDelayMs: Number($("#greetingStartDelayMs").value),
       },
     };
   }
@@ -2930,7 +4104,15 @@ async function pitchStudioView() {
 
   $("#voiceLang").onchange = loadVoices;
   $("#voiceGender").onchange = loadVoices;
+  $("#localBrainProvider").onchange = () => {
+    const useOpenAi = $("#localBrainProvider").value === "openai";
+    $("#localGeminiTextModel").closest("label").hidden = useOpenAi;
+    $("#localOpenAiTextModel").closest("label").hidden = !useOpenAi;
+  };
+  $("#localBrainProvider").onchange();
   $("#lengthScale").oninput = () => { $("#lsVal").textContent = $("#lengthScale").value; };
+  $("#volumeDb").oninput = () => { $("#volVal").textContent = `${$("#volumeDb").value} dB`; };
+  $("#greetingStartDelayMs").oninput = () => { $("#greetingDelayVal").textContent = `${$("#greetingStartDelayMs").value} ms`; };
   $("#previewBtn").onclick = () => playPreview(selectedVoice);
   $("#pitchRefresh").onclick = () => pitchStudioView();
   $("#tabCloser").onclick = () => aiStudioView();
@@ -2951,7 +4133,7 @@ async function pitchStudioView() {
       const poll = setInterval(async () => {
         waited += 5;
         const s = await api("/api/pitch-admin/");
-        if (s.services.pitchPid && (s.config.pipeline === "gemini-live" || (s.services.piper && s.services.whisper))) {
+        if (s.services.pitchPid && (s.config.pipeline !== "local" || (s.services.piper && s.services.whisper))) {
           clearInterval(poll);
           status.textContent = `ready (pid ${s.services.pitchPid})`;
           setTimeout(() => pitchStudioView(), 1200);

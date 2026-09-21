@@ -1,0 +1,14 @@
+{
+  "speaker": "Irenz",
+  "voice_id": "irenz-taglish-v1",
+  "source_dir": "voice-training/recordings/irenz-taglish-v1",
+  "output_dir": "voice-training/piper/irenz-taglish-v1",
+  "sample_rate": 22050,
+  "clip_count": 1110,
+  "missing_count": 0,
+  "missing": [],
+  "audio_seconds": 4754.732900000019,
+  "audio_minutes": 79.24554833333364,
+  "min_seconds": 2.559955,
+  "max_seconds": 7.509297
+}

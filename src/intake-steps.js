@@ -232,6 +232,32 @@ const PAIN_INDUSTRY_TEMPLATES = {
       "More efficient technician scheduling"
     ]
   },
+  "Rental Services": {
+    pains: [
+      "Customers ask what is available for their date or project",
+      "Rental rates depend on duration, quantity, location or package",
+      "Customers need delivery, pickup, setup and lead-time clarity",
+      "Staff needs requirements before recommending the right rental option",
+      "Deposit, reservation, damage and overtime rules cause hesitation",
+      "Availability changes quickly and can be promised by mistake"
+    ],
+    solutions: [
+      "Recommend rental options based on use case, schedule, quantity and location",
+      "Explain rates, inclusions, contract terms, deposit and reservation process",
+      "Collect name, contact, rental dates, delivery area, item or service needed, quantity and special requirements",
+      "Set expectations when final price depends on assessment or staff confirmation",
+      "Move ready customers to quotation, booking, reservation or payment",
+      "Confirm availability only after live inventory/calendar connection or staff confirmation"
+    ],
+    outcomes: [
+      "More complete rental inquiries",
+      "Faster quotation preparation",
+      "Less back-and-forth before booking",
+      "Clearer deposit and rental-term expectations",
+      "Better matching between customer need and rental package",
+      "Fewer promises on unavailable inventory or schedules"
+    ]
+  },
   Hotel: {
     pains: [
       "Guests ask if rooms are available for specific dates",
@@ -447,6 +473,23 @@ const STEPS = [
       // step title, so nothing downstream needs it.
       { name: "answer", label: "Manual written entry — products or services, and their prices", type: "textarea", required: true },
       { name: "currency", label: "Currency", type: "select", options: ["PHP", "USD"], default: "PHP" }
+    ]
+  },
+  {
+    id: "customer_service",
+    title: "Customer service questions",
+    why: "Closer may also handle service and support questions, not only sales. Tell it what customers usually need help with, what details to collect, and when staff must take over.",
+    kind: KINDS.PROSE,
+    category: "Customer service",
+    required: false,
+    fields: [
+      {
+        name: "answer",
+        label: "Will customers also use chat for customer service? If yes, what services do they need, what do they usually ask, what details should Closer collect, and when should staff take over?",
+        type: "textarea",
+        required: true,
+        placeholder: "Example: Yes. Customers ask for repair status, rescheduling, warranty coverage, installation help, and billing questions. Closer should collect name, contact number, order/invoice number, product or service availed, issue, photos if useful, preferred schedule, and urgency. Staff must take over for complaints, refunds, account changes, or anything not in the knowledge base."
+      }
     ]
   },
   {
@@ -820,16 +863,16 @@ const VALIDITY_OPTIONS = [
 const INDUSTRY_PACKS = {
   general: {
     label: "General business",
-    order: ["identity", "pain_solutions", "products", "promos", "media", "payments", "shipping", "policies", "qualification", "boundaries", "documents", "faq", "live_data"]
+    order: ["identity", "pain_solutions", "customer_service", "products", "promos", "media", "payments", "shipping", "policies", "qualification", "boundaries", "documents", "faq", "live_data"]
   },
   retail: {
     label: "Retail / online selling",
-    order: ["identity", "pain_solutions", "products", "promos", "media", "payments", "shipping", "policies", "qualification", "boundaries", "documents", "faq", "live_data"],
+    order: ["identity", "pain_solutions", "customer_service", "products", "promos", "media", "payments", "shipping", "policies", "qualification", "boundaries", "documents", "faq", "live_data"],
     labels: { products: "Your items and prices" }
   },
   clinic: {
     label: "Clinic / aesthetic / dental",
-    order: ["identity", "pain_solutions", "products", "promos", "media", "payments", "policies", "qualification", "boundaries", "documents", "faq", "live_data"],
+    order: ["identity", "pain_solutions", "customer_service", "products", "promos", "media", "payments", "policies", "qualification", "boundaries", "documents", "faq", "live_data"],
     drop: ["shipping"],
     labels: {
       products: "Treatments, packages and prices",
@@ -841,7 +884,7 @@ const INDUSTRY_PACKS = {
   },
   church: {
     label: "Church / ministry",
-    order: ["identity", "pain_solutions", "media", "payments", "policies", "qualification", "boundaries", "documents", "faq", "live_data"],
+    order: ["identity", "pain_solutions", "customer_service", "media", "payments", "policies", "qualification", "boundaries", "documents", "faq", "live_data"],
     drop: ["products", "promos", "shipping"],
     labels: {
       identity: "Who you are and what you believe",
@@ -851,14 +894,24 @@ const INDUSTRY_PACKS = {
   },
   hotel: {
     label: "Hotel / resort / staycation",
-    order: ["identity", "pain_solutions", "products", "promos", "media", "payments", "policies", "qualification", "boundaries", "documents", "faq", "live_data"],
+    order: ["identity", "pain_solutions", "customer_service", "products", "promos", "media", "payments", "policies", "qualification", "boundaries", "documents", "faq", "live_data"],
     drop: ["shipping"],
     labels: { products: "Rooms, rates and inclusions" }
   },
   restaurant: {
     label: "Restaurant / food",
-    order: ["identity", "pain_solutions", "products", "promos", "media", "payments", "shipping", "policies", "qualification", "boundaries", "documents", "faq", "live_data"],
+    order: ["identity", "pain_solutions", "customer_service", "products", "promos", "media", "payments", "shipping", "policies", "qualification", "boundaries", "documents", "faq", "live_data"],
     labels: { products: "Menu and prices", shipping: "Delivery areas and fees" }
+  },
+  rental: {
+    label: "Rental services",
+    order: ["identity", "pain_solutions", "customer_service", "products", "promos", "media", "payments", "shipping", "policies", "qualification", "boundaries", "documents", "faq", "live_data"],
+    labels: {
+      products: "Rental items, services, rates and terms",
+      shipping: "Delivery, pickup and lead time",
+      policies: "Rental terms, deposits and damage rules",
+      qualification: "What you need to know before quoting a rental"
+    }
   }
 };
 
@@ -886,6 +939,7 @@ function suggestPack(company = {}, pageName = "") {
   if (/clinic|dental|aesthetic|derma|medical|spa/.test(hay)) return "clinic";
   if (/hotel|resort|staycation|inn|lodge/.test(hay)) return "hotel";
   if (/restaurant|cafe|coffee|food|grill|eatery|bakery/.test(hay)) return "restaurant";
+  if (/rental|rent|lease|hire|equipment|printer|copier|photocopier/.test(hay)) return "rental";
   if (/shop|store|boutique|closet|apparel|clothing|retail|shirt|ads|funnel|studio/.test(hay)) return "retail";
   return "general";
 }

@@ -1,0 +1,13 @@
+{
+  "speaker": "Gab",
+  "source_dir": "voice-training/recordings/mike-taglish-v1",
+  "output_dir": "voice-training/piper/gab-v1",
+  "sample_rate": 22050,
+  "clip_count": 970,
+  "missing_count": 0,
+  "missing": [],
+  "audio_seconds": 4781.841276000021,
+  "audio_minutes": 79.69735460000035,
+  "min_seconds": 2.815964,
+  "max_seconds": 7.679955
+}

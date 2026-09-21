@@ -23,7 +23,7 @@ function messengerEventKey(event, psid) {
 }
 const { prisma } = require("./db");
 const { decryptSecret, encryptSecret } = require("./crypto");
-const { generateSalesReply } = require("./ai");
+const { generateSalesReply, leadUpdateDataForAi } = require("./ai");
 const { notifyBookingCreated, notifyHandoff, notifySecurityAlert } = require("./notify");
 const { createCheckoutLink } = require("./checkout-link");
 const { maybeAddWebsiteResearchToLead } = require("./closer-web-research");
@@ -638,9 +638,7 @@ async function handleClientMessengerEvent({ page, psid, text, maybeCreateQuotati
       where: { id: lead.id },
       data: {
         ...ai.leadPatch,
-        lead_score: ai.leadScore,
-        quotation_ready: ai.quotationReady,
-        lead_status: ai.quotationReady ? "quotation_ready" : "contacted"
+        ...leadUpdateDataForAi(lead.lead_status, ai)
       }
     })) || lead;
 

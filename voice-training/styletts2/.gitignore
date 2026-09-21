@@ -1,0 +1,6 @@
+__pycache__/
+*.pyc
+output/checkpoints/
+output/generated-audio/
+output/resampled-24k/
+

@@ -150,7 +150,197 @@ function normaliseLeadScore(value) {
   return ["hot", "warm", "cold"].includes(v) ? v : "cold";
 }
 
-function buildGuardrailPrompt({ company, kb, lead, message, customQuestions, instructions, customInstructions, history = [], alreadySent = [], checkoutEnabled = false, researchContext = "", bookingContext = "" }) {
+const DEFAULT_LEAD_QUALIFICATION_RULES = {
+  mode: "ai_decides",
+  sourceProfiles: {
+    default: {
+      label: "Default",
+      leadCriteria: [
+        "Customer gives a phone number, email, or usable contact detail.",
+        "Customer gives company/business context plus a real need.",
+        "Customer asks for a demo, consultation, site visit, assessment, quote, proposal, package recommendation, checkout, payment link, or says they want to proceed."
+      ],
+      notLeadCriteria: [
+        "Greeting only.",
+        "A vague one-word reply like interested, details, price, how much, package, hi, hello, yes, or an emoji with no buyer detail.",
+        "AI answered and the customer did not reply again.",
+        "Spam, abuse, job-seeking, support confusion, or unrelated messages."
+      ]
+    },
+    facebook_messenger: {
+      label: "Facebook Messenger",
+      leadCriteria: [
+        "Customer gives a phone number or email that staff can use for sales follow-up.",
+        "Customer typed a real follow-up after the AI answered and also gave a company/business detail, location, or specific need.",
+        "Customer asks for a demo, consultation, quotation, package recommendation, payment link, booking, or says they want to proceed, and gives enough contact detail for staff to reach them."
+      ],
+      notLeadCriteria: [
+        "Only clicked a pre-built Facebook question, quick reply, button, or ad prompt.",
+        "Only says interested, details, price, how much, package, hi, hello, yes, or sends an emoji with no other detail.",
+        "No phone number or email is saved from the Messenger inquiry.",
+        "AI answered and the customer did not reply again."
+      ]
+    },
+    website_demo: {
+      label: "Website / Demo",
+      leadCriteria: [
+        "Customer submits a demo, consultation, assessment, audit, or contact form with a usable contact detail.",
+        "Customer clicks demo or selects a package and gives enough identity or business context for sales follow-up.",
+        "Customer asks a specific fit, setup, timeline, package, or pricing question after visiting the website."
+      ],
+      notLeadCriteria: [
+        "Anonymous page view, package click, demo click, or checkout start with no contact detail and no customer message.",
+        "Bot/test traffic, repeated empty submissions, or accidental clicks."
+      ]
+    },
+    checkout_payment: {
+      label: "Checkout / Payment",
+      leadCriteria: [
+        "Customer selected a package and asks for or receives a payment link.",
+        "Customer starts checkout with name, email, phone, or company detail.",
+        "Customer sends payment proof, payment confirmation, or asks how to complete payment."
+      ],
+      notLeadCriteria: [
+        "Payment page visit or abandoned click with no contact detail.",
+        "Payment support confusion from someone who is not a buyer."
+      ]
+    }
+  },
+  leadCriteria: [
+    "Customer gives a phone number, email, or usable contact detail.",
+    "Customer gives company/business context plus a real need.",
+    "Customer asks for a demo, consultation, site visit, assessment, quote, proposal, package recommendation, checkout, payment link, or says they want to proceed."
+  ],
+  notLeadCriteria: [
+    "Greeting only.",
+    "A vague one-word reply like interested, details, price, how much, package, hi, hello, yes, or an emoji with no buyer detail.",
+    "Only clicked a pre-built Facebook question, quick reply, button, or ad prompt.",
+    "AI answered and the customer did not reply again.",
+    "Spam, abuse, job-seeking, support confusion, or unrelated messages."
+  ],
+  temperatures: {
+    cold: "Possible buyer but early, incomplete, or weak intent.",
+    warm: "Meaningful interest: asking details, fit, demo, assessment, quote, terms, package comparison, or timeline.",
+    hot: "Ready-to-buy behavior: says yes/proceed/start, requests payment link, starts checkout, sends payment proof, asks to book urgently, or commits to a next buying step."
+  },
+  pipelineStages: {
+    new: "Worth following up.",
+    learning_demo: "Asking details, checking fit, doing consult, site visit, demo, or assessment.",
+    quote_sent: "Price, package, proposal, or offer was sent.",
+    follow_up_negotiation: "Quote sent, waiting for answer, approval, objection handling, or changes.",
+    payment_pending: "Customer said yes; waiting for payment.",
+    won: "Paid, booked, or accepted.",
+    lost: "Not buying, no fit, spam, or not worth sales follow-up."
+  },
+  defaultInstruction: "Be strict. If unsure, keep it as Inquiry only and tell staff what proof is missing."
+};
+
+function leadQualificationRules(settings) {
+  const rules = settings?.lead_qualification_rules;
+  if (rules && typeof rules === "object" && !Array.isArray(rules)) {
+    return {
+      ...DEFAULT_LEAD_QUALIFICATION_RULES,
+      ...rules,
+      temperatures: {
+        ...DEFAULT_LEAD_QUALIFICATION_RULES.temperatures,
+        ...(rules.temperatures || {})
+      },
+      pipelineStages: {
+        ...DEFAULT_LEAD_QUALIFICATION_RULES.pipelineStages,
+        ...(rules.pipelineStages || {})
+      },
+      sourceProfiles: {
+        ...DEFAULT_LEAD_QUALIFICATION_RULES.sourceProfiles,
+        ...(rules.sourceProfiles || {})
+      }
+    };
+  }
+  return DEFAULT_LEAD_QUALIFICATION_RULES;
+}
+
+function renderLeadQualificationRules(rules) {
+  return [
+    "=== AI LEAD QUALIFICATION RULES ===",
+    "Use these business-editable rules to decide whether the conversation is a real lead. Do not use hidden keyword rules.",
+    "Choose the closest source profile from sourceProfiles using the conversation channel/source. If no profile matches, use default plus the global rules.",
+    "For Facebook Messenger, a quick-reply/button click alone is not buyer proof. If no phone number or email is saved, keep it as inquiry_only unless the business has explicitly configured a different source rule.",
+    "If the AI answered and the customer did not reply again, keep it as inquiry_only.",
+    JSON.stringify(rules, null, 2),
+    "",
+    "Return the decision in lead_qualification. If the person is not a lead, use status inquiry_only, temperature none, stage unqualified, and a short reason staff can understand."
+  ].join("\n");
+}
+
+function normaliseLeadQualification(value, fallbackScore = "cold") {
+  const raw = value && typeof value === "object" ? value : {};
+  const status = String(raw.status || raw.is_lead || "").toLowerCase();
+  const isLead = status === "lead" || status === "yes" || status === "true" || raw.is_lead === true;
+  const temperature = isLead ? normaliseLeadScore(raw.temperature || raw.lead_score || fallbackScore) : "cold";
+  const stage = String(raw.stage || raw.pipeline_stage || (isLead ? "new" : "unqualified")).toLowerCase().trim()
+    .replace(/\s*\/\s*/g, "_")
+    .replace(/[\s-]+/g, "_");
+  const allowedStages = new Set([
+    "new", "contacted", "qualified", "learning_demo", "quote_sent",
+    "quotation_ready", "follow_up_negotiation", "negotiation",
+    "payment_pending", "appointment", "won", "lost", "unqualified", "spam"
+  ]);
+  const confidence = Number.parseInt(raw.confidence, 10);
+  return {
+    status: isLead ? "lead" : "inquiry_only",
+    reason: String(raw.reason || (isLead ? "AI classified this as a lead." : "AI did not find enough buyer proof.")).trim().slice(0, 500),
+    confidence: Number.isFinite(confidence) ? Math.max(0, Math.min(100, confidence)) : null,
+    temperature,
+    stage: allowedStages.has(stage) ? stage : (isLead ? "new" : "unqualified"),
+    nextAction: String(raw.next_action || "").trim().slice(0, 240),
+    missingInfo: Array.isArray(raw.missing_info) ? raw.missing_info.map((item) => String(item).trim()).filter(Boolean).slice(0, 8) : []
+  };
+}
+
+function leadUpdateDataForAi(currentStatus, ai = {}) {
+  const current = String(currentStatus || "new").toLowerCase();
+  const qualification = ai.leadQualification || {
+    status: "inquiry_only",
+    reason: "AI did not return a lead qualification decision.",
+    confidence: null,
+    temperature: "cold",
+    stage: "unqualified",
+    nextAction: "Review inquiry"
+  };
+
+  if (["won", "lost", "spam"].includes(current)) {
+    return {
+      lead_score: current === "won" ? "hot" : "cold",
+      lead_qualification_status: current === "spam" ? "inquiry_only" : "lead",
+      lead_qualification_reason: qualification.reason,
+      lead_qualification_confidence: qualification.confidence,
+      lead_next_action: qualification.nextAction || null
+    };
+  }
+
+  if (qualification.status !== "lead") {
+    return {
+      lead_status: "unqualified",
+      lead_score: "cold",
+      quotation_ready: false,
+      lead_qualification_status: "inquiry_only",
+      lead_qualification_reason: qualification.reason,
+      lead_qualification_confidence: qualification.confidence,
+      lead_next_action: qualification.nextAction || null
+    };
+  }
+
+  return {
+    lead_status: qualification.stage || "new",
+    lead_score: qualification.temperature || ai.leadScore || "cold",
+    quotation_ready: Boolean(ai.quotationReady),
+    lead_qualification_status: "lead",
+    lead_qualification_reason: qualification.reason,
+    lead_qualification_confidence: qualification.confidence,
+    lead_next_action: qualification.nextAction || null
+  };
+}
+
+function buildGuardrailPrompt({ company, kb, lead, message, customQuestions, instructions, customInstructions, leadQualificationRulesConfig, history = [], alreadySent = [], checkoutEnabled = false, researchContext = "", bookingContext = "" }) {
   // Kind-aware rendering. Was `kb.map(item => "Q: ...\nA: ...")`, which forced
   // a price list, a promo and a shipping table to all pretend to be questions.
   // company.id is passed so a budget overflow names the workspace in the log.
@@ -204,6 +394,8 @@ function buildGuardrailPrompt({ company, kb, lead, message, customQuestions, ins
     "=== THIS BUSINESS'S BOOKING SETUP ===",
     bookingContext || "Booking calendar: not configured.",
     "",
+    renderLeadQualificationRules(leadQualificationRules({ lead_qualification_rules: leadQualificationRulesConfig })),
+    "",
     "=== THE CONVERSATION ===",
     // ADDED 2026-08-18. The prompt used to contain ONLY the latest message, so
     // Closer had no memory of what it had just asked. It asked a prospect
@@ -220,14 +412,15 @@ function buildGuardrailPrompt({ company, kb, lead, message, customQuestions, ins
     "",
     "=== WHAT TO RETURN ===",
     "Reply with JSON only:",
-    '{"reply": "...", "follow_up_messages": [], "intent": "...", "handoff_reason": "", "lead_updates": {}, "lead_score": "hot|warm|cold", "unanswered": null, "send_media": [], "security_alert": null, "create_booking": null}',
+    '{"reply": "...", "follow_up_messages": [], "intent": "...", "handoff_reason": "", "lead_updates": {}, "lead_qualification": {"status": "lead|inquiry_only", "reason": "...", "confidence": 0, "temperature": "hot|warm|cold|none", "stage": "new|learning_demo|quote_sent|follow_up_negotiation|payment_pending|won|lost|unqualified", "next_action": "...", "missing_info": []}, "lead_score": "hot|warm|cold", "unanswered": null, "send_media": [], "security_alert": null, "create_booking": null}',
     "",
     "reply — what you are sending the customer, in your own words.",
     "follow_up_messages — optional second Messenger bubble(s). Use at most ONE short follow-up. For B2B sales prospects, use it when the main reply answers the question but does not yet include a pain, benefit, proof point, or next-step value bridge. Use [] for support, payment confirmation, handoff, or when the main reply already carries the sales insight.",
     "intent — a short label for what they want, your choice of wording.",
     "handoff_reason — empty string unless a human is genuinely needed. Set it only when the customer asks for a person, raises a complaint, or wants something you are not permitted to decide. Never set it merely because a topic sounds sensitive.",
     "lead_updates — any details you learned about the customer in THIS message, keyed by the store-as names listed above. Only include a field when they actually told you; never guess, and never copy their whole message into a field.",
-    "lead_score — how close this person is to buying, judged from the whole conversation in whatever language they used. hot = ready or urgent, warm = genuinely interested, cold = still browsing.",
+    "lead_qualification — your CRM classification for staff. Follow the AI Lead Qualification Rules exactly. Be strict: if there is no real buyer proof, return inquiry_only and explain what is missing.",
+    "lead_score — keep this in sync with lead_qualification.temperature. If lead_qualification.status is inquiry_only, use cold.",
     // This is what makes the "we tune it with you" promise keepable. The model
     // already knows when it had to say it could not confirm something, so it
     // reports the gap itself — no keyword matching, no guessing.
@@ -415,6 +608,7 @@ async function generateSalesReply({ companyId, conversationId, message }) {
     customQuestions,
     instructions: activeInstructions.content,
     customInstructions: settings?.ai_custom_instructions || "",
+    leadQualificationRulesConfig: settings?.lead_qualification_rules,
     // Oldest first for reading. The newest row is the message we are answering
     // now, which is shown separately, so it is dropped here.
     history: (conversation?.messages || []).slice(1).reverse(),
@@ -497,6 +691,7 @@ async function generateSalesReply({ companyId, conversationId, message }) {
 
   const mergedLead = { ...lead, ...patch };
   const leadScore = normaliseLeadScore(parsed.lead_score);
+  const leadQualification = normaliseLeadQualification(parsed.lead_qualification, leadScore);
   const isQuotationReady = quotationReady(mergedLead, customQuestions);
 
   await prisma.aiLog.create({
@@ -524,7 +719,8 @@ async function generateSalesReply({ companyId, conversationId, message }) {
     intent: parsed.intent || "qualifying",
     handoffReason: parsed.handoff_reason || "",
     leadPatch: patch,
-    leadScore,
+    leadScore: leadQualification.temperature,
+    leadQualification,
     quotationReady: isQuotationReady,
     needsHuman,
     // Passed to the webhook, which records it. Kept as raw model output here
@@ -607,5 +803,8 @@ module.exports = {
   quotationReady,
   requiredFieldKeys,
   missingFields,
-  normaliseLeadScore
+  normaliseLeadScore,
+  DEFAULT_LEAD_QUALIFICATION_RULES,
+  leadQualificationRules,
+  leadUpdateDataForAi
 };

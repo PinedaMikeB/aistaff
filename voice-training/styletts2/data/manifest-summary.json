@@ -1,0 +1,98 @@
+{
+  "speaker": "mike-taglish-v1",
+  "seed": 20260830,
+  "source_rows": 970,
+  "prepared_rows": 970,
+  "train_rows": 873,
+  "val_rows": 97,
+  "smoke_train_rows": 120,
+  "smoke_val_rows": 24,
+  "ood_text_rows": 30,
+  "class_distribution": {
+    "filipino": 180,
+    "english": 23,
+    "taglish": 767
+  },
+  "audio_root_for_styletts2": "/Volumes/Wotg Drive Mike/GitHub/AIStaff/voice-training/styletts2/output",
+  "train_manifest": "/Volumes/Wotg Drive Mike/GitHub/AIStaff/voice-training/styletts2/data/train.txt",
+  "val_manifest": "/Volumes/Wotg Drive Mike/GitHub/AIStaff/voice-training/styletts2/data/val.txt",
+  "frontend": "custom Taglish: English words unchanged with English G2P + simple Filipino IPA-like G2P for Tagalog words",
+  "warnings_count": 15,
+  "warnings_sample": [
+    {
+      "id": "cls014",
+      "token": "quezon",
+      "warning": "loanword/name letter `q` mapped in Filipino word `quezon`"
+    },
+    {
+      "id": "cls014",
+      "token": "quezon",
+      "warning": "loanword/name letter `z` mapped in Filipino word `quezon`"
+    },
+    {
+      "id": "eng005",
+      "token": "stock",
+      "warning": "loanword/name letter `c` mapped in Filipino word `stock`"
+    },
+    {
+      "id": "fup008",
+      "token": "stock",
+      "warning": "loanword/name letter `c` mapped in Filipino word `stock`"
+    },
+    {
+      "id": "obj140",
+      "token": "stock",
+      "warning": "loanword/name letter `c` mapped in Filipino word `stock`"
+    },
+    {
+      "id": "prd002",
+      "token": "stock",
+      "warning": "loanword/name letter `c` mapped in Filipino word `stock`"
+    },
+    {
+      "id": "prd003",
+      "token": "stock",
+      "warning": "loanword/name letter `c` mapped in Filipino word `stock`"
+    },
+    {
+      "id": "prd009",
+      "token": "stock",
+      "warning": "loanword/name letter `c` mapped in Filipino word `stock`"
+    },
+    {
+      "id": "prd018",
+      "token": "stock",
+      "warning": "loanword/name letter `c` mapped in Filipino word `stock`"
+    },
+    {
+      "id": "prd028",
+      "token": "stock",
+      "warning": "loanword/name letter `c` mapped in Filipino word `stock`"
+    },
+    {
+      "id": "prd032",
+      "token": "stock",
+      "warning": "loanword/name letter `c` mapped in Filipino word `stock`"
+    },
+    {
+      "id": "prd060",
+      "token": "stock",
+      "warning": "loanword/name letter `c` mapped in Filipino word `stock`"
+    },
+    {
+      "id": "prd063",
+      "token": "stock",
+      "warning": "loanword/name letter `c` mapped in Filipino word `stock`"
+    },
+    {
+      "id": "prd078",
+      "token": "stock",
+      "warning": "loanword/name letter `c` mapped in Filipino word `stock`"
+    },
+    {
+      "id": "prd097",
+      "token": "stock",
+      "warning": "loanword/name letter `c` mapped in Filipino word `stock`"
+    }
+  ]
+}

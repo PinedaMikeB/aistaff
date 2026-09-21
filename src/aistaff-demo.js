@@ -496,6 +496,16 @@ function hasLeadProfile(session) {
   );
 }
 
+function hasConcreteBuyingStep(session) {
+  return Boolean(hasLeadProfile(session) && (session.quotationOffered || session.quotationEmailConfirmed));
+}
+
+function leadTemperatureForSession(session) {
+  if (hasConcreteBuyingStep(session)) return "hot";
+  if (hasLeadProfile(session)) return "warm";
+  return session.contact || session.inquiryTopics || session.pageConfirmed ? "cold" : "cold";
+}
+
 function getNextMissingLeadField(session) {
   for (const field of INITIAL_LEAD_FIELDS) {
     if (field.key === "email") {
@@ -3920,13 +3930,13 @@ async function persistAistaffTurnToPostgres({ pageId, psid, customerText, reply,
         channel: "facebook_messenger",
         status: "open",
         intent: "aistaff_demo_inquiry",
-        lead_score: session.weeklyInquiries ? "hot" : "warm",
+        lead_score: leadTemperatureForSession(session),
         last_message_at: new Date()
       },
       update: {
         facebook_page_id: facebookPage?.id,
         intent: "aistaff_demo_inquiry",
-        lead_score: session.weeklyInquiries ? "hot" : "warm",
+        lead_score: leadTemperatureForSession(session),
         last_message_at: new Date()
       }
     });
@@ -3969,7 +3979,7 @@ async function persistAistaffTurnToPostgres({ pageId, psid, customerText, reply,
       urgency: session.sendsQuotations || null,
       notes: encodeAistaffLeadNotes(session),
       lead_status: hasLeadProfile(session) ? "qualified" : (session.contact ? "contacted" : "new"),
-      lead_score: session.weeklyInquiries ? "hot" : (hasLeadProfile(session) ? "warm" : "cold"),
+      lead_score: leadTemperatureForSession(session),
       quotation_ready: Boolean(hasLeadProfile(session) && session.quotationOffered)
     };
 

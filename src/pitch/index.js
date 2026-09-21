@@ -25,7 +25,12 @@ function preflight() {
   if (config.brainProvider === "openai" && !config.openai.apiKey) problems.push("OPENAI_API_KEY is empty");
   if (config.brainProvider === "gemini" && !config.gemini.apiKey) problems.push("GEMINI_API_KEY is empty");
   if (config.brainProvider === "local" || config.brainProvider === "local-pipeline") {
-    if (!config.gemini.apiKey) problems.push("GEMINI_API_KEY is empty — local pipeline needs Gemini text");
+    if (config.localPipeline.brainProvider === "openai" && !config.openai.apiKey) {
+      problems.push("OPENAI_API_KEY is empty — local pipeline is set to OpenAI text");
+    }
+    if (config.localPipeline.brainProvider !== "openai" && !config.gemini.apiKey) {
+      problems.push("GEMINI_API_KEY is empty — local pipeline is set to Gemini text");
+    }
     if (!config.localPipeline.whisperUrl) problems.push("PITCH_LOCAL_WHISPER_URL is empty — local pipeline needs whisper.cpp");
     if (!config.localPipeline.voxcpmUrl) problems.push("PITCH_VOXCPM2_URL is empty — local pipeline needs VoxCPM2 TTS");
   }
@@ -49,7 +54,8 @@ async function main() {
 
   log.info(
     `starting — extension ${config.sip.username} -> ${config.sip.gatewayHost}:${config.sip.gatewayPort}, ` +
-    `local ${config.sip.localHost}:${config.sip.localPort}, brain=${config.brainProvider}`
+    `local ${config.sip.localHost}:${config.sip.localPort}, brain=${config.brainProvider}, ` +
+    `model=${config.brainProvider === "local" ? config.localPipeline[`${config.localPipeline.brainProvider}TextModel`] : config.brainProvider === "gemini" ? config.gemini.liveModel : config.openai.realtimeModel}`
   );
 
   ua = new SipUa(config.sip);

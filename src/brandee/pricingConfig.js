@@ -6,7 +6,7 @@
 // from this file (or its Super Admin-published DB override — see
 // pricingOverride.js) instead of repeating quantities across components.
 //
-// TAX MODE — AIStaff Solutions Corporation is currently NON-VAT registered.
+// TAX MODE — AIStaff Business Solutions Corporation is currently NON-VAT registered.
 // The three published prices below (₱599 / ₱1,199 / ₱2,999) are the TOTAL
 // monthly prices a customer pays; no 12% VAT is added on top, and nothing in
 // this app may display "VAT included" while taxMode is NON_VAT. The internal
@@ -210,7 +210,7 @@ function computeTaxBreakdown(totalPrice, taxConfig = DEFAULT_TAX_CONFIG) {
   return { taxMode: "VAT", vatableSale, vat, total, label: "VAT-inclusive transaction" };
 }
 
-const PRICING_NOTE = "Prices shown are the total monthly subscription prices. AIStaff Solutions Corporation is currently non-VAT registered.";
+const PRICING_NOTE = "Prices shown are the total monthly subscription prices. AIStaff Business Solutions Corporation is currently non-VAT registered.";
 
 // Anonymous (pre-registration) preview limits — enforced server-side
 // regardless of what a client sends. One preview per kind per anonymous

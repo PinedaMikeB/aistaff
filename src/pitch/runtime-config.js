@@ -22,24 +22,45 @@ const CONFIG_PATH = process.env.PITCH_RUNTIME_CONFIG
   || path.join(__dirname, "..", "..", "local-runtime", "pitch-config.json");
 
 const DEFAULTS = {
-  // "gemini-live" = pipeline 1 (premium, native Taglish + emotion)
-  // "local"       = pipeline 2/3 (whisper -> text brain -> local TTS)
+  // "gemini-live"     = Google native speech-to-speech
+  // "openai-realtime" = OpenAI native speech-to-speech
+  // "local"           = whisper -> text brain -> local TTS
   pipeline: "gemini-live",
 
   // Pipeline 1 settings. Gemini Live picks from Google's prebuilt voices;
   // there is no custom voice and no language setting (the model matches
   // whatever the caller speaks).
   geminiLive: {
+    model: "gemini-3.1-flash-live-preview",
     voice: "Aoede",
   },
 
+  openaiRealtime: {
+    model: "gpt-realtime",
+    voice: "marin",
+  },
+
   local: {
+    // Piper is only the voice. This chooses the LLM that thinks/orchestrates.
+    brainProvider: "gemini",        // gemini | openai
+    geminiTextModel: "gemini-3.5-flash-lite",
+    openaiTextModel: "gpt-4.1-mini",
+
     // Which local TTS engine the local pipeline uses.
-    ttsEngine: "piper",             // piper | kokoro
-    piperVoice: "en_US-lessac-medium",
+    ttsEngine: "piper",             // piper | kokoro | zonos2
+    piperVoice: "gab_taglish_epoch59",
     piperSpeakerId: null,           // for multi-speaker models
     piperLengthScale: 1.0,          // >1 slower, <1 faster
     piperNoiseScale: 0.667,
+    piperVolumeDb: -5,              // lower Gab without retraining
+    zonos2Url: "http://127.0.0.1:1919/tts/generate",
+    zonos2SpeakerId: "",            // e.g. default_ad689b18cfb01a0d = AmericanFemale
+    zonos2SessionId: "",            // only needed for uploaded/cached speakers
+    zonos2Seed: 12,
+    zonos2Speed: 0.85,
+    zonos2MaxTokens: 700,
+    greetingText: "Hello, this is Pitch, your AI sales and support staff. How can I help you today?",
+    greetingStartDelayMs: 250,
     whisperModel: "ggml-medium",
     whisperLanguage: "auto",        // auto | en | tl
   },
@@ -91,6 +112,7 @@ function resolveBrainProvider(envValue) {
   const cfg = readConfig();
   if (cfg.pipeline === "local") return "local";
   if (cfg.pipeline === "gemini-live") return "gemini";
+  if (cfg.pipeline === "openai-realtime") return "openai";
   return envValue || "gemini";
 }
 

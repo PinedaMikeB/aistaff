@@ -1,0 +1,116 @@
+{
+  "title": "PHILGEPS OPPORTUNITY BRIEFING",
+  "date_iso": "2026-08-28",
+  "date_long": "August 28, 2026",
+  "opportunities_reviewed": 5,
+  "opportunities_screened": 40,
+  "best_opportunities": [
+    {
+      "match_rating": "STRONG MATCH",
+      "score": 8,
+      "project": "2026-08-4390 Procurement of Website Development and Implementation Services",
+      "procuring_entity": "Province of Quezon",
+      "reference_number": "13209616",
+      "abc": "PHP 500,000.00",
+      "deadline": "August 31, 2026 8:10 AM",
+      "procurement_method": "Negotiated Procurement - Small Value Procurement (Sec. 34)",
+      "why_fit": "This is a direct website-development services procurement under a small-value route, with a budget and 48-day delivery window that are realistic for AIStaff's custom systems and implementation work.",
+      "important_requirements": [
+        "Public notice exposes only one line item: Website Development and Implementation Services",
+        "Delivery period is 48 days",
+        "The official notice says to inquire at the Office of the Department of Education (DepEd) - Quezon for details",
+        "Contact person in the public abstract: Gerardo F. L. Micor, BAC Secretariat/PGADH-Provincial Budget Office, quezonbac@gmail.com, (042) 719-1130",
+        "The public abstract does not clearly state the PhilGEPS membership level requirement, document checklist, or prior-experience threshold"
+      ],
+      "risks_or_blockers": [
+        "The official PhilGEPS abstract is unusually sparse and does not describe the actual website scope, number of pages, integrations, hosting model, warranty terms, or acceptance criteria",
+        "The note to inquire with DepEd-Quezon creates an agency-detail inconsistency because the posting entity shown in the header is the Province of Quezon",
+        "Because the eligibility checklist is not visible in the public abstract, Red PhilGEPS acceptability and any prior-project requirement must be confirmed before committing effort"
+      ],
+      "recommended_next_action": "Request the RFQ packet immediately, confirm whether Red PhilGEPS registration is acceptable, and ask for the exact scope, implementation milestones, and ownership of hosting, domain, content migration, and post-launch support.",
+      "official_link": "https://notices.philgeps.gov.ph/GEPSNONPILOT/Tender/SplashBidNoticeAbstractUI.aspx?BusCatID=10&DirectFrom=OpenOpp&Type=category&menuIndex=3&refID=13209616"
+    }
+  ],
+  "urgent_deadlines": [
+    {
+      "project": "2026-08-4390 Procurement of Website Development and Implementation Services",
+      "procuring_entity": "Province of Quezon",
+      "reference_number": "13209616",
+      "deadline": "August 31, 2026 8:10 AM",
+      "note": "New notice published on August 28, 2026 and closes within three days; details are sparse, so the RFQ packet should be requested immediately.",
+      "official_link": "https://notices.philgeps.gov.ph/GEPSNONPILOT/Tender/SplashBidNoticeAbstractUI.aspx?BusCatID=10&DirectFrom=OpenOpp&Type=category&menuIndex=3&refID=13209616"
+    }
+  ],
+  "not_recommended": [
+    {
+      "project": "SUBSCRIPTION TO PLAGIARISM DETECTION AND ACADEMIC INTEGRITY SOFTWARE/SERVICE",
+      "procuring_entity": "Iloilo State University of Fisheries Science and Technology",
+      "reference_number": "13208702",
+      "reason": "This is a product-style software subscription procurement with AI-detection and LMS-integration features, but it reads like a brand/vendor-specific license supply with training rather than a custom AIStaff service engagement. The likely edge belongs to an authorized software reseller or niche academic platform vendor, not a new government services bidder.",
+      "official_link": "https://notices.philgeps.gov.ph/GEPSNONPILOT/Tender/SplashBidNoticeAbstractUI.aspx?BusCatID=10&DirectFrom=OpenOpp&Type=category&menuIndex=3&refID=13208702"
+    }
+  ],
+  "todays_recommendation": {
+    "best_opportunity": "2026-08-4390 Procurement of Website Development and Implementation Services (Ref 13209616) is the best opportunity to pursue today because it is a fresh small-value services procurement that directly matches AIStaff's web and custom-system delivery capabilities.",
+    "documents_to_prepare": [
+      "Current PhilGEPS registration and annexes",
+      "Mayor's/Business Permit and SEC registration",
+      "Notarized Omnibus Sworn Statement",
+      "One-page company profile focused on website builds, system implementation, automation, and support",
+      "Portfolio sheet showing relevant websites, custom systems, and integrations",
+      "Draft clarification email requesting the full RFQ scope and document checklist"
+    ],
+    "clarifications_to_request": [
+      "Whether Red PhilGEPS registration is acceptable for this small-value procurement",
+      "Whether the project is a new website build, redesign, portal migration, or implementation of an existing approved design",
+      "Whether hosting, domain management, SSL, content migration, analytics, and maintenance are part of the required scope",
+      "Which entity will issue the detailed requirements and receive submissions: Province of Quezon BAC or DepEd-Quezon"
+    ]
+  },
+  "source_urls_checked": [
+    "https://notices.philgeps.gov.ph/GEPSNONPILOT/Tender/SplashOpportunitiesSearchUI.aspx?BusCatID=10&ClickFrom=OpenOpp&menuIndex=3&type=category",
+    "https://notices.philgeps.gov.ph/GEPSNONPILOT/Tender/SplashOpportunitiesSearchUI.aspx?BusCatID=43&ClickFrom=OpenOpp&menuIndex=3&type=category",
+    "https://notices.philgeps.gov.ph/GEPSNONPILOT/Tender/SplashBidNoticeAbstractUI.aspx?BusCatID=10&DirectFrom=OpenOpp&Type=category&menuIndex=3&refID=13209616",
+    "https://notices.philgeps.gov.ph/GEPSNONPILOT/Tender/SplashBidNoticeAbstractUI.aspx?BusCatID=43&DirectFrom=OpenOpp&Type=category&menuIndex=3&refID=13211679",
+    "https://notices.philgeps.gov.ph/GEPSNONPILOT/Tender/SplashBidNoticeAbstractUI.aspx?BusCatID=10&DirectFrom=OpenOpp&Type=category&menuIndex=3&refID=13212827",
+    "https://notices.philgeps.gov.ph/GEPSNONPILOT/Tender/SplashBidNoticeAbstractUI.aspx?BusCatID=10&DirectFrom=OpenOpp&Type=category&menuIndex=3&refID=13208702",
+    "https://notices.philgeps.gov.ph/GEPSNONPILOT/Tender/SplashBidNoticeAbstractUI.aspx?BusCatID=10&DirectFrom=OpenOpp&Type=category&menuIndex=3&refID=13205295"
+  ],
+  "notes": [
+    "This run used only official public PhilGEPS notices pages.",
+    "The public category listings checked today showed Friday, August 28, 2026 on the official site.",
+    "Previously reported Tiwi Disaster AI (Ref 13211679) was rechecked on August 28, 2026 and still shows the same header-versus-body deadline inconsistency already reported on August 26, 2026, so it was not repeated as a new item.",
+    "Previously reported Gumaca HRMS (Ref 13212827) was rechecked on August 28, 2026 with no material change in budget, deadline, or visible requirements, so it was not repeated.",
+    "Previously rejected Los Baños legislative tracking system (Ref 13205295) remains active but unchanged, and it is still too hardware-heavy and compliance-heavy for a clean AIStaff first-government bid.",
+    "No genuine new AIStaff-fit opportunity surfaced from the consulting-services first page or from the public notices reviewed for other requested categories beyond the website-development RFQ above."
+  ],
+  "scan_metadata": {
+    "generated_at": "2026-08-27T23:07:32.347Z",
+    "input_path": "/Volumes/Wotg Drive Mike/GitHub/AIStaff/reports/philgeps-opportunities/2026-08-28.input.json",
+    "preflight": {
+      "repoPath": "/Volumes/Wotg Drive Mike/GitHub/AIStaff",
+      "envFileLoaded": true,
+      "smtpHostPresent": true,
+      "smtpPortPresent": true,
+      "selectedAuthEnv": {
+        "user": "NOTIFY_SMTP_USER",
+        "pass": "NOTIFY_SMTP_PASS"
+      },
+      "recipientEnvUsed": "ADMIN_ALERT_EMAIL",
+      "missingEnvNames": []
+    },
+    "email": {
+      "ok": true,
+      "reason": "sent",
+      "recipient": "mpineda@aistaff.click",
+      "messageId": "<fcbb3a98-5a8e-6530-de61-73e91173ae7c@aistaff.click>",
+      "auth_env": {
+        "user": "NOTIFY_SMTP_USER",
+        "pass": "NOTIFY_SMTP_PASS"
+      }
+    }
+  },
+  "email_subject": "PHILGEPS OPPORTUNITY BRIEFING - 2026-08-28",
+  "plain_text_briefing": "PHILGEPS OPPORTUNITY BRIEFING\nDate: August 28, 2026\nBEST OPPORTUNITIES\nMatch rating: STRONG MATCH\nScore: 8/10\nProject: 2026-08-4390 Procurement of Website Development and Implementation Services\nProcuring entity: Province of Quezon\nReference number: 13209616\nABC: PHP 500,000.00\nDeadline: August 31, 2026 8:10 AM\nProcurement method: Negotiated Procurement - Small Value Procurement (Sec. 34)\nWhy it fits AIStaff: This is a direct website-development services procurement under a small-value route, with a budget and 48-day delivery window that are realistic for AIStaff's custom systems and implementation work.\nImportant requirements: Public notice exposes only one line item: Website Development and Implementation Services; Delivery period is 48 days; The official notice says to inquire at the Office of the Department of Education (DepEd) - Quezon for details; Contact person in the public abstract: Gerardo F. L. Micor, BAC Secretariat/PGADH-Provincial Budget Office, quezonbac@gmail.com, (042) 719-1130; The public abstract does not clearly state the PhilGEPS membership level requirement, document checklist, or prior-experience threshold\nRisks or blockers: The official PhilGEPS abstract is unusually sparse and does not describe the actual website scope, number of pages, integrations, hosting model, warranty terms, or acceptance criteria; The note to inquire with DepEd-Quezon creates an agency-detail inconsistency because the posting entity shown in the header is the Province of Quezon; Because the eligibility checklist is not visible in the public abstract, Red PhilGEPS acceptability and any prior-project requirement must be confirmed before committing effort\nRecommended next action: Request the RFQ packet immediately, confirm whether Red PhilGEPS registration is acceptable, and ask for the exact scope, implementation milestones, and ownership of hosting, domain, content migration, and post-launch support.\nOfficial PhilGEPS link: https://notices.philgeps.gov.ph/GEPSNONPILOT/Tender/SplashBidNoticeAbstractUI.aspx?BusCatID=10&DirectFrom=OpenOpp&Type=category&menuIndex=3&refID=13209616\nURGENT DEADLINES\nProject: 2026-08-4390 Procurement of Website Development and Implementation Services\nProcuring entity: Province of Quezon\nReference number: 13209616\nDeadline: August 31, 2026 8:10 AM\nWhy urgent: New notice published on August 28, 2026 and closes within three days; details are sparse, so the RFQ packet should be requested immediately.\nOfficial PhilGEPS link: https://notices.philgeps.gov.ph/GEPSNONPILOT/Tender/SplashBidNoticeAbstractUI.aspx?BusCatID=10&DirectFrom=OpenOpp&Type=category&menuIndex=3&refID=13209616\nNOT RECOMMENDED\n- SUBSCRIPTION TO PLAGIARISM DETECTION AND ACADEMIC INTEGRITY SOFTWARE/SERVICE (Iloilo State University of Fisheries Science and Technology; Ref 13208702) - This is a product-style software subscription procurement with AI-detection and LMS-integration features, but it reads like a brand/vendor-specific license supply with training rather than a custom AIStaff service engagement. The likely edge belongs to an authorized software reseller or niche academic platform vendor, not a new government services bidder.\n  Official PhilGEPS link: https://notices.philgeps.gov.ph/GEPSNONPILOT/Tender/SplashBidNoticeAbstractUI.aspx?BusCatID=10&DirectFrom=OpenOpp&Type=category&menuIndex=3&refID=13208702\nTODAY'S RECOMMENDATION\nBest opportunity to pursue: 2026-08-4390 Procurement of Website Development and Implementation Services (Ref 13209616) is the best opportunity to pursue today because it is a fresh small-value services procurement that directly matches AIStaff's web and custom-system delivery capabilities.\nDocuments AIStaff should prepare: Current PhilGEPS registration and annexes; Mayor's/Business Permit and SEC registration; Notarized Omnibus Sworn Statement; One-page company profile focused on website builds, system implementation, automation, and support; Portfolio sheet showing relevant websites, custom systems, and integrations; Draft clarification email requesting the full RFQ scope and document checklist\nClarifications to request from the BAC: Whether Red PhilGEPS registration is acceptable for this small-value procurement; Whether the project is a new website build, redesign, portal migration, or implementation of an existing approved design; Whether hosting, domain management, SSL, content migration, analytics, and maintenance are part of the required scope; Which entity will issue the detailed requirements and receive submissions: Province of Quezon BAC or DepEd-Quezon\n## NOTES\n- This run used only official public PhilGEPS notices pages.\n- The public category listings checked today showed Friday, August 28, 2026 on the official site.\n- Previously reported Tiwi Disaster AI (Ref 13211679) was rechecked on August 28, 2026 and still shows the same header-versus-body deadline inconsistency already reported on August 26, 2026, so it was not repeated as a new item.\n- Previously reported Gumaca HRMS (Ref 13212827) was rechecked on August 28, 2026 with no material change in budget, deadline, or visible requirements, so it was not repeated.\n- Previously rejected Los Baños legislative tracking system (Ref 13205295) remains active but unchanged, and it is still too hardware-heavy and compliance-heavy for a clean AIStaff first-government bid.\n- No genuine new AIStaff-fit opportunity surfaced from the consulting-services first page or from the public notices reviewed for other requested categories beyond the website-development RFQ above.\nSCAN METADATA\n- Opportunities reviewed: 5\n- Opportunities screened from official listings: 40\n- Repo path confirmed: /Volumes/Wotg Drive Mike/GitHub/AIStaff\n- Email recipient used: mpineda@aistaff.click\n- Email send status: sent\n- Source URLs checked: https://notices.philgeps.gov.ph/GEPSNONPILOT/Tender/SplashOpportunitiesSearchUI.aspx?BusCatID=10&ClickFrom=OpenOpp&menuIndex=3&type=category | https://notices.philgeps.gov.ph/GEPSNONPILOT/Tender/SplashOpportunitiesSearchUI.aspx?BusCatID=43&ClickFrom=OpenOpp&menuIndex=3&type=category | https://notices.philgeps.gov.ph/GEPSNONPILOT/Tender/SplashBidNoticeAbstractUI.aspx?BusCatID=10&DirectFrom=OpenOpp&Type=category&menuIndex=3&refID=13209616 | https://notices.philgeps.gov.ph/GEPSNONPILOT/Tender/SplashBidNoticeAbstractUI.aspx?BusCatID=43&DirectFrom=OpenOpp&Type=category&menuIndex=3&refID=13211679 | https://notices.philgeps.gov.ph/GEPSNONPILOT/Tender/SplashBidNoticeAbstractUI.aspx?BusCatID=10&DirectFrom=OpenOpp&Type=category&menuIndex=3&refID=13212827 | https://notices.philgeps.gov.ph/GEPSNONPILOT/Tender/SplashBidNoticeAbstractUI.aspx?BusCatID=10&DirectFrom=OpenOpp&Type=category&menuIndex=3&refID=13208702 | https://notices.philgeps.gov.ph/GEPSNONPILOT/Tender/SplashBidNoticeAbstractUI.aspx?BusCatID=10&DirectFrom=OpenOpp&Type=category&menuIndex=3&refID=13205295",
+  "html_briefing": "<div style=\"font-family:Arial,sans-serif;max-width:860px;margin:0 auto;color:#18212b;line-height:1.5\">\n    <h1 style=\"font-size:24px;margin:0 0 8px\">PHILGEPS OPPORTUNITY BRIEFING</h1>\n    <p style=\"margin:0 0 24px\">Date: August 28, 2026</p>\n    <section style=\"margin:0 0 24px\"><h2 style=\"font-size:18px;margin:0 0 12px\">BEST OPPORTUNITIES</h2>\n      <div style=\"padding:14px 16px;border:1px solid #d9e1ea;border-radius:10px;margin:0 0 14px\">\n        <p style=\"margin:0 0 8px\"><strong>STRONG MATCH</strong> · Score 8/10</p>\n        <p style=\"margin:0 0 8px\"><strong>Project:</strong> 2026-08-4390 Procurement of Website Development and Implementation Services</p>\n        <p style=\"margin:0 0 8px\"><strong>Procuring entity:</strong> Province of Quezon</p>\n        <p style=\"margin:0 0 8px\"><strong>Reference number:</strong> 13209616</p>\n        <p style=\"margin:0 0 8px\"><strong>ABC:</strong> PHP 500,000.00</p>\n        <p style=\"margin:0 0 8px\"><strong>Deadline:</strong> August 31, 2026 8:10 AM</p>\n        <p style=\"margin:0 0 8px\"><strong>Procurement method:</strong> Negotiated Procurement - Small Value Procurement (Sec. 34)</p>\n        <p style=\"margin:0 0 8px\"><strong>Why it fits AIStaff:</strong> This is a direct website-development services procurement under a small-value route, with a budget and 48-day delivery window that are realistic for AIStaff's custom systems and implementation work.</p>\n        <p style=\"margin:0 0 8px\"><strong>Important requirements:</strong> Public notice exposes only one line item: Website Development and Implementation Services; Delivery period is 48 days; The official notice says to inquire at the Office of the Department of Education (DepEd) - Quezon for details; Contact person in the public abstract: Gerardo F. L. Micor, BAC Secretariat/PGADH-Provincial Budget Office, quezonbac@gmail.com, (042) 719-1130; The public abstract does not clearly state the PhilGEPS membership level requirement, document checklist, or prior-experience threshold</p>\n        <p style=\"margin:0 0 8px\"><strong>Risks or blockers:</strong> The official PhilGEPS abstract is unusually sparse and does not describe the actual website scope, number of pages, integrations, hosting model, warranty terms, or acceptance criteria; The note to inquire with DepEd-Quezon creates an agency-detail inconsistency because the posting entity shown in the header is the Province of Quezon; Because the eligibility checklist is not visible in the public abstract, Red PhilGEPS acceptability and any prior-project requirement must be confirmed before committing effort</p>\n        <p style=\"margin:0 0 8px\"><strong>Recommended next action:</strong> Request the RFQ packet immediately, confirm whether Red PhilGEPS registration is acceptable, and ask for the exact scope, implementation milestones, and ownership of hosting, domain, content migration, and post-launch support.</p>\n        <p style=\"margin:0\"><a href=\"https://notices.philgeps.gov.ph/GEPSNONPILOT/Tender/SplashBidNoticeAbstractUI.aspx?BusCatID=10&amp;DirectFrom=OpenOpp&amp;Type=category&amp;menuIndex=3&amp;refID=13209616\">Official PhilGEPS link</a></p>\n      </div>\n    </section>\n    <section style=\"margin:0 0 24px\"><h2 style=\"font-size:18px;margin:0 0 12px\">URGENT DEADLINES</h2><ul><li><strong>2026-08-4390 Procurement of Website Development and Implementation Services</strong> (13209616) - August 31, 2026 8:10 AM. New notice published on August 28, 2026 and closes within three days; details are sparse, so the RFQ packet should be requested immediately. <a href=\"https://notices.philgeps.gov.ph/GEPSNONPILOT/Tender/SplashBidNoticeAbstractUI.aspx?BusCatID=10&amp;DirectFrom=OpenOpp&amp;Type=category&amp;menuIndex=3&amp;refID=13209616\">Official link</a></li></ul></section>\n    <section style=\"margin:0 0 24px\"><h2 style=\"font-size:18px;margin:0 0 12px\">NOT RECOMMENDED</h2><ul><li><strong>SUBSCRIPTION TO PLAGIARISM DETECTION AND ACADEMIC INTEGRITY SOFTWARE/SERVICE</strong> (Iloilo State University of Fisheries Science and Technology; Ref 13208702) - This is a product-style software subscription procurement with AI-detection and LMS-integration features, but it reads like a brand/vendor-specific license supply with training rather than a custom AIStaff service engagement. The likely edge belongs to an authorized software reseller or niche academic platform vendor, not a new government services bidder. <a href=\"https://notices.philgeps.gov.ph/GEPSNONPILOT/Tender/SplashBidNoticeAbstractUI.aspx?BusCatID=10&amp;DirectFrom=OpenOpp&amp;Type=category&amp;menuIndex=3&amp;refID=13208702\">Official link</a></li></ul></section>\n    <section style=\"margin:0 0 24px\"><h2 style=\"font-size:18px;margin:0 0 12px\">TODAY'S RECOMMENDATION</h2>\n    <p><strong>Best opportunity to pursue:</strong> 2026-08-4390 Procurement of Website Development and Implementation Services (Ref 13209616) is the best opportunity to pursue today because it is a fresh small-value services procurement that directly matches AIStaff's web and custom-system delivery capabilities.</p>\n    <p><strong>Documents AIStaff should prepare:</strong> Current PhilGEPS registration and annexes; Mayor's/Business Permit and SEC registration; Notarized Omnibus Sworn Statement; One-page company profile focused on website builds, system implementation, automation, and support; Portfolio sheet showing relevant websites, custom systems, and integrations; Draft clarification email requesting the full RFQ scope and document checklist</p>\n    <p><strong>Clarifications to request from the BAC:</strong> Whether Red PhilGEPS registration is acceptable for this small-value procurement; Whether the project is a new website build, redesign, portal migration, or implementation of an existing approved design; Whether hosting, domain management, SSL, content migration, analytics, and maintenance are part of the required scope; Which entity will issue the detailed requirements and receive submissions: Province of Quezon BAC or DepEd-Quezon</p>\n  </section>\n    <section style=\"margin:0 0 24px\"><h2 style=\"font-size:18px;margin:0 0 12px\">NOTES</h2><ul><li>This run used only official public PhilGEPS notices pages.</li><li>The public category listings checked today showed Friday, August 28, 2026 on the official site.</li><li>Previously reported Tiwi Disaster AI (Ref 13211679) was rechecked on August 28, 2026 and still shows the same header-versus-body deadline inconsistency already reported on August 26, 2026, so it was not repeated as a new item.</li><li>Previously reported Gumaca HRMS (Ref 13212827) was rechecked on August 28, 2026 with no material change in budget, deadline, or visible requirements, so it was not repeated.</li><li>Previously rejected Los Baños legislative tracking system (Ref 13205295) remains active but unchanged, and it is still too hardware-heavy and compliance-heavy for a clean AIStaff first-government bid.</li><li>No genuine new AIStaff-fit opportunity surfaced from the consulting-services first page or from the public notices reviewed for other requested categories beyond the website-development RFQ above.</li></ul></section>\n    <section style=\"margin:0 0 24px\"><h2 style=\"font-size:18px;margin:0 0 12px\">SCAN METADATA</h2>\n    <ul>\n      <li>Opportunities reviewed: 5</li>\n      <li>Opportunities screened from official listings: 40</li>\n      <li>Repo path confirmed: /Volumes/Wotg Drive Mike/GitHub/AIStaff</li>\n      <li>Email recipient used: mpineda@aistaff.click</li>\n      <li>Email send status: sent</li>\n    </ul>\n  </section>\n  </div>"
+}

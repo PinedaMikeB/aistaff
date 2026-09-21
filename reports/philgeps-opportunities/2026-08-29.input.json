@@ -1,0 +1,137 @@
+{
+  "title": "PHILGEPS OPPORTUNITY BRIEFING",
+  "date_iso": "2026-08-29",
+  "date_long": "August 29, 2026",
+  "opportunities_reviewed": 7,
+  "opportunities_screened": 40,
+  "best_opportunities": [
+    {
+      "match_rating": "STRONG MATCH",
+      "score": 8,
+      "project": "RFQ no. 2026-08-28-006_1 LOT_Procurement of Website Hosting and Technical Support Services for the Encyclopedia of Philippine Art (EPA) Digital Edition",
+      "procuring_entity": "Cultural Center of the Philippines - Pasay City Metro Manila",
+      "reference_number": "13217867",
+      "abc": "PHP 617,000.00",
+      "deadline": "September 1, 2026 9:00 AM",
+      "procurement_method": "Negotiated Procurement - Small Value Procurement (Sec. 34) / RFQ",
+      "why_fit": "This is a fresh small-value website services procurement covering hosting and technical support, which fits AIStaff's website, implementation, maintenance, and systems-support capabilities without demanding a large hardware or enterprise delivery footprint in the public abstract.",
+      "important_requirements": [
+        "Submission deadline in the notice body: on or before September 1, 2026 at 9:00 AM to the CCP Procurement Management Division",
+        "Public notice exposes a downloadable RFQ document link for the detailed scope",
+        "Post-award documents named in the abstract: signed quotation, valid Business/Mayor's Permit, PhilGEPS Registration, notarized Omnibus Sworn Statement with proof of authority if applicable, and latest 2025 annual income tax return plus business tax returns",
+        "Contract duration shown in the abstract: 6 months",
+        "Official contacts in the abstract: Regie Zapanta Profeta, regie.profeta@culturalcenter.gov.ph, and submission contacts glycidas.penaranda@culturalcenter.gov.ph / pmd@culturalcenter.gov.ph, tel. 8551-0039"
+      ],
+      "risks_or_blockers": [
+        "The PhilGEPS abstract does not summarize the actual hosting architecture, service-level expectations, maintenance hours, migration scope, cybersecurity obligations, or ownership boundaries; those are pushed into the linked RFQ document",
+        "The posting is classified as Goods - General Support Services, so award may still favor a supplier already positioned for managed hosting operations rather than a custom-build vendor unless the RFQ is service-led",
+        "The abstract does not explicitly state the acceptable PhilGEPS membership level or any prior-project threshold, so Red PhilGEPS eligibility needs confirmation before bid preparation"
+      ],
+      "recommended_next_action": "Open the linked RFQ immediately, confirm whether Red PhilGEPS registration is acceptable, and check the exact scope for hosting stack, uptime/support expectations, migration work, security responsibilities, and whether website enhancement work is included or the scope is strictly support-only.",
+      "official_link": "https://notices.philgeps.gov.ph/GEPSNONPILOT/Tender/SplashBidNoticeAbstractUI.aspx?menuIndex=3&refID=13217867&DirectFrom=OpenOpp&Type=category&BusCatID=10"
+    },
+    {
+      "match_rating": "STRONG MATCH",
+      "score": 8,
+      "project": "2026-08-4390 Procurement of Website Development and Implementation Services",
+      "procuring_entity": "Province of Quezon",
+      "reference_number": "13209616",
+      "abc": "PHP 500,000.00",
+      "deadline": "August 31, 2026 8:10 AM",
+      "procurement_method": "Negotiated Procurement - Small Value Procurement (Sec. 34)",
+      "why_fit": "This remains a direct website-development services procurement under a small-value route, with a budget and 48-day delivery window that are still realistic for AIStaff's custom systems and implementation work.",
+      "important_requirements": [
+        "Public notice exposes only one line item: Website Development and Implementation Services",
+        "Delivery period shown in the abstract: 48 days",
+        "Other Information section says to inquire at the Office of the Department of Education (DepEd) - Quezon for details",
+        "Official contact in the abstract: Gerardo F. L. Micor, BAC Secretariat/PGADH-Provincial Budget Office, quezonbac@gmail.com, (042) 719-1130",
+        "The public abstract still does not clearly state the PhilGEPS membership level requirement, document checklist, or prior-experience threshold"
+      ],
+      "risks_or_blockers": [
+        "The PhilGEPS abstract remains unusually sparse and still does not describe the real website scope, number of pages, integrations, hosting model, warranty terms, or acceptance criteria",
+        "The note to inquire with DepEd-Quezon still creates an agency-detail inconsistency because the posting entity shown in the header is the Province of Quezon",
+        "Because the eligibility checklist is not visible in the public abstract, Red PhilGEPS acceptability and any prior-project requirement still need confirmation before committing effort"
+      ],
+      "recommended_next_action": "Request the RFQ packet immediately, confirm whether Red PhilGEPS registration is acceptable, and ask for the exact scope, implementation milestones, and ownership of hosting, domain, content migration, and post-launch support.",
+      "official_link": "https://notices.philgeps.gov.ph/GEPSNONPILOT/Tender/SplashBidNoticeAbstractUI.aspx?menuIndex=3&refID=13209616&DirectFrom=OpenOpp&Type=category&BusCatID=10"
+    }
+  ],
+  "urgent_deadlines": [
+    {
+      "project": "2026-08-4390 Procurement of Website Development and Implementation Services",
+      "procuring_entity": "Province of Quezon",
+      "reference_number": "13209616",
+      "deadline": "August 31, 2026 8:10 AM",
+      "note": "Previously reported and still closing within the next three days; the RFQ packet should be requested immediately because the public abstract remains sparse.",
+      "official_link": "https://notices.philgeps.gov.ph/GEPSNONPILOT/Tender/SplashBidNoticeAbstractUI.aspx?menuIndex=3&refID=13209616&DirectFrom=OpenOpp&Type=category&BusCatID=10"
+    },
+    {
+      "project": "RFQ no. 2026-08-28-006_1 LOT_Procurement of Website Hosting and Technical Support Services for the Encyclopedia of Philippine Art (EPA) Digital Edition",
+      "procuring_entity": "Cultural Center of the Philippines - Pasay City Metro Manila",
+      "reference_number": "13217867",
+      "deadline": "September 1, 2026 9:00 AM",
+      "note": "New notice published on August 29, 2026 and already closes within three days; the linked RFQ should be reviewed immediately.",
+      "official_link": "https://notices.philgeps.gov.ph/GEPSNONPILOT/Tender/SplashBidNoticeAbstractUI.aspx?menuIndex=3&refID=13217867&DirectFrom=OpenOpp&Type=category&BusCatID=10"
+    }
+  ],
+  "not_recommended": [
+    {
+      "project": "Productivity Software and AI Subscriptions",
+      "procuring_entity": "Bureau of Fisheries and Aquatic Resources - RV",
+      "reference_number": "13218056",
+      "reason": "The abstract is a bundle of branded software licenses and subscriptions, including AI assistants, design tools, and iPad apps. This is a reseller/license-supply procurement, not a custom AI systems or managed-service opportunity for AIStaff.",
+      "official_link": "https://notices.philgeps.gov.ph/GEPSNONPILOT/Tender/SplashBidNoticeAbstractUI.aspx?menuIndex=3&refID=13218056&DirectFrom=OpenOpp&Type=category&BusCatID=10"
+    },
+    {
+      "project": "ESTABISHMENT OF ENHANCED TAX REVENUE ASSESSMENT AND COLLECTION SYSTEM (E-TRACS)",
+      "procuring_entity": "Municipality of Del Gallego, Camarines Sur",
+      "reference_number": "13218408",
+      "reason": "Although the title sounds relevant, the public abstract only shows an annual subscription to the E-TRACS Sustainability Program under Limited Source Bidding. That reads as an incumbent or product-specific continuation, not an open custom-system build for a new supplier.",
+      "official_link": "https://notices.philgeps.gov.ph/GEPSNONPILOT/Tender/SplashBidNoticeAbstractUI.aspx?menuIndex=3&refID=13218408&DirectFrom=OpenOpp&Type=category&BusCatID=10"
+    },
+    {
+      "project": "NEGO-PROCUREMENT OF CENTRALIZED LEGISLATIVE AND ADMINISTRATIVE MANAGEMENT AND TRACKING SYSTEM FOR SANGGUNIANG BAYAN, LOS BANOS, LAGUNA",
+      "procuring_entity": "Municipality of Los Baños, Laguna",
+      "reference_number": "13205295",
+      "reason": "It still looks attractive on the surface because it names AI assistant integration and speech-to-text, but the live abstract remains dominated by server hardware, Wi-Fi infrastructure, on-prem deployment, domain/network integration, and a broad multi-component delivery package that is too hardware-heavy for a clean AIStaff first-government bid.",
+      "official_link": "https://notices.philgeps.gov.ph/GEPSNONPILOT/Tender/SplashBidNoticeAbstractUI.aspx?menuIndex=3&refID=13205295&DirectFrom=OpenOpp&Type=category&BusCatID=10"
+    }
+  ],
+  "todays_recommendation": {
+    "best_opportunity": "RFQ no. 2026-08-28-006 Website Hosting and Technical Support Services for the Encyclopedia of Philippine Art (Ref 13217867) is the best opportunity to pursue today because it is new, directly services-based, small-value, and easier to position for AIStaff than the more ambiguous Quezon posting.",
+    "documents_to_prepare": [
+      "Current PhilGEPS registration and annexes",
+      "Mayor's/Business Permit and SEC registration",
+      "Notarized Omnibus Sworn Statement with proof of signatory authority",
+      "Latest 2025 annual income tax return and recent business tax returns",
+      "One-page capability sheet focused on website operations, implementation, support, and integrations",
+      "Short hosting-and-support approach note covering uptime handling, security, migration, and response process"
+    ],
+    "clarifications_to_request": [
+      "For CCP: whether Red PhilGEPS registration is acceptable for this small-value RFQ",
+      "For CCP: the exact hosting stack, traffic expectations, uptime/support SLA, backup responsibilities, and whether content updates or website enhancements are included",
+      "For Quezon: whether the project is a new website build, redesign, portal migration, or implementation of an existing approved design",
+      "For Quezon: which entity will issue the detailed requirements and receive submissions, Province of Quezon BAC or DepEd-Quezon"
+    ]
+  },
+  "source_urls_checked": [
+    "https://notices.philgeps.gov.ph/GEPSNONPILOT/Tender/SplashOpportunitiesSearchUI.aspx?BusCatID=10&ClickFrom=OpenOpp&menuIndex=3&type=category",
+    "https://notices.philgeps.gov.ph/GEPSNONPILOT/Tender/SplashOpportunitiesSearchUI.aspx?BusCatID=43&ClickFrom=OpenOpp&menuIndex=3&type=category",
+    "https://notices.philgeps.gov.ph/GEPSNONPILOT/Tender/SplashBidNoticeAbstractUI.aspx?menuIndex=3&refID=13217867&DirectFrom=OpenOpp&Type=category&BusCatID=10",
+    "https://notices.philgeps.gov.ph/GEPSNONPILOT/Tender/SplashBidNoticeAbstractUI.aspx?menuIndex=3&refID=13218056&DirectFrom=OpenOpp&Type=category&BusCatID=10",
+    "https://notices.philgeps.gov.ph/GEPSNONPILOT/Tender/SplashBidNoticeAbstractUI.aspx?menuIndex=3&refID=13218408&DirectFrom=OpenOpp&Type=category&BusCatID=10",
+    "https://notices.philgeps.gov.ph/GEPSNONPILOT/Tender/SplashBidNoticeAbstractUI.aspx?menuIndex=3&refID=13209616&DirectFrom=OpenOpp&Type=category&BusCatID=10",
+    "https://notices.philgeps.gov.ph/GEPSNONPILOT/Tender/SplashBidNoticeAbstractUI.aspx?menuIndex=3&refID=13212827&DirectFrom=OpenOpp&Type=category&BusCatID=10",
+    "https://notices.philgeps.gov.ph/GEPSNONPILOT/Tender/SplashBidNoticeAbstractUI.aspx?menuIndex=3&refID=13211679&DirectFrom=OpenOpp&Type=category&BusCatID=43",
+    "https://notices.philgeps.gov.ph/GEPSNONPILOT/Tender/SplashBidNoticeAbstractUI.aspx?menuIndex=3&refID=13212887&DirectFrom=OpenOpp&Type=category&BusCatID=43",
+    "https://notices.philgeps.gov.ph/GEPSNONPILOT/Tender/SplashBidNoticeAbstractUI.aspx?menuIndex=3&refID=13205295&DirectFrom=OpenOpp&Type=category&BusCatID=10"
+  ],
+  "notes": [
+    "This run used only official public PhilGEPS notices pages and did not bypass login, CAPTCHA, or access controls.",
+    "The official public category listings displayed Saturday, August 29, 2026 during the scan.",
+    "Previously reported Tiwi Disaster AI (Ref 13211679) was rechecked on August 29, 2026 and still shows the same header-versus-body deadline inconsistency already reported on August 26, 2026, so it was not repeated as a new item.",
+    "Previously reported Gumaca HRMS (Ref 13212827) was rechecked on August 29, 2026 with no material change in budget, deadline, or visible requirements, so it was not repeated.",
+    "New consulting-services first-page notices reviewed on August 29, 2026 did not surface a cleaner AIStaff fit than the two website-related IT notices kept above.",
+    "The CCP public abstract links to a public Google Docs RFQ for detailed scope, but this report does not assume any unquoted requirement beyond what is visible in the official PhilGEPS abstract."
+  ]
+}

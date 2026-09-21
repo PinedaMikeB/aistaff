@@ -24,7 +24,7 @@
   } catch {}
 
   try {
-    visitorId = sessionStorage.getItem(VISITOR_KEY) || "";
+    visitorId = window.aiStaffVisitorId || sessionStorage.getItem(VISITOR_KEY) || "";
     if (!visitorId) {
       const randomPart = window.crypto?.randomUUID
         ? window.crypto.randomUUID()
@@ -151,6 +151,7 @@
   toggle.addEventListener("click", () => setOpen(!isOpen));
   openBtn?.addEventListener("click", () => {
     setOpen(true);
+    window.aiStaffInternalTrack && window.aiStaffInternalTrack("WebsiteChatOpened", { source_page: window.location.pathname });
     document.getElementById("siteChatWidget")?.scrollIntoView({ behavior: "smooth", block: "end" });
   });
 
@@ -164,6 +165,7 @@
     history.push({ role: "user", content: text });
     renderMessage("user", text);
     saveHistory();
+    window.aiStaffInternalTrack && window.aiStaffInternalTrack("WebsiteChatMessageSent", { source_page: window.location.pathname });
 
     isSending = true;
     const typingBubble = renderMessage("assistant typing", "···");
@@ -172,7 +174,11 @@
       const res = await fetch("/api/public/site-chat", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ visitorId, messages: history.slice(-12) })
+        body: JSON.stringify({
+          visitorId,
+          tracking: window.aiStaffAttributionPayload ? window.aiStaffAttributionPayload({ source_page: window.location.pathname }) : null,
+          messages: history.slice(-12)
+        })
       });
       const data = await res.json();
       typingBubble.remove();

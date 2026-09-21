@@ -790,7 +790,7 @@
     content.innerHTML = `
       <h1>Pricing and Allowances</h1>
       <p class="page-sub">${published ? `Published: ${published.taxMode} · updated ${fmtDate(published.publishedAt)}` : "Nothing published yet — the app is using the code-level default prices."} Changes require SUPERADMIN and are audited.</p>
-      <div class="banner banner-warn">AIStaff Solutions Corporation is currently non-VAT registered. Do not switch taxMode to VAT without confirming this has changed.</div>
+      <div class="banner banner-warn">AIStaff Business Solutions Corporation is currently non-VAT registered. Do not switch taxMode to VAT without confirming this has changed.</div>
       <form id="pricingForm">
         <div class="field"><label for="p_taxMode">Tax mode</label>
           <select id="p_taxMode"><option value="NON_VAT" ${working.taxMode === "NON_VAT" ? "selected" : ""}>NON_VAT (no VAT charged)</option><option value="VAT" ${working.taxMode === "VAT" ? "selected" : ""}>VAT (published price becomes tax-inclusive)</option></select>

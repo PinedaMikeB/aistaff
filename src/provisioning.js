@@ -41,7 +41,21 @@ function companyNameFor(customer) {
   return person ? `${person}'s Business` : "New Client";
 }
 
-module.exports = { SETUP_TOKEN_TTL_HOURS, companyNameFor };
+function alertRecipients(...values) {
+  const seen = new Set();
+  const recipients = [];
+  for (const value of values) {
+    for (const email of String(value || "").split(/[,\s;]+/)) {
+      const clean = email.trim().toLowerCase();
+      if (!clean || seen.has(clean)) continue;
+      seen.add(clean);
+      recipients.push(clean);
+    }
+  }
+  return recipients;
+}
+
+module.exports = { SETUP_TOKEN_TTL_HOURS, companyNameFor, alertRecipients };
 
 /** Next free account number, AIS-YYYY-NNNN, matching the backfill format. */
 async function nextAccountNumber(tx) {
@@ -265,20 +279,26 @@ async function sendWelcomeEmail(userId, setupUrl, kind) {
     // purpose: different audience, different content, and a failure here must
     // never stop the customer getting their password link.
     try {
-      const adminEmail = process.env.ADMIN_ALERT_EMAIL || process.env.SEED_ADMIN_EMAIL;
-      if (adminEmail && paidOrder) {
+      const recipients = alertRecipients(
+        process.env.ADMIN_ALERT_EMAILS,
+        process.env.ADMIN_ALERT_EMAIL,
+        process.env.SEED_ADMIN_EMAIL
+      );
+      if (recipients.length && paidOrder) {
         const customer = await prisma.customer.findFirst({
           where: { email: user.email },
           orderBy: { created_at: "desc" }
         });
         if (customer) {
-          await notifyNewSale({
-            to: adminEmail,
-            customer,
-            order: paidOrder,
-            company: user.company,
-            setupPercent: 0
-          });
+          for (const to of recipients) {
+            await notifyNewSale({
+              to,
+              customer,
+              order: paidOrder,
+              company: user.company,
+              setupPercent: 0
+            });
+          }
         }
       }
     } catch (error) {

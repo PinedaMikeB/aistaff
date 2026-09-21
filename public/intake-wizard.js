@@ -12,6 +12,7 @@
 const intakeState = {
   data: null,
   activeStepId: null,
+  editingRowId: null,
   rows: [],
   uploads: []
 };
@@ -90,16 +91,35 @@ function intakeCheckOtherHtml(name, otherValue = "") {
       </label>`;
 }
 
-function intakeSavedFieldValues(step) {
-  if (!step?.paymentSetup && !step?.painSetup) return {};
-  const entry = step?.latestEntry;
+function intakeActiveEditRow(step) {
+  if (!step || !intakeState.editingRowId) return null;
+  const row = intakeState.rows.find((r) => r.id === intakeState.editingRowId);
+  if (!row) return null;
+  return row.category === step.category ? row : null;
+}
+
+function intakeRowsForStep(rows, step) {
+  if (!step) return rows || [];
+  return (rows || []).filter((row) => row.category === step.category);
+}
+
+function intakeStepForRow(row, steps = []) {
+  if (!row) return null;
+  return steps.find((step) => step.category === row.category)
+    || steps.find((step) => step.kind && step.kind === row.kind)
+    || null;
+}
+
+function intakeSavedFieldValues(step, editRow = null) {
+  const entry = editRow || ((step?.paymentSetup || step?.painSetup) ? step?.latestEntry : null);
   if (!entry) return {};
+  const validUntil = entry.validUntil || entry.valid_until || "";
   const values = {
     answer: entry.answer || "",
     title: entry.title || step.title || "",
     currency: entry.currency || "",
-    validity: "",
-    validUntilDate: entry.validUntil ? String(entry.validUntil).slice(0, 10) : ""
+    validity: validUntil ? "custom" : "",
+    validUntilDate: validUntil ? String(validUntil).slice(0, 10) : ""
   };
 
   const groupLabels = {
@@ -182,14 +202,16 @@ function intakeFieldHtml(field, step, validityOptions, savedValues = {}) {
   }
   if (field.type === "date") {
     return `<label class="${field.showWhen ? `intake-when-${field.showWhen}` : ""}" ${field.showWhen ? "hidden" : ""}>${label}
-      <input type="date" name="${field.name}" /></label>`;
+      <input type="date" name="${field.name}" value="${escapeHtml(saved || "")}" /></label>`;
   }
   if (field.type === "validity") {
+    const selected = savedValues.validity !== undefined ? savedValues.validity : (step.validityDefault || "");
+    const savedDate = savedValues.validUntilDate || "";
     const opts = validityOptions.map((o) =>
-      `<option value="${o.value}" ${o.value === (step.validityDefault || "") ? "selected" : ""}>${o.label}</option>`
+      `<option value="${o.value}" ${o.value === selected ? "selected" : ""}>${o.label}</option>`
     ).join("");
     return `<label>${label}<select name="validity">${opts}</select></label>
-      <label class="intake-custom-date" hidden>End date<input type="date" name="validUntilDate" /></label>`;
+      <label class="intake-custom-date" ${selected === "custom" ? "" : "hidden"}>End date<input type="date" name="validUntilDate" value="${escapeHtml(savedDate)}" /></label>`;
   }
   // Roughly 100 words. maxlength is the browser's own guard so an over-long
   // label is stopped at the keyboard, never at a failed save; the server
@@ -198,6 +220,35 @@ function intakeFieldHtml(field, step, validityOptions, savedValues = {}) {
   const placeholder = field.placeholder ? ` placeholder="${escapeHtml(field.placeholder)}"` : "";
   return `<label class="${field.showWhen ? `intake-when-${field.showWhen}` : ""}" ${field.showWhen ? "hidden" : ""}>${label}${field.required ? " *" : ""}
     <input type="text" name="${field.name}" value="${escapeHtml(saved || field.default || "")}"${limit}${placeholder} ${field.required ? "required" : ""} /></label>`;
+}
+
+function intakeEditMetaPanel(row) {
+  const validUntil = row.validUntil || row.valid_until || "";
+  const expires = validUntil ? String(validUntil).slice(0, 10) : "";
+  return `
+    <div class="intake-edit-context full">
+      <div>
+        <span class="settings-group">Editing saved knowledge</span>
+        <b>${escapeHtml(row.title || row.question || row.category)}</b>
+        <small>${escapeHtml(row.source_name || row.source_kind || "typed")} · Expires: ${escapeHtml(expires || "No end date")}</small>
+      </div>
+      <button class="button button-soft" type="button" id="intakeCancelEditTop">Cancel edit</button>
+    </div>
+    <label>Topic
+      <input type="text" name="edit_title" value="${escapeHtml(row.title || row.question || row.category || "")}" maxlength="900" required />
+    </label>
+    <label>Source
+      <input type="text" name="edit_source_name" value="${escapeHtml(row.source_name || "")}" placeholder="Where did this come from?" maxlength="300" />
+    </label>
+    <label>Expires
+      <select name="edit_validity">
+        <option value="" ${!expires ? "selected" : ""}>No end date</option>
+        <option value="custom" ${expires ? "selected" : ""}>On a specific date...</option>
+      </select>
+    </label>
+    <label class="intake-edit-custom-date" ${expires ? "" : "hidden"}>End date
+      <input type="date" name="edit_valid_until_date" value="${escapeHtml(expires)}" />
+    </label>`;
 }
 
 /** Structured rows editor — shipping rates by area, spec tables. */
@@ -416,8 +467,12 @@ function intakePainSolutionPayload(form, raw, payload) {
 function intakeStepPanel(step, data) {
   if (!step) return `<section class="panel"><p>Nothing to set up.</p></section>`;
 
-  const savedValues = intakeSavedFieldValues(step);
-  const fields = (step.fields || [])
+  const editRow = intakeActiveEditRow(step);
+  const savedValues = intakeSavedFieldValues(step, editRow);
+  const editableFields = editRow && (step.faqCheck || step.qualification)
+    ? [{ name: "answer", label: "Detail", type: "textarea", required: true }]
+    : (step.fields || []);
+  const fields = editableFields
     .map((f) => intakeFieldHtml(f, step, data.validityOptions || [], savedValues))
     .join("");
 
@@ -445,27 +500,33 @@ function intakeStepPanel(step, data) {
   const setupEditNote = step.latestEntry && (step.paymentSetup || step.painSetup)
     ? `<p class="muted">Loaded your saved settings for this step. Saving will update them.</p>`
     : "";
+  const kicker = editRow
+    ? "Editing saved knowledge"
+    : (step.done ? ((step.paymentSetup || step.painSetup) ? "Saved — review or change" : "Saved — you can add more") : "Step");
 
   return `
     <section class="panel intake-panel">
-      <p class="section-kicker">${step.done ? ((step.paymentSetup || step.painSetup) ? "Saved — review or change" : "Saved — you can add more") : "Step"}</p>
+      <p class="section-kicker">${kicker}</p>
       <h2>${step.title}</h2>
       <p class="intake-why">${step.why}</p>
       ${step.note ? `<p class="intake-note">${step.note}</p>` : ""}
-      ${setupEditNote}
-      ${step.faqCheck ? intakeFaqPanel(step) : ""}
-      ${step.qualification ? intakeQualificationPanel(step) : ""}
-      ${step.faqCheck || step.qualification ? `
+      ${editRow ? "" : setupEditNote}
+      ${!editRow && step.faqCheck ? intakeFaqPanel(step) : ""}
+      ${!editRow && step.qualification ? intakeQualificationPanel(step) : ""}
+      ${!editRow && (step.faqCheck || step.qualification) ? `
         <div class="intake-actions">
           <button class="button button-soft" type="button" id="intakeSkipBtn">Skip for now</button>
         </div>` : `
       <form id="intakeForm" class="form-grid">
+        ${editRow ? intakeEditMetaPanel(editRow) : ""}
         ${upload}
         ${fields}
         ${intakeRowsEditor(step)}
         <div class="intake-actions full">
-          <button class="button button-primary" type="submit">Save and continue</button>
-          <button class="button button-soft" type="button" id="intakeSkipBtn">Skip for now</button>
+          <button class="button button-primary" type="submit">${editRow ? "Save changes" : "Save and continue"}</button>
+          ${editRow
+            ? `<button class="button button-soft" type="button" id="intakeCancelEditBtn">Cancel edit</button>`
+            : `<button class="button button-soft" type="button" id="intakeSkipBtn">Skip for now</button>`}
         </div>
       </form>`}
     </section>`;
@@ -526,11 +587,29 @@ function intakeCollect(form, step) {
   return payload;
 }
 
+function intakePayloadForExistingRow(row, payload, raw) {
+  const sourceName = String(raw.edit_source_name || "").trim();
+  const validity = String(raw.edit_validity || "");
+  const validUntilDate = String(raw.edit_valid_until_date || "").trim();
+  const hasCurrencyField = Object.prototype.hasOwnProperty.call(raw, "currency");
+  const hasNewUploadSource = intakeState.uploads.some((u) => u.status === "ok" || u.status === "filename");
+  const update = {
+    title: String(raw.edit_title || payload.title || row.title || row.question || row.category || "").trim(),
+    answer: payload.answer,
+    currency: hasCurrencyField ? (payload.currency || null) : (row.currency || null),
+    source_name: sourceName || null,
+    source_kind: hasNewUploadSource ? payload.sourceKind : (row.source_kind || payload.sourceKind || "typed"),
+    valid_until: validity === "custom" && validUntilDate ? new Date(validUntilDate).toISOString() : null
+  };
+  if (payload.data !== undefined) update.data = payload.data && payload.data.length ? payload.data : [];
+  return update;
+}
+
 function wirePainTemplates(step) {
   if (!step?.painSetup || !step.painTemplates) return;
   const select = document.querySelector('select[name="pain_industry"]');
   if (!select) return;
-  const savedValues = intakeSavedFieldValues(step);
+  const savedValues = intakeSavedFieldValues(step, intakeActiveEditRow(step));
 
   const map = {
     customer_pains: "pains",
@@ -605,6 +684,8 @@ async function knowledgeBaseView() {
     intakeState.activeStepId = data.currentStepId;
   }
   const step = data.steps.find((s) => s.id === intakeState.activeStepId);
+  if (intakeState.editingRowId && !intakeActiveEditRow(step)) intakeState.editingRowId = null;
+  const visibleRows = intakeRowsForStep(rows, step);
 
   const packOptions = data.packs
     .map((p) => `<option value="${p.key}" ${p.key === data.industryPack ? "selected" : ""}>${p.label}</option>`)
@@ -625,11 +706,11 @@ async function knowledgeBaseView() {
       <div class="intake-main">
         ${intakeStepPanel(step, data)}
         <section class="panel">
-          <h2>What Closer knows so far (${rows.length})</h2>
-          <p class="muted">Everything here is what Closer will answer from. Check it the way a customer would read it.</p>
+          <h2>What Closer knows for ${escapeHtml(step?.title || "this section")} (${visibleRows.length})</h2>
+          <p class="muted">Only the saved knowledge from this selected section is shown here. Click a row to edit it in the fields above.</p>
           <div class="table-wrap"><table>
             <thead><tr><th>Topic</th><th>Detail</th><th>Source</th><th>Actions</th></tr></thead>
-            <tbody>${rows.map((r) => `<tr>
+            <tbody>${visibleRows.map((r) => `<tr class="${r.id === intakeState.editingRowId ? "is-editing" : ""}" data-load-kb="${r.id}">
               <td>${escapeHtml(r.title || r.question || r.category)}</td>
               <td>${escapeHtml(String(r.answer || "").slice(0, 120))}${String(r.answer || "").length > 120 ? "…" : ""}</td>
               <td class="muted">${escapeHtml(r.source_name || r.source_kind || "typed")}</td>
@@ -638,7 +719,7 @@ async function knowledgeBaseView() {
                 <button type="button" class="intake-link" data-edit-kb="${r.id}">Edit</button>
                 <button type="button" class="intake-link is-danger" data-delete-kb="${r.id}">Delete</button>
               </td>
-            </tr>`).join("") || `<tr><td colspan="4">Nothing yet. Start with the first step and this fills up as you go.</td></tr>`}</tbody>
+            </tr>`).join("") || `<tr><td colspan="4">Nothing saved in this section yet. Use the fields above to add it.</td></tr>`}</tbody>
           </table></div>
         </section>
       </div>
@@ -655,6 +736,8 @@ function wireIntake(step, data) {
   $("#intakePack").onchange = async (e) => {
     await api("/api/intake/pack", { method: "POST", body: { pack: e.target.value } });
     intakeState.activeStepId = null;
+    intakeState.editingRowId = null;
+    intakeState.uploads = [];
     knowledgeBaseView();
   };
 
@@ -663,12 +746,33 @@ function wireIntake(step, data) {
       // Staged files belong to the step that was open. Carrying them into the
       // next step would silently file a price list under "Policies".
       intakeState.uploads = [];
+      intakeState.editingRowId = null;
       intakeState.activeStepId = btn.dataset.step;
       knowledgeBaseView();
     };
   });
 
   const findRow = (id) => intakeState.rows.find((r) => r.id === id);
+  const editRowInPanel = (row) => {
+    const rowStep = intakeStepForRow(row, data.steps);
+    if (!rowStep) {
+      intakeShowEntry(row, true);
+      return;
+    }
+    intakeState.uploads = [];
+    intakeState.activeStepId = rowStep.id;
+    intakeState.editingRowId = row.id;
+    knowledgeBaseView();
+    setTimeout(() => document.querySelector(".intake-panel")?.scrollIntoView({ behavior: "smooth", block: "start" }), 0);
+  };
+
+  document.querySelectorAll("[data-load-kb]").forEach((rowEl) => {
+    rowEl.onclick = (event) => {
+      if (event.target.closest("button, a")) return;
+      const row = findRow(rowEl.dataset.loadKb);
+      if (row) editRowInPanel(row);
+    };
+  });
 
   document.querySelectorAll("[data-view-kb]").forEach((btn) => {
     btn.onclick = () => {
@@ -680,7 +784,7 @@ function wireIntake(step, data) {
   document.querySelectorAll("[data-edit-kb]").forEach((btn) => {
     btn.onclick = () => {
       const row = findRow(btn.dataset.editKb);
-      if (row) intakeShowEntry(row, true);
+      if (row) editRowInPanel(row);
     };
   });
 
@@ -688,6 +792,7 @@ function wireIntake(step, data) {
     btn.onclick = async () => {
       if (!window.confirm("Delete this? Closer will stop using it when answering customers.")) return;
       await api(`/api/knowledge-base/${btn.dataset.deleteKb}`, { method: "DELETE" });
+      if (intakeState.editingRowId === btn.dataset.deleteKb) intakeState.editingRowId = null;
       toast("Deleted");
       knowledgeBaseView();
     };
@@ -702,6 +807,24 @@ function wireIntake(step, data) {
       if (custom) custom.hidden = validitySelect.value !== "custom";
     };
   }
+
+  const editValiditySelect = document.querySelector('select[name="edit_validity"]');
+  if (editValiditySelect) {
+    editValiditySelect.onchange = () => {
+      const custom = document.querySelector(".intake-edit-custom-date");
+      if (custom) custom.hidden = editValiditySelect.value !== "custom";
+    };
+  }
+
+  const cancelEdit = () => {
+    intakeState.editingRowId = null;
+    intakeState.uploads = [];
+    knowledgeBaseView();
+  };
+  const cancelEditBtn = $("#intakeCancelEditBtn");
+  if (cancelEditBtn) cancelEditBtn.onclick = cancelEdit;
+  const cancelEditTop = $("#intakeCancelEditTop");
+  if (cancelEditTop) cancelEditTop.onclick = cancelEdit;
 
   const addRow = $("#intakeAddRow");
   if (addRow) {
@@ -965,6 +1088,7 @@ function wireIntakeSubmit(step) {
   if (!form) return;
   form.onsubmit = async (event) => {
     event.preventDefault();
+    const editRow = intakeActiveEditRow(step);
 
     if (step.liveData) {
       const formData = new FormData(form);
@@ -1035,17 +1159,25 @@ function wireIntakeSubmit(step) {
     }
 
     try {
-      const saved = await api(`/api/intake/step/${step.id}`, { method: "POST", body: payload });
-      await intakeAttachOriginalUploads(saved.entry?.id);
+      if (editRow) {
+        const raw = Object.fromEntries(new FormData(form));
+        const update = intakePayloadForExistingRow(editRow, payload, raw);
+        await api(`/api/knowledge-base/${editRow.id}`, { method: "PUT", body: update });
+        await intakeAttachOriginalUploads(editRow.id);
+      } else {
+        const saved = await api(`/api/intake/step/${step.id}`, { method: "POST", body: payload });
+        await intakeAttachOriginalUploads(saved.entry?.id);
+      }
     } catch (error) {
       // Show what the server actually said. Previously this threw into the
       // console and the screen simply did nothing.
       toast(error.message || "Could not save that — please try again");
       return;
     }
-    toast("Saved — Closer knows this now");
+    toast(editRow ? "Updated — Closer uses this now" : "Saved — Closer knows this now");
     intakeState.uploads = [];
-    intakeState.activeStepId = null;
+    intakeState.editingRowId = null;
+    intakeState.activeStepId = editRow ? step.id : null;
     knowledgeBaseView();
   };
 }
@@ -1148,6 +1280,10 @@ async function maybeShowSetupModal() {
   .intake-wordcount { justify-self: end; font-size: 11px; color: #6a7382; font-weight: 600; }
   .intake-wordcount.is-over { color: #b32d2d; }
   .intake-actions { display: flex; gap: 10px; align-items: center; }
+  .intake-edit-context { display: flex; justify-content: space-between; gap: 12px; align-items: flex-start; padding: 12px 14px; border: 1px solid #d9cef8; border-left: 3px solid #6b4dff; border-radius: 8px; background: #fbf9ff; }
+  .intake-edit-context div { display: grid; gap: 4px; min-width: 0; }
+  .intake-edit-context b { color: #262338; font-size: 15px; line-height: 1.25; }
+  .intake-edit-context small { color: #6a7382; font-weight: 700; line-height: 1.35; }
   .intake-check { display: flex !important; gap: 10px; align-items: center; grid-column: 1 / -1; }
   .intake-check input[type=checkbox] { width: 18px; height: 18px; margin: 0; flex: 0 0 auto; }
   .intake-check-group { border: 1px solid #e3e8f0; border-radius: 10px; padding: 12px; background: #fbfcff; }
@@ -1159,6 +1295,8 @@ async function maybeShowSetupModal() {
   .intake-check-option.intake-check-other { display: grid !important; grid-template-columns: auto auto minmax(160px, 1fr); align-items: center; }
   .intake-check-other input[type=text] { width: 100%; min-height: 34px; padding: 6px 8px; font-size: 13px; }
   .intake-kb-actions { white-space: nowrap; }
+  tr[data-load-kb] { cursor: pointer; }
+  tr[data-load-kb].is-editing td { background: #f2eeff; }
   .intake-link { border: 0; background: none; padding: 2px 6px; cursor: pointer; font: inherit; font-size: 12px; color: #4b3ecf; text-decoration: underline; }
   .intake-link.is-danger { color: #b32d2d; }
   .intake-entry-view { white-space: pre-wrap; word-break: break-word; max-height: 50vh; overflow: auto; background: #f7f8fb; padding: 12px; border-radius: 8px; font-size: 13px; font-family: inherit; }
@@ -1294,7 +1432,21 @@ function intakeShowEntry(row, editing) {
   });
 
   const editBtn = wrap.querySelector("#intakeEntryEdit");
-  if (editBtn) editBtn.onclick = () => { close(); intakeShowEntry(row, true); };
+  if (editBtn) {
+    editBtn.onclick = () => {
+      const rowStep = intakeStepForRow(row, intakeState.data?.steps || []);
+      if (rowStep) {
+        close();
+        intakeState.uploads = [];
+        intakeState.activeStepId = rowStep.id;
+        intakeState.editingRowId = row.id;
+        knowledgeBaseView();
+      } else {
+        close();
+        intakeShowEntry(row, true);
+      }
+    };
+  }
 
   const saveBtn = wrap.querySelector("#intakeEntrySave");
   if (saveBtn) {

@@ -65,21 +65,7 @@
       </div>
     </main>
 
-    <footer class="site-footer" data-public>
-      <b>AIStaff.click</b>
-      <span>Closer — AI Sales Agent</span>
-      <span>support@aistaff.click</span>
-      <span>+63 900 000 0000</span>
-      <a href="/about/">About Us</a>
-      <a href="/contact/">Contact Us</a>
-      <a href="/pricing/">Pricing</a>
-      <a href="/privacy">Privacy Policy</a>
-      <a href="/terms">Terms</a>
-      <a href="/refund-policy/">Refund Policy</a>
-      <a href="/cancellation-policy/">Cancellation Policy</a>
-      <a href="/service-fulfillment-policy/">Service Fulfillment Policy</a>
-      <a href="/support/">Support</a>
-    </footer>
+    <div id="site-footer-root"></div>
 
     <div id="siteChatWidget" class="site-chat-widget" data-public>
       <button id="siteChatToggle" class="site-chat-toggle" aria-label="Chat with AIStaff" aria-expanded="false">
@@ -104,7 +90,12 @@
 
     <main id="adminApp" class="admin-app" hidden>
       <aside class="admin-sidebar">
-        <a class="brand" href="/admin/dashboard"><img class="brand-logo" src="/aistaff-logo-square.png" alt="AIStaff" width="40" height="40" /></a>
+        <div class="admin-sidebar-head">
+          <a class="brand" href="/admin/dashboard"><img class="brand-logo" src="/aistaff-logo-square.png" alt="AIStaff" width="40" height="40" /></a>
+          <button id="adminMenuToggle" class="admin-menu-toggle" type="button" aria-controls="adminNav" aria-expanded="false" aria-label="Open admin menu">
+            <span></span><span></span><span></span>
+          </button>
+        </div>
         <nav id="adminNav"></nav>
         <!-- Who is signed in. Without this, someone with two workspaces open
              cannot tell which account they are acting in — and a staff member
@@ -181,5 +172,5 @@
     <script src="/closer-status.js"></script>
     <script src="/platform.js"></script>
     <script src="/app.js"></script>
-  </body>
+  <script src="/js/site-footer.js" defer></script></body>
 </html>

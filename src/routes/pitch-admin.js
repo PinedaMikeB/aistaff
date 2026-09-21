@@ -39,6 +39,110 @@ const GEMINI_VOICES = [
   { name: "Orus",   gender: "male",   note: "firm" },
 ];
 
+const GEMINI_LIVE_MODELS = [
+  { model: "gemini-3.1-flash-live-preview", label: "Gemini 3.1 Flash Live" },
+  { model: "gemini-2.5-flash-native-audio-preview-09-2025", label: "Gemini 2.5 Flash Native Audio" },
+];
+
+const OPENAI_REALTIME_MODELS = [
+  { model: "gpt-realtime", label: "GPT Realtime" },
+];
+
+const OPENAI_FALLBACK_MODELS = [
+  { model: "gpt-5.6-luna", label: "GPT-5.6 Luna" },
+  { model: "gpt-5.6-terra", label: "GPT-5.6 Terra" },
+  { model: "gpt-5.6-sol", label: "GPT-5.6 Sol" },
+  { model: "gpt-5-mini", label: "GPT-5 mini" },
+  { model: "gpt-4.1-mini", label: "GPT-4.1 mini" },
+  { model: "gpt-realtime", label: "GPT Realtime" },
+];
+
+const LOCAL_TEXT_MODELS = {
+  gemini: [
+    { model: "gemini-3.7-flash", label: "Gemini 3.7 Flash" },
+    { model: "gemini-3.5-flash-lite", label: "Gemini 3.5 Flash-Lite" },
+    { model: "gemini-3-flash", label: "Gemini 3 Flash" },
+    { model: "gemini-3.1-flash-lite", label: "Gemini 3.1 Flash-Lite" },
+  ],
+  openai: OPENAI_FALLBACK_MODELS,
+};
+
+function safeModel(value) {
+  return String(value || "").trim().replace(/[^\w.\-:]/g, "").slice(0, 120);
+}
+
+let openAiModelCache = { expiresAt: 0, models: null, error: null };
+
+function labelOpenAiModel(id) {
+  return String(id || "")
+    .replace(/^gpt-/, "GPT-")
+    .replace(/-/g, " ")
+    .replace(/\bmini\b/i, "mini")
+    .replace(/\bnano\b/i, "nano")
+    .replace(/\brealtime\b/i, "Realtime")
+    .replace(/\bluna\b/i, "Luna")
+    .replace(/\bterra\b/i, "Terra")
+    .replace(/\bsol\b/i, "Sol");
+}
+
+function sortOpenAiModels(models) {
+  const rank = (id) => {
+    const s = String(id || "");
+    if (/^gpt-5\.6/.test(s)) return 0;
+    if (/^gpt-5/.test(s)) return 1;
+    if (/^gpt-4\.1/.test(s)) return 2;
+    if (/realtime/.test(s)) return 3;
+    if (/^gpt/.test(s)) return 4;
+    return 5;
+  };
+  return [...models].sort((a, b) => rank(a.model) - rank(b.model) || a.model.localeCompare(b.model));
+}
+
+async function openAiModels() {
+  const now = Date.now();
+  if (openAiModelCache.models && openAiModelCache.expiresAt > now) return openAiModelCache;
+  if (!process.env.OPENAI_API_KEY) {
+    openAiModelCache = {
+      expiresAt: now + 60_000,
+      models: OPENAI_FALLBACK_MODELS,
+      error: "OPENAI_API_KEY is not set",
+    };
+    return openAiModelCache;
+  }
+
+  try {
+    const res = await fetch("https://api.openai.com/v1/models", {
+      headers: { Authorization: `Bearer ${process.env.OPENAI_API_KEY}` },
+    });
+    const data = await res.json();
+    if (!res.ok || data.error) {
+      throw new Error(data.error?.message || `OpenAI models failed with HTTP ${res.status}`);
+    }
+    const seen = new Set();
+    const models = sortOpenAiModels((data.data || [])
+      .map((m) => safeModel(m.id))
+      .filter(Boolean)
+      .filter((id) => {
+        if (seen.has(id)) return false;
+        seen.add(id);
+        return true;
+      })
+      .map((id) => ({ model: id, label: labelOpenAiModel(id) })));
+    openAiModelCache = {
+      expiresAt: now + 5 * 60_000,
+      models: models.length ? models : OPENAI_FALLBACK_MODELS,
+      error: null,
+    };
+  } catch (error) {
+    openAiModelCache = {
+      expiresAt: now + 60_000,
+      models: OPENAI_FALLBACK_MODELS,
+      error: error.message || String(error),
+    };
+  }
+  return openAiModelCache;
+}
+
 fs.mkdirSync(PREVIEW_DIR, { recursive: true });
 
 const wrap = (fn) => (req, res) =>
@@ -88,9 +192,11 @@ function runningPipeline() {
     const log = fs.readFileSync(path.join(REPO_ROOT, "logs", "pitch-live.log"), "utf8");
     const lines = log.split("\n").filter((l) => l.includes("starting — extension"));
     const last = lines[lines.length - 1] || "";
-    const m = last.match(/brain=(\w+)/);
+    const m = last.match(/brain=([\w-]+)/);
     if (!m) return null;
-    return m[1] === "local" ? "local" : "gemini-live";
+    if (m[1] === "local") return "local";
+    if (m[1] === "openai") return "openai-realtime";
+    return "gemini-live";
   } catch { return null; }
 }
 
@@ -101,8 +207,8 @@ function buildRouter({ requireAuth } = {}) {
 
   // ---- current state -------------------------------------------------
   r.get("/", guard, wrap(async (req, res) => {
-    const [piperUp, whisperUp, pid] = await Promise.all([
-      probe(PIPER_HEALTH), probe(WHISPER_HEALTH), pitchProcess(),
+    const [piperUp, whisperUp, pid, openaiModels] = await Promise.all([
+      probe(PIPER_HEALTH), probe(WHISPER_HEALTH), pitchProcess(), openAiModels(),
     ]);
     res.json({
       config: readConfig(),
@@ -112,6 +218,20 @@ function buildRouter({ requireAuth } = {}) {
       whisperModels: whisperModels(),
       languages: listLanguages(),
       geminiVoices: GEMINI_VOICES,
+      pitchModels: {
+        geminiLive: GEMINI_LIVE_MODELS,
+        openaiRealtime: openaiModels.models,
+        localText: {
+          ...LOCAL_TEXT_MODELS,
+          openai: openaiModels.models,
+        },
+      },
+      modelFetch: {
+        openai: {
+          live: !openaiModels.error,
+          error: openaiModels.error,
+        },
+      },
     });
   }));
 
@@ -195,24 +315,40 @@ function buildRouter({ requireAuth } = {}) {
   r.put("/config", guard, wrap(async (req, res) => {
     const b = req.body || {};
     const patch = {};
-    if (b.pipeline === "gemini-live" || b.pipeline === "local") patch.pipeline = b.pipeline;
+    if (["gemini-live", "openai-realtime", "local"].includes(b.pipeline)) patch.pipeline = b.pipeline;
     if (typeof b.bargeInEnabled === "boolean") patch.bargeInEnabled = b.bargeInEnabled;
-    if (b.geminiLive && typeof b.geminiLive === "object" && b.geminiLive.voice) {
-      const v = String(b.geminiLive.voice);
-      if (GEMINI_VOICES.some((g) => g.name === v)) patch.geminiLive = { voice: v };
+    if (b.geminiLive && typeof b.geminiLive === "object") {
+      patch.geminiLive = {};
+      if (b.geminiLive.voice) {
+        const v = String(b.geminiLive.voice);
+        if (GEMINI_VOICES.some((g) => g.name === v)) patch.geminiLive.voice = v;
+      }
+      if (b.geminiLive.model) patch.geminiLive.model = safeModel(b.geminiLive.model);
+    }
+    if (b.openaiRealtime && typeof b.openaiRealtime === "object") {
+      patch.openaiRealtime = {};
+      if (b.openaiRealtime.model) patch.openaiRealtime.model = safeModel(b.openaiRealtime.model);
+      if (b.openaiRealtime.voice) patch.openaiRealtime.voice = safeModel(b.openaiRealtime.voice);
     }
     if (b.local && typeof b.local === "object") {
       patch.local = {};
       const L = b.local;
+      if (L.brainProvider === "gemini" || L.brainProvider === "openai") patch.local.brainProvider = L.brainProvider;
+      if (L.geminiTextModel) patch.local.geminiTextModel = safeModel(L.geminiTextModel);
+      if (L.openaiTextModel) patch.local.openaiTextModel = safeModel(L.openaiTextModel);
       if (L.ttsEngine) patch.local.ttsEngine = String(L.ttsEngine);
       if (L.piperVoice) patch.local.piperVoice = String(L.piperVoice).replace(/[^\w.\-]/g, "");
       if (L.whisperModel) patch.local.whisperModel = String(L.whisperModel).replace(/[^\w.\-]/g, "");
       if (L.whisperLanguage) patch.local.whisperLanguage = String(L.whisperLanguage).slice(0, 8);
+      if (typeof L.greetingText === "string") {
+        const text = L.greetingText.trim().slice(0, 500);
+        if (text) patch.local.greetingText = text;
+      }
       if (L.piperSpeakerId !== undefined) {
         patch.local.piperSpeakerId = L.piperSpeakerId === null || L.piperSpeakerId === ""
           ? null : Number(L.piperSpeakerId);
       }
-      for (const k of ["piperLengthScale", "piperNoiseScale"]) {
+      for (const k of ["piperLengthScale", "piperNoiseScale", "piperVolumeDb", "greetingStartDelayMs"]) {
         if (L[k] !== undefined && Number.isFinite(Number(L[k]))) patch.local[k] = Number(L[k]);
       }
     }
@@ -255,7 +391,7 @@ module.exports = { buildRouter };
 // ---------------------------------------------------------------------------
 function promptRoutes(r, guard) {
   const {
-    PROMPT_KEYS, buildSeed, fillVariables, ensurePitchPrompts, clearPitchPromptCache,
+    PROMPT_KEYS, buildSeed, normalizePromptForPipeline, fillVariables, ensurePitchPrompts, clearPitchPromptCache,
   } = require("../pitch/prompt");
   const { PrismaClient } = require("@prisma/client");
   if (!global.__pitchPrisma) global.__pitchPrisma = new PrismaClient();
@@ -270,20 +406,24 @@ function promptRoutes(r, guard) {
     const revisions = await prisma.promptRevision.findMany({
       where: { key }, orderBy: { version: "desc" },
     });
-    const active = revisions.find((x) => x.is_active) || revisions[0] || null;
+    const activeRow = revisions.find((x) => x.is_active) || revisions[0] || null;
+    const viewRevision = (x) => ({
+      id: x.id, version: x.version, note: x.note, created_by: x.created_by,
+      is_active: x.is_active, created_at: x.created_at,
+      chars: x.content.length,
+      content: normalizePromptForPipeline(x.content, pipeline),
+    });
     res.json({
-      pipeline, key, active,
-      revisions: revisions.map((x) => ({
-        id: x.id, version: x.version, note: x.note, created_by: x.created_by,
-        is_active: x.is_active, created_at: x.created_at,
-        chars: x.content.length, content: x.content,
-      })),
+      pipeline, key,
+      active: activeRow ? viewRevision(activeRow) : null,
+      revisions: revisions.map(viewRevision),
     });
   }));
 
   r.post("/prompt", guard, wrap(async (req, res) => {
-    const key = keyFor(req.body.pipeline || readConfig().pipeline);
-    const content = String(req.body.content || "");
+    const pipeline = req.body.pipeline || readConfig().pipeline;
+    const key = keyFor(pipeline);
+    const content = normalizePromptForPipeline(String(req.body.content || ""), pipeline);
     if (content.length < 20) return res.status(400).json({ error: "content too short" });
     const top = await prisma.promptRevision.findFirst({
       where: { key }, orderBy: { version: "desc" },
@@ -316,20 +456,25 @@ function promptRoutes(r, guard) {
   r.get("/prompt/preview", guard, wrap(async (req, res) => {
     await ensurePitchPrompts();
     const pipeline = req.query.pipeline || readConfig().pipeline;
+    const runtime = readConfig();
     const key = keyFor(pipeline);
     const row = await prisma.promptRevision.findFirst({
       where: { key, is_active: true }, orderBy: { version: "desc" },
     });
-    const text = row ? row.content
-      : buildSeed({ pipeline, smsEnabled: pipeline !== "local" });
-    res.json({
-      pipeline, key,
-      content: fillVariables(text, {
+    const text = normalizePromptForPipeline(
+      row ? row.content : buildSeed({ pipeline, smsEnabled: pipeline !== "local" }),
+      pipeline
+    );
+    let content = fillVariables(text, {
         businessName: process.env.PITCH_BUSINESS_NAME || "your business",
         agentName: process.env.PITCH_AGENT_NAME || "Pitch",
         callerId: "+639171234567",
-      }),
-    });
+      });
+    if (pipeline === "local") {
+      const { buildPiperLanguageGuidance } = require("../pitch/voice-language");
+      content = `${content}\n\n${buildPiperLanguageGuidance(runtime.local?.piperVoice)}`;
+    }
+    res.json({ pipeline, key, content });
   }));
 
   // Put the code seed back, for when an edit goes wrong.

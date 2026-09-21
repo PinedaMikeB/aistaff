@@ -1,0 +1,77 @@
+[
+  {
+    "id": "cls014",
+    "token": "quezon",
+    "warning": "loanword/name letter `q` mapped in Filipino word `quezon`"
+  },
+  {
+    "id": "cls014",
+    "token": "quezon",
+    "warning": "loanword/name letter `z` mapped in Filipino word `quezon`"
+  },
+  {
+    "id": "eng005",
+    "token": "stock",
+    "warning": "loanword/name letter `c` mapped in Filipino word `stock`"
+  },
+  {
+    "id": "fup008",
+    "token": "stock",
+    "warning": "loanword/name letter `c` mapped in Filipino word `stock`"
+  },
+  {
+    "id": "obj140",
+    "token": "stock",
+    "warning": "loanword/name letter `c` mapped in Filipino word `stock`"
+  },
+  {
+    "id": "prd002",
+    "token": "stock",
+    "warning": "loanword/name letter `c` mapped in Filipino word `stock`"
+  },
+  {
+    "id": "prd003",
+    "token": "stock",
+    "warning": "loanword/name letter `c` mapped in Filipino word `stock`"
+  },
+  {
+    "id": "prd009",
+    "token": "stock",
+    "warning": "loanword/name letter `c` mapped in Filipino word `stock`"
+  },
+  {
+    "id": "prd018",
+    "token": "stock",
+    "warning": "loanword/name letter `c` mapped in Filipino word `stock`"
+  },
+  {
+    "id": "prd028",
+    "token": "stock",
+    "warning": "loanword/name letter `c` mapped in Filipino word `stock`"
+  },
+  {
+    "id": "prd032",
+    "token": "stock",
+    "warning": "loanword/name letter `c` mapped in Filipino word `stock`"
+  },
+  {
+    "id": "prd060",
+    "token": "stock",
+    "warning": "loanword/name letter `c` mapped in Filipino word `stock`"
+  },
+  {
+    "id": "prd063",
+    "token": "stock",
+    "warning": "loanword/name letter `c` mapped in Filipino word `stock`"
+  },
+  {
+    "id": "prd078",
+    "token": "stock",
+    "warning": "loanword/name letter `c` mapped in Filipino word `stock`"
+  },
+  {
+    "id": "prd097",
+    "token": "stock",
+    "warning": "loanword/name letter `c` mapped in Filipino word `stock`"
+  }
+]

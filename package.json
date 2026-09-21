@@ -14,6 +14,8 @@
     "assign:superadmin": "node scripts/assign-superadmin.js",
     "brandee:import-static-templates": "node scripts/brandee-import-static-templates.js",
     "brandee:activate-imported-templates": "node scripts/brandee-activate-imported-templates.js",
+    "scan:ungm": "node scripts/ungm-public-opportunity-scan.js",
+    "health:procurement-briefing": "node scripts/procurement-briefing-health.js",
     "start:live": "bash scripts/start-live.sh",
     "install:launchd": "bash scripts/install-aistaff-launchd.sh",
     "setup:dns": "bash scripts/setup-aistaff-click-dns.sh",

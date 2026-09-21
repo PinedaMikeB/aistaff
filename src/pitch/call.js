@@ -37,6 +37,10 @@ function writeWav(file, chunks, rate = 8000) {
   return { file, seconds: total / rate, peak };
 }
 
+function safeFileToken(value) {
+  return String(value || "unknown").replace(/[^\w.-]+/g, "_").slice(0, 80) || "unknown";
+}
+
 /**
  * One live call: SIP dialog + RTP session + brain, tied together.
  *
@@ -69,6 +73,37 @@ class Call {
     this.recording = !!process.env.PITCH_RECORD_DIR;
     this.recIn = [];
     this.recOut = [];
+    this.conversationFile = null;
+  }
+
+  _appendConversationEvent(event) {
+    try {
+      if (!this.conversationFile) return;
+      fs.appendFileSync(this.conversationFile, `${JSON.stringify({
+        at: new Date().toISOString(),
+        callId: this.dialog.callId || this.dialog.id || null,
+        callerId: this.dialog.callerId,
+        ...event,
+      })}\n`);
+    } catch (err) {
+      log.warn(`conversation log failed: ${err.message}`);
+    }
+  }
+
+  _openConversationLog({ remote, codec }) {
+    const dir = process.env.PITCH_CONVERSATION_LOG_DIR
+      || path.join(__dirname, "..", "..", "local-runtime", "pitch-conversations");
+    const stamp = new Date().toISOString().replace(/[:.]/g, "-");
+    const caller = safeFileToken(this.dialog.callerId);
+    fs.mkdirSync(dir, { recursive: true });
+    this.conversationFile = path.join(dir, `${stamp}-${caller}.jsonl`);
+    this._appendConversationEvent({
+      type: "call_start",
+      remote,
+      codec,
+      tenant: this.tenant,
+    });
+    log.info(`conversation log: ${this.conversationFile}`);
   }
 
   async start() {
@@ -81,6 +116,7 @@ class Call {
 
     const codec = remote.codec || "PCMU";
     log.info(`call: from=${this.dialog.callerId} codec=${codec} remote=${remote.host}:${remote.port}`);
+    this._openConversationLog({ remote, codec });
 
     this.controls.ring();
 
@@ -140,6 +176,7 @@ class Call {
     this.brain.on("transcript", ({ role, text }) => {
       if (!text) return;
       this.transcript.push({ role, text, at: Date.now() });
+      this._appendConversationEvent({ type: "message", role, text });
       log.info(`[${role}] ${text}`);
     });
 
@@ -175,6 +212,17 @@ class Call {
       `rtpIn=${stats?.packetsIn ?? 0} rtpOut=${stats?.packetsOut ?? 0} ` +
       `speechOut=${stats?.speechOut ?? 0} lost=${stats?.lost ?? 0}`
     );
+    this._appendConversationEvent({
+      type: "call_end",
+      reason,
+      durationSeconds: Number(seconds),
+      rtp: {
+        packetsIn: stats?.packetsIn ?? 0,
+        packetsOut: stats?.packetsOut ?? 0,
+        speechOut: stats?.speechOut ?? 0,
+        lost: stats?.lost ?? 0,
+      },
+    });
 
     try { this.brain?.close(); } catch { /* noop */ }
     try { this.rtp?.close(); } catch { /* noop */ }
