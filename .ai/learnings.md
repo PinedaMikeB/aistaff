@@ -98,6 +98,27 @@ When product quality is the marketing strategy, demonstrate:
 
 ## Development Lessons
 
+## Engine Platform Baseline Lessons (2026-09-22)
+
+- AIStaff already has the correct tenant root in `Company`, tenant-scoped
+  users, subscriptions, platform roles, and audit logs. The Engine Platform
+  should extend these records instead of creating a parallel tenant system.
+- `/srv/apps/marga-app` is the operational Marga application on Ryzen;
+  `/srv/apps/marga-biz` is the public website and must not be treated as the
+  service operations backend.
+- The Marga service portal already provides tickets, companies, branches,
+  devices, toner requests, service history, and staff schedule operations.
+- Existing Master Schedule writes are allowlisted PATCH/DELETE operations.
+  Schedule creation needs a reviewed authenticated connector endpoint rather
+  than a direct AIStaff database write.
+- The bosgame Qwen LAN proxy can be healthy while the model backend is down.
+  Future model health must check both proxy reachability and model readiness.
+- User-level systemd with `Linger=no` is not sufficient for an always-on model
+  service that must survive desktop logout and reboot.
+- Recovery packages should include database dumps, application-level exports,
+  Git history, runtime inventories, and checksums; one artifact alone is not a
+  complete rollback point.
+
 - Public copy should be treated as product behavior documentation, not merely marketing text.
 - Components for agent cards, status badges, CTAs, and product sections should be reusable and data-driven.
 - Smooth-scroll CTA behavior should reuse the existing routing and navigation pattern.

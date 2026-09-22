@@ -349,6 +349,34 @@ Remaining refinements:
 
 ## Confirmed Marketing Direction
 
+## Engine Platform Foundation - Phase 1 Baseline (2026-09-22)
+
+Completed:
+
+- Captured validated AIStaff, n8n, and Margabase database backups.
+- Exported all current n8n workflows and encrypted credential records.
+- Created a complete AIStaff Git bundle and SHA-256 recovery manifest.
+- Inventoried existing AIStaff tenant, subscription, role, and audit models.
+- Identified `/srv/apps/marga-app` as the operational Marga application and
+  inventoried its service, customer, machine, ticket, schedule, and field data.
+- Recorded the Qwen proxy and model-backend health baseline on bosgame.
+- Created branch `codex/engine-platform-foundation` from commit `93570d0`.
+
+Next:
+
+1. Define the versioned execution envelope.
+2. Define canonical Service Engine action schemas.
+3. Define connector preflight, execution, and normalized response contracts.
+4. Add fixtures for Marga and a generic service tenant.
+5. Review the contracts before introducing database migrations.
+
+Safety status:
+
+- Existing AIStaff, n8n, and Marga production behavior was not changed.
+- The active Service Monitoring Engine remains published and unchanged.
+- The baseline recovery package is stored under
+  `/srv/automations/backups/aistaff-engine-platform/20260922-193343`.
+
 The public category is confirmed:
 
 AIStaff is the AI workforce for B2B sales conversations.
