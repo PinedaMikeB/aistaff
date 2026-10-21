@@ -15,6 +15,7 @@ const execFileAsync = promisify(execFile);
 
 const { readConfig, writeConfig, CONFIG_PATH } = require("../pitch/runtime-config");
 const { listVoices, listLanguages, VOICE_DIR } = require("../pitch/voice-catalogue");
+const pitchControl = require("../pitch/control-client");
 
 const REPO_ROOT = path.join(__dirname, "..", "..");
 const PIPER_BIN = path.join(REPO_ROOT, "local-runtime", "venvs", "piper", "bin", "piper");
@@ -207,6 +208,23 @@ function buildRouter({ requireAuth } = {}) {
 
   // ---- current state -------------------------------------------------
   r.get("/", guard, wrap(async (req, res) => {
+    if (pitchControl.enabled()) {
+      const remote = await pitchControl.getState();
+      const openaiModels = await openAiModels();
+      return res.json({
+        ...remote,
+        remoteControl: true,
+        runningPipeline: remote.services?.pitch?.up ? remote.config?.pipeline : null,
+        languages: listLanguages(),
+        geminiVoices: GEMINI_VOICES,
+        pitchModels: {
+          geminiLive: GEMINI_LIVE_MODELS,
+          openaiRealtime: openaiModels.models,
+          localText: { ...LOCAL_TEXT_MODELS, openai: openaiModels.models },
+        },
+        modelFetch: { openai: { live: !openaiModels.error, error: openaiModels.error } },
+      });
+    }
     const [piperUp, whisperUp, pid, openaiModels] = await Promise.all([
       probe(PIPER_HEALTH), probe(WHISPER_HEALTH), pitchProcess(), openAiModels(),
     ]);
@@ -237,6 +255,11 @@ function buildRouter({ requireAuth } = {}) {
 
   // ---- voice catalogue ------------------------------------------------
   r.get("/voices", guard, wrap(async (req, res) => {
+    if (pitchControl.enabled()) {
+      const state = await pitchControl.getState();
+      const voices = state.options?.piperVoices || [];
+      return res.json({ voices, count: voices.length });
+    }
     const { language, gender, installedOnly } = req.query;
     let voices = listVoices({ language: language || null, gender: gender || null });
     if (installedOnly === "true") voices = voices.filter((v) => v.installed);
@@ -245,6 +268,9 @@ function buildRouter({ requireAuth } = {}) {
 
   // ---- download a voice on demand -------------------------------------
   r.post("/voices/:key/install", guard, wrap(async (req, res) => {
+    if (pitchControl.enabled()) {
+      return res.status(409).json({ error: "Install ONNX models directly on Bosgame before selecting them" });
+    }
     const key = String(req.params.key).replace(/[^\w.\-]/g, "");
     const meta = listVoices().find((v) => v.key === key);
     if (!meta) return res.status(404).json({ error: "unknown voice" });
@@ -267,6 +293,17 @@ function buildRouter({ requireAuth } = {}) {
 
   // ---- synthesize a preview clip --------------------------------------
   r.post("/preview", guard, wrap(async (req, res) => {
+    if (pitchControl.enabled()) {
+      const audio = await pitchControl.preview(req.body || {});
+      res.set({
+        "Content-Type": audio.contentType,
+        "Content-Length": audio.buffer.length,
+        "Cache-Control": "no-store",
+        "X-Preview-Ms": audio.headers.get("x-preview-ms") || "",
+        "X-Piper-Voice": audio.headers.get("x-piper-voice") || "",
+      });
+      return res.send(audio.buffer);
+    }
     const cfg = readConfig();
     const voice = String(req.body.voice || cfg.local.piperVoice).replace(/[^\w.\-]/g, "");
     const text = String(req.body.text || "").trim().slice(0, 400)
@@ -313,6 +350,7 @@ function buildRouter({ requireAuth } = {}) {
 
   // ---- save settings ---------------------------------------------------
   r.put("/config", guard, wrap(async (req, res) => {
+    if (pitchControl.enabled()) return res.json(await pitchControl.saveConfig(req.body || {}));
     const b = req.body || {};
     const patch = {};
     if (["gemini-live", "openai-realtime", "local"].includes(b.pipeline)) patch.pipeline = b.pipeline;
@@ -357,6 +395,7 @@ function buildRouter({ requireAuth } = {}) {
 
   // ---- restart the voice services --------------------------------------
   r.post("/restart", guard, wrap(async (req, res) => {
+    if (pitchControl.enabled()) return res.status(202).json(await pitchControl.restart());
     const script = path.join(REPO_ROOT, "local-runtime", "bin", "restart-voice-stack.sh");
     if (!fs.existsSync(script)) {
       return res.status(500).json({ error: "restart-voice-stack.sh not found" });

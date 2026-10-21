@@ -399,11 +399,12 @@ async function loadTenantContext() {
   const now = Date.now();
   if (tenantCache.data && tenantCache.expiresAt > now) return tenantCache.data;
 
-  const out = { businessName: null, knowledge: "" };
+  const out = { businessName: null, knowledge: "", companyId: process.env.PITCH_COMPANY_ID || null };
   try {
     const { loadAistaffAiConfig, formatKnowledgeBaseForPrompt } = require("../aistaff-ai-config");
     const cfg = await loadAistaffAiConfig(process.env.PITCH_COMPANY_ID || undefined);
     out.businessName = cfg.company && cfg.company.name ? cfg.company.name : null;
+    out.companyId = (cfg.company && cfg.company.id) || out.companyId;
 
     // Closer's budget is 60,000 characters. That is fine for Messenger, where
     // the prompt is sent once per typed reply and latency is invisible. On a
@@ -449,11 +450,15 @@ async function loadInstructions({ businessName, agentName, callerId, smsEnabled,
     callerId,
     knowledge: tenant.knowledge,
   });
+  // Who is calling (saved contacts, with permission — src/contacts.js). Varies per call, so never stored.
+  let callerSection = "";
+  try { callerSection = await require("../contacts").callerPromptSection(tenant.companyId, callerId); } catch { callerSection = ""; }
+  const withCaller = callerSection ? `${filled}\n\n${callerSection}` : filled;
   if (pipeline === "local") {
     const voice = require("./runtime-config").readConfig().local?.piperVoice;
-    return `${filled}\n\n${buildPiperLanguageGuidance(voice)}`;
+    return `${withCaller}\n\n${buildPiperLanguageGuidance(voice)}`;
   }
-  return filled;
+  return withCaller;
 }
 
 function clearPitchPromptCache() { promptCache.clear(); }

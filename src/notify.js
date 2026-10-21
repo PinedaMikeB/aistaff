@@ -14,6 +14,7 @@
  * than throwing — a missing mailbox must never break a customer reply.
  */
 
+require("./mail-ipv4");
 const nodemailer = require("nodemailer");
 
 const FROM_NAME = "AIStaff";
@@ -37,8 +38,26 @@ function transport() {
  * Send one notification. Never throws — a mail failure must not affect a
  * customer conversation, so every caller gets a result object instead.
  */
-async function sendNotification({ to, subject, text, html }) {
+/**
+ * Every alert has two audiences, told apart at a glance:
+ *  - tenant   -> subject "[Marga Enterprises] ...", sender "Marga Enterprises alerts"
+ *  - platform -> subject "[AIStaff platform] Marga Enterprises · ...", sender
+ *                "AIStaff Platform", with a banner saying who the tenant copy went to.
+ */
+async function sendNotification({ to, subject, text, html, audience, tenantName, tenantRecipients }) {
   if (!to) return { ok: false, reason: "no_recipient" };
+  let fromName = FROM_NAME;
+  if (audience === "tenant" && tenantName) {
+    subject = `[${tenantName}] ${subject}`;
+    fromName = `AIStaff for ${tenantName}`;
+  } else if (audience === "platform") {
+    const who = (tenantRecipients || []).join(", ") || "nobody (the tenant has no alert contacts!)";
+    subject = `[AIStaff platform] ${tenantName ? `${tenantName} · ` : ""}${subject}`;
+    fromName = "AIStaff Platform";
+    const note = `PLATFORM COPY for AIStaff support — tenant: ${tenantName || "?"}. The tenant's alert contacts got their own copy: ${who}.`;
+    text = `${note}\n\n${text || ""}`;
+    if (html) html = `<div style="background:#eef2ff;border:1px solid #c7d2fe;color:#3730a3;border-radius:8px;padding:8px 12px;margin:0 0 12px;font-family:system-ui,sans-serif;font-size:13px"><b>Platform copy</b> for AIStaff support — tenant: <b>${escapeHtmlText(tenantName || "?")}</b>. Tenant copy sent to: ${escapeHtmlText(who)}.</div>${html}`;
+  }
 
   if (!notifyConfigured()) {
     // Visible, not silent. Without this the feature would look built and do
@@ -49,7 +68,7 @@ async function sendNotification({ to, subject, text, html }) {
 
   try {
     const info = await transport().sendMail({
-      from: `${FROM_NAME} <${FROM_ADDRESS}>`,
+      from: `${String(fromName).replace(/[<>"]/g, "")} <${FROM_ADDRESS}>`,
       to,
       subject,
       text,
@@ -348,8 +367,279 @@ async function notifyBookingCreated({ to, companyName, booking, audience = "cust
   return sendNotification({ to, subject, text, html });
 }
 
+/**
+ * The Page's Messenger credential was rejected by Facebook (usually 190/460:
+ * the rep who connected it had their Facebook session reset). Until someone
+ * reconnects, Closer cannot answer ANY customer. Silent failure here meant
+ * customers were ignored for hours before anyone noticed.
+ */
+async function notifyFacebookDisconnected({ to, companyName, pageName, reason }) {
+  const link = "https://aistaff.click/admin/settings";
+  const text = [
+    `Closer stopped replying on ${pageName || "your Facebook Page"} (${companyName}).`,
+    "",
+    `Facebook rejected the saved connection: ${reason || "access token invalidated"}.`,
+    "This usually happens when the Facebook account that connected the Page changes its password, logs out of all devices, or is checked by Facebook security.",
+    "",
+    "A Page admin needs to reconnect the Page in AIStaff Settings > Facebook Page Connection:",
+    link
+  ].join("\n");
+  const html = wrap("Closer stopped replying on Facebook", `
+    <p style="font-size:14px;margin:0 0 12px"><b>${pageName || "Your Facebook Page"}</b> (${companyName}) is disconnected. Customers messaging the Page are not getting replies.</p>
+    <p style="font-size:14px;margin:0 0 12px;color:#6a7382">Facebook said: ${reason || "access token invalidated"}</p>
+    <p style="font-size:14px;margin:0 0 12px">This usually happens when the Facebook account that connected the Page changes its password, logs out of all devices, or is checked by Facebook security.</p>
+    <p style="margin:20px 0 0"><a href="${link}" style="display:inline-block;padding:10px 18px;background:#1a2233;color:#fff;text-decoration:none;border-radius:8px;font-size:14px">Reconnect the Page</a></p>
+  `);
+  return sendNotification({ to, subject: `Action needed: Closer disconnected from ${pageName || "Facebook"} - ${companyName}`, text, html });
+}
+
+function escapeNotifyHtml(value) {
+  return String(value ?? "").replace(/[&<>"]/g, (ch) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", "\"": "&quot;" }[ch]));
+}
+
+/**
+ * A Business Engine request was saved in (or queued for) the tenant's own
+ * system by Closer. Staff must not have to discover it by searching: the
+ * tenant notify list and the platform admin get the reference and the facts.
+ */
+/** Staff resolve loop buttons + reply instructions (src/resolve-loop.js). */
+function resolveBlock(requestId, recipient) {
+  if (!requestId || !recipient) return { html: "", text: "", code: "" };
+  const links = require("./resolve-loop").resolveLinks(requestId, recipient);
+  const button = (href, label, bg) => `<a href="${href}" style="display:inline-block;margin:0 8px 8px 0;padding:10px 14px;border-radius:8px;background:${bg};color:#fff;text-decoration:none;font-weight:700;font-size:14px">${label}</a>`;
+  return {
+    code: links.code,
+    html: `<div style="border:1px solid #c7d2fe;background:#eef2ff;border-radius:10px;padding:14px 16px;margin:0 0 16px">
+      <p style="margin:0 0 10px;font-weight:700;color:#3730a3">Step 2 — only after you fixed it:</p>
+      ${button(links.retry, "I fixed it — try again", "#15803d")}
+      <p style="margin:6px 0 0;font-size:13px;color:#4b5563">Closer saves the request, sends the customer the reference on Messenger and by email, and emails you when done. If it still fails, you get a new email saying what is still wrong. (Replying <i>“fixed”</i> to this email works too.)</p>
+    </div>`,
+    text: ["STEP 2 — ONLY AFTER YOU FIXED IT:", `I fixed it — try again: ${links.retry}`, "Closer saves the request and sends the customer the reference. (Replying \"fixed\" to this email works too.)", ""].join("\n")
+  };
+}
+
+async function notifyEngineRequest({ to, companyName, operationName, outcome, reference, details, customerName, reason, audience, tenantRecipients, systemName, contact, requestId = null }) {
+  const resolution = outcome === "failed" ? resolutionSteps({ reason, systemName, contact }) : null;
+  const queued = outcome === "staff_approval";
+  const failed = outcome === "failed";
+  const title = failed ? `ACTION NEEDED: ${operationName} could not be completed` : queued ? `${operationName} waiting for staff approval` : `${operationName} created by Closer`;
+  const footer = failed
+    ? "Closer did NOT save this request yet. Fix the problem above (step 1), then click \"I fixed it — try again\" (step 2). Please do not create it manually — Closer saves it and informs the customer."
+    : queued ? "Approve or reject it in AIStaff > Settings > Business Engines." : "Please check it in your system and coordinate with the customer.";
+  // Show coded values as their label ("Running / Print OK (1)"), not JSON.
+  const rows = Object.entries(details || {})
+    .filter(([, value]) => value !== null && value !== undefined && value !== "")
+    .map(([key, value]) => [key, value && typeof value === "object" && "label" in value ? `${value.label} (${value.value})` : value]);
+  const resolve = failed ? resolveBlock(requestId, to) : { html: "", text: "", code: "" };
+  const text = [
+    `${title} — ${companyName}`,
+    "",
+    resolutionText(resolution),
+    resolve.text,
+    reference ? `Reference: ${reference}` : "",
+    failed && reason ? `Problem: ${reason}` : "",
+    customerName ? `Messenger customer: ${customerName}` : "",
+    "",
+    ...rows.map(([key, value]) => `${key}: ${typeof value === "object" ? JSON.stringify(value) : value}`),
+    "",
+    footer
+  ].filter((line, index, all) => line !== "" || all[index - 1] !== "").join("\n");
+  const html = wrap(title, `
+    ${resolutionHtml(resolution)}
+    ${resolve.html}
+    ${reference ? `<p style="font-size:16px;margin:0 0 12px"><b>Reference: ${escapeNotifyHtml(reference)}</b></p>` : ""}
+    ${failed && reason ? `<p style="font-size:15px;margin:0 0 12px;color:#9a3412"><b>Problem:</b> ${escapeNotifyHtml(reason)}</p>` : ""}
+    <p style="font-size:14px;margin:0 0 12px">${escapeNotifyHtml(companyName)}${customerName ? ` · Messenger customer: ${escapeNotifyHtml(customerName)}` : ""}</p>
+    <table style="font-size:13px;border-collapse:collapse">${rows.map(([key, value]) => `<tr><td style="padding:3px 12px 3px 0;color:#6a7382;vertical-align:top">${escapeNotifyHtml(key)}</td><td style="padding:3px 0">${escapeNotifyHtml(typeof value === "object" ? JSON.stringify(value) : value)}</td></tr>`).join("")}</table>
+    <p style="font-size:13px;margin:16px 0 0;color:#6a7382">${escapeNotifyHtml(footer)}</p>
+  `);
+  return sendNotification({ to, subject: `${reference ? `[${reference}] ` : ""}${title}${resolve.code ? ` [${resolve.code}]` : ""}`, text, html, audience, tenantName: companyName, tenantRecipients });
+}
+
+function escapeHtmlText(value) {
+  return String(value ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c]);
+}
+
+function rowsTable(rows) {
+  return `<table style="border-collapse:collapse;width:100%;font-size:14px">${rows
+    .filter(([, value]) => value !== null && value !== undefined && value !== "")
+    .map(([key, value]) => `<tr><td style="padding:4px 8px;color:#6a7382;vertical-align:top">${escapeHtmlText(key)}</td><td style="padding:4px 8px">${escapeHtmlText(value)}</td></tr>`)
+    .join("")}</table>`;
+}
+
+/**
+ * "What to do to resolve this" for any tenant, built from the problem the
+ * tenant's own system (or AIStaff) reported. Works for every tenant: the
+ * system's own message is quoted, the steps depend only on the kind of error.
+ */
+function resolutionSteps({ reason, systemName, contact }) {
+  const system = systemName ? `your ${systemName} system` : "your company system";
+  const text = String(reason || "").trim();
+  const status = Number((text.match(/HTTP (\d{3})/) || [])[1] || 0);
+  const message = text.replace(/^.*?\(HTTP \d{3}\):\s*/, "").trim() || text;
+  const reach = [contact?.phone, contact?.email].filter(Boolean).join(" / ");
+  // One way out (Mike 2026-10-20): fix it, then click "I fixed it — try again".
+  // No manual creation / "I'll handle it": Closer saves it and informs the customer.
+  void reach;
+  const finish = ["Come back to this email and click \"I fixed it — try again\" below."];
+  let headline;
+  let fix;
+  if (!text) {
+    headline = "The request could not be completed automatically.";
+    fix = [`Open the conversation in AIStaff › Inquiries to see what the customer needs.`];
+  } else if (status === 409 || status === 422) {
+    headline = `${systemName || "Your system"} refused the request because of a setting or rule.`;
+    fix = [`Fix this in ${system}: ${message}`];
+  } else if (status === 400) {
+    headline = `${systemName || "Your system"} rejected one of the values sent.`;
+    fix = [`Check this in the details below: ${message}`, "If the value is right, check the field rules in AIStaff › Settings › Business Engines › Workflows."];
+  } else if (status === 401 || status === 403) {
+    headline = `AIStaff's access to ${system} was refused.`;
+    fix = [`Check the API key and its permissions in AIStaff › Settings › Connections & Actions${systemName ? ` (${systemName})` : ""}. Message: ${message}`];
+  } else if (status === 404) {
+    headline = `${systemName || "Your system"} could not find a record.`;
+    fix = [`Check that the customer / item exists and is active in ${system}: ${message}`];
+  } else if (status >= 500 || /timeout|timed out|ECONN|fetch failed|unreachable|network/i.test(text)) {
+    headline = `${systemName || "Your system"} was down or did not answer.`;
+    fix = [`Check that ${system} is running and reachable. Message: ${message}`];
+  } else if (/disabled|not connected|turned off/i.test(text)) {
+    headline = "The connection or job is switched off.";
+    fix = [`Turn it on in AIStaff › Settings › Business Engines or Connections & Actions. Message: ${message}`];
+  } else {
+    headline = "The request could not be completed automatically.";
+    fix = [`Reason given: ${message}`];
+  }
+  return { headline, steps: [...fix, ...finish] };
+}
+
+function resolutionHtml(resolution) {
+  if (!resolution) return "";
+  return `<div style="background:#fff7ed;border:1px solid #fdba74;border-radius:10px;padding:12px 16px;margin:0 0 16px">
+    <p style="margin:0 0 6px;font-size:15px;color:#9a3412"><b>Step 1 — fix this first</b></p>
+    <p style="margin:0 0 8px;font-size:14px">${escapeHtmlText(resolution.headline)}</p>
+    <ol style="margin:0;padding-left:20px;font-size:14px">${resolution.steps.map((step) => `<li style="margin:4px 0">${escapeHtmlText(step)}</li>`).join("")}</ol>
+  </div>`;
+}
+
+function resolutionText(resolution) {
+  if (!resolution) return "";
+  return ["WHAT TO DO TO RESOLVE THIS", resolution.headline, ...resolution.steps.map((step, index) => `${index + 1}. ${step}`), ""].join("\n");
+}
+
+/** Tenant alert contacts (alert_contacts, else notify_email) and the platform admin. */
+function alertAudiences(settings) {
+  const contacts = Array.isArray(settings?.alert_contacts) && settings.alert_contacts.length
+    ? settings.alert_contacts
+    : String(settings?.notify_email || "").split(/[,;\s]+/).filter((e) => e.includes("@")).map((email) => ({ name: "", email }));
+  const tenant = contacts.filter((c) => c.email).map((c) => ({ email: c.email, label: c.name ? `${c.name} <${c.email}>` : c.email }));
+  const platform = String(process.env.ADMIN_ALERT_EMAIL || process.env.SEED_ADMIN_EMAIL || "").split(/[,;\s]+/).filter((e) => e.includes("@"));
+  return { tenant, platform, sms: contacts.filter((c) => c.phone).map((c) => ({ name: c.name, phone: c.phone })) };
+}
+
+async function sendToTenantAndPlatform({ settings, tenantName, build }) {
+  const { tenant, platform } = alertAudiences(settings);
+  const tenantLabels = tenant.map((t) => t.label);
+  const results = [];
+  for (const t of tenant) results.push(await sendNotification({ ...build({ email: t.email, audience: "tenant" }), to: t.email, audience: "tenant", tenantName }));
+  for (const email of platform) {
+    if (tenant.some((t) => t.email.toLowerCase() === email.toLowerCase())) continue;
+    results.push(await sendNotification({ ...build({ email, audience: "platform" }), to: email, audience: "platform", tenantName, tenantRecipients: tenantLabels }));
+  }
+  return { ok: results.some((r) => r.ok), results };
+}
+
+/** Status update to the business's CUSTOMER (plain words, no internal states). */
+async function notifyCustomerStatus({ to, companyName, customerName, statusText, nextStep, reference, details, companyId = null, conversationId = null }) {
+  const title = reference ? `Your request ${reference} — ${companyName}` : `Update on your request — ${companyName}`;
+  const rows = [["Status", statusText], ["Reference number", reference || "Not issued yet"], ...Object.entries(details || {})];
+  const text = [
+    `Hi${customerName ? ` ${customerName}` : ""},`,
+    "",
+    statusText,
+    nextStep || "",
+    "",
+    ...rows.filter(([, v]) => v !== null && v !== undefined && v !== "").map(([k, v]) => `${k}: ${v}`),
+    "",
+    `— ${companyName}`
+  ].join("\n");
+  const html = wrap(escapeHtmlText(title), `<p>Hi${customerName ? ` ${escapeHtmlText(customerName)}` : ""},</p><p>${escapeHtmlText(statusText)}</p>${nextStep ? `<p>${escapeHtmlText(nextStep)}</p>` : ""}${rowsTable(rows)}<p style="color:#6a7382;font-size:13px">— ${escapeHtmlText(companyName)}</p>`);
+  // Customer status emails go out FROM the tenant's own inbox (Settings > Channels > Email)
+  // when it is connected; otherwise from the AIStaff system sender as before.
+  if (companyId) {
+    const { prisma } = require("./db");
+    const emailChannel = require("./email-channel");
+    const conversation = conversationId
+      ? await prisma.conversation.findUnique({ where: { id: conversationId }, select: { channel: true, external_id: true } }).catch(() => null)
+      : null;
+    // The customer is already talking to us by email in this thread: Closer's reply IS the update.
+    if (conversation?.channel === "email" && String(conversation.external_id || "").toLowerCase() === String(to || "").toLowerCase()) {
+      return { ok: false, reason: "same_email_thread" };
+    }
+    const viaTenant = await emailChannel.sendTenantEmail({ companyId, to, subject: title, text, html, conversationId }).catch((error) => ({ ok: false, reason: error.message }));
+    if (viaTenant.ok) return viaTenant;
+    if (viaTenant.reason !== "not_connected") console.warn("[notify] tenant inbox send failed (%s), using AIStaff sender", viaTenant.reason);
+  }
+  return sendNotification({ to, subject: title, text, html });
+}
+
+/** Customer followed up and the request is still not resolved: tell staff again, urgently. */
+async function notifyUnresolvedFollowup({ settings, companyName, minutesWaiting, customerMessage, problem, details, contact, alertCount, systemName, requestId = null, claimedBy = null, history = [], complaint = false }) {
+  const resolution = resolutionSteps({ reason: problem, systemName, contact });
+  const hours = minutesWaiting >= 120 ? `${Math.round(minutesWaiting / 6) / 10} h` : `${minutesWaiting} min`;
+  const subject = `${complaint ? "COMPLAINT · " : ""}URGENT (${alertCount || 1} follow-up${alertCount === 1 ? "" : "s"}): customer still waiting ${hours}`;
+  const rows = [
+    ["Customer just said", customerMessage],
+    ["Waiting since request", `${minutesWaiting} minutes`],
+    ["Why it is not done", problem || "Not completed automatically"],
+    ["Caller", contact?.name],
+    ["Phone", contact?.phone],
+    ["Email", contact?.email || "not given yet (Closer is asking)"],
+    ["Being handled by", claimedBy?.name ? `${claimedBy.name} (since ${claimedBy.at})` : ""],
+    ...Object.entries(details || {})
+  ];
+  const historyText = history.length ? ["FOLLOW-UP HISTORY (one open case, no duplicate tickets):", ...history.map((line) => `- ${line}`), ""] : [];
+  const historyHtml = history.length ? `<p style="margin:14px 0 4px;font-weight:700">Follow-up history <span style="font-weight:400;color:#6a7382">(one open case, no duplicate tickets)</span></p><ul style="margin:0 0 12px;padding-left:18px;font-size:13px">${history.map((line) => `<li>${escapeHtmlText(line)}</li>`).join("")}</ul>` : "";
+  const text = [subject, "", resolutionText(resolution), "The customer followed up and their request still has no reference number. Fix the problem (step 1), then click \"I fixed it — try again\" (step 2). Closer saves it and informs the customer.", "", ...historyText, ...rows.filter(([, v]) => v !== null && v !== undefined && v !== "").map(([k, v]) => `${k}: ${v}`)].join("\n");
+  const html = wrap(escapeHtmlText(subject), `${resolutionHtml(resolution)}<p><b>The customer followed up and their request still has no reference number.</b> Fix the problem (step 1), then click \"I fixed it — try again\" (step 2). Closer saves it and informs the customer.</p>${historyHtml}${rowsTable(rows)}`);
+  return sendToTenantAndPlatform({ settings, tenantName: companyName, build: (recipient = {}) => {
+    const resolve = resolveBlock(requestId, recipient.email);
+    return {
+      subject: `${subject}${resolve.code ? ` [${resolve.code}]` : ""}`,
+      text: resolve.text ? text.replace("\n\n", `\n\n${resolve.text}\n`) : text,
+      html: resolve.html ? html.replace(resolutionHtml(resolution), `${resolutionHtml(resolution)}${resolve.html}`) : html
+    };
+  } });
+}
+
+/** The customer is complaining about an open, scheduled request (3+ follow-ups or upset words). */
+async function notifyComplaint({ settings, companyName, customerMessage, followups, reference, reason, ticket, details, history = [], contact, ticked = true }) {
+  const subject = `COMPLAINT: ${contact?.name || "customer"} — ${reference || "open request"} (${followups} follow-up${followups === 1 ? "" : "s"})`;
+  const rows = [
+    ["Why this is a complaint", reason],
+    ["Customer just said", customerMessage],
+    ["Reference", reference],
+    ["Scheduled", ticket?.scheduledFor || ""],
+    ["Assigned to", ticket?.assignedTo || ""],
+    ["Caller", contact?.name], ["Phone", contact?.phone], ["Email", contact?.email],
+    ...Object.entries(details || {})
+  ];
+  const todo = `Call the customer today, tell them what is happening with their request, and make sure it is done.${ticked ? ' "With Complain" is now ticked on the ticket.' : ""}`;
+  const historyHtml = history.length ? `<p style="margin:14px 0 4px;font-weight:700">Follow-up history</p><ul style="margin:0 0 12px;padding-left:18px;font-size:13px">${history.map((line) => `<li>${escapeHtmlText(line)}</li>`).join("")}</ul>` : "";
+  const text = [subject, "", todo, "", ...(history.length ? ["FOLLOW-UP HISTORY:", ...history.map((l) => `- ${l}`), ""] : []), ...rows.filter(([, v]) => v).map(([k, v]) => `${k}: ${v}`)].join("\n");
+  const html = wrap(escapeHtmlText(subject), `<p style="background:#fef2f2;border:1px solid #fecaca;color:#991b1b;border-radius:8px;padding:10px 12px"><b>${escapeHtmlText(todo)}</b></p>${historyHtml}${rowsTable(rows)}`);
+  return sendToTenantAndPlatform({ settings, tenantName: companyName, build: () => ({ subject, text, html }) });
+}
+
 module.exports = {
+  notifyComplaint,
+  resolutionSteps,
+  alertAudiences,
+  sendToTenantAndPlatform,
+  notifyCustomerStatus,
+  notifyUnresolvedFollowup,
   sendNotification,
+  notifyEngineRequest,
+  notifyFacebookDisconnected,
   notifyHandoff,
   notifySetupMilestone,
   notifyGapDigest,

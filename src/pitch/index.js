@@ -1,4 +1,6 @@
 "use strict";
+// 2026-10-20: the Ryzen IPv6 route is broken (curl falls back, Node fetch does not) -> always try IPv4 first.
+require("dns").setDefaultResultOrder("ipv4first");
 
 const { config } = require("./config");
 const { log } = require("./log");

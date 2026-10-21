@@ -16,8 +16,15 @@
  * it matters far more now that a model can trigger checkout.
  */
 
+const crypto = require("crypto");
 const { prisma } = require("./db");
-const { calculateCart, getPaymentProvider, paymentProviderForCountry, AVAILABLE_PLANS } = require("./payments");
+const {
+  PAYMENT_MODE,
+  calculateCart,
+  getPaymentProvider,
+  paymentProviderForCountry,
+  AVAILABLE_PLANS
+} = require("./payments");
 
 const REUSE_WINDOW_HOURS = 24;
 
@@ -40,17 +47,24 @@ function planFor(slug) {
   return AVAILABLE_PLANS.find((p) => p.slug === slug) || AVAILABLE_PLANS[0];
 }
 
+function invoiceNumber() {
+  const stamp = new Date().toISOString().slice(0, 10).replace(/-/g, "");
+  return `INV-${stamp}-${crypto.randomBytes(3).toString("hex").toUpperCase()}`;
+}
+
 /**
  * Create (or reuse) a checkout link for someone in a conversation.
  *
  * Returns a plain object of FACTS — url, amount, plan, saving. The model
  * writes the sentence that carries it, so the closing line is never canned.
  */
-async function createCheckoutLink({ companyId, email, name, mobile, planSlug, billingFrequency, conversationId }) {
+async function createCheckoutLink({ companyId, email, name, companyName, mobile, planSlug, billingFrequency, conversationId }) {
   const cleanEmail = String(email || "").trim().toLowerCase();
   if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(cleanEmail)) {
     return { ok: false, reason: "invalid_email" };
   }
+  const cleanCompanyName = String(companyName || "").trim().slice(0, 200);
+  if (!cleanCompanyName) return { ok: false, reason: "missing_company_name" };
 
   const frequency = billingFrequency === "annual" ? "annual" : "monthly";
   const plan = planFor(planSlug);
@@ -97,36 +111,90 @@ async function createCheckoutLink({ companyId, email, name, mobile, planSlug, bi
     customer = await prisma.customer.create({
       data: {
         full_name: name || cleanEmail.split("@")[0],
+        company_name: cleanCompanyName,
+        business_name: cleanCompanyName,
         email: cleanEmail,
         mobile_number: mobile || "not provided",
         billing_address: "To be provided",
         city: "-", province: "-", postal_code: "-", country: "Philippines"
       }
     });
+  } else if (!customer.company_name || !customer.business_name) {
+    customer = await prisma.customer.update({
+      where: { id: customer.id },
+      data: {
+        company_name: customer.company_name || cleanCompanyName,
+        business_name: customer.business_name || cleanCompanyName
+      }
+    });
   }
 
-  const order = await prisma.order.create({
-    data: {
-      order_number: orderNumber,
-      customer_id: customer.id,
-      subtotal: cart.subtotal,
-      tax: cart.tax,
-      total: cart.total,
-      currency: cart.currency,
-      billing_frequency: frequency,
-      payment_provider: provider,
-      payment_status: "pending",
-      order_status: "awaiting_payment",
-      source_conversation_id: conversationId || null,
-      items: {
-        create: cart.items.map((item) => ({
-          item_type: item.itemType, item_id: item.itemId, item_name: item.itemName,
-          quantity: 1, unit_price: item.lineTotal, line_total: item.lineTotal,
-          billing_frequency: frequency
-        }))
+  const order = await prisma.$transaction(async (tx) => {
+    const pricingPlan = await tx.pricingPlan.findUnique({ where: { slug: plan.slug } });
+    if (!pricingPlan) throw new Error(`Pricing plan ${plan.slug} is missing from the catalog`);
+
+    const createdOrder = await tx.order.create({
+      data: {
+        order_number: orderNumber,
+        customer_id: customer.id,
+        subtotal: cart.subtotal,
+        tax: cart.tax,
+        total: cart.total,
+        currency: cart.currency,
+        billing_frequency: frequency,
+        payment_provider: provider,
+        payment_status: "pending",
+        order_status: "awaiting_payment",
+        source_conversation_id: conversationId || null,
+        items: {
+          create: cart.items.map((item) => ({
+            item_type: item.itemType, item_id: item.itemId, item_name: item.itemName,
+            quantity: item.quantity, unit_price: item.unitPrice, line_total: item.lineTotal,
+            billing_frequency: item.billingFrequency
+          }))
+        }
+      },
+      include: { items: true }
+    });
+
+    await tx.payment.create({
+      data: {
+        order_id: createdOrder.id,
+        provider,
+        provider_payment_id: `${provider}_${createdOrder.order_number}`,
+        payment_method: provider,
+        amount: cart.total,
+        currency: cart.currency,
+        status: "pending",
+        provider_response: { mode: PAYMENT_MODE, source: "conversation_checkout" }
       }
-    },
-    include: { items: true }
+    });
+    await tx.subscription.create({
+      data: {
+        customer_id: customer.id,
+        order_id: createdOrder.id,
+        pricing_plan_id: pricingPlan.id,
+        provider,
+        provider_subscription_id: null,
+        billing_frequency: frequency,
+        amount: cart.items.find((item) => item.itemType === "pricing_plan").lineTotal,
+        currency: cart.currency,
+        status: "pending"
+      }
+    });
+    await tx.invoice.create({
+      data: {
+        order_id: createdOrder.id,
+        invoice_number: invoiceNumber(),
+        customer_id: customer.id,
+        amount: cart.total,
+        currency: cart.currency,
+        status: "pending",
+        due_date: new Date(Date.now() + 3 * 24 * 60 * 60 * 1000),
+        invoice_url: `/api/orders/${createdOrder.order_number}/invoice`
+      }
+    });
+    return createdOrder;
   });
 
   const invoice = await getPaymentProvider(provider).createInvoice({
@@ -141,6 +209,10 @@ async function createCheckoutLink({ companyId, email, name, mobile, planSlug, bi
   await prisma.order.update({
     where: { id: order.id },
     data: { external_payment_id: invoice.providerPaymentId, external_checkout_url: invoice.checkoutUrl }
+  });
+  await prisma.payment.updateMany({
+    where: { order_id: order.id, provider },
+    data: { provider_payment_id: invoice.providerPaymentId, provider_response: invoice }
   });
 
   console.log("[checkout] %s %s %s %s for %s (conversation=%s)",

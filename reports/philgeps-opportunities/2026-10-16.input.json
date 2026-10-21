@@ -1,0 +1,233 @@
+{
+  "title": "PHILGEPS + UNGM OPPORTUNITY BRIEFING",
+  "date_iso": "2026-10-16",
+  "executive_summary": {
+    "philgeps_opportunities_scanned": 106,
+    "ungm_opportunities_scanned": 7,
+    "new_relevant_opportunities": 3,
+    "source_access_notes": "All six official PhilGEPS category pages and relevant notice abstracts were publicly accessible. The official UNGM search page returned an internal error, so seven official public UNGM notice pages and indexed official search results were checked directly without login. Detailed solicitation attachments may require supplier registration or portal opt-in.",
+    "bid_count": 0,
+    "high_priority_review_count": 1,
+    "review_count": 2,
+    "skip_count": 5
+  },
+  "best_opportunities": [
+    {
+      "source": "PhilGEPS",
+      "match_rating": "STRONG MATCH",
+      "score": 8.2,
+      "project": "Procurement of one (1) lot - Influencer Marketing Service",
+      "procuring_entity": "Philippine Postal Corporation",
+      "country": "Philippines",
+      "reference_number": "13290357 / RFQ#129-09-26",
+      "abc": "PHP 1,999,826.96",
+      "deadline": "Official abstract and RFQ body: October 19, 2026 10:00 AM PHT; category listing displayed October 23, 2026 9:30 AM PHT",
+      "days_remaining": 3,
+      "procurement_method": "Negotiated Procurement - Small Value Procurement (Sec. 34); RFQ",
+      "published": "October 16, 2026",
+      "why_fit": "Brandee directly supports influencer planning, recommended-influencer research, content deployment calendars, campaign reporting, and social-media analytics. The three-month SVP is commercially meaningful and closely aligned with AIStaff's digital-content workflows.",
+      "project_summary": "One lot of influencer marketing through December 31, 2026, including an influencer marketing plan, recommended influencer list, content deployment calendar, monthly campaign performance reports, and social-media analytics reports.",
+      "important_requirements": [
+        "Valid PhilGEPS registration certificate/number, Mayor's or Business Permit, notarized NGPA Omnibus Sworn Statement, and income/business tax return must accompany the quotation.",
+        "Corporations/partnerships must attach a notarized Secretary's Certificate; sole proprietors must attach a notarized SPA for the authorized representative.",
+        "Signed quotation and 2026 documentary requirements must be submitted physically at Annex II Building, MCPO, Manila.",
+        "The public abstract does not state a prior-experience threshold; the attached TOR must be obtained and checked before deciding to bid."
+      ],
+      "risks_or_blockers": [
+        "Deadline conflict: the category page displayed October 23 at 9:30 AM, but the notice header and RFQ body say October 19 at 10:00 AM. Do not rely on the later date without written confirmation.",
+        "Physical submission in Manila and a three-day preparation window create execution risk.",
+        "The detailed TOR is not visible in the public abstract; influencer reach, platform, audience, content volume, approval, and analytics requirements remain unknown.",
+        "The public contact uses a Yahoo address despite being listed in an official PhilGEPS notice; confirm any clarification response through the official procurement office."
+      ],
+      "how_we_could_qualify": [
+        "Bid directly if AIStaff's corporate documents are current and Brandee can satisfy the TOR with a documented influencer network and reporting methodology.",
+        "Use a Philippine influencer-management partner if the TOR requires named creators, guaranteed reach, or prior comparable campaigns."
+      ],
+      "recommended_next_action": "Treat October 19 10:00 AM as the deadline. Obtain the TOR/canvass form immediately, call the Procurement Division to confirm the controlling deadline and submission method, then make a same-day go/no-go decision based on influencer roster, deliverables, and documentary readiness. Public contact: Saturnino A. Bernales Jr., 63-2-5270133 / 5275869, saturnino.bernales@yahoo.com.ph.",
+      "official_link": "https://notices.philgeps.gov.ph/GEPSNONPILOT/Tender/SplashBidNoticeAbstractUI.aspx?menuIndex=3&refID=13290357&DirectFrom=OpenOpp"
+    },
+    {
+      "source": "UNGM",
+      "match_rating": "POSSIBLE MATCH",
+      "score": 6.8,
+      "project": "Request for Expression of Interest - Legal AI Solution",
+      "buyer_organization": "World Food Programme (WFP)",
+      "country": "Multiple destinations / global",
+      "reference_number": "HQ26NF194 / UNGM Notice 317650",
+      "budget_contract_value": "Not stated publicly.",
+      "deadline": "October 23, 2026 4:00 PM GMT+2 (October 23, 2026 10:00 PM PHT); body calls the timezone CET while the header shows GMT+2",
+      "days_remaining": 7,
+      "procurement_type": "Request for EOI",
+      "published": "October 12, 2026",
+      "why_it_fits_aistaff": "A legal AI solution could use AIStaff's custom conversational AI, knowledge retrieval, workflow automation, document assistance, dashboards, and integrations.",
+      "what_they_need": "WFP is identifying suppliers with verified technical and financial capacity to provide a Legal AI Solution; eligible suppliers will be invited to the later bidding stage.",
+      "eligibility": [
+        "UNGM Basic registration.",
+        "Completed EOI Response Form and the documents requested in the public PDF.",
+        "Submission by email to hq.tenders@wfp.org with dubai.procurement@wfp.org copied.",
+        "Exact prior-experience, security, legal-domain, financial-capacity, hosting, and data-protection thresholds must be verified in the EOI attachment."
+      ],
+      "blockers_risks": [
+        "The public description is too high-level to establish whether a new supplier can meet verified technical and financial capacity requirements.",
+        "Legal AI may demand mature legal-domain datasets, enterprise security, explainability, auditability, privacy controls, and existing reference deployments.",
+        "Timezone wording is inconsistent: the header shows GMT+2 while the body says CET."
+      ],
+      "how_we_could_qualify": [
+        "Respond directly only if the EOI attachment accepts relevant custom-AI references and AIStaff can evidence security, financial, and delivery capacity.",
+        "Otherwise participate with a legal-technology or established enterprise-software partner."
+      ],
+      "next_action": "Download and review the public EOI response form today, map every capacity requirement to evidence, confirm the timezone discrepancy with WFP, and decide whether AIStaff should respond directly or through a legal-tech partner. Public contacts: hq.tenders@wfp.org and dubai.procurement@wfp.org.",
+      "url": "https://www.ungm.org/Public/Notice/317650"
+    },
+    {
+      "source": "PhilGEPS",
+      "match_rating": "POSSIBLE MATCH",
+      "score": 5.8,
+      "project": "Installation of Accounting System and Encryption Software / Encrypted Site-to-Site Connection to Data Server",
+      "procuring_entity": "Municipality of Taysan, Batangas",
+      "country": "Philippines",
+      "reference_number": "13286115 / TAYSAN2026-072",
+      "abc": "PHP 350,000.00",
+      "deadline": "October 21, 2026 10:00 AM PHT",
+      "days_remaining": 5,
+      "procurement_method": "Negotiated Procurement - Small Value Procurement (Sec. 34); RFQ",
+      "published": "October 16, 2026",
+      "why_fit": "The work includes multi-office software setup, role-based access, integrations, database configuration, user training, backup/recovery, and post-implementation support, overlapping with AIStaff's custom systems and integration services.",
+      "project_summary": "Install and configure accounting, budget, payroll, and treasury applications; establish encrypted site-to-site connectivity; supply a server/UPS; migrate or encode data; integrate modules; train users; conduct UAT; and provide warranty and support within 30 days.",
+      "important_requirements": [
+        "Thirty-day delivery period in Batangas with on-site and remote implementation support.",
+        "Includes physical server and UPS plus two-month subscriptions for multiple government financial applications.",
+        "Requires Philippine public-sector accounting/IPSAS workflows, payroll, budget, treasury, LandBank file processes, integrations, training, UAT, backup, and recovery.",
+        "The public abstract does not state registration level, prior-experience documents, submission mechanics, or detailed acceptance criteria; confirm with BAC."
+      ],
+      "risks_or_blockers": [
+        "Scope and budget suggest an existing packaged local-government accounting suite rather than a greenfield custom build.",
+        "Hardware supply, encrypted networking, government accounting compliance, data migration, and 30-day delivery exceed AIStaff's normal low-complexity service profile.",
+        "A direct bid is not recommended without an established Philippine government accounting-software partner."
+      ],
+      "how_we_could_qualify": [
+        "Participate as an integration, workflow, dashboard, or support subcontractor under an established compliant accounting-system vendor."
+      ],
+      "recommended_next_action": "Ask BAC whether this is brand-specific or requires an existing application license, request the RFQ/specifications and documentary checklist, and pursue only with a proven LGU accounting-system partner. Public contact: Margie Celemen Africa, 63-043-7842235, taysanbac2020@gmail.com.",
+      "official_link": "https://notices.philgeps.gov.ph/GEPSNONPILOT/Tender/SplashBidNoticeAbstractUI.aspx?menuIndex=3&refID=13286115&DirectFrom=OpenOpp"
+    }
+  ],
+  "urgent_deadlines": [
+    {
+      "source": "PhilGEPS",
+      "title": "Procurement of one (1) lot - Influencer Marketing Service",
+      "buyer_organization": "Philippine Postal Corporation",
+      "reference_number": "13290357 / RFQ#129-09-26",
+      "deadline": "October 19, 2026 10:00 AM PHT per notice/RFQ body; category page displayed October 23, 2026 9:30 AM",
+      "days_remaining": 3,
+      "note": "Best new lead. Treat the earlier date as controlling and obtain the TOR plus written deadline confirmation immediately.",
+      "url": "https://notices.philgeps.gov.ph/GEPSNONPILOT/Tender/SplashBidNoticeAbstractUI.aspx?menuIndex=3&refID=13290357&DirectFrom=OpenOpp"
+    },
+    {
+      "source": "PhilGEPS",
+      "title": "Procurement of Services as Media Partner of the MTIT BARMM",
+      "buyer_organization": "Ministry of Trade, Investments & Tourism - BARMM",
+      "reference_number": "13289046 / 2026-109",
+      "deadline": "October 19, 2026 12:00 AM PHT in the notice header; current category page displayed October 19, 2026 9:00 AM",
+      "days_remaining": 3,
+      "note": "Previously reported possible match. The changed listing time conflicts with the notice header; pursue only with immediate BAC clarification and a BARMM-based media partner.",
+      "url": "https://notices.philgeps.gov.ph/GEPSNONPILOT/Tender/SplashBidNoticeAbstractUI.aspx?menuIndex=3&refID=13289046&DirectFrom=OpenOpp"
+    },
+    {
+      "source": "UNGM",
+      "title": "Machine-Assisted Crisis Simulation Methodology, Toolkit and Prototype Simulations",
+      "buyer_organization": "United Nations System Staff College",
+      "reference_number": "UNSSC/RFQ/2026/07 / UNGM Notice 316352",
+      "deadline": "October 19, 2026 11:59 PM GMT+2 (October 20, 2026 5:59 AM PHT)",
+      "days_remaining": 3,
+      "note": "Previously reported possible match. Pursue only if the revised RFQ, Q&As, methodology lead, references, and full submission are already nearly ready.",
+      "url": "https://www.ungm.org/Public/Notice/316352"
+    }
+  ],
+  "not_recommended": [
+    {
+      "source": "PhilGEPS",
+      "title": "Annual Maintenance of Cloud Traffic Violation System",
+      "procuring_entity": "City of Mandaue, Cebu",
+      "reference_number": "13285300 / PR-2026-1013-00020",
+      "reason": "The PHP 816,000 SVP sounds adjacent to cloud software, but it is maintenance of an existing traffic-violation system with no public technical specification. The canvass must be obtained locally and the abstract conflicts on October 19 versus October 20 timing; this likely favors the incumbent system vendor.",
+      "official_link": "https://notices.philgeps.gov.ph/GEPSNONPILOT/Tender/SplashBidNoticeAbstractUI.aspx?menuIndex=3&refID=13285300&DirectFrom=OpenOpp"
+    },
+    {
+      "source": "PhilGEPS",
+      "title": "Supply, Delivery and Installation of an Integrated Conference and Video System",
+      "procuring_entity": "Municipality of Argao, Cebu",
+      "reference_number": "13290246",
+      "reason": "This is an on-site audiovisual hardware and installation procurement, not a chatbot, voice agent, software workflow, or digital-content engagement.",
+      "official_link": "https://notices.philgeps.gov.ph/GEPSNONPILOT/Tender/SplashBidNoticeAbstractUI.aspx?menuIndex=3&refID=13290246&DirectFrom=OpenOpp"
+    },
+    {
+      "source": "UNGM",
+      "title": "Executive Communications Consultant",
+      "buyer_organization": "WIPO",
+      "reference_number": "rfx_846 / UNGM Notice 317187",
+      "reason": "This is an individual-consultant speechwriting framework requiring senior executive communications expertise, not an AI product, content agency, or system-delivery contract for AIStaff.",
+      "url": "https://www.ungm.org/Public/Notice/317187"
+    },
+    {
+      "source": "UNGM",
+      "title": "Media Monitoring Service",
+      "buyer_organization": "UNICEF Thailand",
+      "reference_number": "9206193 / UNGM Notice 316990",
+      "reason": "The assignment requires continuous Thai print/online media monitoring, real-time database access, daily alerts, comparative share-of-voice analysis, and an established monitoring agency capability. AIStaff does not currently have the required local media corpus and monitoring operation.",
+      "url": "https://www.ungm.org/Public/Notice/316990"
+    },
+    {
+      "source": "UNGM",
+      "title": "Digital Communications Agency for Youth Mobilization through U-Report",
+      "buyer_organization": "UNICEF Mali",
+      "reference_number": "RFP-9206576 / UNGM Notice 317293",
+      "reason": "The thematic fit is reasonable, but the French-language, Mali-focused campaign requires local youth-mobilization and communications capacity and uses UNICEF e-submission. No credible local-delivery path is currently evident.",
+      "url": "https://www.ungm.org/Public/Notice/317293"
+    }
+  ],
+  "todays_recommendation": {
+    "best_opportunity": "PHLPost Influencer Marketing Service (PhilGEPS 13290357), conditional on immediate TOR review, confirmation of the October 19 deadline, complete 2026 corporate documents, and a credible influencer roster. If those cannot be assembled today, do not rush a noncompliant physical bid.",
+    "documents_to_prepare": [
+      "Valid PhilGEPS registration certificate/number and Mayor's/Business Permit",
+      "Notarized NGPA Omnibus Sworn Statement and notarized Secretary's Certificate",
+      "Latest income/business tax return",
+      "Brandee capability statement, influencer marketing methodology, sample deployment calendar, campaign analytics/report samples, and relevant references",
+      "Named influencer shortlist with audience fit, availability, indicative reach, rates, and brand-safety checks",
+      "For WFP Legal AI: UNGM Basic profile, company/financial documents, security and architecture evidence, legal-AI capability matrix, and reference projects"
+    ],
+    "clarifications_to_request": [
+      "PHLPost: Which deadline controls—October 19 10:00 AM or the category listing's October 23 9:30 AM?",
+      "PHLPost: Obtain the full TOR and confirm influencer count/tier, platforms, content volume, target audience, approval workflow, paid-media obligations, analytics definitions, and physical submission package.",
+      "WFP: Confirm whether the deadline is GMT+2 or CET and whether consortium/partner references are acceptable for verified capacity.",
+      "MTIT-BARMM: Confirm the changed closing time, media accreditation, local presence, deliverable volume, and submission method."
+    ]
+  },
+  "source_urls_checked": [
+    "https://notices.philgeps.gov.ph/GEPSNONPILOT/Tender/SplashOpportunitiesSearchUI.aspx?BusCatID=10&ClickFrom=OpenOpp&menuIndex=3&type=category",
+    "https://notices.philgeps.gov.ph/GEPSNONPILOT/Tender/SplashOpportunitiesSearchUI.aspx?BusCatID=43&ClickFrom=OpenOpp&menuIndex=3&type=category",
+    "https://notices.philgeps.gov.ph/GEPSNONPILOT/Tender/SplashOpportunitiesSearchUI.aspx?BusCatID=37&ClickFrom=OpenOpp&menuIndex=3&type=category",
+    "https://notices.philgeps.gov.ph/GEPSNONPILOT/Tender/SplashOpportunitiesSearchUI.aspx?BusCatID=23&ClickFrom=OpenOpp&menuIndex=3&type=category",
+    "https://notices.philgeps.gov.ph/GEPSNONPILOT/Tender/SplashOpportunitiesSearchUI.aspx?BusCatID=17&ClickFrom=OpenOpp&menuIndex=3&type=category",
+    "https://notices.philgeps.gov.ph/GEPSNONPILOT/Tender/SplashOpportunitiesSearchUI.aspx?BusCatID=157&ClickFrom=OpenOpp&menuIndex=3&type=category",
+    "https://notices.philgeps.gov.ph/GEPSNONPILOT/Tender/SplashBidNoticeAbstractUI.aspx?menuIndex=3&refID=13290357&DirectFrom=OpenOpp",
+    "https://notices.philgeps.gov.ph/GEPSNONPILOT/Tender/SplashBidNoticeAbstractUI.aspx?menuIndex=3&refID=13285300&DirectFrom=OpenOpp",
+    "https://notices.philgeps.gov.ph/GEPSNONPILOT/Tender/SplashBidNoticeAbstractUI.aspx?menuIndex=3&refID=13286115&DirectFrom=OpenOpp",
+    "https://notices.philgeps.gov.ph/GEPSNONPILOT/Tender/SplashBidNoticeAbstractUI.aspx?menuIndex=3&refID=13289046&DirectFrom=OpenOpp",
+    "https://notices.philgeps.gov.ph/GEPSNONPILOT/Tender/SplashBidNoticeAbstractUI.aspx?menuIndex=3&refID=13287843&DirectFrom=OpenOpp",
+    "https://www.ungm.org/Public/Notice/317650",
+    "https://www.ungm.org/Public/Notice/317187",
+    "https://www.ungm.org/Public/Notice/316990",
+    "https://www.ungm.org/Public/Notice/317293",
+    "https://www.ungm.org/Public/Notice/316352",
+    "https://www.ungm.org/Public/Notice/315247",
+    "https://www.ungm.org/Public/Notice/317029"
+  ],
+  "notes": [
+    "Official PhilGEPS public category pages and notice abstracts were used. No login or restricted documents were accessed.",
+    "The six PhilGEPS category pages showed 106 visible listings in total: 20 Information Technology, 20 Consulting Services, 16 Communication Equipment and Parts, 20 Services, 20 Office Equipment, and 10 Advertising and Marketing Services.",
+    "The official UNGM search page returned an internal error. Seven direct official notice pages/search-result records were checked; UNGM opportunities scanned is therefore 7, not an inferred search total.",
+    "The WFP Legal AI EOI response PDF is publicly linked. No restricted attachment was used for scoring; detailed eligibility remains pending attachment review.",
+    "No bid, EOI, vendor registration, procurement email, or commitment was submitted."
+  ]
+}

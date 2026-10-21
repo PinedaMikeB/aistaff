@@ -1,0 +1,206 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="referrer" content="no-referrer">
+  <title>Connect your Facebook Page | AIStaff</title>
+  <meta name="robots" content="noindex,nofollow">
+  <style>
+    :root { color-scheme: light; --ink:#172033; --muted:#667085; --line:#dfe3ec; --brand:#6556e8; --brand2:#3178f6; --ok:#16784a; --warn:#9b5c00; }
+    * { box-sizing:border-box; }
+    body { margin:0; min-height:100vh; font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif; color:var(--ink); background:radial-gradient(circle at 15% 10%,#e8e5ff 0,transparent 34%),linear-gradient(145deg,#f8f9ff,#eef3ff); }
+    main { width:min(680px,calc(100% - 32px)); margin:48px auto; }
+    .brand { display:flex; align-items:center; gap:10px; margin-bottom:18px; font-weight:800; font-size:20px; }
+    .brand-mark { display:grid; place-items:center; width:38px; height:38px; border-radius:11px; color:#fff; background:linear-gradient(135deg,var(--brand),var(--brand2)); }
+    .card { padding:clamp(24px,5vw,44px); border:1px solid rgba(103,112,143,.2); border-radius:22px; background:rgba(255,255,255,.94); box-shadow:0 20px 60px rgba(35,48,94,.12); }
+    h1 { margin:0 0 10px; font-size:clamp(28px,6vw,42px); line-height:1.08; }
+    h2 { margin:28px 0 10px; font-size:19px; }
+    p { line-height:1.6; }
+    .muted { color:var(--muted); }
+    .context { margin:22px 0; padding:16px 18px; border-radius:14px; background:#f5f6ff; border:1px solid #e1e3ff; }
+    .context span { display:block; color:var(--muted); font-size:12px; font-weight:700; text-transform:uppercase; letter-spacing:.06em; }
+    .context strong { display:block; margin-top:5px; font-size:18px; }
+    .notice { margin:18px 0; padding:14px 16px; border-radius:12px; color:#654500; background:#fff8e8; border:1px solid #f2ddb0; line-height:1.5; }
+    .success { color:var(--ok); background:#effaf4; border-color:#bfe6cf; }
+    .error { color:#9a2828; background:#fff3f3; border-color:#efc5c5; }
+    .button { display:inline-flex; justify-content:center; align-items:center; min-height:48px; padding:0 20px; border:0; border-radius:12px; color:#fff; background:linear-gradient(135deg,var(--brand),var(--brand2)); font:700 15px inherit; text-decoration:none; cursor:pointer; }
+    .button:disabled { opacity:.55; cursor:not-allowed; }
+    .pages { display:grid; gap:10px; margin:16px 0 22px; }
+    .page-choice { display:flex; gap:12px; align-items:flex-start; padding:15px; border:1px solid var(--line); border-radius:13px; cursor:pointer; }
+    .page-choice:has(input:checked) { border-color:var(--brand); box-shadow:0 0 0 3px rgba(101,86,232,.12); }
+    .page-choice input { margin-top:4px; }
+    .page-choice strong,.page-choice small { display:block; }
+    .page-choice small { margin-top:4px; color:var(--muted); }
+    .privacy { margin-top:24px; padding-top:20px; border-top:1px solid var(--line); font-size:13px; color:var(--muted); }
+    [hidden] { display:none !important; }
+  </style>
+</head>
+<body>
+  <main>
+    <div class="brand"><span class="brand-mark">AI</span> AIStaff</div>
+    <section class="card" aria-live="polite">
+      <div id="loading">
+        <h1>Checking your secure link…</h1>
+        <p class="muted">This will only take a moment.</p>
+      </div>
+
+      <div id="invalid" hidden>
+        <h1>This link cannot be used</h1>
+        <p id="invalidMessage" class="notice error">Ask AIStaff support for a new Facebook connection link.</p>
+      </div>
+
+      <div id="complete" hidden>
+        <h1>Facebook Page connected</h1>
+        <p id="completeMessage" class="notice success"></p>
+        <p class="muted">You may close this page. AIStaff support can now finish your knowledge base and test Messenger replies.</p>
+      </div>
+
+      <div id="authorize" hidden>
+        <p class="muted">Private client authorization</p>
+        <h1>Connect your Facebook Page</h1>
+        <p>AIStaff support sent you this link so you can authorize your business Page yourself.</p>
+        <div class="context"><span>AIStaff account</span><strong id="companyName"></strong></div>
+        <div id="currentPageNotice" class="notice" hidden></div>
+        <div class="notice"><b>Keep your login private.</b> Enter your Facebook password and verification code only on Facebook’s own screen. AIStaff never sees or stores them.</div>
+        <p>You must use a Facebook profile that has full control of the Page you want Closer to answer.</p>
+        <button id="facebookStart" class="button" type="button">Continue with Facebook</button>
+        <p id="expiry" class="privacy"></p>
+      </div>
+
+      <form id="selectPage" hidden>
+        <p class="muted">Final confirmation</p>
+        <h1>Choose the business Page</h1>
+        <p>Facebook returned the Pages you manage. Select the exact Page that belongs to <b id="selectCompanyName"></b>.</p>
+        <div id="managedPages" class="pages"></div>
+        <div class="notice"><b>Check the Page name carefully.</b> Closer will receive and answer Messenger conversations for the Page you confirm here.</div>
+        <button id="connectButton" class="button" type="submit">Connect selected Page</button>
+        <p id="selectError" class="notice error" hidden></p>
+      </form>
+    </section>
+  </main>
+  <script>
+    const token = new URLSearchParams(location.hash.slice(1)).get("token") || "";
+    const apiPath = "/api/public/facebook-connection-invite";
+    const inviteHeaders = { Accept: "application/json", Authorization: `Bearer ${token}` };
+    const show = (id) => {
+      ["loading", "invalid", "complete", "authorize", "selectPage"].forEach((name) => {
+        document.getElementById(name).hidden = name !== id;
+      });
+    };
+    const fail = (message) => {
+      document.getElementById("invalidMessage").textContent = message || "Ask AIStaff support for a new Facebook connection link.";
+      show("invalid");
+    };
+
+    async function loadInvite() {
+      if (!token) return fail("This link is incomplete. Ask AIStaff support to send the full connection link again.");
+      let response;
+      let data;
+      try {
+        response = await fetch(apiPath, { headers: inviteHeaders });
+        data = await response.json();
+      } catch {
+        return fail("The connection service could not be reached. Please try again shortly.");
+      }
+
+      if (data.completed) {
+        document.getElementById("completeMessage").textContent = data.message;
+        return show("complete");
+      }
+      if (!response.ok || !data.ok) return fail(data.message || data.error);
+
+      if (data.authorizationReady) {
+        document.getElementById("selectCompanyName").textContent = data.companyName;
+        const list = document.getElementById("managedPages");
+        list.replaceChildren();
+        data.managedPages.forEach((page) => {
+          const label = document.createElement("label");
+          label.className = "page-choice";
+          const radio = document.createElement("input");
+          radio.type = "radio";
+          radio.name = "pageId";
+          radio.value = page.id;
+          const words = document.createElement("span");
+          const name = document.createElement("strong");
+          name.textContent = page.name;
+          const detail = document.createElement("small");
+          detail.textContent = page.category || `Facebook Page ID ${page.id}`;
+          words.append(name, detail);
+          label.append(radio, words);
+          list.append(label);
+        });
+        return show("selectPage");
+      }
+
+      document.getElementById("companyName").textContent = data.companyName;
+      document.getElementById("expiry").textContent = `For your security, this one-time link expires ${new Date(data.expiresAt).toLocaleString()}.`;
+      if (data.currentPage) {
+        const notice = document.getElementById("currentPageNotice");
+        notice.textContent = data.currentPage.status === "token_expired"
+          ? `${data.currentPage.name} needs a fresh Facebook authorization before Messenger replies can resume.`
+          : `${data.currentPage.name} is currently saved. Continuing will refresh or replace that connection.`;
+        notice.hidden = false;
+      }
+      show("authorize");
+    }
+
+    document.getElementById("facebookStart").addEventListener("click", async () => {
+      const button = document.getElementById("facebookStart");
+      button.disabled = true;
+      button.textContent = "Opening Facebook…";
+      try {
+        const connectMode = new URLSearchParams(location.hash.slice(1)).get("mode") === "business" ? "business" : "personal";
+        const response = await fetch(`${apiPath}/start`, {
+          method: "POST",
+          headers: { ...inviteHeaders, "Content-Type": "application/json" },
+          body: JSON.stringify({ mode: connectMode })
+        });
+        const data = await response.json();
+        if (!response.ok || !data.authorizationUrl) throw new Error(data.error || "Facebook authorization could not be started.");
+        location.assign(data.authorizationUrl);
+      } catch (problem) {
+        button.disabled = false;
+        button.textContent = "Continue with Facebook";
+        fail(problem.message);
+      }
+    });
+
+    document.getElementById("selectPage").addEventListener("submit", async (event) => {
+      event.preventDefault();
+      const selected = document.querySelector('input[name="pageId"]:checked');
+      const error = document.getElementById("selectError");
+      if (!selected) {
+        error.textContent = "Select the business Page you want AIStaff to answer.";
+        error.hidden = false;
+        return;
+      }
+      const selectedName = selected.closest("label").querySelector("strong").textContent;
+      if (!window.confirm(`Connect “${selectedName}” to this AIStaff account?`)) return;
+
+      const button = document.getElementById("connectButton");
+      button.disabled = true;
+      button.textContent = "Connecting…";
+      error.hidden = true;
+      try {
+        const response = await fetch(`${apiPath}/select`, {
+          method: "POST",
+          headers: { ...inviteHeaders, "Content-Type": "application/json" },
+          body: JSON.stringify({ pageId: selected.value })
+        });
+        const data = await response.json();
+        if (!response.ok) throw new Error(data.error || "The Page could not be connected.");
+        document.getElementById("completeMessage").textContent = `${data.connectedPage.name} is connected and Messenger replies are enabled.`;
+        show("complete");
+      } catch (problem) {
+        error.textContent = problem.message;
+        error.hidden = false;
+        button.disabled = false;
+        button.textContent = "Connect selected Page";
+      }
+    });
+
+    loadInvite();
+  </script>
+</body>
+</html>

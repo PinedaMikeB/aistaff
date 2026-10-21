@@ -20,11 +20,17 @@ async function verifyPassword(hash, password) {
   return argon2.verify(hash, password);
 }
 
-function signSession(user) {
+function signSession(user, options = {}) {
   return jwt.sign(
     {
       sub: user.id,
       company_id: user.company_id,
+      // The user's own company remains in company_id. During an audited
+      // support session only, active_company_id scopes tenant routes to the
+      // customer being assisted. Never overwrite company_id: the UI needs it
+      // to show the persistent "you are assisting" warning and exit safely.
+      active_company_id: options.companyId || user.company_id,
+      assist_session_id: options.assistSessionId || null,
       role: user.role,
       // Stamped into the token so a password reset can kill every existing
       // session immediately. Compared against the DB value on each request.
@@ -76,6 +82,33 @@ async function requireAuth(req, res, next) {
 
     req.user = user;
     req.companyId = user.company_id;
+
+    // A platform user may temporarily work inside a customer's tenant, but
+    // only while the signed token points at a real, still-open audit record.
+    // This prevents a stale or malformed assist cookie from silently routing
+    // writes into the wrong company.
+    const activeCompanyId = payload.active_company_id;
+    if (activeCompanyId && activeCompanyId !== user.company_id) {
+      if (!payload.assist_session_id || !user.platform_role) {
+        clearSessionCookie(res);
+        return res.status(401).json({ error: "Invalid assist session" });
+      }
+      const assistSession = await prisma.assistSession.findFirst({
+        where: {
+          id: payload.assist_session_id,
+          staff_user_id: user.id,
+          company_id: activeCompanyId,
+          ended_at: null
+        },
+        select: { id: true, company_id: true }
+      });
+      if (!assistSession) {
+        clearSessionCookie(res);
+        return res.status(401).json({ error: "Assist session expired" });
+      }
+      req.companyId = assistSession.company_id;
+      req.assistSessionId = assistSession.id;
+    }
     next();
   } catch (error) {
     return res.status(401).json({ error: "Invalid session" });

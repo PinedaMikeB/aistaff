@@ -72,8 +72,47 @@ function customerRow(c, me) {
       <td>${c.conversations}${c.openGaps ? ` <span class="plat-pill is-warn">${c.openGaps} gaps</span>` : ""}</td>
       <td class="muted">${c.lastMessageAt ? fmtDate(c.lastMessageAt) : "never"}</td>
       <td>${needs.length ? `<span class="muted">${escapeHtml(needs.join(" · "))}</span>` : `<span class="plat-pill is-ok">healthy</span>`}</td>
-      <td>${me.can.customersAssist ? `<button type="button" class="intake-link" data-assist="${c.id}" data-name="${escapeHtml(c.name)}">Assist →</button>` : ""}</td>
+      <td>${me.can.customersAssist ? `<div class="platform-row-actions">
+        <button type="button" class="intake-link" data-assist="${c.id}" data-name="${escapeHtml(c.name)}">Assist →</button>
+        <button type="button" class="intake-link" data-facebook-invite="${c.id}" data-name="${escapeHtml(c.name)}">Facebook link</button>
+      </div>` : ""}</td>
     </tr>`;
+}
+
+function showFacebookInviteDialog({ company, url, expiresInHours }) {
+  const wrap = document.createElement("div");
+  wrap.className = "intake-modal-backdrop";
+  wrap.innerHTML = `
+    <div class="intake-modal">
+      <h3>Send Facebook connection link</h3>
+      <p>Send this link to <b>${escapeHtml(company.name)}</b>. They open it on their own device and authorize Facebook privately.</p>
+      <label class="settings-field">
+        <span>One-time link · expires in ${Number(expiresInHours)} hours</span>
+        <input type="text" readonly value="${escapeHtml(url)}" data-facebook-invite-url>
+      </label>
+      <div class="settings-warning"><b>Never ask for their Facebook password or OTP.</b> The client enters those only on Facebook’s screen.</div>
+      <div class="intake-modal-actions">
+        <button type="button" class="button button-soft" data-close-facebook-invite>Close</button>
+        <button type="button" class="button button-primary" data-copy-facebook-invite>Copy link</button>
+      </div>
+    </div>`;
+  document.body.appendChild(wrap);
+
+  const close = () => wrap.remove();
+  wrap.querySelector("[data-close-facebook-invite]").onclick = close;
+  wrap.onclick = (event) => { if (event.target === wrap) close(); };
+  wrap.querySelector("[data-copy-facebook-invite]").onclick = async () => {
+    const input = wrap.querySelector("[data-facebook-invite-url]");
+    try {
+      await navigator.clipboard.writeText(url);
+      toast("Facebook connection link copied");
+    } catch {
+      input.focus();
+      input.select();
+      document.execCommand("copy");
+      toast("Facebook connection link selected—copy it before closing");
+    }
+  };
 }
 
 function renderPlatformStats() {
@@ -197,6 +236,26 @@ function wirePlatformCustomerActions() {
     };
   });
 
+  document.querySelectorAll("[data-facebook-invite]").forEach((btn) => {
+    btn.onclick = async () => {
+      btn.disabled = true;
+      const original = btn.textContent;
+      btn.textContent = "Creating…";
+      try {
+        const result = await api(`/api/platform/customers/${btn.dataset.facebookInvite}/facebook-connection-invite`, {
+          method: "POST",
+          body: {}
+        });
+        showFacebookInviteDialog(result);
+      } catch (error) {
+        toast(error.message);
+      } finally {
+        btn.disabled = false;
+        btn.textContent = original;
+      }
+    };
+  });
+
   document.querySelectorAll("[data-status-for]").forEach((sel) => {
     sel.onchange = async () => {
       const customer = platformState.customers.find((c) => c.id === sel.dataset.statusFor);
@@ -292,6 +351,7 @@ async function renderAssistBanner() {
 	  .platform-filter { display: flex; align-items: center; gap: 8px; font-size: 12px; font-weight: 700; color: #6a7382; }
 	  .platform-filter select, .plat-status-select { min-width: 150px; border: 1px solid var(--line); border-radius: 8px; padding: 8px 10px; background: #fff; font: inherit; color: var(--ink); }
 	  .plat-status-select { min-width: 118px; }
+	  .platform-row-actions { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; min-width: 118px; }
 
 	  .plat-bar { height: 6px; border-radius: 99px; background: rgba(120,130,160,.2); overflow: hidden; width: 120px; }
 	  .plat-bar > span { display: block; height: 100%; border-radius: 99px; }

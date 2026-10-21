@@ -114,6 +114,7 @@ async function provisionPaidOrder(orderId) {
           data: {
             name: companyNameFor(customer),
             account_number: accountNumber,
+            contact_person: customer.full_name || null,
             industry: customer.industry || null,
             website: customer.business_website || null,
             contact_email: email,

@@ -24,7 +24,7 @@ function messengerEventKey(event, psid) {
 const { prisma } = require("./db");
 const { decryptSecret, encryptSecret } = require("./crypto");
 const { generateSalesReply, leadUpdateDataForAi } = require("./ai");
-const { notifyBookingCreated, notifyHandoff, notifySecurityAlert } = require("./notify");
+const { notifyBookingCreated, notifyHandoff, notifySecurityAlert, notifyFacebookDisconnected } = require("./notify");
 const { createCheckoutLink } = require("./checkout-link");
 const { maybeAddWebsiteResearchToLead } = require("./closer-web-research");
 const {
@@ -92,6 +92,65 @@ function pageAccessToken(page) {
   return "";
 }
 
+/**
+ * Turn a Meta Send API response into an actionable connection state.
+ *
+ * OAuth code 190 means the saved Page token can no longer send. Subcode 460
+ * is the common password/security-session invalidation seen in production.
+ * Leaving the Page "active" after that would make every health screen lie, so
+ * expire only that Page and require a fresh Facebook authorization.
+ */
+async function throwMessengerApiError(response, body, page, operation) {
+  let metaError = null;
+  try {
+    metaError = JSON.parse(body)?.error || null;
+  } catch {
+    // Meta occasionally returns a non-JSON proxy error. Preserve the body in
+    // the thrown error, but do not treat it as an invalid credential.
+  }
+
+  if (Number(metaError?.code) === 190) {
+    const flipped = await prisma.facebookPage.updateMany({
+      where: { id: page.id, status: "active" },
+      data: { status: "token_expired" }
+    }).catch((error) => {
+      console.error("[messenger] could not mark expired Page token page=%s: %s", page.page_id, error.message);
+      return { count: 0 };
+    });
+    // Alert only on the active -> token_expired transition so a burst of
+    // incoming messages produces one email, not one per customer message.
+    if (flipped?.count > 0) {
+      try {
+        const [settings, company, fresh] = await Promise.all([
+          prisma.companySetting.findUnique({ where: { company_id: page.company_id } }),
+          prisma.company.findUnique({ where: { id: page.company_id }, select: { name: true } }),
+          prisma.facebookPage.findUnique({ where: { id: page.id }, select: { page_name: true } })
+        ]);
+        const recipients = [settings?.notify_email, process.env.ADMIN_ALERT_EMAIL || process.env.SEED_ADMIN_EMAIL]
+          .filter(Boolean)
+          .filter((email, i, all) => all.indexOf(email) === i);
+        for (const to of recipients) {
+          await notifyFacebookDisconnected({
+            to,
+            companyName: company?.name || "your business",
+            pageName: fresh?.page_name || page.page_name,
+            reason: metaError?.message ? String(metaError.message).slice(0, 220) : `code ${metaError.code}/${metaError.error_subcode || "none"}`
+          });
+        }
+      } catch (error) {
+        console.error("[messenger] disconnect alert failed page=%s: %s", page.page_id, error.message);
+      }
+    }
+    console.error("[messenger] Page token expired page=%s code=%s subcode=%s; Facebook reconnection required",
+      page.page_id, metaError.code, metaError.error_subcode || "none");
+  }
+
+  const error = new Error(`${operation} failed: ${response.status} ${body}`);
+  error.metaCode = metaError?.code || null;
+  error.metaSubcode = metaError?.error_subcode || null;
+  throw error;
+}
+
 async function sendMessengerPayload(page, psid, message) {
   const token = pageAccessToken(page);
   if (!token) throw new Error(`No Messenger access token configured for page ${page.page_id}`);
@@ -107,7 +166,7 @@ async function sendMessengerPayload(page, psid, message) {
   });
   if (!response.ok) {
     const body = await response.text();
-    throw new Error(`Messenger Send API failed: ${response.status} ${body}`);
+    await throwMessengerApiError(response, body, page, "Messenger Send API");
   }
   return response.json();
 }
@@ -215,7 +274,7 @@ async function sendMessengerSenderAction(page, psid, senderAction) {
 
   if (!response.ok) {
     const body = await response.text();
-    throw new Error(`Messenger sender action failed: ${response.status} ${body}`);
+    await throwMessengerApiError(response, body, page, "Messenger sender action");
   }
   return response.json();
 }
@@ -582,6 +641,16 @@ async function handleClientMessengerEvent({ page, psid, text, maybeCreateQuotati
     });
   }
 
+  // Settings > Channels: Messenger ticked off (paused) or "AI replies" off -> the
+  // message is stored for staff in Inquiries, Closer does not answer. No row = on.
+  const messengerChannel = await prisma.tenantChannel.findUnique({
+    where: { company_id_channel_key: { company_id: page.company_id, channel_key: "facebook_messenger" } }
+  }).catch(() => null);
+  if (messengerChannel && (!messengerChannel.enabled || !messengerChannel.ai_replies)) {
+    console.log("[messenger] company=%s channel paused or AI replies off: stored for staff only", page.company_id);
+    return;
+  }
+
   let lead = await prisma.lead.findFirst({ where: { company_id: page.company_id, conversation_id: conversation.id } });
   if (!lead) {
     lead = await prisma.lead.create({
@@ -630,6 +699,19 @@ async function handleClientMessengerEvent({ page, psid, text, maybeCreateQuotati
           }
         })
       ]));
+    // Never silent: the customer got no reply, so staff must hear about it.
+    await bestEffort("failure handoff email", `company=${page.company_id}`, async () => {
+      const [settings, company] = await Promise.all([
+        prisma.companySetting.findUnique({ where: { company_id: page.company_id } }),
+        prisma.company.findUnique({ where: { id: page.company_id }, select: { name: true } })
+      ]);
+      const recipients = [...String(settings?.notify_email || "").split(/[,;\s]+/), process.env.ADMIN_ALERT_EMAIL || process.env.SEED_ADMIN_EMAIL]
+        .map((value) => String(value || "").trim()).filter((value) => value.includes("@"))
+        .filter((value, index, all) => all.indexOf(value) === index);
+      for (const to of recipients) {
+        await notifyHandoff({ to, companyName: company?.name || "your business", lead, reason: `Closer could not reply. ${error.message}`, lastMessage: text, conversationId: conversation.id });
+      }
+    });
     return;
   }
 
@@ -921,6 +1003,7 @@ async function handleClientMessengerEvent({ page, psid, text, maybeCreateQuotati
         conversationId: conversation.id,
         email: ai.paymentRequest.email,
         name: ai.paymentRequest.name || updatedLead?.customer_name,
+        companyName: ai.paymentRequest.company || updatedLead?.company_name,
         mobile: ai.paymentRequest.mobile || updatedLead?.mobile_number,
         planSlug: ai.paymentRequest.plan,
         billingFrequency: ai.paymentRequest.billing
@@ -966,6 +1049,46 @@ async function handleClientMessengerEvent({ page, psid, text, maybeCreateQuotati
   }
 }
 
+async function handleCustomerUpdateTemplateStatus(page, change) {
+  if (change?.field !== "message_template_status_update") return;
+  const value = change.value || {};
+  const name = String(value.message_template_name || value.name || "").trim();
+  const metaId = value.message_template_id || value.id;
+  const status = String(value.event || value.status || "").trim().toUpperCase();
+  if (!name || !status) return;
+  const template = await prisma.customerUpdateTemplate.findFirst({
+    where: { company_id: page.company_id, facebook_page_id: page.id, meta_template_name: name }
+  });
+  if (!template) {
+    console.warn("[customer-updates] Meta status for unknown template page=%s name=%s status=%s", page.page_id, name, status);
+    return;
+  }
+  const reason = value.reason || value.rejection_reason || value.other_info || null;
+  await prisma.customerUpdateTemplate.update({
+    where: { id: template.id },
+    data: {
+      status,
+      meta_template_id: metaId ? String(metaId) : template.meta_template_id,
+      meta_error: status === "APPROVED" ? null : reason ? String(reason).slice(0, 1000) : template.meta_error
+    }
+  });
+  if (status === "APPROVED") {
+    await prisma.$transaction([
+      prisma.customerUpdateTemplate.updateMany({
+        where: {
+          company_id: template.company_id,
+          facebook_page_id: template.facebook_page_id,
+          key: template.key,
+          id: { not: template.id }
+        },
+        data: { active: false }
+      }),
+      prisma.customerUpdateTemplate.update({ where: { id: template.id }, data: { active: true, archived_at: null } })
+    ]);
+  }
+  console.log("[customer-updates] template status page=%s name=%s status=%s", page.page_id, name, status);
+}
+
 async function handleMessengerWebhook(payload, { maybeCreateQuotationDraft }) {
   if (payload.object !== "page") return;
 
@@ -975,6 +1098,14 @@ async function handleMessengerWebhook(payload, { maybeCreateQuotationDraft }) {
     if (!page || page.status !== "active") {
       console.warn(`Ignoring webhook for unknown or inactive page ${pageId}`);
       continue;
+    }
+
+    for (const change of entry.changes || []) {
+      try {
+        await handleCustomerUpdateTemplateStatus(page, change);
+      } catch (error) {
+        console.error("[customer-updates] template status handling failed page=%s: %s", pageId, error.message);
+      }
     }
 
     const isMarketingPage = isAistaffMarketingPage(pageId);

@@ -1,199 +1,234 @@
 PHILGEPS + UNGM OPPORTUNITY BRIEFING
-Date: September 11, 2026
+Date: October 21, 2026
 
 EXECUTIVE SUMMARY
 
-PhilGEPS opportunities scanned: 105
-UNGM opportunities scanned: 14
-New relevant opportunities: 2
-Source access notes: Official PhilGEPS public category listings and shortlisted notice abstracts were checked successfully through the external runtime after sandbox DNS failed. Official UNGM public search returned 14 unique active listings and some notice details; several later UNGM detail requests were HTTP 429 rate-limited. No login, CAPTCHA, MFA, paywall, or restricted access was bypassed.
+PhilGEPS opportunities scanned: 104
+UNGM opportunities scanned: 8
+New relevant opportunities: 4
+Source access notes: All six official PhilGEPS public category first pages were checked without login and 104 visible listings were screened. PhilGEPS intermittently returned a temporary transaction error for some pages, which succeeded on bounded retry. The official UNGM public search helper returned HTTP 400, so eight official notice pages were checked directly. No access control was bypassed.
 
 BID: 0
 HIGH PRIORITY REVIEW: 2
-REVIEW: 1
-SKIP: 6
+REVIEW: 2
+SKIP: 5
 
 BEST OPPORTUNITIES
-Score: 9/10
+Score: 9.2/10
 Recommendation: HIGH PRIORITY REVIEW
 Source: PhilGEPS
 
-Title: Website Hosting and Technical Support Services for the Encyclopedia of Philippine Art Digital Edition
-Buyer / Organization: Cultural Center of the Philippines
+Title: Procurement of an Artificial Intelligence (AI)-Backed Customer Support Solution
+Buyer / Organization: Philippine Postal Corporation
 Country: Philippines
-Reference Number: 13234016
-Procurement Type: Negotiated Procurement - Small Value Procurement (Sec. 34); RFQ
-Published: September 10, 2026
-Deadline: September 14, 2026 5:00 PM (PHT)
-Days Remaining: 3
-Budget / Contract Value: PHP 617,000.00
-URL: https://notices.philgeps.gov.ph/GEPSNONPILOT/Tender/SplashBidNoticeAbstractUI.aspx?menuIndex=3&refID=13234016&DirectFrom=OpenOpp&Type=category&BusCatID=10
+Reference Number: 13298019 / PPC-BAC-2026-28
+Procurement Type: Public Bidding; Goods / Information Technology
+Published: October 21, 2026
+Deadline: November 19, 2026 9:00 AM PHT
+Days Remaining: 29
+Budget / Contract Value: PHP 7,000,000.00
+URL: https://notices.philgeps.gov.ph/GEPSNONPILOT/Tender/SplashBidNoticeAbstractUI.aspx?BusCatID=10&DirectFrom=OpenOpp&Type=category&menuIndex=3&refID=13298019
 
 WHY IT FITS AISTAFF:
-Direct fit for AIStaff's website operations, hosting, technical support, integrations, and managed-service capability. The SVP RFQ, post-award document model, and email submission remain unusually accessible to a new small supplier.
+This is the clearest direct fit yet for Closer AI and Pitch AI: an AI-backed customer-support solution for a national service organization, with strong overlap in chatbot, voice, customer-service automation, knowledge workflows, dashboards, and integrations.
 
 WHAT THEY NEED:
-One lot of website hosting and technical support for the Encyclopedia of Philippine Art Digital Edition. The official abstract remains Active and publicly links the detailed RFQ.
+An AI-backed customer-support solution delivered within 84 calendar days or twelve weeks from Notice to Proceed. The public abstract does not expose the channel mix, user volumes, integrations, hosting, knowledge-base, language, SLA, security, or acceptance specifications.
 
 ELIGIBILITY:
-- Submit the signed quotation and comply with the detailed linked RFQ/RFP specifications and terms.
-- Post-award documents include a valid Business/Mayor's Permit, PhilGEPS registration, notarized Omnibus Sworn Statement and signing authority, CY 2025 annual ITR, and business tax returns for at least the last six months.
-- Submit to glycidas.penaranda@culturalcenter.gov.ph and pmd@culturalcenter.gov.ph or the CCP Procurement Management Division by the deadline.
-- Public contact: Regie Zapanta Profeta, (02) 8551-0039, regie.profeta@culturalcenter.gov.ph.
+- Bidders must satisfy the detailed eligibility rules and show a similar completed contract within the three years before bid submission.
+- Bidding documents cost PHP 10,000; pre-bid conference is October 28 at 10:30 AM PHT in Manila and/or via Zoom.
+- Manual bids are due November 19 at 9:00 AM PHT and require bid security.
+- The complete bidding documents govern the SLCC value, technical specifications, financial capacity, support, data protection, and integration requirements.
 
 BLOCKERS / RISKS:
-- The abstract still says Delivery Period: 0 days, inconsistent with an ongoing hosting/support service; the contract term must be confirmed from the RFQ.
-- Hosting architecture, migration scope, traffic/storage, security, uptime SLA, backup/DR, support hours, incumbent access, and exit obligations require review before pricing.
-- Only three calendar days remain.
+- Public bidding, bid security, manual submission, and the similar-contract rule create an eligibility burden for a new company.
+- The notice does not state the required customer channels, transaction volumes, Philippine-language support, integrations, security certifications, hosting model, SLA, or evaluation tests.
+- An 84-day implementation may be aggressive if the scope includes voice, messaging, knowledge ingestion, CRM/ticketing integration, migration, and nationwide rollout.
+- AIStaff may need an experienced public-sector prime or joint-venture partner if its own comparable contract evidence is insufficient.
 
 HOW WE COULD QUALIFY:
-- AIStaff can bid directly if its business, tax, PhilGEPS, and OSS documents are current.
-- Use a managed hosting partner only if the RFQ requires infrastructure certifications beyond AIStaff's credentials.
+- Lead the conversational AI, web/Messenger chat, voice-agent, routing, knowledge, analytics, and integration solution using Closer and Pitch.
+- Use an eligible Philippine systems-integrator partner to cover public-bidding history, enterprise infrastructure, security, and SLCC requirements if permitted.
 
 NEXT ACTION:
-Make the bid/no-bid decision today, review the linked RFQ, clarify the service term, and prepare a signed technical-commercial quotation for email submission before September 14.
+Acquire the full bidding documents immediately, attend the October 28 pre-bid conference, build a mandatory-requirements matrix, clarify channels/volumes/integrations/security/SLA and SLCC thresholds, and identify a qualified public-sector integration partner before the go/no-go decision.
 
-Score: 8.5/10
+Score: 8/10
 Recommendation: HIGH PRIORITY REVIEW
-Source: PhilGEPS
+Source: UNGM
 
-Title: Procurement of Records Management System (Phase 1)
-Buyer / Organization: Rizal Technological University
-Country: Philippines
-Reference Number: 13236620
-Procurement Type: Negotiated Procurement - Small Value Procurement (Sec. 34); RFQ
-Published: September 11, 2026
-Deadline: September 17, 2026 5:00 PM (PHT)
-Days Remaining: 6
-Budget / Contract Value: PHP 1,350,000.00
-URL: https://notices.philgeps.gov.ph/GEPSNONPILOT/Tender/SplashBidNoticeAbstractUI.aspx?menuIndex=3&refID=13236620&DirectFrom=OpenOpp&Type=category&BusCatID=10
+Title: Provision of Web / App Development and Maintenance Services for UNHCR Private Sector Partnerships in the MENA Region
+Buyer / Organization: UNHCR
+Country: Multiple destinations / MENA; remote-capable subject to TOR
+Reference Number: EOI/2026/003/MENA/PSP / UNGM 316449
+Procurement Type: Request for Expression of Interest; UNGM Basic registration
+Published: October 1, 2026; Q&A updated October 14, 2026
+Deadline: October 22, 2026 11:59 PM GMT+4
+Days Remaining: 1
+Budget / Contract Value: Not stated publicly.
+URL: https://www.ungm.org/Public/Notice/316449
 
 WHY IT FITS AISTAFF:
-A records-management system is a direct custom-software, workflow, search, dashboard, and integration opportunity for AIStaff. The SVP path is accessible and the notice permits a new supplier if the detailed technical scope is achievable.
+The scope directly matches AIStaff custom web/app development, integrations, UI/UX, hosting, maintenance, technical support, and digital optimization. This EOI stage does not require a detailed technical or financial proposal.
 
 WHAT THEY NEED:
-Phase 1 of a records management system, classified as goods, with a 15-day delivery period. The complete requirements are in an associated RFQ that was not exposed as a direct public download in the logged-out abstract.
+Interested providers for web and digital platform development, mobile applications, payment and system integrations, UI/UX, optimization, hosting, security, maintenance, and technical support across UNHCR private-sector partnerships in MENA.
 
 ELIGIBILITY:
-- Submit a signed sealed quotation manually to the RTU BAC Secretariat by September 17 at 5:00 PM.
-- Include a photocopy of the PhilGEPS Registration Certificate and use the current GPPB forms.
-- Public contact: Chona M. Halili, 0999-995-5861; BAC Secretariat office telephone (02) 8534-8267 local 5101.
+- UNGM Basic registration and the requested EOI information in the public TOR.
+- Relevant experience and capability evidence; detailed technical and financial proposals are not required at this stage.
+- Review Annex A TOR and the October 14 Q&A before responding; public contact is Upasana Kalelia at shrivasu@unhcr.org.
 
 BLOCKERS / RISKS:
-- The detailed RFQ/specification was not publicly downloadable from the logged-out abstract, so users, modules, migration, hosting, security, training, acceptance criteria, and source-code/IP terms are unknown.
-- A 15-day delivery period is very aggressive for a custom system unless Phase 1 is narrowly scoped or an existing platform is acceptable.
-- Submission appears manual and sealed; travel/courier timing must be planned.
+- Only one day remains.
+- The regional scope may require mature web/app references, payment integration, security, multilingual support, and scalable maintenance capacity.
+- The TOR may impose MENA delivery, staffing, financial-capacity, or prior-contract requirements not visible in the notice summary.
 
 HOW WE COULD QUALIFY:
-- AIStaff can bid directly using a configurable records/workflow platform if the RFQ confirms a contained Phase 1 scope.
-- Provide company credentials, principal and developer portfolios, implementation plan, security controls, and a realistic acceptance schedule.
+- Submit an EOI only if the existing portfolio, corporate documents, team capability statement, and relevant references can be assembled without unsupported claims.
+- Position AIStaff as a remote development and AI-integration specialist, with regional partners if the TOR requires local delivery.
 
 NEXT ACTION:
-Request or collect the associated RFQ from RTU today, confirm whether the 15-day period covers deployment or full implementation, and proceed only if scope and acceptance criteria fit an existing AIStaff platform.
+Immediate EOI go/no-go: review the TOR and Q&A today, confirm all experience and submission fields, and respond only if the evidence package is already substantially ready.
 
-Score: 7.5/10
+Score: 7.3/10
 Recommendation: REVIEW
 Source: PhilGEPS
 
-Title: Identification Management System for Senior Citizens, Persons with Disabilities, and Solo Parents
-Buyer / Organization: Municipality of Sto. Domingo, Nueva Ecija
+Title: Supply, Delivery, and Installation of a Biometric System with Time and Attendance Monitoring System
+Buyer / Organization: University of Rizal System
 Country: Philippines
-Reference Number: 13236817
+Reference Number: 13298218 / 2026-05-0793
 Procurement Type: Negotiated Procurement - Small Value Procurement (Sec. 34); RFQ
-Published: September 11, 2026
-Deadline: September 14, 2026 1:00 AM (PHT)
-Days Remaining: 3
-Budget / Contract Value: PHP 400,000.00
-URL: https://notices.philgeps.gov.ph/GEPSNONPILOT/Tender/SplashBidNoticeAbstractUI.aspx?menuIndex=3&refID=13236817&DirectFrom=OpenOpp&Type=category&BusCatID=10
+Published: October 21, 2026
+Deadline: October 28, 2026 1:00 AM PHT
+Days Remaining: 7
+Budget / Contract Value: PHP 1,600,000.00
+URL: https://notices.philgeps.gov.ph/GEPSNONPILOT/Tender/SplashBidNoticeAbstractUI.aspx?menuIndex=3&refID=13298218&DirectFrom=OpenOpp
 
 WHY IT FITS AISTAFF:
-The core requirement could align with AIStaff's custom databases, citizen-service workflows, dashboards, notifications, and integrations, and the SVP budget is suitable for a focused system.
+Attendance software, implementation, licensing, support, workflow automation, and system integration fit AIStaff's custom-system capability, while the SVP route is more accessible than a large public bid.
 
 WHAT THEY NEED:
-Purchase and delivery of an identification management system for three citizen groups. The public description contains only the project name and does not expose technical specifications or submission instructions.
+Twenty face-and-fingerprint attendance devices plus attendance-management software and licenses for at least 2,000 expandable users, implementation, technology transfer, accessories, and a three-year onsite warranty within 30 days.
 
 ELIGIBILITY:
-- Delivery period shown in the official abstract is five days.
-- Public contact: Marlyn Llanera Laureta, 0967-821-9345, marlynlaureta1964@gmail.com.
-- PhilGEPS registration and the detailed RFQ/eligibility documents must be confirmed directly because the abstract does not state them.
+- Submit the RFQ with current PhilGEPS registration, DTI/SEC registration, and Mayor's Permit.
+- Sealed submission is requested, although the notice also says quotations may be emailed to procurement.morong@urs.edu.ph.
+- The attached TOR controls the full device, software, warranty, integration, and acceptance requirements.
 
 BLOCKERS / RISKS:
-- The 1:00 AM closing time is unusual and should be treated literally unless the procuring entity issues a correction.
-- A five-day delivery window is likely infeasible for a new custom build and may imply an off-the-shelf product, equipment, card printing, or pre-existing solution.
-- No public scope clarifies biometrics, ID cards/printers, migration, privacy, hosting, cybersecurity, training, warranty, or submission method.
+- The project is hardware-heavy and requires 20 biometric devices, onsite installation, and three years of onsite warranty.
+- The 30-day delivery schedule is tight and requires a proven biometric vendor with local stock and support.
+- The notice is ambiguous between sealed and email submission and shows a 1:00 AM deadline, which should be confirmed.
+- AIStaff should not bid alone without manufacturer-backed hardware, warranties, and onsite support.
 
 HOW WE COULD QUALIFY:
-- Pursue only if the municipality confirms a software-led scope that can be configured from an existing AIStaff system.
-- Partner with an ID-card or hardware vendor if physical enrollment or printing equipment is mandatory and partnerships are allowed.
+- Partner with an authorized biometric-device supplier while AIStaff delivers workflow, attendance software integration, reporting, training, and support.
 
 NEXT ACTION:
-Call or email the contact immediately for the RFQ and clarify the 1:00 AM deadline, five-day delivery requirement, hardware component, data privacy/security obligations, and submission method before committing bid effort.
+Obtain the attached TOR, confirm the unusual 1:00 AM deadline and accepted submission method, and proceed only with a manufacturer-backed partner that can meet the 30-day delivery and three-year onsite warranty.
+
+Score: 7/10
+Recommendation: REVIEW
+Source: UNGM
+
+Title: Long Term Agreement for Performance Marketing Services for Southeast Asia Region
+Buyer / Organization: UNICEF
+Country: Southeast Asia, including the Philippines
+Reference Number: LRPS-2026-9206410 / UNGM 316300
+Procurement Type: Request for Proposal; UNGM Basic registration and UNICEF e-submission
+Published: September 30, 2026
+Deadline: October 21, 2026 10:00 AM GMT+3 as displayed by UNGM; notice text says Bangkok time, creating a timezone inconsistency
+Days Remaining: 0
+Budget / Contract Value: Not stated publicly.
+URL: https://www.ungm.org/Public/Notice/316300
+
+WHY IT FITS AISTAFF:
+Brandee's content automation, campaign workflows, CRM support, analytics, and performance reporting overlap a regional digital fundraising and performance-marketing engagement covering the Philippines and neighboring markets.
+
+WHAT THEY NEED:
+Regional long-term marketing support across Google, Meta, YouTube, TikTok, CRM, paid and owned channels, focused on acquiring recurring and one-time donors in Southeast Asia.
+
+ELIGIBILITY:
+- UNGM company/NGO registration with all mandatory profile fields completed and UNICEF e-submission access.
+- Full technical and financial response through the UNICEF e-submission system.
+- Regional performance-marketing, donor-acquisition, media-buying, optimization, reporting, and platform experience.
+
+BLOCKERS / RISKS:
+- The deadline is today and the clarification window has passed.
+- UNGM displays GMT+3 while the notice body refers to Bangkok time; do not assume which timezone controls.
+- The regional LTA likely requires substantial paid-media spend management, fundraising experience, platform certifications, and multi-country capacity beyond Brandee alone.
+
+HOW WE COULD QUALIFY:
+- Pursue only if a compliant proposal is already nearly complete and an experienced regional performance-marketing prime can cover media buying and donor acquisition.
+
+NEXT ACTION:
+Treat as an urgent partner-only carry-forward; do not rush a new response unless portal access, the complete proposal, regional references, pricing, and the controlling deadline are already confirmed.
 
 URGENT DEADLINES
-Source: PhilGEPS
-Title: Procurement of Archiving System
-Buyer / Organization: Municipality of Aguilar, Pangasinan
-Reference Number: 13229588
-Deadline: September 11, 2026 1:00 PM (PHT)
-Days Remaining: 0
-Why urgent: Previously reported possible match remains Active and unchanged. The public purchase request is unavailable, leaving software versus equipment, scanning, migration, eligibility, and submission scope unresolved; do not price without it.
-URL: https://notices.philgeps.gov.ph/GEPSNONPILOT/Tender/SplashBidNoticeAbstractUI.aspx?menuIndex=3&refID=13229588&DirectFrom=OpenOpp&Type=category&BusCatID=23
 Source: UNGM
-Title: Development of Municipal Information System
-Buyer / Organization: UNDP Syria
-Reference Number: UNDP-SYR-00680 / UNGM 312901
-Deadline: September 13, 2026 9:00 AM (GMT-4)
+Title: Long Term Agreement for Performance Marketing Services for Southeast Asia Region
+Buyer / Organization: UNICEF
+Reference Number: LRPS-2026-9206410 / UNGM 316300
+Deadline: October 21, 2026 10:00 AM GMT+3 as displayed; body says Bangkok time
+Days Remaining: 0
+Why urgent: Proceed only if the full partner-led response and portal submission are already ready; confirm the timezone inconsistency first.
+URL: https://www.ungm.org/Public/Notice/316300
+Source: UNGM
+Title: Web / App Development and Maintenance Services for UNHCR MENA
+Buyer / Organization: UNHCR
+Reference Number: EOI/2026/003/MENA/PSP / UNGM 316449
+Deadline: October 22, 2026 11:59 PM GMT+4
+Days Remaining: 1
+Why urgent: Strong EOI-stage fit; review the TOR/Q&A and submit only if the existing evidence package is already ready.
+URL: https://www.ungm.org/Public/Notice/316449
+Source: UNGM
+Title: Multimedia Campaign to Prevent Child Marriage in Cambodia and Advance Girls' Education
+Buyer / Organization: UNICEF
+Reference Number: LRPS-2026-9206270 / UNGM 315247
+Deadline: October 22, 2026 10:00 AM GMT+7 in the header and latest amendment; body retains an older October 15 date
+Days Remaining: 1
+Why urgent: Previously reported carry-forward; proceed only with Cambodia production capacity and a complete compliant email package. The conflicting body text remains a material warning.
+URL: https://www.ungm.org/Public/Notice/315247
+Source: UNGM
+Title: Legal AI Solution EOI
+Buyer / Organization: World Food Programme
+Reference Number: HQ26NF194 / UNGM 317650
+Deadline: October 23, 2026 4:00 PM GMT+2
 Days Remaining: 2
-Why urgent: Previously reported possible technical match remains active, but the multi-municipality Syria deployment, local context, security, and UNDP Quantum proposal burden remain disproportionate for AIStaff.
-URL: https://www.ungm.org/Public/Notice/312901
-Source: PhilGEPS
-Title: Identification Management System for Senior Citizens, Persons with Disabilities, and Solo Parents
-Buyer / Organization: Municipality of Sto. Domingo, Nueva Ecija
-Reference Number: 13236817
-Deadline: September 14, 2026 1:00 AM (PHT)
-Days Remaining: 3
-Why urgent: New possible match. The unusually early closing time and five-day delivery period require immediate clarification; the public abstract does not include the technical scope.
-URL: https://notices.philgeps.gov.ph/GEPSNONPILOT/Tender/SplashBidNoticeAbstractUI.aspx?menuIndex=3&refID=13236817&DirectFrom=OpenOpp&Type=category&BusCatID=10
-Source: PhilGEPS
-Title: Website Hosting and Technical Support Services for the Encyclopedia of Philippine Art Digital Edition
-Buyer / Organization: Cultural Center of the Philippines
-Reference Number: 13234016
-Deadline: September 14, 2026 5:00 PM (PHT)
-Days Remaining: 3
-Why urgent: Previously reported strong match remains Active and unchanged; complete the RFQ review and bid/no-bid decision today.
-URL: https://notices.philgeps.gov.ph/GEPSNONPILOT/Tender/SplashBidNoticeAbstractUI.aspx?menuIndex=3&refID=13234016&DirectFrom=OpenOpp&Type=category&BusCatID=10
+Why urgent: Previously reported carry-forward; respond only if AIStaff can evidence a mature legal-AI solution and the requested technical and financial capacity.
+URL: https://www.ungm.org/Public/Notice/317650
 
 NOT RECOMMENDED
-- [PhilGEPS] Various Software Subscription Services for Project TANAW - 3rd Bidding (Samar State University; Ref 13237164) - The SVP path and Red PhilGEPS eligibility are accessible, but the abstract contains a stale August 12, 2025 submission date that conflicts with the September 14, 2026 header, while the attached specifications are not publicly exposed. The actual subscription products may require authorized resale rather than AIStaff development.
-  URL: https://notices.philgeps.gov.ph/GEPSNONPILOT/Tender/SplashBidNoticeAbstractUI.aspx?menuIndex=3&refID=13237164&DirectFrom=OpenOpp&Type=category&BusCatID=10
-- [PhilGEPS] Tourism Promotions through Strategic Media Placements in Digital Televisions (Province of Negros Oriental; Ref 13236969) - The work requires purchased placement inventory across 30 airports and 10 seaports with 300 spots per month, not Brandee content production or digital campaign management. AIStaff does not appear to control the required nationwide digital-TV media network.
-  URL: https://notices.philgeps.gov.ph/GEPSNONPILOT/Tender/SplashBidNoticeAbstractUI.aspx?menuIndex=3&refID=13236969&DirectFrom=OpenOpp&Type=category&BusCatID=157
-- [PhilGEPS] Supply and Delivery of Various ICT Equipment (Bureau of Fisheries and Aquatic Resources Region V; Ref 13236592) - This is a straightforward hardware purchase for storage devices, a mouse, flash drive, and laptop. It does not require AIStaff software or AI services.
-  URL: https://notices.philgeps.gov.ph/GEPSNONPILOT/Tender/SplashBidNoticeAbstractUI.aspx?menuIndex=3&refID=13236592&DirectFrom=OpenOpp&Type=category&BusCatID=10
-- [UNGM] Call for External Collaboration - Support project management, research, and knowledge management activities (ILO; Ref rfx_10589_HQ / UNGM 313978) - This new notice is a call for an individual consultant in Switzerland, not a company procurement for AI systems, content automation, or managed services. The detail page was also HTTP 429 rate-limited during verification.
-  URL: https://www.ungm.org/Public/Notice/313978
-- [UNGM] Development of Comprehensive Data Governance Frameworks for Social Protection MIS (ILO Nigeria; Ref rfx_10463_ROAF / UNGM 313917) - This is an individual-consultant assignment requiring Nigeria-specific legal, social-protection, stakeholder, and data-governance expertise across federal and state levels. It is not a realistic company-level AIStaff implementation opportunity.
-  URL: https://www.ungm.org/Public/Notice/313917
-- [UNGM] Modern Loan Management Information System (UNRWA; Ref RFPS-3626000021-(MM) / UNGM 309505) - The listing says September 14, but the description says proposals were due August 24 and questions by August 12. This unresolved status/deadline inconsistency, enterprise lending complexity, and separate In-Tend submission path make it unsuitable.
-  URL: https://www.ungm.org/Public/Notice/309505
+- [PhilGEPS] Procurement of Special Advertorial Package (Bases Conversion and Development Authority; Ref 13298856 / BG2026-086-1977) - Although the PHP 500,000 SVP includes social amplification and editorial content, it primarily purchases a specific print/digital advertorial and event exposure package from an established publisher, not AIStaff content production or marketing services.
+  URL: https://notices.philgeps.gov.ph/GEPSNONPILOT/Tender/SplashBidNoticeAbstractUI.aspx?menuIndex=3&refID=13298856&DirectFrom=OpenOpp
+- [PhilGEPS] Engineering and Data Capturing Software (City of Toledo, Cebu; Ref 13297622) - The PHP 21.755 million listing appears to be specialist engineering/data-capture software supply, likely requiring established licensed products, authorization, and technical domain support rather than an AIStaff custom agent.
+  URL: https://notices.philgeps.gov.ph/GEPSNONPILOT/Tender/SplashBidNoticeAbstractUI.aspx?menuIndex=3&refID=13297622&DirectFrom=OpenOpp
+- [PhilGEPS] Managed Detection and Response Service Subscription for Three Years (University of the Philippines Manila; Ref 13298065) - This is specialized enterprise cybersecurity monitoring and incident response requiring mature SOC/MDR capability, certifications, tooling, and references outside AIStaff's current service profile.
+  URL: https://notices.philgeps.gov.ph/GEPSNONPILOT/Tender/SplashBidNoticeAbstractUI.aspx?menuIndex=3&refID=13298065&DirectFrom=OpenOpp
+- [UNGM] Hosting, Administration, Maintenance and Custom Development of UNICEF's Moodle Workplace LMS (UNICEF; Ref RFPS 503950 / UNGM 311133) - The technical overlap is real, but this is a mature global Moodle Workplace hosting and custom-development contract with extensive appendices, 180-day proposal validity, and likely substantial enterprise LMS references and operating capacity.
+  URL: https://www.ungm.org/Public/Notice/311133
+- [UNGM] WTO Occupational Safety and Health Management Software (World Trade Organization; Ref RFP-2026-238-WTO OSH Management Software / UNGM 315503) - The notice expressly seeks a well-established firm and a mature specialist OSH product; AIStaff lacks demonstrated occupational-safety software references and the notice metadata is incomplete.
+  URL: https://www.ungm.org/Public/Notice/315503
 
 TODAY'S RECOMMENDATION
-Best opportunity to pursue: Pursue PhilGEPS Ref 13234016, CCP's PHP 617,000 Website Hosting and Technical Support Services RFQ, as today's best opportunity. Also obtain the RTU Records Management System RFQ today; it is the strongest new lead but its 15-day delivery scope is not yet verifiable.
-Documents AIStaff should prepare: Signed CCP quotation/RFQ response and itemized technical-commercial offer; Current Business/Mayor's Permit and PhilGEPS registration/organization ID; BIR Form 2303, CY 2025 annual ITR, and the last six months of applicable business tax returns; Notarized Omnibus Sworn Statement and proof of signing authority; AIStaff company profile, relevant principal/team portfolios, hosting and security architecture, migration/implementation plan, support SLA, and acceptance plan; For RTU: current GPPB quotation forms, PhilGEPS certificate copy, and a sealed-submission/courier plan
-Clarifications to request: CCP: confirm contract term, hosting platform constraints, migration scope, current stack, traffic/storage, backup/DR, uptime, security, support hours, and renewal/exit obligations.; RTU: obtain the associated RFQ and confirm modules, users, records volume, migration, hosting, security, integrations, training, warranty, source-code/IP terms, and whether 15 days means deployment or full acceptance.; Sto. Domingo: confirm the 1:00 AM deadline, five-day delivery period, biometrics/card-printing or hardware scope, privacy/security requirements, eligibility documents, and submission method.; Aguilar: obtain the purchase request immediately if a same-day response is still possible; otherwise record it as missed rather than guessing the archiving scope.
+Best opportunity to pursue: Prioritize the new PHLPost AI-backed customer support solution (PhilGEPS 13298019). It is a direct Closer/Pitch fit and the PHP 7 million budget plus November 19 deadline justify immediate document review, but AIStaff should pursue it only after confirming the technical specification and an eligible public-sector integration/SLCC path.
+Documents AIStaff should prepare: Current PhilGEPS registration, SEC/DTI registration, Mayor's/Business Permit, tax clearance/returns, audited financial statements, corporate authorization, and bid-security options; Closer and Pitch capability statement covering chat, voice, routing, knowledge, analytics, integrations, security, data privacy, support, and deployment architecture; Comparable customer-service/AI project references, completion certificates, contracts, team CVs, implementation plan, support SLA, and acceptance-test approach; Potential systems-integrator or joint-venture partner credentials and similar-contract evidence; UNGM Basic profile, concise web/app capability statement, relevant portfolio, team profile, financial capacity evidence, and EOI response materials for UNHCR
+Clarifications to request: PHLPost: required channels, languages, concurrent users and volumes, CRM/ticketing/website/telephony integrations, knowledge sources, hosting/data residency, security certifications, SLA, training, support term, evaluation tests, and exact SLCC threshold.; PHLPost: whether consortium/JV or subcontractor experience is accepted and how partner experience is scored.; University of Rizal System: controlling deadline/time, sealed-versus-email submission, approved device brands/specifications, software integration, data privacy, acceptance criteria, warranty response times, and local support requirements.; UNHCR: whether MENA presence is mandatory, minimum project count/value, financial thresholds, allowed partners/subcontractors, and the exact EOI submission method from the TOR.
 
 NOTES
-- PhilGEPS count is the 105 visible first-page listings across the six requested official public category pages: 20 each in Information Technology, Consulting Services, Communication Equipment and Parts, Services, and Office Equipment, plus 5 in Advertising Agency Services.
-- UNGM count is 14 unique active notices returned by the official public notice search across the configured AIStaff keyword set. No new or materially updated UNGM notice met the realistic-pursuit threshold.
-- Official PhilGEPS abstracts were opened for each qualified lead, plausible rejected lead, and urgent carry-forward; public status, budget, method, deadline, duration, description, document-request count, and contact details were checked where shown.
-- The CCP abstract publicly links a Google Docs RFQ. Its link and abstract summary were referenced; no paid or restricted document was downloaded.
-- RTU's detailed Records Management System RFQ, Sto. Domingo's system specification, and Aguilar's purchase request were not publicly downloadable from the logged-out abstracts. Missing scope was treated as a blocker rather than inferred.
-- UNGM public search and several notice details were checked. Some later notice detail pages returned HTTP 429, so those notices were not promoted without verified scope.
-- The Samar State University notice conflicts internally: its header closes September 14, 2026, while its description instructs submission by August 12, 2025. Neither date was assumed correct.
-- The UNRWA loan-system notice also conflicts internally: the listing closes September 14, 2026, while its description says proposals were due August 24, 2026.
+- The six PhilGEPS category first pages contained 104 visible listings: 20 Information Technology, 20 Consulting Services, 20 Communication Equipment and Parts, 20 Services, 20 Office Equipment, and 4 Advertising Agency Services.
+- The official UNGM JSON search helper returned HTTP 400. The bounded UNGM count is limited to eight official notice pages actually checked directly.
+- Public UNGM attachments referenced by the notice pages included the WFP Legal AI EOI, UNHCR web/app TOR and Q&A, UNICEF Cambodia RFP forms, UNICEF Moodle TOR/pricing documents, and UNHCR Thailand media-partnership forms. No restricted or paid documents were accessed.
+- UNICEF Cambodia notice 315247 remains internally inconsistent: the header and latest revision show October 22, while older body text says October 15.
+- UNICEF performance-marketing notice 316300 displays a GMT+3 deadline while the body describes Bangkok time; the controlling timezone must be confirmed.
+- The University of Rizal System notice 13298218 shows a 1:00 AM deadline and mentions both sealed and email quotation paths; both points require confirmation.
+- No bid, EOI, vendor registration, procurement email, portal acknowledgement, document purchase, or commitment was submitted.
 
 SCAN METADATA
-- Repo path confirmed: /Volumes/Wotg Drive Mike/GitHub/AIStaff
+- Repo path confirmed: /srv/apps/aistaff
 - Email recipient used: mpineda@aistaff.click
 - Email send status: sent
-- Source URLs checked: https://notices.philgeps.gov.ph/GEPSNONPILOT/Tender/SplashOpportunitiesSearchUI.aspx?BusCatID=10&ClickFrom=OpenOpp&menuIndex=3&type=category | https://notices.philgeps.gov.ph/GEPSNONPILOT/Tender/SplashOpportunitiesSearchUI.aspx?BusCatID=43&ClickFrom=OpenOpp&menuIndex=3&type=category | https://notices.philgeps.gov.ph/GEPSNONPILOT/Tender/SplashOpportunitiesSearchUI.aspx?BusCatID=37&ClickFrom=OpenOpp&menuIndex=3&type=category | https://notices.philgeps.gov.ph/GEPSNONPILOT/Tender/SplashOpportunitiesSearchUI.aspx?BusCatID=23&ClickFrom=OpenOpp&menuIndex=3&type=category | https://notices.philgeps.gov.ph/GEPSNONPILOT/Tender/SplashOpportunitiesSearchUI.aspx?BusCatID=17&ClickFrom=OpenOpp&menuIndex=3&type=category | https://notices.philgeps.gov.ph/GEPSNONPILOT/Tender/SplashOpportunitiesSearchUI.aspx?BusCatID=157&ClickFrom=OpenOpp&menuIndex=3&type=category | https://notices.philgeps.gov.ph/GEPSNONPILOT/Tender/SplashBidNoticeAbstractUI.aspx?menuIndex=3&refID=13236620&DirectFrom=OpenOpp&Type=category&BusCatID=10 | https://notices.philgeps.gov.ph/GEPSNONPILOT/Tender/SplashBidNoticeAbstractUI.aspx?menuIndex=3&refID=13236817&DirectFrom=OpenOpp&Type=category&BusCatID=10 | https://notices.philgeps.gov.ph/GEPSNONPILOT/Tender/SplashBidNoticeAbstractUI.aspx?menuIndex=3&refID=13237164&DirectFrom=OpenOpp&Type=category&BusCatID=10 | https://notices.philgeps.gov.ph/GEPSNONPILOT/Tender/SplashBidNoticeAbstractUI.aspx?menuIndex=3&refID=13236969&DirectFrom=OpenOpp&Type=category&BusCatID=157 | https://notices.philgeps.gov.ph/GEPSNONPILOT/Tender/SplashBidNoticeAbstractUI.aspx?menuIndex=3&refID=13236592&DirectFrom=OpenOpp&Type=category&BusCatID=10 | https://notices.philgeps.gov.ph/GEPSNONPILOT/Tender/SplashBidNoticeAbstractUI.aspx?menuIndex=3&refID=13234016&DirectFrom=OpenOpp&Type=category&BusCatID=10 | https://notices.philgeps.gov.ph/GEPSNONPILOT/Tender/SplashBidNoticeAbstractUI.aspx?menuIndex=3&refID=13229588&DirectFrom=OpenOpp&Type=category&BusCatID=23 | https://www.ungm.org/Public/Notice/Search | https://www.ungm.org/Public/Notice/313978 | https://www.ungm.org/Public/Notice/313917 | https://www.ungm.org/Public/Notice/312901 | https://www.ungm.org/Public/Notice/309505
+- Source URLs checked: https://notices.philgeps.gov.ph/GEPSNONPILOT/Tender/SplashOpportunitiesSearchUI.aspx?BusCatID=10&ClickFrom=OpenOpp&menuIndex=3&type=category | https://notices.philgeps.gov.ph/GEPSNONPILOT/Tender/SplashOpportunitiesSearchUI.aspx?BusCatID=43&ClickFrom=OpenOpp&menuIndex=3&type=category | https://notices.philgeps.gov.ph/GEPSNONPILOT/Tender/SplashOpportunitiesSearchUI.aspx?BusCatID=37&ClickFrom=OpenOpp&menuIndex=3&type=category | https://notices.philgeps.gov.ph/GEPSNONPILOT/Tender/SplashOpportunitiesSearchUI.aspx?BusCatID=23&ClickFrom=OpenOpp&menuIndex=3&type=category | https://notices.philgeps.gov.ph/GEPSNONPILOT/Tender/SplashOpportunitiesSearchUI.aspx?BusCatID=17&ClickFrom=OpenOpp&menuIndex=3&type=category | https://notices.philgeps.gov.ph/GEPSNONPILOT/Tender/SplashOpportunitiesSearchUI.aspx?BusCatID=157&ClickFrom=OpenOpp&menuIndex=3&type=category | https://notices.philgeps.gov.ph/GEPSNONPILOT/Tender/SplashBidNoticeAbstractUI.aspx?BusCatID=10&DirectFrom=OpenOpp&Type=category&menuIndex=3&refID=13298019 | https://notices.philgeps.gov.ph/GEPSNONPILOT/Tender/SplashBidNoticeAbstractUI.aspx?menuIndex=3&refID=13298218&DirectFrom=OpenOpp | https://notices.philgeps.gov.ph/GEPSNONPILOT/Tender/SplashBidNoticeAbstractUI.aspx?menuIndex=3&refID=13298856&DirectFrom=OpenOpp | https://www.ungm.org/Public/Notice | https://www.ungm.org/Public/Notice/318491 | https://www.ungm.org/Public/Notice/317650 | https://www.ungm.org/Public/Notice/316300 | https://www.ungm.org/Public/Notice/315247 | https://www.ungm.org/Public/Notice/316449 | https://www.ungm.org/Public/Notice/311133 | https://www.ungm.org/Public/Notice/317716 | https://www.ungm.org/Public/Notice/315503

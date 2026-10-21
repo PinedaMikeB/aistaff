@@ -17,7 +17,7 @@ const navItems = [
   ["quotations", "Quotations"],
   ["bookings", "Bookings"],
   ["payments", "Payments"],
-  ["follow-ups", "Follow-ups"],
+  ["follow-ups", "Customer Updates"],
   ["settings", "Settings"]
 ];
 
@@ -112,6 +112,79 @@ function renderMessageTranscript(messages) {
       ${media}
     </article>`;
   }).join("");
+}
+
+// "Preview what Closer sees" — the exact prompt for this company.
+async function openCloserPromptPreview() {
+  const overlay = document.createElement("div");
+  overlay.className = "closer-preview-overlay";
+  overlay.innerHTML = `
+    <div class="closer-preview-modal" role="dialog" aria-label="Preview what Closer sees">
+      <div class="closer-preview-head">
+        <h2>What Closer sees</h2>
+        <button type="button" class="button button-soft" data-close-preview>Close</button>
+      </div>
+      <form class="closer-preview-form">
+        <label>Sample customer message
+          <input name="message" value="Hi po, kailangan namin ng ink para sa printer." maxlength="2000">
+        </label>
+        <button class="button button-primary" type="submit">Build preview</button>
+      </form>
+      <div class="closer-preview-body muted">Type a sample message and press Build preview.</div>
+    </div>`;
+  document.body.appendChild(overlay);
+  const close = () => overlay.remove();
+  overlay.querySelector("[data-close-preview]").onclick = close;
+  overlay.addEventListener("click", (event) => { if (event.target === overlay) close(); });
+  const body = overlay.querySelector(".closer-preview-body");
+  overlay.querySelector("form").onsubmit = async (event) => {
+    event.preventDefault();
+    body.innerHTML = "Building…";
+    try {
+      const message = new FormData(event.currentTarget).get("message");
+      const data = await api("/api/closer/prompt-preview", { method: "POST", body: { message } });
+      const highlighted = escapeHtml(data.prompt).replace(/^(=== .+? ===)$/gm, '<b class="closer-preview-section">$1</b>');
+      body.classList.remove("muted");
+      body.innerHTML = `
+        <p><b>Model:</b> ${escapeHtml(data.provider)} · ${escapeHtml(data.model)} &nbsp; <b>Size:</b> ${Number(data.characters).toLocaleString()} characters</p>
+        <p><b>Sections, in order (top wins):</b></p>
+        <ol class="closer-preview-sections">${data.sections.map((section) => `<li>${escapeHtml(section.title)} <span class="muted">${section.characters.toLocaleString()} chars</span></li>`).join("")}</ol>
+        <details><summary><b>Tools Closer can use (${data.tools.length})</b></summary>
+          <ul class="closer-preview-tools">${data.tools.map((tool) => `<li><code>${escapeHtml(tool.name)}</code> — ${escapeHtml(tool.description || "")}<br><small>Fields: ${escapeHtml(Object.keys(tool.parameters?.properties || {}).join(", ") || "none")}</small></li>`).join("")}</ul>
+        </details>
+        <details open><summary><b>Full prompt</b></summary><pre class="closer-preview-prompt">${highlighted}</pre></details>`;
+    } catch (error) {
+      body.innerHTML = `<p class="settings-warning">${escapeHtml(error.message)}</p>`;
+    }
+  };
+}
+
+function localStatusText(local, model) {
+  if (!local || !local.reachable) return "Bosgame not reachable";
+  const state = local.models?.[model] || "unknown";
+  return state === "loaded" ? "Loaded on the Bosgame - ready" : state === "loading" ? "Loading on the Bosgame..." : `Not loaded (${state})`;
+}
+
+// Poll the Bosgame until the newly selected local model is in memory.
+function watchLocalModel(select, model) {
+  let line = select.parentElement.querySelector(".local-model-status");
+  if (!line) {
+    line = document.createElement("div");
+    line.className = "muted local-model-status";
+    select.parentElement.appendChild(line);
+  }
+  line.textContent = "Loading on the Bosgame...";
+  const started = Date.now();
+  const tick = async () => {
+    try {
+      const data = await api("/api/models");
+      line.textContent = localStatusText(data.local, model);
+      if (data.local?.models?.[model] === "loaded") { toast(`${model} is loaded and answering`); return; }
+    } catch (_) { /* keep polling */ }
+    if (Date.now() - started < 10 * 60 * 1000) setTimeout(tick, 5000);
+    else line.textContent = "Still not loaded after 10 minutes - check the Bosgame.";
+  };
+  setTimeout(tick, 3000);
 }
 
 function escapeHtml(value) {
@@ -717,6 +790,12 @@ function rowLink(route, id, text) {
 }
 
 function setMode(mode, panel = "login") {
+  // Direct /admin loads begin behind the neutral boot screen defined in the
+  // shared HTML shell. Remove it only when the correct app mode is ready.
+  document.documentElement.classList.remove("admin-route-booting");
+  const bootScreen = $("#adminBootScreen");
+  if (bootScreen) bootScreen.hidden = true;
+
   const publicHeader = $("[data-public].site-header");
   const publicSite = $("#publicSite");
   const publicFooter = $("[data-public].site-footer");
@@ -868,7 +947,11 @@ function settingsTabs(active = "") {
   const tabs = [
     ["", "General"],
     ["lead-qualification", "Lead Qualification"],
-    ["facebook-page-connection", "Facebook Page Connection"]
+    ["customer-updates", "Customer Updates"],
+    ["facebook-page-connection", "Facebook Page Connection"],
+    ["business-engines", "Business Engines"],
+    ["connections-actions", "Connections & Actions"],
+    ["channels", "Channels"]
   ];
   return `<nav class="subnav">${tabs.map(([slug, label]) => (
     `<a class="${active === slug ? "active" : ""}" href="${adminPath("settings", slug || null)}">${label}</a>`
@@ -1822,6 +1905,23 @@ async function leadDetailView(id) {
   };
 }
 
+function alertContactRowHtml(contact = {}) {
+  return `<div class="alert-contact-row">
+    <label>Name<input data-alert="name" value="${escapeHtml(contact.name || "")}" placeholder="e.g. Charlotte Edano" /></label>
+    <label>Email<input data-alert="email" type="email" value="${escapeHtml(contact.email || "")}" placeholder="name@company.com" /></label>
+    <label>Mobile (SMS)<input data-alert="phone" type="tel" value="${escapeHtml(contact.phone || "")}" placeholder="09xx xxx xxxx" /></label>
+    <label class="alert-contact-report" title="Gets the daily briefing report"><input data-alert="daily_report" type="checkbox" ${contact.daily_report ? "checked" : ""} /> Daily report</label>
+    <button class="button button-soft alert-contact-remove" type="button" title="Remove" aria-label="Remove">✕</button>
+  </div>`;
+}
+
+function alertContactRowsHtml(settings) {
+  const list = Array.isArray(settings?.alert_contacts) && settings.alert_contacts.length
+    ? settings.alert_contacts
+    : String(settings?.notify_email || "").split(/[,;\s]+/).filter((email) => email.includes("@")).map((email) => ({ name: "", email, phone: "" }));
+  return (list.length ? list : [{}]).map(alertContactRowHtml).join("");
+}
+
 function field(name, label, value = "", type = "text") {
   return `<label>${label}<input type="${type}" name="${name}" value="${escapeHtml(value || "")}" /></label>`;
 }
@@ -2455,17 +2555,223 @@ async function quotationDetailView(id) {
   });
 }
 
+function customerUpdateDeliveryRows(deliveries) {
+  if (!deliveries.length) return `<tr><td colspan="6"><div class="empty-state"><p>No Customer Updates have been sent yet.</p></div></td></tr>`;
+  return deliveries.map((delivery) => `<tr>
+    <td><b>${escapeHtml(delivery.recipientName)}</b><small>${escapeHtml(delivery.pageName)}</small></td>
+    <td>${escapeHtml(delivery.templateName)}</td>
+    <td class="update-log-message">${escapeHtml(delivery.renderedText)}</td>
+    <td>${customerUpdateStatus(delivery.status)}</td>
+    <td>${fmtDate(delivery.sentAt || delivery.createdAt)}</td>
+    <td>${escapeHtml(delivery.createdBy || "—")}${delivery.metaError ? `<small class="update-error">${escapeHtml(delivery.metaError)}</small>` : ""}</td>
+  </tr>`).join("");
+}
+
 async function followUpsView() {
-  setTitle("Follow-ups");
-  const rows = await api("/api/follow-ups");
+  setTitle("Customer Updates");
+  const [updates, followUps] = await Promise.all([
+    api("/api/customer-updates"),
+    api("/api/follow-ups")
+  ]);
+  const draftKey = `aistaff-customer-update-draft:${updates.page?.id || "none"}`;
+  let restoredDraft = null;
+  try { restoredDraft = JSON.parse(sessionStorage.getItem(draftKey) || "null"); } catch (_) { restoredDraft = null; }
+
   $("#adminContent").innerHTML = `
-    <section class="panel">
-      <div class="panel-header"><h2>Basic follow-up tracker</h2><span>${rows.length} tasks</span></div>
-      <div class="table-wrap"><table>
-        <thead><tr><th>Due Date</th><th>Status</th><th>Lead</th><th>Company</th><th>Note</th><th>Assigned</th></tr></thead>
-        <tbody>${rows.map((f) => `<tr><td>${fmtDate(f.due_date)}</td><td>${statusPill(f.status)}</td><td>${rowLink("leads", f.lead_id, f.lead.customer_name || "Lead")}</td><td>${f.lead.company_name || "TBD"}</td><td>${f.note || ""}</td><td>${f.assigned_user?.name || "Unassigned"}</td></tr>`).join("")}</tbody>
-      </table></div>
-    </section>`;
+    <div class="customer-update-page">
+      <section class="panel update-page-heading">
+        <div class="panel-header">
+          <div><p class="eyebrow">Messenger Utility Messages</p><h2>Send verified service updates</h2><p class="muted settings-lede">Use an approved tenant template for factual updates such as schedules, reference numbers, assigned representatives, documents, payments, or completed work—even after the standard 24-hour reply window.</p></div>
+          <a class="button button-soft" href="${adminPath("settings", "customer-updates")}">Manage templates</a>
+        </div>
+        <div class="update-page-tabs" role="tablist">
+          <button class="active" type="button" data-update-tab="send">Send update</button>
+          <button type="button" data-update-tab="log">Delivery log <span>${updates.deliveries.length}</span></button>
+          <button type="button" data-update-tab="tasks">Tasks <span>${followUps.length}</span></button>
+        </div>
+      </section>
+
+      <div data-update-panel="send">
+        ${customerUpdateReadinessMarkup(updates)}
+        ${restoredDraft ? `<div class="update-draft-notice"><span><b>Draft restored.</b> Your unsent customer update is still here.</span><button class="intake-link is-danger" type="button" id="resetCustomerUpdateDraft">Reset draft</button></div>` : ""}
+        ${!updates.templates.length ? `<section class="panel empty-state"><h2>No approved templates yet</h2><p>Add a template in tenant Settings, submit it to Meta, and wait for approval before sending.</p><a class="button button-primary" href="${adminPath("settings", "customer-updates")}">Set up Customer Update templates</a></section>` : `
+        <div class="update-compose-grid">
+          <section class="panel update-compose-panel">
+            <div class="panel-header"><div><h2>1. Choose customer and update</h2><p class="muted">Only Messenger customers from ${escapeHtml(updates.page?.name || "the connected Page")} are listed.</p></div></div>
+            <form id="customerUpdateSendForm" class="update-send-form">
+              <label class="full">Find customer
+                <input id="customerUpdateCustomerSearch" type="search" placeholder="Search customer name or recent message" autocomplete="off" />
+              </label>
+              <label class="full">Customer
+                <select name="conversation_id" id="customerUpdateConversation" required>
+                  <option value="">Select a Messenger customer…</option>
+                  ${updates.conversations.map((conversation) => `<option value="${escapeHtml(conversation.id)}" data-search="${escapeHtml(`${conversation.customerName} ${conversation.lastCustomerMessage}`.toLowerCase())}">${escapeHtml(conversation.customerName)} · last customer message ${fmtDate(conversation.lastCustomerMessageAt)}</option>`).join("")}
+                </select>
+              </label>
+              <div id="customerUpdateWindowState" class="full update-window-state" hidden></div>
+              <label class="full">Approved template
+                <select name="template_id" id="customerUpdateTemplate" required>
+                  <option value="">Select an approved template…</option>
+                  ${updates.templates.map((template) => `<option value="${escapeHtml(template.id)}">${escapeHtml(template.displayName)} · v${template.version}</option>`).join("")}
+                </select>
+              </label>
+              <div id="customerUpdateTemplateGuidance" class="full update-template-guidance" hidden></div>
+              <div id="customerUpdateVariableFields" class="full form-grid update-variable-fields"></div>
+              <div class="full update-form-actions">
+                <button class="button button-soft" type="button" id="clearCustomerUpdateForm">Clear</button>
+                <button class="button button-primary" type="submit">Preview update</button>
+              </div>
+            </form>
+          </section>
+          <section class="panel update-preview-panel" id="customerUpdatePreviewPanel">
+            <p class="eyebrow">2. Review exact message</p>
+            <div class="empty-state"><h2>Preview required</h2><p>Choose the customer and template, enter only verified values, then preview the exact message before it can be sent.</p></div>
+          </section>
+        </div>`}
+      </div>
+
+      <section class="panel" data-update-panel="log" hidden>
+        <div class="panel-header"><div><h2>Customer Update delivery log</h2><p class="muted settings-lede">Every send attempt is retained with its exact message, template version, sender, and Meta result.</p></div><span>${updates.deliveries.length} recent</span></div>
+        <div class="table-wrap"><table class="update-log-table"><thead><tr><th>Customer / Page</th><th>Template</th><th>Exact message</th><th>Status</th><th>When</th><th>Sent by</th></tr></thead><tbody>${customerUpdateDeliveryRows(updates.deliveries)}</tbody></table></div>
+      </section>
+
+      <section class="panel" data-update-panel="tasks" hidden>
+        <div class="panel-header"><div><h2>Follow-up tasks</h2><p class="muted settings-lede">Existing internal reminders remain here. They do not send a Messenger message.</p></div><span>${followUps.length} tasks</span></div>
+        <div class="table-wrap"><table>
+          <thead><tr><th>Due Date</th><th>Status</th><th>Lead</th><th>Company</th><th>Note</th><th>Assigned</th></tr></thead>
+          <tbody>${followUps.map((f) => `<tr><td>${fmtDate(f.due_date)}</td><td>${statusPill(f.status)}</td><td>${rowLink("leads", f.lead_id, f.lead.customer_name || "Lead")}</td><td>${escapeHtml(f.lead.company_name || "TBD")}</td><td>${escapeHtml(f.note || "")}</td><td>${escapeHtml(f.assigned_user?.name || "Unassigned")}</td></tr>`).join("")}</tbody>
+        </table></div>
+      </section>
+    </div>`;
+
+  document.querySelectorAll("[data-update-tab]").forEach((button) => {
+    button.onclick = () => {
+      document.querySelectorAll("[data-update-tab]").forEach((item) => item.classList.toggle("active", item === button));
+      document.querySelectorAll("[data-update-panel]").forEach((panel) => { panel.hidden = panel.dataset.updatePanel !== button.dataset.updateTab; });
+    };
+  });
+
+  if (!updates.templates.length) return;
+  const form = $("#customerUpdateSendForm");
+  const customerSelect = $("#customerUpdateConversation");
+  const templateSelect = $("#customerUpdateTemplate");
+  const variableFields = $("#customerUpdateVariableFields");
+  const previewPanel = $("#customerUpdatePreviewPanel");
+  let previewToken = null;
+
+  const selectedCustomer = () => updates.conversations.find((item) => item.id === customerSelect.value);
+  const selectedTemplate = () => updates.templates.find((item) => item.id === templateSelect.value);
+  const currentVariables = () => Object.fromEntries([...variableFields.querySelectorAll("input")].map((input) => [input.name, input.value]));
+  const saveDraft = () => {
+    sessionStorage.setItem(draftKey, JSON.stringify({ conversationId: customerSelect.value, templateId: templateSelect.value, variables: currentVariables() }));
+  };
+  const invalidatePreview = () => {
+    previewToken = null;
+    previewPanel.innerHTML = `<p class="eyebrow">2. Review exact message</p><div class="empty-state"><h2>Preview required</h2><p>Your selection or values changed. Preview the exact message again before sending.</p></div>`;
+    saveDraft();
+  };
+  const renderWindowState = () => {
+    const customer = selectedCustomer();
+    const box = $("#customerUpdateWindowState");
+    if (!customer) { box.hidden = true; return; }
+    box.hidden = false;
+    box.className = `full update-window-state ${customer.standardWindowOpen ? "is-open" : "is-closed"}`;
+    box.innerHTML = customer.standardWindowOpen
+      ? `<b>Standard reply window is open.</b><span>It closes ${fmtDate(customer.standardWindowClosesAt)}. This Utility template is still valid for its approved purpose.</span>`
+      : `<b>Standard 24-hour reply window has closed.</b><span>An approved Utility template may be used for this verified service update.</span>`;
+  };
+  const renderTemplateFields = (saved = {}) => {
+    const template = selectedTemplate();
+    const guidance = $("#customerUpdateTemplateGuidance");
+    if (!template) {
+      guidance.hidden = true;
+      variableFields.innerHTML = "";
+      return;
+    }
+    guidance.hidden = false;
+    guidance.innerHTML = `<b>Use only when:</b><span>${escapeHtml(template.aiUsageInstruction)}</span><small>${escapeHtml(template.bodyText)}</small>`;
+    variableFields.innerHTML = template.variableKeys.length
+      ? template.variableKeys.map((key) => `<label>${escapeHtml(customerUpdateVariableLabel(key))}<input name="${escapeHtml(key)}" required maxlength="500" value="${escapeHtml(saved[key] || (key === "customer_name" ? selectedCustomer()?.customerName || "" : ""))}" placeholder="Verified ${escapeHtml(customerUpdateVariableLabel(key).toLowerCase())}" /></label>`).join("")
+      : `<p class="muted full">This approved template has no variable fields.</p>`;
+    variableFields.querySelectorAll("input").forEach((input) => { input.oninput = invalidatePreview; });
+  };
+
+  $("#customerUpdateCustomerSearch").oninput = (event) => {
+    const query = event.currentTarget.value.trim().toLowerCase();
+    [...customerSelect.options].forEach((option, index) => { if (index) option.hidden = Boolean(query && !option.dataset.search.includes(query)); });
+  };
+  customerSelect.onchange = () => {
+    renderWindowState();
+    const customerNameInput = variableFields.querySelector('[name="customer_name"]');
+    if (customerNameInput && !customerNameInput.value.trim()) customerNameInput.value = selectedCustomer()?.customerName || "";
+    invalidatePreview();
+  };
+  templateSelect.onchange = () => { renderTemplateFields(); invalidatePreview(); };
+  $("#clearCustomerUpdateForm").onclick = () => {
+    if (!window.confirm("Clear this unsent Customer Update draft?")) return;
+    sessionStorage.removeItem(draftKey);
+    customerSelect.value = "";
+    templateSelect.value = "";
+    renderWindowState();
+    renderTemplateFields();
+    invalidatePreview();
+    sessionStorage.removeItem(draftKey);
+  };
+  $("#resetCustomerUpdateDraft")?.addEventListener("click", () => {
+    if (!window.confirm("Reset the restored Customer Update draft?")) return;
+    sessionStorage.removeItem(draftKey);
+    followUpsView();
+  });
+
+  if (restoredDraft) {
+    customerSelect.value = updates.conversations.some((item) => item.id === restoredDraft.conversationId) ? restoredDraft.conversationId : "";
+    templateSelect.value = updates.templates.some((item) => item.id === restoredDraft.templateId) ? restoredDraft.templateId : "";
+    renderWindowState();
+    renderTemplateFields(restoredDraft.variables || {});
+  }
+
+  form.onsubmit = async (event) => {
+    event.preventDefault();
+    const submit = form.querySelector('[type="submit"]');
+    submit.disabled = true;
+    try {
+      const preview = await api("/api/customer-updates/preview", {
+        method: "POST",
+        body: { conversation_id: customerSelect.value, template_id: templateSelect.value, variables: currentVariables() }
+      });
+      previewToken = preview.previewToken;
+      previewPanel.innerHTML = `
+        <p class="eyebrow">2. Review exact message</p>
+        <h2>Confirm before sending</h2>
+        <dl class="update-preview-facts"><div><dt>Customer</dt><dd>${escapeHtml(preview.recipientName)}</dd></div><div><dt>From Page</dt><dd>${escapeHtml(preview.pageName)}</dd></div><div><dt>Template</dt><dd>${escapeHtml(preview.templateName)}</dd></div></dl>
+        <div class="update-message-preview">${escapeHtml(preview.renderedText)}</div>
+        <label class="update-confirm-check"><input type="checkbox" id="confirmCustomerUpdate" /> <span>I verified the customer, business event, and every value above. Send this exact Utility message.</span></label>
+        <button class="button button-primary full" type="button" id="sendCustomerUpdate" disabled>Send Customer Update</button>
+        <p class="muted update-preview-expiry">Preview expires in ${preview.expiresInMinutes} minutes and can be used only once.</p>`;
+      const confirm = $("#confirmCustomerUpdate");
+      const send = $("#sendCustomerUpdate");
+      confirm.onchange = () => { send.disabled = !confirm.checked; };
+      send.onclick = async () => {
+        if (!previewToken || !confirm.checked) return;
+        send.disabled = true;
+        send.textContent = "Sending…";
+        try {
+          await api("/api/customer-updates/send", { method: "POST", body: { preview_token: previewToken, confirmed: true } });
+          sessionStorage.removeItem(draftKey);
+          toast("Customer Update sent through Messenger");
+          followUpsView();
+        } catch (error) {
+          toast(error.message);
+          send.textContent = "Send Customer Update";
+          send.disabled = false;
+        }
+      };
+    } catch (error) {
+      toast(error.message);
+    } finally {
+      submit.disabled = false;
+    }
+  };
 }
 
 async function aiStudioView() {
@@ -2530,8 +2836,9 @@ async function aiStudioView() {
               <td><b>${escapeHtml(s.label)}</b><br /><span class="muted">${escapeHtml(s.detail)}</span></td>
               <td>
                 <select data-model-fn="${s.fn}">
-                  ${models.catalogue.map((c) => `<option value="${c.provider}|${c.model}" ${c.model === s.model ? "selected" : ""}>${escapeHtml(c.label)}</option>`).join("")}
+                  ${models.catalogue.filter((c) => !Array.isArray(c.functions) || c.functions.includes(s.fn)).map((c) => `<option value="${c.provider}|${c.model}" ${c.model === s.model ? "selected" : ""}>${escapeHtml(c.label)}</option>`).join("")}
                 </select>
+                ${s.provider === "local" ? `<div class="muted local-model-status" data-local-status="${escapeHtml(s.model)}">${escapeHtml(localStatusText(models.local, s.model))}</div>` : ""}
               </td>
               <td class="model-price" data-price-for="${s.fn}">—</td>
               <td class="model-est" data-est-for="${s.fn}">—</td>
@@ -2576,10 +2883,11 @@ async function aiStudioView() {
       const [provider, model] = select.value.split("|");
       const previous = select.dataset.current || "";
       try {
-        await api("/api/models", { method: "POST", body: { fn: select.dataset.modelFn, provider, model } });
+        const saved = await api("/api/models", { method: "POST", body: { fn: select.dataset.modelFn, provider, model } });
         select.dataset.current = select.value;
         paintPrice(select.dataset.modelFn, select.value);
-        toast(`${select.dataset.modelFn} now uses ${model}`);
+        toast(saved.loading ? `Loading ${model} on the Bosgame (the previous model is unloaded). This takes about 2-3 minutes.` : `${select.dataset.modelFn} now uses ${model}`);
+        if (saved.loading) watchLocalModel(select, model);
       } catch (error) {
         // Revert the dropdown so it never shows a model that was refused.
         if (previous) select.value = previous;
@@ -2668,7 +2976,7 @@ async function demoPageStudioView() {
             <td><b>${escapeHtml(demoSetting.label)}</b><br /><span class="muted">${escapeHtml(demoSetting.detail)}</span></td>
             <td>
               <select data-demo-model-fn="${demoSetting.fn}">
-                ${models.catalogue.map((c) => `<option value="${c.provider}|${c.model}" ${c.provider === demoSetting.provider && c.model === demoSetting.model ? "selected" : ""}>${escapeHtml(c.label)}</option>`).join("")}
+                ${models.catalogue.filter((c) => !Array.isArray(c.functions)).map((c) => `<option value="${c.provider}|${c.model}" ${c.provider === demoSetting.provider && c.model === demoSetting.model ? "selected" : ""}>${escapeHtml(c.label)}</option>`).join("")}
               </select>
             </td>
             <td class="model-price" data-demo-price-for="${demoSetting.fn}">—</td>
@@ -2807,6 +3115,10 @@ async function legacyAiStudioView() {
           </label>
           <button class="button button-primary" type="submit">Save instructions</button>
         </form>
+        <div class="closer-preview-row">
+          <button type="button" class="button button-soft" id="closerPromptPreviewBtn">Preview what Closer sees</button>
+          <span class="muted">Shows the exact combined instructions, tools and knowledge Closer receives. Nothing is sent to customers.</span>
+        </div>
       </section>
 
       <section class="panel">
@@ -2919,11 +3231,35 @@ async function showCloserPromptPreview() {
   wrap.onclick = (e) => { if (e.target === wrap) close(); };
 }
 
-async function facebookPageConnectionView() {
+async function facebookPageConnectionView({ autoSelect = true } = {}) {
   setTitle("Facebook Page Connection");
   const data = await api("/api/facebook-page-connection");
   const params = new URLSearchParams(location.search);
   const connectedPage = data.connectedPage;
+
+  // Most small-business owners authorize exactly one Page. Persist that Page
+  // immediately while the short-lived Facebook authorization is still fresh;
+  // requiring a second, easy-to-miss Select click left authorization complete
+  // but the tenant with no saved page and no Messenger subscription.
+  if (autoSelect && !connectedPage && data.managedPages.length === 1 && data.authFreshUntil) {
+    try {
+      const result = await api("/api/facebook-page-connection/select", {
+        method: "POST",
+        body: { pageId: data.managedPages[0].id }
+      });
+      history.replaceState(null, "", adminPath("settings", "facebook-page-connection"));
+      toast(result.subscribeError
+        ? `Page saved, but Messenger setup needs attention: ${result.subscribeError}`
+        : `Connected Page: ${result.connectedPage.name}`);
+      if (result.subscribeError) {
+        return facebookPageConnectionView({ autoSelect: false });
+      }
+      return facebookPageConnectionView();
+    } catch (error) {
+      toast(`Could not save the authorized Page: ${error.message}`);
+    }
+  }
+
   const currentPageName = connectedPage?.name || "None";
   const currentStatus = connectedPage ? "Connected" : "Not connected";
   const currentReplies = connectedPage ? "Enabled" : "Disabled";
@@ -2944,6 +3280,7 @@ async function facebookPageConnectionView() {
 
       <section class="panel connection-status-panel">
         <div class="panel-header"><h2>Current connection</h2></div>
+        ${data.connectionIssue ? `<div class="settings-warning"><b>Reconnect required:</b> ${escapeHtml(data.connectionIssue)}</div>` : ""}
         <div class="connection-summary">
           <article>
             <span>Current connected Facebook Page</span>
@@ -3017,12 +3354,23 @@ async function facebookPageConnectionView() {
 
   document.querySelectorAll("[data-select-facebook-page]").forEach((button) => {
     button.onclick = async () => {
-      await api("/api/facebook-page-connection/select", {
-        method: "POST",
-        body: { pageId: button.dataset.selectFacebookPage }
-      });
-      toast(`Connected Page: ${button.closest(".managed-page-card").querySelector("strong").textContent}`);
-      facebookPageConnectionView();
+      const originalText = button.textContent;
+      button.disabled = true;
+      button.textContent = "Connecting...";
+      try {
+        const result = await api("/api/facebook-page-connection/select", {
+          method: "POST",
+          body: { pageId: button.dataset.selectFacebookPage }
+        });
+        toast(result.subscribeError
+          ? `Page saved, but Messenger setup needs attention: ${result.subscribeError}`
+          : `Connected Page: ${result.connectedPage.name}`);
+        await facebookPageConnectionView({ autoSelect: !result.subscribeError });
+      } catch (error) {
+        toast(`Could not connect this Page: ${error.message}`);
+        button.disabled = false;
+        button.textContent = originalText;
+      }
     };
   });
 
@@ -3217,13 +3565,267 @@ async function leadQualificationSettingsView() {
   };
 }
 
+function customerUpdateReadinessMarkup(data) {
+  if (!data.page) {
+    return `<div class="update-readiness is-blocked"><b>No active Facebook Page.</b><span>Connect a Page before creating Meta Utility templates.</span><a href="${adminPath("settings", "facebook-page-connection")}">Connect Page →</a></div>`;
+  }
+  if (data.readiness.utilityPermission === false) {
+    return `<div class="update-readiness is-warning"><b>Reconnect required for Utility Messaging.</b><span>The Meta app has the permission, but ${escapeHtml(data.page.name)}'s saved token does not include it yet.</span><a href="${adminPath("settings", "facebook-page-connection")}">Reconnect Page →</a></div>`;
+  }
+  if (data.readiness.utilityPermission === true) {
+    return `<div class="update-readiness is-ready"><b>${escapeHtml(data.page.name)} is ready.</b><span>The saved Page token includes Utility Messaging access.</span></div>`;
+  }
+  return `<div class="update-readiness is-warning"><b>Utility permission could not be verified.</b><span>You may prepare drafts, but Meta will verify access when a template is submitted.</span></div>`;
+}
+
+function customerUpdateStatus(value) {
+  const status = String(value || "DRAFT").toUpperCase();
+  return `<span class="update-status is-${status.toLowerCase()}">${escapeHtml(status.replaceAll("_", " "))}</span>`;
+}
+
+function customerUpdateIsLocalDraft(template) {
+  return ["DRAFT", "ERROR"].includes(String(template?.status || "").toUpperCase());
+}
+
+function customerUpdateVariableLabel(key) {
+  const labels = {
+    customer_name: "Customer name",
+    schedule: "Confirmed date and time",
+    reference_number: "Reference number",
+    assigned_person: "Assigned representative",
+    status: "Confirmed status",
+    document_type: "Document type"
+  };
+  return labels[key] || String(key || "").replaceAll("_", " ").replace(/\b\w/g, (letter) => letter.toUpperCase());
+}
+
+function customerUpdateVariablesFromText(value) {
+  const keys = [];
+  const seen = new Set();
+  for (const match of String(value || "").matchAll(/{{\s*([a-z][a-z0-9_]*)\s*}}/gi)) {
+    const key = match[1].toLowerCase();
+    if (!seen.has(key)) {
+      seen.add(key);
+      keys.push(key);
+    }
+  }
+  return keys;
+}
+
+function showCustomerUpdateTemplateEditor(template = null) {
+  const isVersionedEdit = template && !customerUpdateIsLocalDraft(template);
+  const wrap = document.createElement("div");
+  wrap.className = "intake-modal-backdrop";
+  wrap.innerHTML = `
+    <div class="intake-modal is-wide update-template-modal">
+      <div class="panel-header">
+        <div>
+          <p class="eyebrow">Tenant Utility Template</p>
+          <h3>${template ? `Edit ${escapeHtml(template.displayName)}` : "Add Customer Update template"}</h3>
+        </div>
+        ${template ? customerUpdateStatus(template.status) : ""}
+      </div>
+      ${isVersionedEdit ? `<div class="settings-warning"><b>This version has already been submitted.</b> Saving creates a new draft version. The currently approved version remains available until Meta approves the replacement.</div>` : ""}
+      <form id="customerUpdateTemplateForm" class="update-template-form">
+        <label>Template name
+          <input name="display_name" maxlength="120" required value="${escapeHtml(template?.displayName || "")}" placeholder="Example: Appointment reminder" />
+        </label>
+        <label>Language
+          <select name="language"><option value="en_US" ${!template || template.language === "en_US" ? "selected" : ""}>English (US)</option><option value="fil_PH" ${template?.language === "fil_PH" ? "selected" : ""}>Filipino</option></select>
+        </label>
+        <label class="full">Purpose shown to staff
+          <textarea name="description" rows="2" maxlength="500" placeholder="What business update does this send?">${escapeHtml(template?.description || "")}</textarea>
+        </label>
+        <label class="full">AI usage instruction
+          <textarea name="ai_usage_instruction" rows="3" maxlength="1000" required placeholder="Use only after the appointment date and time are confirmed in the booking record.">${escapeHtml(template?.aiUsageInstruction || "")}</textarea>
+          <small>Define the verified business event that permits this template. This never gives AI permission to invent values or send promotions.</small>
+        </label>
+        <label class="full">Message text
+          <textarea id="customerUpdateBodyInput" name="body_text" rows="5" maxlength="1024" required placeholder="Hello {{customer_name}}, your booking is confirmed for {{schedule}}. Reference number: {{reference_number}}.">${escapeHtml(template?.bodyText || "")}</textarea>
+          <small>Variables use names inside double braces. The message cannot start or end with a variable.</small>
+        </label>
+        <div class="full update-example-band">
+          <div><h3>Example values for Meta review</h3><p>Meta uses these examples when reviewing the template. They are not sent to customers.</p></div>
+          <div id="customerUpdateExampleFields" class="form-grid"></div>
+        </div>
+        <div class="full intake-modal-actions">
+          <button class="button button-soft" type="button" id="customerUpdateTemplateCancel">Cancel</button>
+          <button class="button button-primary" type="submit">${isVersionedEdit ? "Save as new draft version" : template ? "Save draft" : "Add draft"}</button>
+        </div>
+      </form>
+    </div>`;
+  document.body.appendChild(wrap);
+  const form = wrap.querySelector("#customerUpdateTemplateForm");
+  const bodyInput = wrap.querySelector("#customerUpdateBodyInput");
+  const examplesBox = wrap.querySelector("#customerUpdateExampleFields");
+  const savedExamples = { ...(template?.variableExamples || {}) };
+  const renderExamples = () => {
+    const current = Object.fromEntries([...examplesBox.querySelectorAll("input")].map((input) => [input.dataset.variable, input.value]));
+    Object.assign(savedExamples, current);
+    const variables = customerUpdateVariablesFromText(bodyInput.value);
+    examplesBox.innerHTML = variables.length
+      ? variables.map((key) => `<label>${escapeHtml(customerUpdateVariableLabel(key))}<input data-variable="${escapeHtml(key)}" maxlength="500" required value="${escapeHtml(savedExamples[key] || "")}" placeholder="Example for {{${escapeHtml(key)}}}" /></label>`).join("")
+      : `<p class="muted full">No variables detected. You can submit a fixed factual message or add a variable such as <code>{{customer_name}}</code>.</p>`;
+  };
+  renderExamples();
+  bodyInput.oninput = renderExamples;
+  const close = () => wrap.remove();
+  wrap.querySelector("#customerUpdateTemplateCancel").onclick = close;
+  wrap.onclick = (event) => { if (event.target === wrap) close(); };
+  form.onsubmit = async (event) => {
+    event.preventDefault();
+    const fields = Object.fromEntries(new FormData(form));
+    const variableExamples = Object.fromEntries([...examplesBox.querySelectorAll("input")].map((input) => [input.dataset.variable, input.value]));
+    const button = form.querySelector('[type="submit"]');
+    button.disabled = true;
+    try {
+      const result = await api(template ? `/api/customer-update-templates/${template.id}` : "/api/customer-update-templates", {
+        method: template ? "PUT" : "POST",
+        body: { ...fields, variable_examples: variableExamples }
+      });
+      close();
+      toast(result.createdVersion ? "New draft version created" : template ? "Template draft saved" : "Template draft added");
+      customerUpdateTemplateSettingsView();
+    } catch (error) {
+      toast(error.message);
+      button.disabled = false;
+    }
+  };
+}
+
+async function customerUpdateTemplateSettingsView() {
+  setTitle("Customer Update Settings");
+  const data = await api("/api/customer-update-templates");
+  const activeTemplates = data.templates.filter((template) => template.active);
+  const existingKeys = new Set(activeTemplates.map((template) => template.key));
+  const suggestions = data.suggestions.filter((suggestion) => !existingKeys.has(suggestion.key));
+  $("#adminContent").innerHTML = `
+    ${settingsTabs("customer-updates")}
+    <div class="settings-stack update-settings-stack">
+      ${customerUpdateReadinessMarkup(data)}
+      <section class="panel update-settings-header">
+        <div class="panel-header">
+          <div><h2>Customer Update templates</h2><p class="muted settings-lede">Each tenant controls the factual service messages sent from its own Facebook Page. Drafts can be edited or deleted. Submitted templates are versioned and preserved for audit.</p></div>
+          <div class="actions-row"><button class="button button-soft" id="syncCustomerUpdateTemplates">Refresh Meta status</button><button class="button button-primary" id="addCustomerUpdateTemplate">Add template</button></div>
+        </div>
+      </section>
+
+      ${suggestions.length ? `<section class="panel">
+        <div class="panel-header"><div><h2>General starting templates</h2><p class="muted settings-lede">Add only the workflows this business actually uses, then adjust the wording and AI instruction before submitting.</p></div><span>${suggestions.length} available</span></div>
+        <div class="update-suggestion-grid">${suggestions.map((suggestion) => `<article>
+          <div><h3>${escapeHtml(suggestion.displayName)}</h3><p>${escapeHtml(suggestion.description)}</p></div>
+          <button class="button button-soft" type="button" data-add-update-suggestion="${escapeHtml(suggestion.key)}">Add draft</button>
+        </article>`).join("")}</div>
+      </section>` : ""}
+
+      <section class="panel">
+        <div class="panel-header"><div><h2>Tenant template library</h2><p class="muted settings-lede">Only active, Meta-approved versions appear in the sending workflow.</p></div><span>${activeTemplates.length} active</span></div>
+        ${activeTemplates.length ? `<div class="table-wrap"><table class="update-template-table">
+          <thead><tr><th>Template</th><th>Version</th><th>Variables</th><th>Meta status</th><th>Updated</th><th>Actions</th></tr></thead>
+          <tbody>${activeTemplates.map((template) => `<tr>
+            <td><b>${escapeHtml(template.displayName)}</b><small>${escapeHtml(template.description || template.aiUsageInstruction || "")}</small>${template.metaError ? `<small class="update-error">${escapeHtml(template.metaError)}</small>` : ""}</td>
+            <td>v${template.version}</td>
+            <td>${template.variableKeys.length ? template.variableKeys.map((key) => `<code>{{${escapeHtml(key)}}}</code>`).join(" ") : "Fixed text"}</td>
+            <td>${customerUpdateStatus(template.status)}</td>
+            <td>${fmtDate(template.updatedAt)}</td>
+            <td><div class="update-row-actions">
+              <button class="intake-link" type="button" data-edit-update-template="${template.id}">Edit</button>
+              ${customerUpdateIsLocalDraft(template) ? `<button class="intake-link" type="button" data-submit-update-template="${template.id}">${template.status === "ERROR" ? "Retry Meta submission" : "Submit to Meta"}</button>` : ""}
+              <button class="intake-link is-danger" type="button" data-delete-update-template="${template.id}">${customerUpdateIsLocalDraft(template) ? "Delete" : "Archive"}</button>
+            </div></td>
+          </tr>`).join("")}</tbody>
+        </table></div>` : `<div class="empty-state"><p>No tenant templates yet.</p><p>Add a general starting template or create one for this business.</p></div>`}
+      </section>
+    </div>`;
+
+  $("#addCustomerUpdateTemplate").onclick = () => showCustomerUpdateTemplateEditor();
+  $("#syncCustomerUpdateTemplates").onclick = async (event) => {
+    event.currentTarget.disabled = true;
+    try {
+      const result = await api("/api/customer-update-templates/sync", { method: "POST", body: {} });
+      toast(`Checked Meta — ${result.synced.length} template${result.synced.length === 1 ? "" : "s"} updated`);
+      customerUpdateTemplateSettingsView();
+    } catch (error) {
+      toast(error.message);
+      event.currentTarget.disabled = false;
+    }
+  };
+  document.querySelectorAll("[data-add-update-suggestion]").forEach((button) => {
+    button.onclick = async () => {
+      button.disabled = true;
+      try {
+        await api("/api/customer-update-templates", { method: "POST", body: { suggestion_key: button.dataset.addUpdateSuggestion } });
+        toast("Template draft added — review it before submitting to Meta");
+        customerUpdateTemplateSettingsView();
+      } catch (error) {
+        toast(error.message);
+        button.disabled = false;
+      }
+    };
+  });
+  document.querySelectorAll("[data-edit-update-template]").forEach((button) => {
+    button.onclick = () => showCustomerUpdateTemplateEditor(activeTemplates.find((template) => template.id === button.dataset.editUpdateTemplate));
+  });
+  document.querySelectorAll("[data-submit-update-template]").forEach((button) => {
+    button.onclick = async () => {
+      const template = activeTemplates.find((item) => item.id === button.dataset.submitUpdateTemplate);
+      if (data.readiness.utilityPermission === false) {
+        toast(`Reconnect ${data.page?.name || "the Facebook Page"} with Utility Messaging permission before submitting.`);
+        return;
+      }
+      const action = template?.status === "ERROR" ? "Retry submitting" : "Submit";
+      if (!template || !window.confirm(`${action} “${template.displayName}” v${template.version} to Meta for Utility Message approval? The submitted wording becomes locked; later edits create a new version.`)) return;
+      button.disabled = true;
+      try {
+        const result = await api(`/api/customer-update-templates/${template.id}/submit`, { method: "POST", body: {} });
+        toast(`Submitted to Meta — ${result.status}`);
+        customerUpdateTemplateSettingsView();
+      } catch (error) {
+        try {
+          await customerUpdateTemplateSettingsView();
+        } finally {
+          toast(error.message);
+        }
+      }
+    };
+  });
+  document.querySelectorAll("[data-delete-update-template]").forEach((button) => {
+    button.onclick = async () => {
+      const template = activeTemplates.find((item) => item.id === button.dataset.deleteUpdateTemplate);
+      if (!template) return;
+      const isLocalDraft = customerUpdateIsLocalDraft(template);
+      const verb = isLocalDraft ? "delete this local draft" : "archive this version in AIStaff";
+      if (!window.confirm(`Do you want to ${verb}? Historical delivery records and any template already held by Meta are preserved.`)) return;
+      await api(`/api/customer-update-templates/${template.id}`, { method: "DELETE" });
+      toast(isLocalDraft ? "Draft deleted" : "Template archived");
+      customerUpdateTemplateSettingsView();
+    };
+  });
+}
+
 async function settingsView(tab = "") {
+  if (tab === "channels") {
+    await window.channelsSettingsView();
+    return;
+  }
+  if (tab === "business-engines") {
+    await window.businessEnginesSettingsView();
+    return;
+  }
+  if (tab === "connections-actions") {
+    await window.connectionsActionsSettingsView();
+    return;
+  }
   if (tab === "facebook-page-connection") {
     await facebookPageConnectionView();
     return;
   }
   if (tab === "lead-qualification") {
     await leadQualificationSettingsView();
+    return;
+  }
+  if (tab === "customer-updates") {
+    await customerUpdateTemplateSettingsView();
     return;
   }
 
@@ -3241,8 +3843,8 @@ async function settingsView(tab = "") {
   $("#adminContent").innerHTML = `
     ${settingsTabs("")}
     <div class="settings-stack">
-      <section class="panel">
-        <h2>Company profile</h2>
+      <details class="panel settings-fold">
+        <summary><h2>Company profile</h2><span class="muted small">${escapeHtml(company.name || "")}</span></summary>
         <p class="muted settings-lede">How we identify your business, and who we speak to about the account.</p>
         <form id="companyForm" class="form-grid">
           ${field("name", "Company name", company.name)}
@@ -3253,9 +3855,9 @@ async function settingsView(tab = "") {
           ${field("contact_number", "Contact number", company.contact_number)}
           <button class="button button-primary full" type="submit">Save Company</button>
         </form>
-      </section>
-      <section class="panel">
-        <h2>AI and quotation settings</h2>
+      </details>
+      <details class="panel settings-fold">
+        <summary><h2>AI and quotation settings</h2><span class="muted small">replying, quotations, who gets alerts</span></summary>
         <p class="muted settings-lede">Grouped by what each control decides: how the agent replies, what it may do with quotations, and where alerts go.</p>
         <form id="settingsForm" class="form-grid">
           <p class="settings-group full">Replying</p>
@@ -3272,14 +3874,20 @@ async function settingsView(tab = "") {
           <label>Allow AI drafts<select name="allow_ai_quotation_drafts"><option value="true" ${settings.allow_ai_quotation_drafts ? "selected" : ""}>Yes</option><option value="false">No</option></select></label>
           <label>Allow auto-send<select name="allow_auto_send_quotation"><option value="false" ${!settings.allow_auto_send_quotation ? "selected" : ""}>No</option><option value="true">Yes</option></select></label>
 
-          <p class="settings-group full">Notifications</p>
-          ${field("notify_email", "Notify email", settings.notify_email)}
+          <p class="settings-group full">Who gets alerts</p>
+          <div class="full alert-contacts">
+            <p class="muted">These people are told at once when a customer request is saved, cannot be completed, or the customer is still waiting. Email now; the mobile number is used for SMS alerts.</p>
+            <div id="alertContactRows">${alertContactRowsHtml(settings)}</div>
+            <button class="button button-soft" type="button" id="addAlertContact">+ Add person</button>
+          </div>
           <button class="button button-primary full" type="submit">Save Settings</button>
         </form>
-      </section>
+      </details>
 
-      <section class="panel">
-        <h2>What your Closer knows and does</h2>
+      <details class="panel settings-fold" id="briefingSettingsFold"><summary><h2>Daily briefing report</h2><span class="muted small" id="briefingSummary"></span></summary><div id="briefingSettingsPanel"><p class="muted">Loading the daily briefing settings…</p></div></details>
+
+      <details class="panel settings-fold">
+        <summary><h2>What your Closer knows and does</h2><span class="muted small">read-only overview, including all instructions combined</span></summary>
         ${promptPreview ? `
           <p class="muted settings-lede">Built from your own setup, so it is always current. Read-only — change it by editing your Knowledge Base.</p>
 
@@ -3296,26 +3904,31 @@ async function settingsView(tab = "") {
             <ul class="closer-missing">${promptPreview.missing.map((m) => `<li>${escapeHtml(m.label)}${m.skipped ? ' <span class="muted">(you skipped this)</span>' : ""}</li>`).join("")}</ul>
             <p class="muted">A customer asking about any of these will be told someone will follow up. <a href="${adminPath("knowledge-base")}">Fill these in</a>.</p>` : ""}
 
+          ${Array.isArray(promptPreview.layers) && promptPreview.layers.length ? `
+            <p class="settings-group">All instructions Closer follows (combined, read-only)</p>
+            <p class="muted">In this order: your Closer instructions apply everywhere, then each Business Engine's, then the channel the customer is on. Change each one where it lives.</p>
+            <div class="closer-layers">${promptPreview.layers.map((layer, index) => `
+              <div class="closer-layer">
+                <div class="closer-layer-head"><b>${index + 1}. ${escapeHtml(layer.title)}</b>${layer.note ? ` <span class="muted small">(${escapeHtml(layer.note)})</span>` : ""} <a class="small" href="${escapeHtml(layer.edit || "/admin/settings")}">change</a></div>
+                <pre class="closer-layer-text">${escapeHtml(layer.text || "(none)")}</pre>
+              </div>`).join("")}</div>` : ""}
+
           ${promptPreview.openGaps ? `
             <div class="settings-warning"><b>${promptPreview.openGaps} question${promptPreview.openGaps === 1 ? "" : "s"} your customers actually asked</b> that Closer could not answer. <a href="${adminPath("knowledge-base")}">Answer them</a>.</div>` : ""}
         ` : `<p class="muted">Could not load this right now.</p>`}
-      </section>
+      </details>
 
-      <section class="panel">
-        <h2>Extra instructions for your Closer</h2>
-        <p class="muted settings-lede">Closer already knows how to sell from your knowledge base. Use this only to add house style — tone, what to emphasise, what to always mention.</p>
-        <div class="settings-warning">
-          <b>For advanced users.</b> These instructions are added to Closer's built-in rules, they do not replace them. Closer will still refuse to invent prices, confirm stock it cannot check, or promise anything outside your knowledge base — even if you ask it to here. Facts belong in the Knowledge Base, not in this box.
-        </div>
+      <details class="panel settings-fold" id="closer-instructions">
+        <summary><h2>Closer instructions</h2><span class="muted small">${settings.ai_custom_instructions ? "set" : "none yet"} · for every channel</span></summary>
+        <p class="muted settings-lede">Company identity and tone, and anything that applies to every conversation. Step-by-step work (service requests, bookings, orders) belongs in Business Engines; business facts belong in Knowledge Base.</p>
         <form id="closerInstructionsForm" class="form-grid">
-          <label class="full">Your additional instructions
-            <textarea name="ai_custom_instructions" rows="8" placeholder="Halimbawa: Laging banggitin na open kami ng Sunday. Address customers as 'po'. Wag masyadong pushy sa premium package.&#10;&#10;Write in English, Tagalog or Taglish — whichever is easier.">${escapeHtml(settings.ai_custom_instructions || "")}</textarea>
+          <label class="full">Company instructions
+            <textarea name="ai_custom_instructions" rows="6" placeholder="Example: When a customer gives a serial number, search it before asking for more details. Address customers as 'po'.">${escapeHtml(settings.ai_custom_instructions || "")}</textarea>
           </label>
           <button class="button button-primary" type="submit">Save instructions</button>
         </form>
         ${customHistory.revisions.length ? `
-          <h3 class="settings-group">Your changes (${customHistory.revisions.length})</h3>
-          <p class="muted">Every version you have saved. Roll back to put an earlier one live.</p>
+          <details class="settings-history-disclosure"><summary>Version history (${customHistory.revisions.length})</summary>
           <div class="table-wrap"><table>
             <thead><tr><th>Version</th><th>Saved</th><th>By</th><th>Preview</th><th>Actions</th></tr></thead>
             <tbody>${customHistory.revisions.map((r) => `<tr>
@@ -3328,15 +3941,25 @@ async function settingsView(tab = "") {
                 ${r.is_active ? "" : `<button type="button" class="intake-link" data-rollback-custom="${r.version}">Roll back</button>`}
               </td>
             </tr>`).join("")}</tbody>
-          </table></div>` : ""}
-      </section>
+          </table></div></details>` : ""}
+      </details>
       <section class="panel">
         <h2>Facebook Pages</h2>
         <div class="table-wrap"><table><thead><tr><th>Page</th><th>Page ID</th><th>Status</th></tr></thead><tbody>${pages.map((p) => `<tr><td>${p.page_name}</td><td>${p.page_id}</td><td>${statusPill(p.status)}</td></tr>`).join("")}</tbody></table></div>
-        <p class="muted">Use the Facebook Page Connection tab to authorize Facebook, list the Pages you manage, and connect the right Page without showing any access tokens in the dashboard.</p>
+        <p class="muted">Choose how this Page will be authorized. Open the connection screen when the Page administrator is using this device, or create a private one-time link for the client to open on their own device.</p>
         <div class="actions-row">
           <a class="button button-soft" href="${adminPath("settings", "facebook-page-connection")}">Open Facebook Page Connection</a>
+          ${state.user?.platform_role ? `
+            <button
+              class="button button-primary"
+              type="button"
+              id="createClientFacebookLinkBtn"
+              data-company-id="${escapeHtml(company.id)}"
+              data-company-name="${escapeHtml(company.name)}"
+            >Create client connection link</button>` : ""}
         </div>
+        ${state.user?.platform_role ? `
+          <p class="muted">The link is valid for 24 hours and can be used once. The client signs in to Facebook privately; never request their password or OTP. Creating a new link cancels any older unused link for this client.</p>` : ""}
       </section>
     </div>`;
   $("#companyForm").onsubmit = async (event) => {
@@ -3345,6 +3968,8 @@ async function settingsView(tab = "") {
     toast("Company saved");
   };
 
+  const previewBtn = $("#closerPromptPreviewBtn");
+  if (previewBtn) previewBtn.onclick = () => openCloserPromptPreview();
   const instructionsForm = $("#closerInstructionsForm");
   if (instructionsForm) {
     instructionsForm.onsubmit = async (event) => {
@@ -3376,15 +4001,72 @@ async function settingsView(tab = "") {
       };
     });
   }
+
+  const createClientFacebookLinkBtn = $("#createClientFacebookLinkBtn");
+  if (createClientFacebookLinkBtn) {
+    createClientFacebookLinkBtn.onclick = async () => {
+      const companyId = createClientFacebookLinkBtn.dataset.companyId;
+      const companyName = createClientFacebookLinkBtn.dataset.companyName || "this client";
+      const confirmed = window.confirm(
+        `Create a new Facebook connection link for ${companyName}?\n\n` +
+        "Any older unused connection link for this client will stop working."
+      );
+      if (!confirmed) return;
+      const businessMode = window.confirm(
+        "Connection type:\n\n" +
+        "OK = Business-owned (most durable). Only if the client's Page is inside THEIR OWN Facebook business portfolio and the person connecting is an admin of it.\n\n" +
+        "Cancel = Personal login (simplest, works for any Page admin). Can drop if that person's Facebook session is reset; AIStaff emails an alert if it does."
+      );
+
+      const originalText = createClientFacebookLinkBtn.textContent;
+      createClientFacebookLinkBtn.disabled = true;
+      createClientFacebookLinkBtn.textContent = "Creating link…";
+      try {
+        const result = await api(`/api/platform/customers/${companyId}/facebook-connection-invite`, {
+          method: "POST",
+          body: { mode: businessMode ? "business" : "personal" }
+        });
+        showFacebookInviteDialog(result);
+      } catch (error) {
+        toast(`Could not create the client connection link: ${error.message}`);
+      } finally {
+        createClientFacebookLinkBtn.disabled = false;
+        createClientFacebookLinkBtn.textContent = originalText;
+      }
+    };
+  }
+
   $("#settingsForm").onsubmit = async (event) => {
     event.preventDefault();
     const data = Object.fromEntries(new FormData(event.currentTarget));
     ["ai_enabled", "auto_reply_enabled", "business_hours_only", "human_handoff_enabled", "quotation_requires_admin_approval", "allow_ai_quotation_drafts", "allow_auto_send_quotation"].forEach((key) => {
       data[key] = data[key] === "true";
     });
-    await api("/api/settings", { method: "PUT", body: data });
-    toast("Settings saved");
+    data.alert_contacts = [...document.querySelectorAll("#alertContactRows .alert-contact-row")].map((row) => ({
+      name: row.querySelector('[data-alert="name"]').value,
+      email: row.querySelector('[data-alert="email"]').value,
+      phone: row.querySelector('[data-alert="phone"]').value,
+      daily_report: Boolean(row.querySelector('[data-alert="daily_report"]')?.checked)
+    }));
+    try {
+      await api("/api/settings", { method: "PUT", body: data });
+      toast("Settings saved");
+    } catch (error) { toast(error.message); }
   };
+  if (window.mountBriefingSettings) window.mountBriefingSettings();
+  const alertRows = $("#alertContactRows");
+  if (alertRows) {
+    $("#addAlertContact").onclick = () => {
+      alertRows.insertAdjacentHTML("beforeend", alertContactRowHtml());
+      alertRows.lastElementChild.querySelector("input").focus();
+    };
+    alertRows.onclick = (event) => {
+      const remove = event.target.closest(".alert-contact-remove");
+      if (!remove) return;
+      remove.closest(".alert-contact-row").remove();
+      if (!alertRows.children.length) alertRows.insertAdjacentHTML("beforeend", alertContactRowHtml());
+    };
+  }
 }
 
 async function paymentsView() {
@@ -3637,15 +4319,21 @@ if ($("#resetForm")) {
       });
       const json = await res.json();
       if (!json.ok) throw new Error(json.error || "Could not set your password.");
-      toast("Password saved. Please sign in.");
-      // Not signed in automatically: holding the emailed link proves control
-      // of the inbox, not of the password just chosen.
-      setTimeout(() => { location.href = adminPath("login"); }, 1200);
+      // The reset response also creates the authenticated session. Navigate
+      // immediately so the single-use token disappears from the address bar
+      // and a first-time customer continues onboarding without a second login.
+      btn.textContent = "Opening your account...";
+      location.replace(json.redirectTo || adminPath("dashboard"));
+      return;
     } catch (error) {
       toast(error.message);
     } finally {
-      btn.disabled = false;
-      btn.textContent = "Save password";
+      // On success location.replace() is already navigating away. Keep the
+      // form locked so a slow browser cannot submit the consumed token again.
+      if (!btn.textContent.includes("Opening")) {
+        btn.disabled = false;
+        btn.textContent = "Save password";
+      }
     }
   };
 }
@@ -3682,6 +4370,23 @@ if ($("#adminNav")) {
     if (event.target.closest("a")) closeAdminMenu();
   });
 }
+// Keep navigation inside the admin app. Without this, every sidebar or admin
+// link reloads the shared HTML document, briefly exposing the public homepage
+// before the session check finishes.
+document.addEventListener("click", (event) => {
+  if (event.defaultPrevented || event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
+  const link = event.target.closest("a[href]");
+  if (!link || link.hasAttribute("download")) return;
+  if (link.target && link.target !== "_self") return;
+
+  const url = new URL(link.href, window.location.href);
+  if (url.origin !== window.location.origin || !url.pathname.startsWith("/admin")) return;
+
+  event.preventDefault();
+  history.pushState(null, "", `${url.pathname}${url.search}${url.hash}`);
+  closeAdminMenu();
+  routeHandler();
+});
 document.addEventListener("click", (event) => {
   const app = $("#adminApp");
   if (!app || !app.classList.contains("menu-open")) return;
@@ -3709,16 +4414,28 @@ async function pitchStudioView() {
   const svc = state.services;
 
   const dot = (ok) => `<span style="color:${ok ? "#3ecf8e" : "#e05252"}">●</span>`;
-  const langForVoice = (key) => {
-    if (String(key || "").startsWith("gab_taglish_")) return "fil_PH";
-    const m = String(key || "").match(/^([a-z]{2}_[A-Z]{2})-/);
-    return m ? m[1] : "en_US";
-  };
-  const selectedLang = langForVoice(cfg.local.piperVoice);
-  const langOpts = state.languages.map((l) =>
-    `<option value="${l.code}"${l.code === selectedLang ? " selected" : ""}>${escapeHtml(l.name)} — ${l.code} (${l.voices})</option>`).join("");
-  const whisperOpts = state.whisperModels.map((m) =>
-    `<option value="${m.name}"${m.name === cfg.local.whisperModel ? " selected" : ""}>${m.name} (${m.sizeMB} MB)</option>`).join("");
+  const stackOptions = state.options || {};
+  const selectOptions = (rows, selected) => (rows || []).map((row) => {
+    const value = row.value ?? row.key;
+    return `<option value="${escapeHtml(value)}"${value === selected ? " selected" : ""}>${escapeHtml(row.label || row.name || value)}</option>`;
+  }).join("");
+  const asrModelOpts = selectOptions(stackOptions.asrModels, cfg.local.whisperModel);
+  const asrLanguageOpts = selectOptions(stackOptions.asrLanguages, cfg.local.whisperLanguage);
+  const llmModelOpts = selectOptions(stackOptions.llmModels, cfg.local.qwenModel);
+  const ttsEngineOpts = selectOptions(stackOptions.ttsEngines, cfg.local.ttsEngine);
+  const piperVoiceOpts = selectOptions(stackOptions.piperVoices, cfg.local.piperVoice);
+  const pitchSvc = svc.pitch || { up: Boolean(svc.pitchPid), pid: svc.pitchPid || null };
+  const asrSvc = svc.asr || { up: Boolean(svc.whisper), label: "whisper.cpp", port: 8080 };
+  const llmSvc = svc.llm || { up: false, label: "Local LLM", port: null };
+  const piperSvc = svc.piper && typeof svc.piper === "object"
+    ? svc.piper : { up: Boolean(svc.piper), label: "Piper", port: 9891 };
+  const tunable = (id, label, value, min, max, step, unit = "") => `
+    <label>${label} <span class="muted" id="${id}Val">${value}${unit}</span>
+      <input type="range" id="${id}" min="${min}" max="${max}" step="${step}" value="${value}">
+    </label>
+    <label>${label} exact
+      <input type="number" id="${id}Input" min="${min}" max="${max}" step="${step}" value="${value}">
+    </label>`;
   const modelListOptions = (list, selected) => {
     const rows = [...(list || [])];
     if (selected && !rows.some((m) => m.model === selected)) rows.unshift({ model: selected, label: "Saved custom" });
@@ -3763,16 +4480,17 @@ async function pitchStudioView() {
           <button class="button button-soft" id="pitchRefresh">Refresh</button>
         </div>
         <p class="muted">
-          ${dot(!!svc.pitchPid)} Pitch ${svc.pitchPid ? `(pid ${svc.pitchPid})` : "not running"}${state.runningPipeline ? ` — answering with <b>${PIPE_LABEL[state.runningPipeline]}</b>` : ""} &nbsp;·&nbsp;
-          ${dot(svc.whisper)} whisper.cpp :8080 &nbsp;·&nbsp;
-          ${dot(svc.piper)} Piper :9891
+          ${dot(pitchSvc.up)} Pitch ${pitchSvc.pid ? `(pid ${pitchSvc.pid})` : "not running"}${state.runningPipeline ? ` — answering with <b>${PIPE_LABEL[state.runningPipeline]}</b>` : ""} &nbsp;·&nbsp;
+          ${dot(asrSvc.up)} ${escapeHtml(asrSvc.label || "Qwen3-ASR")} :${asrSvc.port || 8190} &nbsp;·&nbsp;
+          ${dot(llmSvc.up)} ${escapeHtml(llmSvc.label || "SEA-LION")} :${llmSvc.port || 8090} &nbsp;·&nbsp;
+          ${dot(piperSvc.up)} ${escapeHtml(piperSvc.label || "Piper")} :${piperSvc.port || 5001}
         </p>
         <p class="muted" style="font-size:12px">Settings file: <code>${escapeHtml(state.configPath)}</code>${cfg.updatedAt ? ` · saved ${new Date(cfg.updatedAt).toLocaleString()}` : ""}</p>
       </section>
 
       <section class="panel">
         <div class="panel-header"><h2>Pipeline</h2></div>
-        <p class="muted settings-lede">Which engine answers calls. Live engines are speech-to-speech. Local runs whisper &rarr; selected text brain &rarr; Piper; Piper speaks only the selected voice language.</p>
+        <p class="muted settings-lede">Which engine answers calls. Local Stack 4 runs Qwen3-ASR &rarr; SEA-LION &rarr; Piper epoch 180. Gemini Live and OpenAI Realtime remain fallbacks.</p>
         <table class="data-table">
           <thead><tr><th></th><th>Pipeline</th><th>TTS cost / call</th><th>Latency</th><th>Taglish</th><th>Emotion</th></tr></thead>
           <tbody>
@@ -3788,8 +4506,8 @@ async function pitchStudioView() {
             </tr>
             <tr>
               <td><input type="radio" name="pipeline" value="local" id="pipeLocal"${cfg.pipeline === "local" ? " checked" : ""}></td>
-              <td><label for="pipeLocal"><b>3 — Local (Piper)</b><br><span class="muted">standard tier</span></label></td>
-              <td>≈ ₱0.02</td><td>~1.3 s</td><td>Voice language only</td><td>Speaker slots</td>
+              <td><label for="pipeLocal"><b>3 — Local Stack 4</b><br><span class="muted">Qwen3-ASR · SEA-LION · Piper</span></label></td>
+              <td>local compute</td><td>measured live</td><td>Taglish</td><td>Piper voice</td>
             </tr>
           </tbody>
         </table>
@@ -3824,38 +4542,60 @@ async function pitchStudioView() {
       </section>
 
       <section class="panel" id="piperPanel">
-        <div class="panel-header"><h2>Local Piper</h2></div>
+        <div class="panel-header"><h2>Local Stack 4</h2></div>
+        <h3>Business identity</h3>
         <div class="form-grid">
-          <label>Text brain<select id="localBrainProvider">
-            <option value="gemini"${cfg.local.brainProvider !== "openai" ? " selected" : ""}>Gemini</option>
-            <option value="openai"${cfg.local.brainProvider === "openai" ? " selected" : ""}>OpenAI</option>
-          </select></label>
-          <label>Gemini brain model<input list="localGeminiModelList" id="localGeminiTextModel" value="${escapeHtml(cfg.local.geminiTextModel || "")}" maxlength="120"></label>
-          <datalist id="localGeminiModelList">${localGeminiModelOpts}</datalist>
-          <label>OpenAI brain model<input list="localOpenAiModelList" id="localOpenAiTextModel" value="${escapeHtml(cfg.local.openaiTextModel || "")}" maxlength="120"></label>
-          <datalist id="localOpenAiModelList">${localOpenAiModelOpts}</datalist>
-          <label>Language<select id="voiceLang">${langOpts}</select></label>
-          <label>Gender<select id="voiceGender">
-            <option value="" selected>All</option>
-            <option value="female">Female</option>
-            <option value="male">Male</option>
-          </select></label>
-          <label>Whisper model<select id="whisperModel">${whisperOpts}</select></label>
-          <label>Speech rate <span class="muted" id="lsVal">${cfg.local.piperLengthScale}</span>
-            <input type="range" id="lengthScale" min="0.6" max="1.6" step="0.05" value="${cfg.local.piperLengthScale}">
-          </label>
-          <label>Volume <span class="muted" id="volVal">${cfg.local.piperVolumeDb ?? -5} dB</span>
-            <input type="range" id="volumeDb" min="-12" max="3" step="1" value="${cfg.local.piperVolumeDb ?? -5}">
-          </label>
-          <label>Greeting delay <span class="muted" id="greetingDelayVal">${cfg.local.greetingStartDelayMs ?? 250} ms</span>
-            <input type="range" id="greetingStartDelayMs" min="0" max="1000" step="50" value="${cfg.local.greetingStartDelayMs ?? 250}">
-          </label>
+          <label>Business name<input type="text" id="businessName" value="${escapeHtml(cfg.business?.name || "AIStaff")}" maxlength="100"></label>
+          <label>Agent name<input type="text" id="agentName" value="${escapeHtml(cfg.business?.agentName || "Pitch")}" maxlength="60"></label>
+        </div>
+
+        <h3 style="margin-top:24px">STT settings</h3>
+        <div class="form-grid">
+          <label>Engine<select id="asrEngine"><option value="qwen3-asr">Qwen3-ASR</option></select></label>
+          <label>Model<select id="asrModel">${asrModelOpts || `<option value="${escapeHtml(cfg.local.whisperModel || "Qwen3-ASR-0.6B")}">${escapeHtml(cfg.local.whisperModel || "Qwen3-ASR-0.6B")}</option>`}</select></label>
+          <label>Language mode<select id="asrLanguage">${asrLanguageOpts}</select></label>
+          <label>ASR endpoint<input type="url" id="asrUrl" value="${escapeHtml(cfg.local.asrUrl || "http://127.0.0.1:8190/inference")}"></label>
+          <label class="full">ASR context<textarea id="asrContext" rows="2" maxlength="500">${escapeHtml(cfg.local.asrContext || "")}</textarea></label>
+        </div>
+
+        <h3 style="margin-top:24px">Silero VAD settings</h3>
+        <div class="form-grid">
+          ${tunable("vadPositiveSpeechThreshold", "Positive speech threshold", cfg.local.vadPositiveSpeechThreshold ?? 0.5, 0.05, 0.99, 0.01)}
+          ${tunable("vadNegativeSpeechThreshold", "Negative speech threshold", cfg.local.vadNegativeSpeechThreshold ?? 0.35, 0.01, 0.98, 0.01)}
+          ${tunable("vadMinSpeechMsSilero", "Minimum speech", cfg.local.vadMinSpeechMsSilero ?? 256, 32, 5000, 32, " ms")}
+          ${tunable("vadPreSpeechPadMs", "Pre-speech padding", cfg.local.vadPreSpeechPadMs ?? 640, 0, 3000, 32, " ms")}
+          ${tunable("vadRedemptionMs", "End-of-turn silence", cfg.local.vadRedemptionMs ?? 2000, 100, 10000, 100, " ms")}
+          ${tunable("vadMaxSpeechMs", "Maximum utterance", cfg.local.vadMaxSpeechMs ?? 12000, 1000, 60000, 500, " ms")}
+          ${tunable("minUtteranceRmsDb", "Minimum utterance RMS", cfg.local.minUtteranceRmsDb ?? 50, 0, 100, 1)}
+          ${tunable("vadBargeInThreshold", "Barge-in threshold", cfg.local.vadBargeInThreshold ?? 0.35, 0.05, 0.99, 0.01)}
+          ${tunable("vadBargeInSustainMs", "Barge-in sustain", cfg.local.vadBargeInSustainMs ?? 120, 32, 2000, 16, " ms")}
+        </div>
+
+        <h3 style="margin-top:24px">LLM settings</h3>
+        <div class="form-grid">
+          <label>Provider<select id="localBrainProvider"><option value="qwen">Local llama.cpp</option></select></label>
+          <label>Model<select id="qwenModel">${llmModelOpts || `<option value="${escapeHtml(cfg.local.qwenModel || "sealion")}">${escapeHtml(cfg.local.qwenModel || "sealion")}</option>`}</select></label>
+          <label>LLM endpoint<input type="url" id="qwenApiUrl" value="${escapeHtml(cfg.local.qwenApiUrl || "http://127.0.0.1:8090/v1/chat/completions")}"></label>
+          ${tunable("temperature", "Temperature", cfg.local.temperature ?? 0.3, 0, 2, 0.05)}
+          ${tunable("maxOutputTokens", "Maximum output tokens", cfg.local.maxOutputTokens ?? 90, 40, 512, 1)}
+          ${tunable("historyTurns", "Conversation history", cfg.local.historyTurns ?? 6, 2, 20, 1, " turns")}
+          ${tunable("requestTimeoutMs", "Request timeout", cfg.local.requestTimeoutMs ?? 20000, 1000, 120000, 1000, " ms")}
+        </div>
+
+        <h3 style="margin-top:24px">TTS settings</h3>
+        <div class="form-grid">
+          <label>Engine<select id="ttsEngine">${ttsEngineOpts || `<option value="piper">Piper</option>`}</select></label>
+          <label>ONNX voice<select id="piperVoice">${piperVoiceOpts || `<option value="${escapeHtml(cfg.local.piperVoice || "")}">${escapeHtml(cfg.local.piperVoice || "No model found")}</option>`}</select></label>
+          <label>Piper endpoint<input type="url" id="piperUrl" value="${escapeHtml(cfg.local.piperUrl || "http://127.0.0.1:5001/synthesize")}"></label>
+          <label>Speaker ID<input type="number" id="piperSpeakerId" min="0" max="999" step="1" value="${cfg.local.piperSpeakerId ?? ""}" placeholder="Single-speaker model"></label>
+          ${tunable("piperLengthScale", "Length scale", cfg.local.piperLengthScale ?? 1, 0.6, 1.6, 0.05)}
+          ${tunable("piperNoiseScale", "Noise scale", cfg.local.piperNoiseScale ?? 0.667, 0, 2, 0.01)}
+          ${tunable("piperVolumeDb", "Volume", cfg.local.piperVolumeDb ?? -4, -18, 6, 1, " dB")}
+          ${tunable("greetingStartDelayMs", "Greeting delay", cfg.local.greetingStartDelayMs ?? 250, 0, 3000, 50, " ms")}
           <label class="full">Opening greeting
             <textarea id="greetingText" rows="3" maxlength="500">${escapeHtml(cfg.local.greetingText || "Hello, this is Pitch, your AI sales and support staff. How can I help you today?")}</textarea>
           </label>
         </div>
-        ${openAiModelNote}
-        <div id="voiceList" class="muted" style="margin-top:14px">Loading voices…</div>
       </section>
 
       <section class="panel" id="previewPanel">
@@ -3928,72 +4668,36 @@ async function pitchStudioView() {
       </section>
     </div>`;
 
-  let selectedVoice = cfg.local.piperVoice;
-
-  async function loadVoices() {
-    const lang = $("#voiceLang").value;
-    const gender = $("#voiceGender").value;
-    const q = new URLSearchParams({ language: lang });
-    if (gender) q.set("gender", gender);
-    const { voices } = await api(`/api/pitch-admin/voices?${q}`);
-    if (!voices.length) {
-      $("#voiceList").innerHTML = `<p class="muted">No voices for this filter.</p>`;
-      return;
-    }
-    $("#voiceList").innerHTML = `
-      <table class="data-table">
-        <thead><tr><th></th><th>Voice</th><th>Quality</th><th>Gender</th><th>Speakers</th><th></th></tr></thead>
-        <tbody>${voices.map((v) => `
-          <tr>
-            <td><input type="radio" name="voice" value="${v.key}"${v.key === selectedVoice ? " checked" : ""}${v.installed ? "" : " disabled"}></td>
-            <td>${escapeHtml(v.name)}<br><span class="muted" style="font-size:11px">${v.key}</span></td>
-            <td>${v.quality}</td>
-            <td>${v.gender}</td>
-            <td>${v.numSpeakers > 1 ? v.numSpeakers : "—"}</td>
-            <td>${v.installed
-              ? `<button class="button button-soft" data-play="${v.key}">Listen</button>`
-              : v.custom
-                ? `<span class="muted">Restore model</span>`
-              : `<button class="button button-soft" data-install="${v.key}">Download</button>`}</td>
-          </tr>`).join("")}
-        </tbody>
-      </table>`;
-
-    $("#voiceList").querySelectorAll('input[name="voice"]').forEach((el) => {
-      el.onchange = () => { selectedVoice = el.value; };
-    });
-    $("#voiceList").querySelectorAll("[data-play]").forEach((b) => {
-      b.onclick = () => playPreview(b.dataset.play);
-    });
-    $("#voiceList").querySelectorAll("[data-install]").forEach((b) => {
-      b.onclick = async () => {
-        b.disabled = true; b.textContent = "Downloading…";
-        try {
-          await api(`/api/pitch-admin/voices/${b.dataset.install}/install`, { method: "POST" });
-          toast(`${b.dataset.install} installed`);
-          await loadVoices();
-        } catch (e) { toast(`Download failed: ${e.message}`); b.disabled = false; b.textContent = "Download"; }
-      };
-    });
-  }
-
-  async function playPreview(voice) {
+  async function playPreview() {
     const meta = $("#previewMeta");
     meta.textContent = "synthesizing…";
     try {
-      const r = await api("/api/pitch-admin/preview", {
+      const response = await fetch("/api/pitch-admin/preview", {
         method: "POST",
-        body: {
-          voice: voice || selectedVoice,
+        credentials: "include",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          voice: $("#piperVoice").value,
           text: $("#previewText").value,
-          lengthScale: Number($("#lengthScale").value),
-        },
+          speakerId: $("#piperSpeakerId").value || null,
+          lengthScale: Number($("#piperLengthScale").value),
+          noiseScale: Number($("#piperNoiseScale").value),
+          volumeDb: Number($("#piperVolumeDb").value),
+        }),
       });
+      if (!response.ok) {
+        const error = await response.json().catch(() => ({ error: response.statusText }));
+        throw new Error(error.error || "Preview failed");
+      }
+      const blob = await response.blob();
       const audio = $("#previewAudio");
+      if (audio.dataset.objectUrl) URL.revokeObjectURL(audio.dataset.objectUrl);
+      const objectUrl = URL.createObjectURL(blob);
+      audio.dataset.objectUrl = objectUrl;
       audio.hidden = false;
-      audio.src = r.url;
+      audio.src = objectUrl;
       audio.play();
-      meta.textContent = `${r.voice} · ${r.ms} ms`;
+      meta.textContent = `${response.headers.get("x-piper-voice") || $("#piperVoice").value} · ${response.headers.get("x-preview-ms") || "?"} ms`;
     } catch (e) { meta.textContent = `failed: ${e.message}`; }
   }
 
@@ -4083,17 +4787,40 @@ async function pitchStudioView() {
         model: $("#openaiRealtimeModel").value,
         voice: $("#openaiRealtimeVoice").value,
       },
+      business: {
+        name: $("#businessName").value,
+        agentName: $("#agentName").value,
+      },
       local: {
-        brainProvider: $("#localBrainProvider").value,
-        geminiTextModel: $("#localGeminiTextModel").value,
-        openaiTextModel: $("#localOpenAiTextModel").value,
-        ttsEngine: "piper",
-        piperVoice: selectedVoice,
-        whisperModel: $("#whisperModel").value,
-        piperLengthScale: Number($("#lengthScale").value),
-        piperVolumeDb: Number($("#volumeDb").value),
+        brainProvider: "qwen",
+        asrUrl: $("#asrUrl").value,
+        asrContext: $("#asrContext").value,
+        whisperModel: $("#asrModel").value,
+        whisperLanguage: $("#asrLanguage").value,
+        qwenApiUrl: $("#qwenApiUrl").value,
+        qwenModel: $("#qwenModel").value,
+        ttsEngine: $("#ttsEngine").value,
+        piperUrl: $("#piperUrl").value,
+        piperVoice: $("#piperVoice").value,
+        piperSpeakerId: $("#piperSpeakerId").value || null,
+        piperLengthScale: Number($("#piperLengthScale").value),
+        piperNoiseScale: Number($("#piperNoiseScale").value),
+        piperVolumeDb: Number($("#piperVolumeDb").value),
         greetingText: $("#greetingText").value,
         greetingStartDelayMs: Number($("#greetingStartDelayMs").value),
+        temperature: Number($("#temperature").value),
+        maxOutputTokens: Number($("#maxOutputTokens").value),
+        historyTurns: Number($("#historyTurns").value),
+        requestTimeoutMs: Number($("#requestTimeoutMs").value),
+        vadPositiveSpeechThreshold: Number($("#vadPositiveSpeechThreshold").value),
+        vadNegativeSpeechThreshold: Number($("#vadNegativeSpeechThreshold").value),
+        vadMinSpeechMsSilero: Number($("#vadMinSpeechMsSilero").value),
+        vadPreSpeechPadMs: Number($("#vadPreSpeechPadMs").value),
+        vadRedemptionMs: Number($("#vadRedemptionMs").value),
+        vadMaxSpeechMs: Number($("#vadMaxSpeechMs").value),
+        vadBargeInThreshold: Number($("#vadBargeInThreshold").value),
+        vadBargeInSustainMs: Number($("#vadBargeInSustainMs").value),
+        minUtteranceRmsDb: Number($("#minUtteranceRmsDb").value),
       },
     };
   }
@@ -4102,18 +4829,22 @@ async function pitchStudioView() {
     await api("/api/pitch-admin/config", { method: "PUT", body: collect() });
   }
 
-  $("#voiceLang").onchange = loadVoices;
-  $("#voiceGender").onchange = loadVoices;
-  $("#localBrainProvider").onchange = () => {
-    const useOpenAi = $("#localBrainProvider").value === "openai";
-    $("#localGeminiTextModel").closest("label").hidden = useOpenAi;
-    $("#localOpenAiTextModel").closest("label").hidden = !useOpenAi;
+  const tunables = {
+    vadPositiveSpeechThreshold: "", vadNegativeSpeechThreshold: "", vadMinSpeechMsSilero: " ms",
+    vadPreSpeechPadMs: " ms", vadRedemptionMs: " ms", vadMaxSpeechMs: " ms",
+    minUtteranceRmsDb: "", vadBargeInThreshold: "", vadBargeInSustainMs: " ms",
+    temperature: "", maxOutputTokens: "", historyTurns: " turns", requestTimeoutMs: " ms",
+    piperLengthScale: "", piperNoiseScale: "", piperVolumeDb: " dB", greetingStartDelayMs: " ms",
   };
-  $("#localBrainProvider").onchange();
-  $("#lengthScale").oninput = () => { $("#lsVal").textContent = $("#lengthScale").value; };
-  $("#volumeDb").oninput = () => { $("#volVal").textContent = `${$("#volumeDb").value} dB`; };
-  $("#greetingStartDelayMs").oninput = () => { $("#greetingDelayVal").textContent = `${$("#greetingStartDelayMs").value} ms`; };
-  $("#previewBtn").onclick = () => playPreview(selectedVoice);
+  Object.entries(tunables).forEach(([id, unit]) => {
+    const range = $(`#${id}`);
+    const input = $(`#${id}Input`);
+    const value = $(`#${id}Val`);
+    const sync = (source, target) => { target.value = source.value; value.textContent = `${source.value}${unit}`; };
+    range.oninput = () => sync(range, input);
+    input.oninput = () => sync(input, range);
+  });
+  $("#previewBtn").onclick = playPreview;
   $("#pitchRefresh").onclick = () => pitchStudioView();
   $("#tabCloser").onclick = () => aiStudioView();
   $("#tabPitch").onclick = () => pitchStudioView();
@@ -4133,9 +4864,11 @@ async function pitchStudioView() {
       const poll = setInterval(async () => {
         waited += 5;
         const s = await api("/api/pitch-admin/");
-        if (s.services.pitchPid && (s.config.pipeline !== "local" || (s.services.piper && s.services.whisper))) {
+        const pitch = s.services.pitch || { up: Boolean(s.services.pitchPid), pid: s.services.pitchPid };
+        const localReady = s.services.asr?.up && s.services.llm?.up && s.services.piper?.up;
+        if (pitch.up && (s.config.pipeline !== "local" || localReady)) {
           clearInterval(poll);
-          status.textContent = `ready (pid ${s.services.pitchPid})`;
+          status.textContent = `ready (pid ${pitch.pid})`;
           setTimeout(() => pitchStudioView(), 1200);
         } else if (waited > 75) {
           clearInterval(poll);
@@ -4146,6 +4879,4 @@ async function pitchStudioView() {
       }, 5000);
     } catch (e) { status.textContent = `failed: ${e.message}`; }
   };
-
-  await loadVoices();
 }

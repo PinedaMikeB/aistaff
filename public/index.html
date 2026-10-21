@@ -3,6 +3,60 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <script>
+      // The public website and admin app share this HTML file. Mark admin
+      // routes before the first paint so the marketing homepage can never
+      // appear while the authenticated app is starting.
+      if (window.location.pathname.startsWith('/admin')) {
+        document.documentElement.classList.add('admin-route-booting');
+      }
+    </script>
+    <style>
+      .admin-boot-screen { display: none; }
+      html.admin-route-booting { background: #f6f3ff; }
+      html.admin-route-booting body {
+        min-height: 100vh;
+        margin: 0;
+        background: #f6f3ff;
+      }
+      html.admin-route-booting [data-public],
+      html.admin-route-booting #publicSite,
+      html.admin-route-booting #site-footer-root {
+        display: none !important;
+      }
+      html.admin-route-booting .admin-boot-screen {
+        position: fixed;
+        inset: 0;
+        z-index: 10000;
+        display: grid;
+        place-items: center;
+        color: #242330;
+        background: #f6f3ff;
+      }
+      .admin-boot-card {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding: 14px 18px;
+        border: 1px solid #ded8f4;
+        border-radius: 14px;
+        background: #fff;
+        box-shadow: 0 10px 30px rgba(44, 35, 84, 0.08);
+        font: 700 14px/1.2 Manrope, sans-serif;
+      }
+      .admin-boot-spinner {
+        width: 16px;
+        height: 16px;
+        border: 2px solid #d9d2f2;
+        border-top-color: #635bdf;
+        border-radius: 50%;
+        animation: admin-boot-spin 0.7s linear infinite;
+      }
+      @keyframes admin-boot-spin { to { transform: rotate(360deg); } }
+      @media (prefers-reduced-motion: reduce) {
+        .admin-boot-spinner { animation: none; border-top-color: #d9d2f2; }
+      }
+    </style>
     <title>AI Agents for Sales, Calls & Marketing | AIStaff</title>
     <meta name="description" content="AIStaff is a connected AI workforce for chat sales, voice calls, marketing, and Facebook advertising. Meet specialized AI agents built to help your business grow." />
     <link rel="canonical" href="https://aistaff.click/" />
@@ -22,9 +76,12 @@
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@500;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet" />
-    <link rel="stylesheet" href="/style.css" />
+    <link rel="stylesheet" href="/style.css?v=20261020-fold" />
   </head>
   <body>
+    <div id="adminBootScreen" class="admin-boot-screen" role="status" aria-live="polite">
+      <div class="admin-boot-card"><span class="admin-boot-spinner" aria-hidden="true"></span><span>Opening AIStaff…</span></div>
+    </div>
     <div id="toast" class="toast" hidden></div>
 
     <header class="site-header cinematic-header" data-public>
@@ -171,6 +228,12 @@
     <script src="/intake-wizard.js"></script>
     <script src="/closer-status.js"></script>
     <script src="/platform.js"></script>
-    <script src="/app.js"></script>
+    <script src="/integrations-settings.js?v=20261014-manual-action-tests"></script>
+    <script src="/business-engines-settings.js?v=20261020-feedback"></script>
+    <script src="/channels-settings.js?v=20261020-widget"></script>
+    <script src="/briefing-settings.js?v=20261020-fold"></script>
+    <script src="/scheduling-settings.js?v=20261020-disclose"></script>
+    <script src="/feedback-settings.js?v=20261020-jobs"></script>
+    <script src="/app.js?v=20261020-fold"></script>
   <script src="/js/site-footer.js" defer></script></body>
 </html>
