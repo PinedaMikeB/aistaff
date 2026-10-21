@@ -3710,15 +3710,14 @@ async function pitchStudioView() {
 
   const dot = (ok) => `<span style="color:${ok ? "#3ecf8e" : "#e05252"}">●</span>`;
   const langForVoice = (key) => {
-    if (String(key || "").startsWith("gab_taglish_")) return "fil_PH";
+    if (/^(gab_taglish_|zonos1110_)/.test(String(key || ""))) return "fil_PH";
+    if (String(key || "").startsWith("irenz_")) return "en_US";
     const m = String(key || "").match(/^([a-z]{2}_[A-Z]{2})-/);
     return m ? m[1] : "en_US";
   };
   const selectedLang = langForVoice(cfg.local.piperVoice);
   const langOpts = state.languages.map((l) =>
     `<option value="${l.code}"${l.code === selectedLang ? " selected" : ""}>${escapeHtml(l.name)} — ${l.code} (${l.voices})</option>`).join("");
-  const whisperOpts = state.whisperModels.map((m) =>
-    `<option value="${m.name}"${m.name === cfg.local.whisperModel ? " selected" : ""}>${m.name} (${m.sizeMB} MB)</option>`).join("");
   const modelListOptions = (list, selected) => {
     const rows = [...(list || [])];
     if (selected && !rows.some((m) => m.model === selected)) rows.unshift({ model: selected, label: "Saved custom" });
@@ -3728,16 +3727,24 @@ async function pitchStudioView() {
   const pitchModels = state.pitchModels || {};
   const geminiLiveModelOpts = modelListOptions(pitchModels.geminiLive, cfg.geminiLive?.model);
   const openaiRealtimeModelOpts = modelListOptions(pitchModels.openaiRealtime, cfg.openaiRealtime?.model);
-  const localGeminiModelOpts = modelListOptions(pitchModels.localText?.gemini, cfg.local.geminiTextModel);
-  const localOpenAiModelOpts = modelListOptions(pitchModels.localText?.openai, cfg.local.openaiTextModel);
   const openAiModelFetch = state.modelFetch?.openai;
   const openAiModelNote = openAiModelFetch
     ? `<p class="muted" style="font-size:12px;margin-top:8px">${openAiModelFetch.live
       ? `OpenAI models loaded from your API key.`
       : `Using fallback OpenAI suggestions: ${escapeHtml(openAiModelFetch.error || "model list unavailable")}`}</p>`
     : "";
+  const rangeSetting = (label, id, value, min, max, step, unit = "") => `
+    <label>${label}
+      <span style="display:grid;grid-template-columns:minmax(0,1fr) 112px;gap:10px;align-items:center;margin-top:6px">
+        <input type="range" id="${id}Range" min="${min}" max="${max}" step="${step}" value="${value}">
+        <span style="display:flex;align-items:center;gap:5px">
+          <input type="number" id="${id}" min="${min}" max="${max}" step="${step}" value="${value}" style="min-width:0">
+          ${unit ? `<span class="muted">${unit}</span>` : ""}
+        </span>
+      </span>
+    </label>`;
 
-  const PIPE_LABEL = { "gemini-live": "Gemini Live", "openai-realtime": "OpenAI Realtime", local: "Local (Piper)" };
+  const PIPE_LABEL = { "gemini-live": "Gemini Live", "openai-realtime": "OpenAI Realtime", local: "Stack 4 Local Taglish" };
   const drifted = state.runningPipeline && state.runningPipeline !== cfg.pipeline;
   const driftBanner = drifted ? `
       <section class="panel" style="border-left:4px solid #e0a33e;background:#fffaf0">
@@ -3764,15 +3771,16 @@ async function pitchStudioView() {
         </div>
         <p class="muted">
           ${dot(!!svc.pitchPid)} Pitch ${svc.pitchPid ? `(pid ${svc.pitchPid})` : "not running"}${state.runningPipeline ? ` — answering with <b>${PIPE_LABEL[state.runningPipeline]}</b>` : ""} &nbsp;·&nbsp;
-          ${dot(svc.whisper)} whisper.cpp :8080 &nbsp;·&nbsp;
-          ${dot(svc.piper)} Piper :9891
+          ${dot(svc.qwenAsr)} Qwen3-ASR :8190 &nbsp;·&nbsp;
+          ${dot(svc.seaLion)} SEA-LION :8090 &nbsp;·&nbsp;
+          ${dot(svc.piper)} Piper :5001
         </p>
         <p class="muted" style="font-size:12px">Settings file: <code>${escapeHtml(state.configPath)}</code>${cfg.updatedAt ? ` · saved ${new Date(cfg.updatedAt).toLocaleString()}` : ""}</p>
       </section>
 
       <section class="panel">
         <div class="panel-header"><h2>Pipeline</h2></div>
-        <p class="muted settings-lede">Which engine answers calls. Live engines are speech-to-speech. Local runs whisper &rarr; selected text brain &rarr; Piper; Piper speaks only the selected voice language.</p>
+        <p class="muted settings-lede">Choose the local Taglish stack or either cloud speech-to-speech fallback.</p>
         <table class="data-table">
           <thead><tr><th></th><th>Pipeline</th><th>TTS cost / call</th><th>Latency</th><th>Taglish</th><th>Emotion</th></tr></thead>
           <tbody>
@@ -3788,16 +3796,11 @@ async function pitchStudioView() {
             </tr>
             <tr>
               <td><input type="radio" name="pipeline" value="local" id="pipeLocal"${cfg.pipeline === "local" ? " checked" : ""}></td>
-              <td><label for="pipeLocal"><b>3 — Local (Piper)</b><br><span class="muted">standard tier</span></label></td>
-              <td>≈ ₱0.02</td><td>~1.3 s</td><td>Voice language only</td><td>Speaker slots</td>
+              <td><label for="pipeLocal"><b>3 — Stack 4 Local Taglish</b><br><span class="muted">Qwen3-ASR + SEA-LION + Piper</span></label></td>
+              <td>Local</td><td>~1–3 s</td><td>Tagalog / Taglish / English</td><td>Trained voice</td>
             </tr>
           </tbody>
         </table>
-        <label class="full" style="margin-top:14px">
-          <input type="checkbox" id="bargeIn"${cfg.bargeInEnabled ? " checked" : ""}>
-          Barge-in — let the caller interrupt the agent mid-sentence
-        </label>
-        <p class="muted" style="font-size:12px">Turning this off stops mid-sentence cut-offs. Endpoint detection stays on either way; the local pipeline cannot work without it.</p>
       </section>
 
       <section class="panel" id="geminiPanel">
@@ -3824,38 +3827,69 @@ async function pitchStudioView() {
       </section>
 
       <section class="panel" id="piperPanel">
-        <div class="panel-header"><h2>Local Piper</h2></div>
+        <div class="panel-header"><h2>Local pipeline settings</h2></div>
+        <p class="muted settings-lede">Every value below is read by the running Qwen3-ASR → Silero VAD → SEA-LION → Piper call pipeline.</p>
+
+        <h3 style="margin:18px 0 10px">Identity</h3>
         <div class="form-grid">
-          <label>Text brain<select id="localBrainProvider">
-            <option value="gemini"${cfg.local.brainProvider !== "openai" ? " selected" : ""}>Gemini</option>
-            <option value="openai"${cfg.local.brainProvider === "openai" ? " selected" : ""}>OpenAI</option>
-          </select></label>
-          <label>Gemini brain model<input list="localGeminiModelList" id="localGeminiTextModel" value="${escapeHtml(cfg.local.geminiTextModel || "")}" maxlength="120"></label>
-          <datalist id="localGeminiModelList">${localGeminiModelOpts}</datalist>
-          <label>OpenAI brain model<input list="localOpenAiModelList" id="localOpenAiTextModel" value="${escapeHtml(cfg.local.openaiTextModel || "")}" maxlength="120"></label>
-          <datalist id="localOpenAiModelList">${localOpenAiModelOpts}</datalist>
-          <label>Language<select id="voiceLang">${langOpts}</select></label>
-          <label>Gender<select id="voiceGender">
-            <option value="" selected>All</option>
-            <option value="female">Female</option>
-            <option value="male">Male</option>
-          </select></label>
-          <label>Whisper model<select id="whisperModel">${whisperOpts}</select></label>
-          <label>Speech rate <span class="muted" id="lsVal">${cfg.local.piperLengthScale}</span>
-            <input type="range" id="lengthScale" min="0.6" max="1.6" step="0.05" value="${cfg.local.piperLengthScale}">
-          </label>
-          <label>Volume <span class="muted" id="volVal">${cfg.local.piperVolumeDb ?? -5} dB</span>
-            <input type="range" id="volumeDb" min="-12" max="3" step="1" value="${cfg.local.piperVolumeDb ?? -5}">
-          </label>
-          <label>Greeting delay <span class="muted" id="greetingDelayVal">${cfg.local.greetingStartDelayMs ?? 250} ms</span>
-            <input type="range" id="greetingStartDelayMs" min="0" max="1000" step="50" value="${cfg.local.greetingStartDelayMs ?? 250}">
-          </label>
-          <label class="full">Opening greeting
-            <textarea id="greetingText" rows="3" maxlength="500">${escapeHtml(cfg.local.greetingText || "Hello, this is Pitch, your AI sales and support staff. How can I help you today?")}</textarea>
-          </label>
+          <label>Business name<input type="text" id="pitchBusinessName" value="${escapeHtml(cfg.business?.name || "AIStaff")}" maxlength="120"></label>
+          <label>Agent name<input type="text" id="pitchAgentName" value="${escapeHtml(cfg.business?.agentName || "Pitch")}" maxlength="80"></label>
         </div>
-        ${openAiModelNote}
-        <div id="voiceList" class="muted" style="margin-top:14px">Loading voices…</div>
+
+        <h3 style="margin:22px 0 10px;padding-top:18px;border-top:1px solid #e5e1ef">STT settings</h3>
+        <div class="form-grid">
+          <label>STT engine<select id="asrEngine">
+            <option value="qwen3-asr" selected>Qwen3-ASR</option>
+          </select></label>
+          <label>Model<select id="asrModel">
+            <option value="Qwen3-ASR-0.6B"${cfg.local.whisperModel === "Qwen3-ASR-0.6B" ? " selected" : ""}>Qwen3-ASR 0.6B</option>
+          </select></label>
+          <label class="full">Inference endpoint<input type="url" id="asrUrl" value="${escapeHtml(cfg.local.asrUrl || "http://127.0.0.1:8190/inference")}"></label>
+          <label>Decode mode<select id="asrLanguage">
+            ${["taglish", "auto", "fil", "en"].map((v) => `<option value="${v}"${cfg.local.whisperLanguage === v ? " selected" : ""}>${v === "taglish" ? "Taglish comparison" : v === "fil" ? "Filipino" : v === "en" ? "English" : "Auto detect"}</option>`).join("")}
+          </select></label>
+          <label class="full">Recognition context<textarea id="asrContext" rows="2" maxlength="500" placeholder="Optional words or names to help recognition">${escapeHtml(cfg.local.asrContext || "")}</textarea></label>
+        </div>
+
+        <h3 style="margin:22px 0 10px;padding-top:18px;border-top:1px solid #e5e1ef">VAD settings</h3>
+        <label class="full" style="margin-bottom:12px"><input type="checkbox" id="bargeIn"${cfg.bargeInEnabled ? " checked" : ""}> Allow caller interruption during agent speech</label>
+        <div class="form-grid">
+          ${rangeSetting("Speech start threshold", "vadPositive", cfg.local.vadPositiveSpeechThreshold ?? 0.5, 0.1, 0.95, 0.01)}
+          ${rangeSetting("Speech end threshold", "vadNegative", cfg.local.vadNegativeSpeechThreshold ?? 0.35, 0.05, 0.9, 0.01)}
+          ${rangeSetting("Minimum speech", "vadMinSpeech", cfg.local.vadMinSpeechMsSilero ?? 256, 64, 2000, 32, "ms")}
+          ${rangeSetting("Pre-speech audio", "vadPreSpeech", cfg.local.vadPreSpeechPadMs ?? 640, 0, 3000, 32, "ms")}
+          ${rangeSetting("End-of-turn silence", "vadRedemption", cfg.local.vadRedemptionMs ?? 2000, 100, 5000, 100, "ms")}
+          ${rangeSetting("Maximum utterance", "vadMaxSpeech", cfg.local.vadMaxSpeechMs ?? 12000, 1000, 60000, 1000, "ms")}
+          ${rangeSetting("Interruption threshold", "vadBargeThreshold", cfg.local.vadBargeInThreshold ?? 0.35, 0.1, 0.95, 0.01)}
+          ${rangeSetting("Interruption sustain", "vadBargeSustain", cfg.local.vadBargeInSustainMs ?? 120, 32, 2000, 32, "ms")}
+        </div>
+
+        <h3 style="margin:22px 0 10px;padding-top:18px;border-top:1px solid #e5e1ef">LLM settings</h3>
+        <div class="form-grid">
+          <label>LLM engine<select id="localLlmEngine"><option value="llama-cpp" selected>llama.cpp</option></select></label>
+          <label>Local model<select id="localQwenModel"><option value="sealion" selected>Gemma SEA-LION v4.5 E2B IT</option></select></label>
+          <label class="full">llama.cpp endpoint<input type="url" id="qwenApiUrl" value="${escapeHtml(cfg.local.qwenApiUrl || "http://127.0.0.1:8090/v1/chat/completions")}"></label>
+          ${rangeSetting("Temperature", "temperature", cfg.local.temperature ?? 0.3, 0, 2, 0.05)}
+          ${rangeSetting("Maximum reply tokens", "maxOutputTokens", cfg.local.maxOutputTokens ?? 90, 20, 500, 10)}
+          ${rangeSetting("Conversation history", "historyTurns", cfg.local.historyTurns ?? 6, 2, 30, 1, "turns")}
+          ${rangeSetting("Request timeout", "requestTimeoutMs", cfg.local.requestTimeoutMs ?? 20000, 1000, 120000, 1000, "ms")}
+        </div>
+
+        <h3 style="margin:22px 0 10px;padding-top:18px;border-top:1px solid #e5e1ef">TTS settings</h3>
+        <div class="form-grid">
+          <label>TTS engine<select id="ttsEngine"><option value="piper" selected>Piper</option></select></label>
+          <label>Voice language filter<select id="voiceLang">${langOpts}</select></label>
+          <label>Voice gender filter<select id="voiceGender"><option value="" selected>All</option><option value="female">Female</option><option value="male">Male</option></select></label>
+          <label>ONNX voice model<select id="piperVoiceSelect"><option value="${escapeHtml(cfg.local.piperVoice)}">${escapeHtml(cfg.local.piperVoice)}</option></select></label>
+          <label class="full">Synthesis endpoint<input type="url" id="piperUrl" value="${escapeHtml(cfg.local.piperUrl || "http://127.0.0.1:5001/synthesize")}"></label>
+          <label>Speaker ID<input type="number" id="piperSpeakerId" min="0" step="1" value="${cfg.local.piperSpeakerId ?? ""}" placeholder="Single speaker"></label>
+          ${rangeSetting("Speech length scale", "lengthScale", cfg.local.piperLengthScale ?? 1, 0.6, 1.6, 0.05)}
+          ${rangeSetting("Voice noise scale", "noiseScale", cfg.local.piperNoiseScale ?? 0.667, 0, 1.5, 0.01)}
+          ${rangeSetting("Output volume", "volumeDb", cfg.local.piperVolumeDb ?? -4, -12, 3, 1, "dB")}
+          ${rangeSetting("Greeting delay", "greetingStartDelayMs", cfg.local.greetingStartDelayMs ?? 250, 0, 3000, 50, "ms")}
+          <label class="full">Opening greeting<textarea id="greetingText" rows="3" maxlength="500">${escapeHtml(cfg.local.greetingText || "Hello, this is Pitch, your AI sales and support staff. How can I help you today?")}</textarea></label>
+        </div>
+        <div style="display:flex;gap:10px;align-items:center;margin-top:12px"><button class="button button-soft" id="listenSelectedVoice">Listen to selected voice</button><span class="muted" id="voiceList">Loading installed ONNX voices…</span></div>
       </section>
 
       <section class="panel" id="previewPanel">
@@ -3872,10 +3906,10 @@ async function pitchStudioView() {
 
       <section class="panel">
         <div class="panel-header">
-          <h2>Pitch instructions — ${PIPE_LABEL[prompt.pipeline]}${prompt.active ? ` · v${prompt.active.version} live` : ""}</h2>
+          <h2>${prompt.pipeline === "local" ? "LLM prompt instructions" : "Pitch instructions"} — ${PIPE_LABEL[prompt.pipeline]}${prompt.active ? ` · v${prompt.active.version} live` : ""}</h2>
           <span class="muted">${prompt.active ? `saved ${new Date(prompt.active.created_at).toLocaleString()} by ${escapeHtml(prompt.active.created_by || "seed")}` : ""}</span>
         </div>
-        <p class="muted settings-lede">Pitch-only prompt for this pipeline. Runtime caller ID and selected Piper voice-language limits are added by Pitch. Switch the pipeline above to edit the other one. Three variables are filled at call time: <code>{{business_name}}</code>, <code>{{agent_name}}</code>, <code>{{caller_number}}</code>.</p>
+        <p class="muted settings-lede">This is the system prompt sent to the selected pipeline. Runtime caller ID and Piper language guidance are added automatically. Three variables are filled at call time: <code>{{business_name}}</code>, <code>{{agent_name}}</code>, <code>{{caller_number}}</code>.</p>
         <form id="pitchPromptForm" class="form-grid">
           <label class="full">Instructions
             <textarea name="content" rows="22" spellcheck="false">${escapeHtml(prompt.active ? prompt.active.content : "")}</textarea>
@@ -3896,6 +3930,7 @@ async function pitchStudioView() {
           <button class="button button-soft" id="promptPreviewBtn">Show assembled prompt</button>
         </div>
         <p class="muted">The same text with <code>{{business_name}}</code>, <code>{{agent_name}}</code> and <code>{{caller_number}}</code> filled in — exactly what the model receives.</p>
+        <label>Sample caller number<input type="text" id="promptCallerNumber" value="09175769817" maxlength="40"></label>
         <pre id="promptPreview" style="white-space:pre-wrap;font-size:12px;max-height:420px;overflow:auto;background:#f6f7f9;padding:14px;border-radius:8px" hidden></pre>
       </section>
 
@@ -3933,48 +3968,20 @@ async function pitchStudioView() {
   async function loadVoices() {
     const lang = $("#voiceLang").value;
     const gender = $("#voiceGender").value;
-    const q = new URLSearchParams({ language: lang });
+    const q = new URLSearchParams({ language: lang, installedOnly: "true" });
     if (gender) q.set("gender", gender);
     const { voices } = await api(`/api/pitch-admin/voices?${q}`);
     if (!voices.length) {
-      $("#voiceList").innerHTML = `<p class="muted">No voices for this filter.</p>`;
+      $("#piperVoiceSelect").innerHTML = "";
+      $("#voiceList").textContent = "No installed ONNX voices for this filter.";
       return;
     }
-    $("#voiceList").innerHTML = `
-      <table class="data-table">
-        <thead><tr><th></th><th>Voice</th><th>Quality</th><th>Gender</th><th>Speakers</th><th></th></tr></thead>
-        <tbody>${voices.map((v) => `
-          <tr>
-            <td><input type="radio" name="voice" value="${v.key}"${v.key === selectedVoice ? " checked" : ""}${v.installed ? "" : " disabled"}></td>
-            <td>${escapeHtml(v.name)}<br><span class="muted" style="font-size:11px">${v.key}</span></td>
-            <td>${v.quality}</td>
-            <td>${v.gender}</td>
-            <td>${v.numSpeakers > 1 ? v.numSpeakers : "—"}</td>
-            <td>${v.installed
-              ? `<button class="button button-soft" data-play="${v.key}">Listen</button>`
-              : v.custom
-                ? `<span class="muted">Restore model</span>`
-              : `<button class="button button-soft" data-install="${v.key}">Download</button>`}</td>
-          </tr>`).join("")}
-        </tbody>
-      </table>`;
-
-    $("#voiceList").querySelectorAll('input[name="voice"]').forEach((el) => {
-      el.onchange = () => { selectedVoice = el.value; };
-    });
-    $("#voiceList").querySelectorAll("[data-play]").forEach((b) => {
-      b.onclick = () => playPreview(b.dataset.play);
-    });
-    $("#voiceList").querySelectorAll("[data-install]").forEach((b) => {
-      b.onclick = async () => {
-        b.disabled = true; b.textContent = "Downloading…";
-        try {
-          await api(`/api/pitch-admin/voices/${b.dataset.install}/install`, { method: "POST" });
-          toast(`${b.dataset.install} installed`);
-          await loadVoices();
-        } catch (e) { toast(`Download failed: ${e.message}`); b.disabled = false; b.textContent = "Download"; }
-      };
-    });
+    if (!voices.some((voice) => voice.key === selectedVoice)) selectedVoice = voices[0].key;
+    $("#piperVoiceSelect").innerHTML = voices.map((voice) =>
+      `<option value="${voice.key}"${voice.key === selectedVoice ? " selected" : ""}>${escapeHtml(voice.name)} — ${escapeHtml(voice.key)}</option>`
+    ).join("");
+    $("#piperVoiceSelect").onchange = () => { selectedVoice = $("#piperVoiceSelect").value; };
+    $("#voiceList").textContent = `${voices.length} installed model${voices.length === 1 ? "" : "s"}`;
   }
 
   async function playPreview(voice) {
@@ -4051,7 +4058,13 @@ async function pitchStudioView() {
   $("#promptPreviewBtn").onclick = async () => {
     const pre = $("#promptPreview");
     try {
-      const r = await api(`/api/pitch-admin/prompt/preview?pipeline=${prompt.pipeline}`);
+      const query = new URLSearchParams({
+        pipeline: prompt.pipeline,
+        businessName: $("#pitchBusinessName")?.value || cfg.business?.name || "AIStaff",
+        agentName: $("#pitchAgentName")?.value || cfg.business?.agentName || "Pitch",
+        callerNumber: $("#promptCallerNumber").value,
+      });
+      const r = await api(`/api/pitch-admin/prompt/preview?${query}`);
       pre.textContent = r.content;
       pre.hidden = false;
     } catch (e) { pre.textContent = `failed: ${e.message}`; pre.hidden = false; }
@@ -4083,17 +4096,39 @@ async function pitchStudioView() {
         model: $("#openaiRealtimeModel").value,
         voice: $("#openaiRealtimeVoice").value,
       },
+      business: {
+        name: $("#pitchBusinessName")?.value || cfg.business?.name || "AIStaff",
+        agentName: $("#pitchAgentName")?.value || cfg.business?.agentName || "Pitch",
+      },
       local: {
-        brainProvider: $("#localBrainProvider").value,
-        geminiTextModel: $("#localGeminiTextModel").value,
-        openaiTextModel: $("#localOpenAiTextModel").value,
+        brainProvider: "qwen",
+        asrUrl: $("#asrUrl").value,
+        asrContext: $("#asrContext").value,
+        qwenApiUrl: $("#qwenApiUrl").value,
+        qwenModel: $("#localQwenModel").value,
         ttsEngine: "piper",
+        piperUrl: $("#piperUrl").value,
         piperVoice: selectedVoice,
-        whisperModel: $("#whisperModel").value,
+        piperSpeakerId: $("#piperSpeakerId").value === "" ? null : Number($("#piperSpeakerId").value),
+        whisperModel: $("#asrModel").value,
+        whisperLanguage: $("#asrLanguage").value,
         piperLengthScale: Number($("#lengthScale").value),
+        piperNoiseScale: Number($("#noiseScale").value),
         piperVolumeDb: Number($("#volumeDb").value),
         greetingText: $("#greetingText").value,
         greetingStartDelayMs: Number($("#greetingStartDelayMs").value),
+        maxOutputTokens: Number($("#maxOutputTokens").value),
+        temperature: Number($("#temperature").value),
+        historyTurns: Number($("#historyTurns").value),
+        requestTimeoutMs: Number($("#requestTimeoutMs").value),
+        vadPositiveSpeechThreshold: Number($("#vadPositive").value),
+        vadNegativeSpeechThreshold: Number($("#vadNegative").value),
+        vadMinSpeechMsSilero: Number($("#vadMinSpeech").value),
+        vadPreSpeechPadMs: Number($("#vadPreSpeech").value),
+        vadRedemptionMs: Number($("#vadRedemption").value),
+        vadMaxSpeechMs: Number($("#vadMaxSpeech").value),
+        vadBargeInThreshold: Number($("#vadBargeThreshold").value),
+        vadBargeInSustainMs: Number($("#vadBargeSustain").value),
       },
     };
   }
@@ -4104,15 +4139,19 @@ async function pitchStudioView() {
 
   $("#voiceLang").onchange = loadVoices;
   $("#voiceGender").onchange = loadVoices;
-  $("#localBrainProvider").onchange = () => {
-    const useOpenAi = $("#localBrainProvider").value === "openai";
-    $("#localGeminiTextModel").closest("label").hidden = useOpenAi;
-    $("#localOpenAiTextModel").closest("label").hidden = !useOpenAi;
+  const bindRangeSetting = (id) => {
+    const range = $(`#${id}Range`);
+    const number = $(`#${id}`);
+    range.oninput = () => { number.value = range.value; };
+    number.oninput = () => { range.value = number.value; };
   };
-  $("#localBrainProvider").onchange();
-  $("#lengthScale").oninput = () => { $("#lsVal").textContent = $("#lengthScale").value; };
-  $("#volumeDb").oninput = () => { $("#volVal").textContent = `${$("#volumeDb").value} dB`; };
-  $("#greetingStartDelayMs").oninput = () => { $("#greetingDelayVal").textContent = `${$("#greetingStartDelayMs").value} ms`; };
+  [
+    "vadPositive", "vadNegative", "vadMinSpeech", "vadPreSpeech", "vadRedemption",
+    "vadMaxSpeech", "vadBargeThreshold", "vadBargeSustain", "temperature",
+    "maxOutputTokens", "historyTurns", "requestTimeoutMs", "lengthScale", "noiseScale",
+    "volumeDb", "greetingStartDelayMs",
+  ].forEach(bindRangeSetting);
+  $("#listenSelectedVoice").onclick = () => playPreview(selectedVoice);
   $("#previewBtn").onclick = () => playPreview(selectedVoice);
   $("#pitchRefresh").onclick = () => pitchStudioView();
   $("#tabCloser").onclick = () => aiStudioView();
@@ -4133,7 +4172,7 @@ async function pitchStudioView() {
       const poll = setInterval(async () => {
         waited += 5;
         const s = await api("/api/pitch-admin/");
-        if (s.services.pitchPid && (s.config.pipeline !== "local" || (s.services.piper && s.services.whisper))) {
+        if (s.services.pitchPid && (s.config.pipeline !== "local" || (s.services.piper && s.services.qwenAsr && s.services.seaLion))) {
           clearInterval(poll);
           status.textContent = `ready (pid ${s.services.pitchPid})`;
           setTimeout(() => pitchStudioView(), 1200);

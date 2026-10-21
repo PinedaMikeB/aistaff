@@ -24,7 +24,7 @@ const CONFIG_PATH = process.env.PITCH_RUNTIME_CONFIG
 const DEFAULTS = {
   // "gemini-live"     = Google native speech-to-speech
   // "openai-realtime" = OpenAI native speech-to-speech
-  // "local"           = whisper -> text brain -> local TTS
+  // "local"           = Qwen3-ASR -> SEA-LION -> Piper epoch 180 (Stack 4)
   pipeline: "gemini-live",
 
   // Pipeline 1 settings. Gemini Live picks from Google's prebuilt voices;
@@ -40,19 +40,30 @@ const DEFAULTS = {
     voice: "marin",
   },
 
+  business: {
+    name: "AIStaff",
+    agentName: "Pitch",
+  },
+
   local: {
     // Piper is only the voice. This chooses the LLM that thinks/orchestrates.
-    brainProvider: "gemini",        // gemini | openai
-    geminiTextModel: "gemini-3.5-flash-lite",
-    openaiTextModel: "gpt-4.1-mini",
+    // The existing "qwen" provider is the generic local OpenAI-compatible
+    // adapter. Stack 4 points it at Gemma-SEA-LION on llama.cpp; no Gemini API
+    // is used.
+    brainProvider: "qwen",
+    asrUrl: "http://127.0.0.1:8190/inference",
+    asrContext: "",
+    qwenApiUrl: "http://127.0.0.1:8090/v1/chat/completions",
+    qwenModel: "sealion",
 
     // Which local TTS engine the local pipeline uses.
     ttsEngine: "piper",             // piper | kokoro | zonos2
-    piperVoice: "gab_taglish_epoch59",
+    piperUrl: "http://127.0.0.1:5001/synthesize",
+    piperVoice: "zonos1110_22050_epoch180",
     piperSpeakerId: null,           // for multi-speaker models
     piperLengthScale: 1.0,          // >1 slower, <1 faster
     piperNoiseScale: 0.667,
-    piperVolumeDb: -5,              // lower Gab without retraining
+    piperVolumeDb: -4,
     zonos2Url: "http://127.0.0.1:1919/tts/generate",
     zonos2SpeakerId: "",            // e.g. default_ad689b18cfb01a0d = AmericanFemale
     zonos2SessionId: "",            // only needed for uploaded/cached speakers
@@ -61,12 +72,29 @@ const DEFAULTS = {
     zonos2MaxTokens: 700,
     greetingText: "Hello, this is Pitch, your AI sales and support staff. How can I help you today?",
     greetingStartDelayMs: 250,
-    whisperModel: "ggml-medium",
-    whisperLanguage: "auto",        // auto | en | tl
+    maxOutputTokens: 90,
+    temperature: 0.3,
+    historyTurns: 6,
+    requestTimeoutMs: 20000,
+    whisperModel: "Qwen3-ASR-0.6B",
+    whisperLanguage: "taglish",
+
+    // Tuned against the 8 kHz AIO100 caller channel. The desktop defaults
+    // detected only the last 1.5 seconds of a four-second phone utterance.
+    vadPositiveSpeechThreshold: 0.5, // lowered from Pithagoras's 0.65 -- confirmed across two real calls that this caller's actual phone-line voice tops out around 0.45-0.74, often sitting well under 0.65
+    vadNegativeSpeechThreshold: 0.35,
+    vadMinSpeechMsSilero: 256,
+    vadPreSpeechPadMs: 640, // raised from 320 -- confirmed live cutting off the first 1-2 words of an utterance
+    vadRedemptionMs: 2000,
+    vadMaxSpeechMs: 12000,
+    vadBargeInThreshold: 0.35,
+    vadBargeInSustainMs: 120,
   },
 
   // Barge-in: cutting the agent off when the caller starts speaking.
   // Endpoint VAD is NOT affected by this — the pipeline cannot work without it.
+  // Keep the SIP pipeline half-duplex until acoustic echo cancellation is
+  // available. Otherwise returned agent audio can flush its own RTP playout.
   bargeInEnabled: true,
 
   updatedAt: null,

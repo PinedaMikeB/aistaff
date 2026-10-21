@@ -133,17 +133,28 @@ const config = {
   },
 
   localPipeline: {
-    // Speech-to-text is local whisper.cpp by default. It must not set a
-    // language; Taglish/Tagalog/English are inferred from the audio.
-    whisperUrl: process.env.PITCH_LOCAL_WHISPER_URL || "http://127.0.0.1:8080/inference",
+    // Stack 4 uses Qwen3-ASR with deterministic English/Filipino comparison.
+    whisperUrl: runtimeConfig.local?.asrUrl
+      || process.env.PITCH_LOCAL_ASR_URL || "http://127.0.0.1:8190/inference",
     whisperModel: runtimeConfig.local?.whisperModel
       || process.env.PITCH_LOCAL_WHISPER_MODEL || "whisper-1",
+    // Qwen's auto detector can mistake short phone audio for another language.
+    // Taglish mode compares auto, English, and Filipino decodes per utterance.
     whisperLanguage: runtimeConfig.local?.whisperLanguage
-      || process.env.PITCH_LOCAL_WHISPER_LANGUAGE || "auto",
+      || process.env.PITCH_LOCAL_WHISPER_LANGUAGE || "taglish",
+    asrContext: runtimeConfig.local?.asrContext
+      || process.env.PITCH_LOCAL_ASR_CONTEXT || "",
     // Text reasoning model. Separate from Live because this path already has
     // audio handled by Whisper/VoxCPM2.
+    // "qwen" is the Pithagoras-proven local brain: Qwen3-8B on Bosgame's GPU
+    // via a plain llama.cpp OpenAI-compatible endpoint, called directly (no
+    // pi, no agent framework -- see brain/local-pipeline.js _replyToStreaming).
     brainProvider: runtimeConfig.local?.brainProvider
-      || process.env.PITCH_LOCAL_BRAIN_PROVIDER || "gemini",
+      || process.env.PITCH_LOCAL_BRAIN_PROVIDER || "qwen",
+    qwenApiUrl: runtimeConfig.local?.qwenApiUrl
+      || process.env.PITCH_LOCAL_QWEN_API_URL || "http://127.0.0.1:8080/v1/chat/completions",
+    qwenModel: runtimeConfig.local?.qwenModel
+      || process.env.PITCH_LOCAL_QWEN_MODEL || "Qwen3-8B-Q4_K_M",
     geminiTextModel: runtimeConfig.local?.geminiTextModel
       || process.env.PITCH_LOCAL_GEMINI_TEXT_MODEL ||
       process.env.PITCH_GEMINI_TEXT_MODEL || "gemini-3.5-flash-lite",
@@ -155,6 +166,8 @@ const config = {
       ? Number(runtimeConfig.local.piperLengthScale) : 1.0,
     piperNoiseScale: Number.isFinite(Number(runtimeConfig.local?.piperNoiseScale))
       ? Number(runtimeConfig.local.piperNoiseScale) : 0.667,
+    piperVolumeDb: Number.isFinite(Number(runtimeConfig.local?.piperVolumeDb))
+      ? Number(runtimeConfig.local.piperVolumeDb) : -6,
     piperGreetingCacheDir: process.env.PITCH_PIPER_GREETING_CACHE_DIR
       || path.join(__dirname, "..", "..", "local-runtime", "pitch-greetings"),
     greetingText: runtimeConfig.local?.greetingText
@@ -167,11 +180,19 @@ const config = {
     ttsEngine: runtimeConfig.local?.ttsEngine
       || process.env.PITCH_LOCAL_TTS_ENGINE || "piper",
 
-    // Local TTS endpoint. The name is historical — this now points at Piper
-    // (port 9891) by default, not VoxCPM2, which never fit on this hardware.
-    // The endpoint stays configurable because local TTS wrappers differ. We
-    // accept WAV/PCM bytes or JSON with a base64 audio field; see
-    // brain/local-pipeline.js.
+    // The real, correct Piper endpoint. Previously ttsEngine="piper" fell
+    // through to voxcpmUrl below with a VoxCPM-shaped payload -- a request
+    // format Piper's own server has never understood, and (separately)
+    // voxcpmUrl's own default pointed at "/" rather than a real endpoint.
+    // Every prior local-pipeline test (English, Gab, Irenz) went through
+    // that broken path, which is why the voice used never mattered. This is
+    // a plain call to Piper's actual /synthesize route.
+    piperUrl: runtimeConfig.local?.piperUrl
+      || process.env.PITCH_LOCAL_PIPER_URL || "http://127.0.0.1:5001/synthesize",
+
+    // Historical VoxCPM endpoint. Still used only if ttsEngine is set to
+    // anything other than "piper" or "zonos2" -- kept for backward
+    // compatibility, not part of the normal local pipeline anymore.
     voxcpmUrl: process.env.PITCH_VOXCPM2_URL || "http://127.0.0.1:9891/",
     voxcpmVoice: process.env.PITCH_VOXCPM2_VOICE || "",
     voxcpmSampleRate: int(process.env.PITCH_VOXCPM2_SAMPLE_RATE, 24000),
@@ -188,19 +209,45 @@ const config = {
       ? Number(runtimeConfig.local?.zonos2Speed ?? process.env.PITCH_ZONOS2_SPEED) : 0.85,
     zonos2MaxTokens: int(runtimeConfig.local?.zonos2MaxTokens ?? process.env.PITCH_ZONOS2_MAX_TOKENS, 700),
 
-    requestTimeoutMs: int(process.env.PITCH_LOCAL_REQUEST_TIMEOUT_MS, 20000),
-    temperature: Number.isFinite(Number(process.env.PITCH_LOCAL_TEMPERATURE))
-      ? Number(process.env.PITCH_LOCAL_TEMPERATURE) : 0.75,
-    maxOutputTokens: int(process.env.PITCH_LOCAL_MAX_OUTPUT_TOKENS, 120),
-    historyTurns: int(process.env.PITCH_LOCAL_HISTORY_TURNS, 6),
+    requestTimeoutMs: int(
+      runtimeConfig.local?.requestTimeoutMs ?? process.env.PITCH_LOCAL_REQUEST_TIMEOUT_MS,
+      20000
+    ),
+    temperature: Number.isFinite(Number(runtimeConfig.local?.temperature ?? process.env.PITCH_LOCAL_TEMPERATURE))
+      ? Number(runtimeConfig.local?.temperature ?? process.env.PITCH_LOCAL_TEMPERATURE) : 0.75,
+    maxOutputTokens: int(
+      runtimeConfig.local?.maxOutputTokens ?? process.env.PITCH_LOCAL_MAX_OUTPUT_TOKENS,
+      120
+    ),
+    historyTurns: int(runtimeConfig.local?.historyTurns ?? process.env.PITCH_LOCAL_HISTORY_TURNS, 6),
     logMetrics: bool(process.env.PITCH_LOCAL_LOG_METRICS, true),
 
-    // Simple energy VAD over phone audio. These are intentionally env-tunable:
-    // the real threshold depends on gateway gain, room noise, and handset.
+    // Old simple energy VAD fields. No longer used for turn detection (see
+    // vad/silero.js) but left here since other code may still reference them.
     vadThreshold: int(process.env.PITCH_LOCAL_VAD_THRESHOLD, 650),
     vadSilenceMs: int(process.env.PITCH_LOCAL_VAD_SILENCE_MS, 700),
     vadMinSpeechMs: int(process.env.PITCH_LOCAL_VAD_MIN_SPEECH_MS, 260),
-    vadMaxSpeechMs: int(process.env.PITCH_LOCAL_VAD_MAX_SPEECH_MS, 12000),
+    vadMaxSpeechMs: int(runtimeConfig.local?.vadMaxSpeechMs ?? process.env.PITCH_LOCAL_VAD_MAX_SPEECH_MS, 12000),
+
+    // Real turn detection: Silero VAD (vad/silero.js), replacing the energy
+    // threshold above. This fixes "detects goodbye while I'm still talking" --
+    // a flat amplitude threshold cannot tell a natural mid-sentence pause
+    // from actually finishing. Values copied exactly from Pithagoras's own
+    // voice config, per instruction.
+    vadPositiveSpeechThreshold: Number.isFinite(Number(runtimeConfig.local?.vadPositiveSpeechThreshold))
+      ? Number(runtimeConfig.local.vadPositiveSpeechThreshold) : 0.65,
+    vadNegativeSpeechThreshold: Number.isFinite(Number(runtimeConfig.local?.vadNegativeSpeechThreshold))
+      ? Number(runtimeConfig.local.vadNegativeSpeechThreshold) : 0.35,
+    vadMinSpeechMsSilero: int(runtimeConfig.local?.vadMinSpeechMsSilero, 256),
+    vadPreSpeechPadMs: int(runtimeConfig.local?.vadPreSpeechPadMs, 320),
+    vadRedemptionMs: int(runtimeConfig.local?.vadRedemptionMs, 1000),
+    // Separate, faster path specifically for barge-in (stopping playback the
+    // instant the caller starts talking over Pitch) -- distinct from the
+    // thresholds above, which decide whether to bother transcribing
+    // something. See vad/silero.js for the full reasoning.
+    vadBargeInThreshold: Number.isFinite(Number(runtimeConfig.local?.vadBargeInThreshold))
+      ? Number(runtimeConfig.local.vadBargeInThreshold) : 0.35,
+    vadBargeInSustainMs: int(runtimeConfig.local?.vadBargeInSustainMs, 120),
 
     // How long the caller must speak CONTINUOUSLY before we cut the agent off.
     // A single frame over the threshold is a click, a breath, or the agent's
@@ -213,8 +260,10 @@ const config = {
   // Business identity spoken on answer. Falls back to brand vars already
   // present in .env.
   business: {
-    name: process.env.PITCH_BUSINESS_NAME || process.env.BUSINESS_BRAND_NAME || "AIStaff",
-    agentName: process.env.PITCH_AGENT_NAME || "Pitch",
+    name: runtimeConfig.business?.name
+      || process.env.PITCH_BUSINESS_NAME || process.env.BUSINESS_BRAND_NAME || "AIStaff",
+    agentName: runtimeConfig.business?.agentName
+      || process.env.PITCH_AGENT_NAME || "Pitch",
   },
 
   logLevel: process.env.PITCH_LOG_LEVEL || "info",

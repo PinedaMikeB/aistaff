@@ -22,6 +22,8 @@ const {
   bookingScenarioReply,
   isGpt5Model,
   usesOpenAiResponsesApi,
+  repairCallerTranscript,
+  preparePiperSpeechText,
 } = require("../src/pitch/brain/local-pipeline");
 
 function tone(n = 160, freq = 440, amp = 12000, rate = 8000) {
@@ -173,9 +175,71 @@ test("local pipeline prompt keeps only the configured recent history turns", () 
   assert.ok(prompt.includes("recent caller one"));
   assert.ok(prompt.includes("recent pitch two"));
   assert.ok(prompt.includes("recent caller three"));
-  assert.ok(prompt.includes("Prefer 15 to 30 spoken words"));
+  assert.ok(prompt.includes("Usually speak 25 to 45 words"));
+  assert.ok(prompt.includes("warm, attentive hospitality professional"));
+  assert.ok(prompt.includes("never become fabrication"));
   assert.ok(prompt.includes("testing a demo scenario"));
   assert.ok(prompt.includes("restaurant table booking"));
+});
+
+test("Taglish Piper prompt requires matching the caller language across short turns", () => {
+  const brain = new LocalPipelineBrain({
+    openaiApiKey: "test-openai",
+    geminiApiKey: "test-gemini",
+    localConfig: {
+      piperVoice: "zonos1110_22050_epoch180",
+      historyTurns: 6,
+    },
+    businessName: "Test Hotel",
+    agentName: "Pitch",
+    callerId: "+639171234567",
+  });
+  brain.systemPrompt = "Help the caller.";
+  brain.history = [
+    { role: "caller", text: "Magkano ang deluxe room?" },
+    { role: "pitch", text: "Ang deluxe room ay 3,500 pesos kada gabi." },
+  ];
+
+  const prompt = brain._buildReplyPrompt("Yes.");
+  const messages = brain._buildReplyMessages("Yes.");
+  assert.match(prompt, /LANGUAGE MATCHING IS REQUIRED/);
+  assert.match(prompt, /continue using the language established/);
+  assert.match(messages[0].content, /reply primarily in natural conversational Tagalog or Taglish/);
+  assert.match(messages.at(-1).content, /^Yes\./);
+  assert.match(messages.at(-1).content, /Mandatory reply language/);
+  assert.match(messages.at(-1).content, /Huwag sumagot sa English lamang/);
+});
+
+test("local hospitality prompt encourages useful warmth without invented facts", () => {
+  const brain = new LocalPipelineBrain({
+    localConfig: { piperVoice: "zonos1110_22050_epoch180", historyTurns: 6 },
+    businessName: "Test Hotel",
+    agentName: "Pitch",
+    callerId: "+639171234567",
+  });
+  brain.systemPrompt = "Help the caller.";
+
+  const system = brain._buildReplyMessages("Magkano ang Deluxe room?")[0].content;
+  assert.match(system, /answer the question directly/);
+  assert.match(system, /ask one natural next question/);
+  assert.match(system, /never more than two complete sentences/);
+  assert.match(system, /Do not invent amenities/);
+  assert.match(system, /Do not mechanically end every answer/);
+  assert.match(system, /Do not say or imply that you will check live availability/);
+  assert.match(system, /HARD CLOCK-TIME RULE/);
+  assert.match(system, /2 PM or 9 AM/);
+  assert.match(system, /HARD MOBILE-NUMBER RULE/);
+  assert.match(system, /Never start the spoken number with 6-3/);
+  assert.match(system, /AUTHORITATIVE TEMPORARY DEMO KNOWLEDGE BASE/);
+  assert.match(system, /Standard Room: 2,500 pesos per night/);
+  assert.match(system, /Solo Set: 450 pesos/);
+  assert.match(system, /chicken adobo, steamed rice, iced tea, and leche flan/);
+  assert.match(system, /100 Demo Avenue, Legazpi Village, Makati City/);
+  assert.match(system, /Never invent a room feature, menu item, price/);
+  assert.match(system, /Missing information is unknown, not negative/);
+  assert.match(system, /Whenever mentioning parking, say it is subject to availability/);
+  assert.match(system, /hotel does not have a sauna, gym, spa/);
+  assert.match(system, /Do not substitute generic price ranges/);
 });
 
 test("local pipeline ignores whisper prompt echo transcripts", () => {
@@ -217,6 +281,10 @@ test("selected Piper voice controls the spoken language", () => {
   assert.match(taglishPrompt, /Filipino Taglish voice/i);
   assert.match(taglishPrompt, /reply naturally in Tagalog or\s+Taglish/i);
 
+  const epoch180 = piperVoiceLanguage("zonos1110_22050_epoch180");
+  assert.strictEqual(epoch180.mode, "taglish");
+  assert.strictEqual(epoch180.speakOnly, false);
+
   assert.strictEqual(
     sanitizeLocalReply(
       "I only speak English on this line.",
@@ -226,6 +294,80 @@ test("selected Piper voice controls the spoken language", () => {
     ),
     "I can understand Tagalog, but this selected voice speaks English. How can I help?"
   );
+});
+
+test("Piper reads Philippine mobile numbers digit by digit", () => {
+  assert.strictEqual(
+    preparePiperSpeechText("My number is 09175769817."),
+    "My number is zero nine one seven five seven six nine eight one seven."
+  );
+  assert.strictEqual(
+    preparePiperSpeechText("Call +63-917-576-9817 for the detalye."),
+    "Call zero nine one seven five seven six nine eight one seven for the details."
+  );
+  assert.strictEqual(
+    preparePiperSpeechText("Caller ID is 6-3-9-1-7-5-7-6-9-8-1-7."),
+    "Caller ID is zero nine one seven five seven six nine eight one seven."
+  );
+  assert.strictEqual(
+    preparePiperSpeechText("Caller ID is 639175769817."),
+    "Caller ID is zero nine one seven five seven six nine eight one seven."
+  );
+  assert.strictEqual(
+    preparePiperSpeechText("Mobile: 0-9-1-7-5-7-6-9-8-1-7."),
+    "Mobile: zero nine one seven five seven six nine eight one seven."
+  );
+  assert.strictEqual(
+    preparePiperSpeechText("September 25 at 4 PM costs 3500 pesos."),
+    "September 25 at 4 PM costs 3500 pesos."
+  );
+  assert.strictEqual(
+    preparePiperSpeechText("Deluxe is PHP 3,500 and dinner is ₱450."),
+    "Deluxe is 3,500 pesos and dinner is 450 pesos."
+  );
+  assert.strictEqual(
+    preparePiperSpeechText("Check-in ay dalawang PM at checkout ay alas dose ng hapon."),
+    "Check-in ay 2 PM at checkout ay 12 PM."
+  );
+  assert.strictEqual(
+    preparePiperSpeechText("Dalawa kami, check-in at alas dos ng hapon, 3,500 pesos."),
+    "Dalawa kami, check-in at 2 PM, 3,500 pesos."
+  );
+  assert.strictEqual(
+    preparePiperSpeechText("Breakfast is alas siyete ng umaga and checkout is labing-dalawang P.M."),
+    "Breakfast is 7 AM and checkout is 12 PM."
+  );
+  assert.strictEqual(
+    preparePiperSpeechText("Ang standard room ay dalawang libo limang daan pesos per night."),
+    "Ang standard room ay 2,500 pesos per night."
+  );
+  assert.strictEqual(
+    preparePiperSpeechText("Deluxe is three thousand five hundred pesos and Family is 4,500 pesos."),
+    "Deluxe is 3,500 pesos and Family is 4,500 pesos."
+  );
+});
+
+test("booking guest count survives ASR errors and is marked as already known", () => {
+  const prior = [{ role: "pitch", text: "Anong date po, at ilang tao ang mag-stay?" }];
+  assert.strictEqual(repairCallerTranscript("Ah, the long Tao September 29.", prior), "Ah, dalawang tao September 29.");
+  assert.strictEqual(repairCallerTranscript("Delaware.", prior), "Dalawa.");
+
+  const brain = new LocalPipelineBrain({
+    localConfig: { piperVoice: "zonos1110_22050_epoch180", historyTurns: 12 },
+    businessName: "Test Hotel",
+    agentName: "Pitch",
+    callerId: "+639171234567",
+  });
+  brain.systemPrompt = "Help the caller.";
+  brain.history = [
+    { role: "caller", text: "I need a room for two." },
+    { role: "pitch", text: "Certainly. What date would you like?" },
+    { role: "caller", text: "September 29." },
+  ];
+  const lastMessage = brain._buildReplyMessages("September 29.").at(-1).content;
+  assert.match(lastMessage, /KNOWN BOOKING FACT/);
+  assert.match(lastMessage, /already said the booking is for 2 guests/);
+  assert.match(lastMessage, /Do not ask how many people or guests again/);
 });
 
 test("local pipeline continues demo booking scenarios instead of looping", () => {

@@ -142,6 +142,8 @@ class Call {
         name, args,
         ua: this.ua,
         callerId: this.dialog.callerId,
+        companyId: this.tenant?.companyId || null,
+        callId: this.callId,
         state: this.toolState,
         log,
       });
