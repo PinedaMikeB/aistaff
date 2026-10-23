@@ -48,3 +48,6 @@ data/staff-reply-inbox.json
 *.backup
 .env.*
 !.env.example
+
+# Voice dataset archives (too big for GitHub; kept on disk)
+voice-training/piper/archives/
