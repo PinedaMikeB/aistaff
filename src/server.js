@@ -1,4 +1,7 @@
 require("dotenv").config({ override: true });
+// 2026-10-20: the Ryzen IPv6 route is broken (curl falls back, Node fetch does not) -> always try IPv4 first.
+require("dns").setDefaultResultOrder("ipv4first");
+require("./mail-ipv4");
 
 const crypto = require("crypto");
 const fs = require("fs");
@@ -28,6 +31,16 @@ const {
   leadUpdateDataForAi
 } = require("./ai");
 const { verifyMessengerSignature, handleMessengerWebhook, sendMessengerText } = require("./messenger-webhook");
+const { exchangeForLongLivedMetaUserToken, inspectMetaToken, isSystemUserToken } = require("./meta-access-tokens");
+const { buildCustomerUpdateRouter } = require("./customer-update-routes");
+const {
+  INVITE_TTL_HOURS,
+  createFacebookConnectionInvite,
+  readFacebookConnectionInvite,
+  claimFacebookConnectionInvite,
+  releaseFacebookConnectionInvite,
+  completeFacebookConnectionInvite
+} = require("./facebook-connection-invites");
 const { generateAistaffDemoReply, getAistaffSession } = require("./aistaff-demo");
 const {
   loadAistaffAiConfig,
@@ -155,6 +168,7 @@ const port = Number(process.env.APP_PORT || 3000);
 const metaVerifyToken = process.env.META_VERIFY_TOKEN || "aistaff_verify_2026";
 const metaOauthStates = new Map();
 const metaAuthorizedPagesByUser = new Map();
+const metaAuthorizedPagesByInvite = new Map();
 
 function looksTaglish(text) {
   return /\b(po|ba|naman|kayo|ninyo|ko|kami|magpa|pwede|gusto|kailangan|salamat|sige)\b/i.test(String(text || ""));
@@ -421,6 +435,9 @@ function pruneExpiredMetaAuth() {
   for (const [userId, auth] of metaAuthorizedPagesByUser.entries()) {
     if (auth.expiresAt <= now) metaAuthorizedPagesByUser.delete(userId);
   }
+  for (const [inviteId, auth] of metaAuthorizedPagesByInvite.entries()) {
+    if (auth.expiresAt <= now) metaAuthorizedPagesByInvite.delete(inviteId);
+  }
 }
 
 function setMetaAuthForUser(userId, value) {
@@ -436,10 +453,72 @@ function getMetaAuthForUser(userId) {
   return metaAuthorizedPagesByUser.get(userId) || null;
 }
 
+function setMetaAuthForInvite(inviteId, value) {
+  pruneExpiredMetaAuth();
+  metaAuthorizedPagesByInvite.set(inviteId, {
+    ...value,
+    expiresAt: Date.now() + (15 * 60 * 1000)
+  });
+}
+
+function getMetaAuthForInvite(inviteId) {
+  pruneExpiredMetaAuth();
+  return metaAuthorizedPagesByInvite.get(inviteId) || null;
+}
+
+/**
+ * Two ways a client can connect a Page (like Zernio/ManyChat offer the first):
+ *  - "personal" (default): Page admin logs in with their own Facebook profile and
+ *    picks the Page. Works for every seller, no business portfolio needed. The
+ *    connection lasts as long as that person's Facebook session (usually months).
+ *  - "business": Facebook Login for Business System-user config. The connection
+ *    belongs to the client's business portfolio and survives the admin's
+ *    password changes / session resets. Requires the Page to be IN a portfolio
+ *    the connecting person fully controls.
+ */
+function normalizeMetaConnectMode(mode) {
+  return String(mode || "").toLowerCase() === "business" ? "business" : "personal";
+}
+
+function metaLoginConfigIdForMode(mode) {
+  if (normalizeMetaConnectMode(mode) === "business") {
+    return process.env.META_BUSINESS_LOGIN_CONFIG_ID || process.env.META_LOGIN_CONFIG_ID || "1615847410149532";
+  }
+  return process.env.META_LOGIN_CONFIG_ID || "1615847410149532";
+}
+
+function buildMetaAuthorizationUrl(req, state, mode = "personal") {
+  const authUrl = new URL("https://www.facebook.com/v20.0/dialog/oauth");
+  authUrl.searchParams.set("client_id", process.env.META_APP_ID || "");
+  authUrl.searchParams.set("redirect_uri", getMetaRedirectUri(req));
+  authUrl.searchParams.set("state", state);
+  authUrl.searchParams.set("response_type", "code");
+  // Facebook Login for Business uses the reviewed dashboard configuration.
+  const loginConfigId = metaLoginConfigIdForMode(mode);
+  authUrl.searchParams.set("config_id", loginConfigId);
+  authUrl.searchParams.set("override_default_response_type", "true");
+  return { authUrl, loginConfigId };
+}
+
 function facebookConnectionPath(params = {}) {
   const query = new URLSearchParams(params);
   const suffix = query.toString() ? `?${query.toString()}` : "";
   return `/admin/settings/facebook-page-connection${suffix}`;
+}
+
+function metaAuthorizationReturnPath(authRequest, params = {}) {
+  if (authRequest?.inviteId && authRequest.rawInviteToken) {
+    const query = new URLSearchParams(params);
+    // URL fragments never reach HTTP access logs or Referer headers. Keep the
+    // bearer secret there while ordinary non-secret result flags use query.
+    return `/facebook-connect/?${query.toString()}#token=${encodeURIComponent(authRequest.rawInviteToken)}`;
+  }
+  return facebookConnectionPath(params);
+}
+
+function facebookInviteBearerToken(req) {
+  const header = String(req.headers.authorization || "");
+  return header.startsWith("Bearer ") ? header.slice(7).trim() : "";
 }
 
 function sanitizeManagedPage(page) {
@@ -1741,6 +1820,7 @@ app.post("/api/public/site-chat", asyncHandler(async (req, res) => {
       conversationId: conversation.id,
       email: ai.paymentRequest.email,
       name: ai.paymentRequest.name || updatedLead.customer_name,
+      companyName: ai.paymentRequest.company || updatedLead.company_name,
       mobile: ai.paymentRequest.mobile || updatedLead.mobile_number,
       planSlug: ai.paymentRequest.plan,
       billingFrequency: ai.paymentRequest.billing
@@ -2167,6 +2247,7 @@ const forgotByIpRateLimiter = createRateLimiter({ windowMs: 60 * 60 * 1000, max:
 const forgotByEmailRateLimiter = createRateLimiter({ windowMs: 60 * 60 * 1000, max: 5 });
 const resetRateLimiter = createRateLimiter({ windowMs: 15 * 60 * 1000, max: 10 });
 const websiteAnalyticsRateLimiter = createRateLimiter({ windowMs: 60 * 1000, max: 180 });
+const facebookInviteRateLimiter = createRateLimiter({ windowMs: 15 * 60 * 1000, max: 30 });
 
 function clientIp(req) {
   return req.ip || req.headers["x-forwarded-for"] || "unknown";
@@ -3591,16 +3672,43 @@ app.post("/api/auth/reset-password", asyncHandler(async (req, res) => {
     const messages = {
       invalid_token: "This reset link is not valid. Please request a new one.",
       token_expired: "This reset link has expired. Please request a new one.",
-      token_already_used: "This reset link has already been used. Please request a new one.",
+      token_already_used: "This reset link has already been used. If you already saved your password, sign in with it. Otherwise, request a new link.",
       weak_password: "Password must be at least 8 characters."
     };
     return res.status(400).json({ ok: false, code: result.code, error: messages[result.code] || messages.invalid_token });
   }
 
-  // Deliberately NOT signing them in here. Resetting proves control of the
-  // inbox, not of the password they just chose — make them type it once.
-  // It also means a stolen reset link cannot become a live session silently.
-  return res.json({ ok: true, message: "Password updated. Please sign in." });
+  // The customer has proved control of the single-use inbox link and typed the
+  // password they just chose. Complete that same action as a login instead of
+  // stranding a first-time client on a consumed reset URL and asking them to
+  // authenticate a second time. A stolen link already has the power to replace
+  // the password, so withholding the session does not preserve the account.
+  const existingUser = await prisma.user.findFirst({
+    where: { id: result.userId, status: "active" }
+  });
+  if (!existingUser) {
+    return res.status(400).json({ ok: false, error: "The password was updated, but this account is not active. Please contact support." });
+  }
+
+  const firstLogin = !existingUser.last_login_at;
+  const user = await prisma.user.update({
+    where: { id: existingUser.id },
+    data: { last_login_at: new Date() }
+  });
+  setSessionCookie(res, signSession(user));
+
+  return res.json({
+    ok: true,
+    message: "Password saved. Your account is ready.",
+    redirectTo: firstLogin ? "/admin/settings/facebook-page-connection" : "/admin/dashboard",
+    user: {
+      id: user.id,
+      company_id: user.company_id,
+      name: user.name,
+      email: user.email,
+      role: user.role
+    }
+  });
 }));
 
 app.post("/api/auth/logout", (req, res) => {
@@ -3734,6 +3842,32 @@ app.put("/api/settings", requireAuth, asyncHandler(async (req, res) => {
   ];
   const data = Object.fromEntries(Object.entries(req.body).filter(([key]) => allowed.includes(key)));
   if (data.quotation_mode !== "auto_send") data.allow_auto_send_quotation = false;
+  // Who gets alerts: people with a name, an email and/or a mobile (for SMS).
+  // notify_email stays the comma list every existing sender already uses.
+  if (Array.isArray(req.body.alert_contacts)) {
+    const contacts = req.body.alert_contacts.slice(0, 10).map((item) => ({
+      name: String(item?.name || "").trim().slice(0, 80),
+      email: String(item?.email || "").trim().toLowerCase().slice(0, 160),
+      phone: String(item?.phone || "").trim().slice(0, 30),
+      daily_report: Boolean(item?.daily_report),
+      urgent: Boolean(item?.urgent)
+    })).filter((item) => item.name || item.email || item.phone);
+    for (const item of contacts) {
+      if (!item.name) return res.status(400).json({ error: "Each alert contact needs a name." });
+      if (!item.email && !item.phone) return res.status(400).json({ error: `${item.name}: add an email or a mobile number.` });
+      if (item.email && !/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(item.email)) return res.status(400).json({ error: `${item.name}: the email "${item.email}" is not valid.` });
+      if (item.phone && item.phone.replace(/\D/g, "").length < 10) return res.status(400).json({ error: `${item.name}: the mobile number "${item.phone}" looks incomplete.` });
+    }
+    // A connected customer inbox (Settings > Channels > Email) must never receive staff alerts:
+    // the email channel would read them as customer mail.
+    const inbox = await prisma.tenantChannel.findUnique({ where: { company_id_channel_key: { company_id: req.companyId, channel_key: "email" } } }).catch(() => null);
+    const inboxAddress = String(inbox?.config?.address || "").toLowerCase();
+    if (inboxAddress && contacts.some((item) => item.email === inboxAddress)) {
+      return res.status(400).json({ error: `${inboxAddress} is your customer email channel (Settings > Channels). Use a staff email for alerts.` });
+    }
+    data.alert_contacts = contacts;
+    data.notify_email = [...new Set(contacts.map((item) => item.email).filter(Boolean))].join(", ") || null;
+  }
   const settings = await prisma.companySetting.update({ where: { company_id: req.companyId }, data });
   clearAistaffAiConfigCache();
   res.json(settings);
@@ -3763,6 +3897,7 @@ app.get("/api/facebook-page-connection", requireAuth, asyncHandler(async (req, r
   ]);
 
   const metaAuth = getMetaAuthForUser(req.user.id);
+  const expiredPage = pages.find((page) => page.status === "token_expired");
   res.json({
     connectedPage: connectedPage ? {
       id: connectedPage.id,
@@ -3773,6 +3908,9 @@ app.get("/api/facebook-page-connection", requireAuth, asyncHandler(async (req, r
       updatedAt: connectedPage.updated_at
     } : null,
     connectionStatus: connectedPage?.status === "active" ? "Connected" : "Not connected",
+    connectionIssue: expiredPage
+      ? `Facebook ended the session for ${expiredPage.page_name}. Connect Facebook Page again to refresh access and resume Messenger replies.`
+      : null,
     savedPages: pages.map((page) => ({
       id: page.id,
       pageId: page.page_id,
@@ -3801,19 +3939,44 @@ app.get("/api/meta/facebook/connect", requireAuth, asyncHandler(async (req, res)
     expiresAt: Date.now() + (10 * 60 * 1000)
   });
 
-  const authUrl = new URL("https://www.facebook.com/v20.0/dialog/oauth");
-  authUrl.searchParams.set("client_id", appId);
-  authUrl.searchParams.set("redirect_uri", getMetaRedirectUri(req));
-  authUrl.searchParams.set("state", state);
-  authUrl.searchParams.set("response_type", "code");
-  // Facebook Login for Business: the permission set comes from the dashboard
-  // configuration, not a raw scope string. A raw scope only works for people
-  // holding a role on the app, which is why non-role users were refused.
-  const loginConfigId = process.env.META_LOGIN_CONFIG_ID || "1615847410149532";
-  authUrl.searchParams.set("config_id", loginConfigId);
-  authUrl.searchParams.set("override_default_response_type", "true");
-  console.log("[fb-connect] redirecting to Facebook with config_id=%s", loginConfigId);
+  const connectMode = normalizeMetaConnectMode(req.query.mode);
+  const { authUrl, loginConfigId } = buildMetaAuthorizationUrl(req, state, connectMode);
+  console.log("[fb-connect] redirecting to Facebook mode=%s config_id=%s", connectMode, loginConfigId);
   res.redirect(302, authUrl.toString());
+}));
+
+/**
+ * Begin a client-owned Facebook authorization from a one-time support link.
+ * No AIStaff or Facebook password is accepted here. The bearer link identifies
+ * the intended tenant; Facebook itself authenticates the Page administrator.
+ */
+app.post("/api/public/facebook-connection-invite/start", asyncHandler(async (req, res) => {
+  if (!facebookInviteRateLimiter.check(clientIp(req)).allowed) {
+    return res.status(429).json({ error: "Too many attempts. Wait a few minutes, then try again." });
+  }
+  const rawInviteToken = facebookInviteBearerToken(req);
+  const result = await readFacebookConnectionInvite(rawInviteToken);
+  if (!result.ok) {
+    return res.status(410).json({ error: "This Facebook connection link is no longer available. Ask AIStaff support for a new link." });
+  }
+  if (!process.env.META_APP_ID || !process.env.META_APP_SECRET) {
+    return res.status(503).json({ error: "Facebook connection is not configured. Contact AIStaff support." });
+  }
+
+  const state = crypto.randomUUID();
+  metaOauthStates.set(state, {
+    inviteId: result.invite.id,
+    companyId: result.invite.company_id,
+    // Kept only in short-lived server memory so Meta can return the client to
+    // the same one-time page. It is never logged or stored in plaintext.
+    rawInviteToken,
+    expiresAt: Date.now() + (10 * 60 * 1000)
+  });
+  const connectMode = normalizeMetaConnectMode(req.body?.mode || req.query.mode);
+  const { authUrl, loginConfigId } = buildMetaAuthorizationUrl(req, state, connectMode);
+  console.log("[fb-connect-invite] starting invite=%s company=%s mode=%s config_id=%s",
+    result.invite.id, result.invite.company_id, connectMode, loginConfigId);
+  res.json({ ok: true, authorizationUrl: authUrl.toString() });
 }));
 
 app.get("/api/meta/facebook/callback", asyncHandler(async (req, res) => {
@@ -3829,7 +3992,9 @@ app.get("/api/meta/facebook/callback", asyncHandler(async (req, res) => {
   metaOauthStates.delete(state);
 
   if (!code) {
-    return res.redirect(302, facebookConnectionPath({ meta_error: errorReason || "Facebook authorization was not completed." }));
+    return res.redirect(302, metaAuthorizationReturnPath(authRequest, {
+      meta_error: errorReason || "Facebook authorization was not completed."
+    }));
   }
 
   const redirectUri = getMetaRedirectUri(req);
@@ -3843,11 +4008,60 @@ app.get("/api/meta/facebook/callback", asyncHandler(async (req, res) => {
   const tokenJson = await tokenResponse.json();
   if (!tokenResponse.ok || !tokenJson.access_token) {
     const message = tokenJson?.error?.message || "Could not complete Facebook authorization.";
-    return res.redirect(302, facebookConnectionPath({ meta_error: message.slice(0, 180) }));
+    return res.redirect(302, metaAuthorizationReturnPath(authRequest, { meta_error: message.slice(0, 180) }));
+  }
+
+  // The authorization-code result is temporary. If /me/accounts is called
+  // with it directly, the resulting Page credential can die with that short
+  // Facebook session (the production symptom was code 190/subcode 460 about
+  // one hour after a successful connection). Derive the Page token only from
+  // the exchanged long-lived user token. The user token itself is never saved.
+  // Facebook Login for Business can be configured to hand back a SYSTEM_USER
+  // token (owned by the client's Business Portfolio) instead of a USER token
+  // (owned by the rep who clicked Connect). USER-derived Page tokens die with
+  // that rep's Facebook session (190/460), which is why Marga kept going
+  // silent a few hours after every reconnect. A SYSTEM_USER token is already
+  // non-expiring and must NOT be run through fb_exchange_token.
+  const grantedTokenInfo = await inspectMetaToken({
+    token: tokenJson.access_token,
+    appId: process.env.META_APP_ID,
+    appSecret: process.env.META_APP_SECRET,
+    fetchImpl: fetch
+  });
+  const grantedIsSystemUser = isSystemUserToken(grantedTokenInfo);
+  console.log("[fb-connect] granted token type=%s user_id=%s expires_at=%s data_access_expires_at=%s config_id=%s",
+    grantedTokenInfo?.type || "unknown",
+    grantedTokenInfo?.userId || "?",
+    grantedTokenInfo ? grantedTokenInfo.expiresAt : "?",
+    grantedTokenInfo ? grantedTokenInfo.dataAccessExpiresAt : "?",
+    "see fb-connect start log");
+  if (!grantedIsSystemUser) {
+    console.warn("[fb-connect] WARNING: Page tokens will be tied to this person's Facebook session and can be revoked by Facebook at any time (190/460). Use the business-owned connection (mode=business, META_BUSINESS_LOGIN_CONFIG_ID) for a durable connection.");
+  }
+
+  let longLivedUserToken;
+  if (grantedIsSystemUser) {
+    longLivedUserToken = tokenJson.access_token;
+  } else try {
+    const exchanged = await exchangeForLongLivedMetaUserToken({
+      shortLivedToken: tokenJson.access_token,
+      appId: process.env.META_APP_ID,
+      appSecret: process.env.META_APP_SECRET,
+      fetchImpl: fetch
+    });
+    longLivedUserToken = exchanged.accessToken;
+    console.log("[fb-connect] long-lived user token exchange OK expires_in=%s",
+      exchanged.expiresIn || "not_reported");
+  } catch (error) {
+    console.error("[fb-connect] long-lived user token exchange FAILED code=%s subcode=%s error=%s",
+      error.metaCode || "none", error.metaSubcode || "none", error.message);
+    return res.redirect(302, metaAuthorizationReturnPath(authRequest, {
+      meta_error: `Facebook could not create a persistent connection: ${error.message}`.slice(0, 180)
+    }));
   }
 
   const pagesUrl = new URL("https://graph.facebook.com/v20.0/me/accounts");
-  pagesUrl.searchParams.set("access_token", tokenJson.access_token);
+  pagesUrl.searchParams.set("access_token", longLivedUserToken);
   pagesUrl.searchParams.set("fields", "id,name,category,tasks,access_token");
   const pagesResponse = await fetch(pagesUrl);
   const pagesJson = await pagesResponse.json();
@@ -3864,7 +4078,7 @@ app.get("/api/meta/facebook/callback", asyncHandler(async (req, res) => {
   }
   if (!pagesResponse.ok) {
     const message = pagesJson?.error?.message || "Could not load Facebook Pages.";
-    return res.redirect(302, facebookConnectionPath({ meta_error: message.slice(0, 180) }));
+    return res.redirect(302, metaAuthorizationReturnPath(authRequest, { meta_error: message.slice(0, 180) }));
   }
 
   const pages = Array.isArray(pagesJson.data)
@@ -3883,6 +4097,16 @@ app.get("/api/meta/facebook/callback", asyncHandler(async (req, res) => {
     pages.length,
     (Array.isArray(pagesJson?.data) ? pagesJson.data.length : 0) - pages.length);
 
+  if (authRequest.inviteId) {
+    setMetaAuthForInvite(authRequest.inviteId, {
+      companyId: authRequest.companyId,
+      pages
+    });
+    return res.redirect(302, metaAuthorizationReturnPath(authRequest, {
+      meta_auth: pages.length ? "success" : "empty"
+    }));
+  }
+
   setMetaAuthForUser(authRequest.userId, {
     companyId: authRequest.companyId,
     pages
@@ -3893,40 +4117,30 @@ app.get("/api/meta/facebook/callback", asyncHandler(async (req, res) => {
   }));
 }));
 
-app.post("/api/facebook-page-connection/select", requireAuth, asyncHandler(async (req, res) => {
-  const body = z.object({
-    pageId: z.string().min(1)
-  }).parse(req.body);
-
-  const metaAuth = getMetaAuthForUser(req.user.id);
-  if (!metaAuth || metaAuth.companyId !== req.companyId) {
-    return res.status(400).json({ error: "Please connect Facebook first to load your managed Pages." });
-  }
-
-  const selected = metaAuth.pages.find((page) => page.id === body.pageId);
-  if (!selected) {
-    return res.status(404).json({ error: "Selected Facebook Page was not found in the authorized list." });
-  }
-
+async function activateFacebookPageForCompany(companyId, selected) {
   await prisma.facebookPage.updateMany({
-    where: { company_id: req.companyId, page_id: { not: selected.id } },
+    where: { company_id: companyId, page_id: { not: selected.id } },
     data: { status: "inactive" }
   });
 
-  const page = await prisma.facebookPage.upsert({
+  // Saving the token and activating Messenger are two different operations.
+  // Keep the Page inactive until Meta confirms subscribed_apps; otherwise a
+  // rejected/expired token makes the dashboard claim replies are enabled even
+  // though Facebook will never deliver a message.
+  const savedPage = await prisma.facebookPage.upsert({
     where: { page_id: selected.id },
     create: {
-      company_id: req.companyId,
+      company_id: companyId,
       page_id: selected.id,
       page_name: selected.name,
       page_access_token_encrypted: encryptSecret(selected.accessToken),
-      status: "active"
+      status: "inactive"
     },
     update: {
-      company_id: req.companyId,
+      company_id: companyId,
       page_name: selected.name,
       page_access_token_encrypted: encryptSecret(selected.accessToken),
-      status: "active"
+      status: "inactive"
     },
     select: { id: true, page_id: true, page_name: true, status: true, updated_at: true }
   });
@@ -3943,13 +4157,21 @@ app.post("/api/facebook-page-connection/select", requireAuth, asyncHandler(async
       method: "POST",
       headers: { "Content-Type": "application/x-www-form-urlencoded" },
       body: new URLSearchParams({
-        subscribed_fields: "messages,messaging_postbacks",
+        subscribed_fields: "messages,messaging_postbacks,message_template_status_update",
         access_token: selected.accessToken
       })
     });
     const subJson = await subResponse.json().catch(() => ({}));
     if (subResponse.ok && subJson && subJson.success) {
+      // This operation uses the exact Page token and permission needed for the
+      // real Messenger delivery path. Do not gate activation on a separate
+      // Page-content read: GET /{page-id}?fields=id,name requires
+      // pages_read_engagement, which Messenger replying itself does not need.
       messengerReplies = "Enabled";
+      await prisma.facebookPage.update({
+        where: { id: savedPage.id },
+        data: { status: "active" }
+      });
       console.log("[fb-subscribe] page_id=%s OK", selected.id);
     } else {
       subscribeError = (subJson && subJson.error && subJson.error.message)
@@ -3961,7 +4183,12 @@ app.post("/api/facebook-page-connection/select", requireAuth, asyncHandler(async
     console.log("[fb-subscribe] page_id=%s THREW error=%s", selected.id, err.message);
   }
 
-  res.json({
+  const page = await prisma.facebookPage.findUnique({
+    where: { id: savedPage.id },
+    select: { id: true, page_id: true, page_name: true, status: true, updated_at: true }
+  });
+
+  return {
     ok: true,
     connectedPage: {
       id: page.id,
@@ -3972,7 +4199,117 @@ app.post("/api/facebook-page-connection/select", requireAuth, asyncHandler(async
       updatedAt: page.updated_at
     },
     subscribeError
+  };
+}
+
+app.post("/api/facebook-page-connection/select", requireAuth, asyncHandler(async (req, res) => {
+  const body = z.object({
+    pageId: z.string().min(1)
+  }).parse(req.body);
+
+  const metaAuth = getMetaAuthForUser(req.user.id);
+  if (!metaAuth || metaAuth.companyId !== req.companyId) {
+    return res.status(400).json({ error: "Please connect Facebook first to load your managed Pages." });
+  }
+
+  const selected = metaAuth.pages.find((page) => page.id === body.pageId);
+  if (!selected) {
+    return res.status(404).json({ error: "Selected Facebook Page was not found in the authorized list." });
+  }
+
+  res.json(await activateFacebookPageForCompany(req.companyId, selected));
+}));
+
+app.get("/api/public/facebook-connection-invite", asyncHandler(async (req, res) => {
+  if (!facebookInviteRateLimiter.check(clientIp(req)).allowed) {
+    return res.status(429).json({ error: "Too many attempts. Wait a few minutes, then try again." });
+  }
+  const result = await readFacebookConnectionInvite(facebookInviteBearerToken(req));
+  if (!result.ok) {
+    const message = {
+      invalid: "This Facebook connection link is invalid.",
+      revoked: "A newer connection link was issued. Ask AIStaff support for the latest link.",
+      expired: "This Facebook connection link has expired. Ask AIStaff support for a new one.",
+      used: result.invite?.connected_page_name
+        ? `${result.invite.connected_page_name} was already connected successfully.`
+        : "This Facebook connection link has already been used."
+    }[result.code] || "This Facebook connection link is unavailable.";
+    return res.status(result.code === "used" ? 200 : 410).json({
+      ok: false,
+      code: result.code,
+      message,
+      completed: result.code === "used" && Boolean(result.invite?.connected_page_id),
+      companyName: result.invite?.company_name || null,
+      pageName: result.invite?.connected_page_name || null
+    });
+  }
+
+  const metaAuth = getMetaAuthForInvite(result.invite.id);
+  const pages = metaAuth?.companyId === result.invite.company_id
+    ? metaAuth.pages.map(sanitizeManagedPage)
+    : [];
+  const currentPage = await prisma.facebookPage.findFirst({
+    where: { company_id: result.invite.company_id },
+    orderBy: { updated_at: "desc" },
+    select: { page_name: true, status: true }
   });
+  res.json({
+    ok: true,
+    companyName: result.invite.company_name,
+    expiresAt: result.invite.expires_at,
+    currentPage: currentPage ? { name: currentPage.page_name, status: currentPage.status } : null,
+    authorizationReady: pages.length > 0,
+    managedPages: pages
+  });
+}));
+
+app.post("/api/public/facebook-connection-invite/select", asyncHandler(async (req, res) => {
+  if (!facebookInviteRateLimiter.check(clientIp(req)).allowed) {
+    return res.status(429).json({ error: "Too many attempts. Wait a few minutes, then try again." });
+  }
+  const body = z.object({ pageId: z.string().min(1) }).parse(req.body || {});
+  const result = await readFacebookConnectionInvite(facebookInviteBearerToken(req));
+  if (!result.ok) {
+    return res.status(410).json({ error: "This Facebook connection link is no longer available. Ask AIStaff support for a new link." });
+  }
+
+  const metaAuth = getMetaAuthForInvite(result.invite.id);
+  if (!metaAuth || metaAuth.companyId !== result.invite.company_id) {
+    return res.status(400).json({ error: "Authorize Facebook first, then select the Page to connect." });
+  }
+  const selected = metaAuth.pages.find((page) => page.id === body.pageId);
+  if (!selected) {
+    return res.status(404).json({ error: "That Page was not returned by the Facebook account you authorized." });
+  }
+
+  const claimedAt = await claimFacebookConnectionInvite(result.invite.id);
+  if (!claimedAt) {
+    return res.status(409).json({ error: "This link is already being used or has expired. Refresh the page before trying again." });
+  }
+
+  let activation;
+  try {
+    activation = await activateFacebookPageForCompany(result.invite.company_id, selected);
+    if (activation.subscribeError || activation.connectedPage.status !== "active") {
+      await releaseFacebookConnectionInvite(result.invite.id, claimedAt);
+      return res.status(502).json({
+        error: `Facebook authorized the Page, but Messenger could not be activated: ${activation.subscribeError || "subscription not active"}`
+      });
+    }
+    const completed = await completeFacebookConnectionInvite(result.invite.id, claimedAt, {
+      page_id: activation.connectedPage.pageId,
+      page_name: activation.connectedPage.name
+    });
+    if (!completed) throw new Error("Connection invite completion could not be recorded");
+  } catch (error) {
+    await releaseFacebookConnectionInvite(result.invite.id, claimedAt).catch(() => {});
+    throw error;
+  }
+
+  metaAuthorizedPagesByInvite.delete(result.invite.id);
+  console.log("[fb-connect-invite] completed invite=%s company=%s page=%s",
+    result.invite.id, result.invite.company_id, activation.connectedPage.pageId);
+  res.json({ ok: true, connectedPage: activation.connectedPage });
 }));
 
 /**
@@ -4060,7 +4397,12 @@ app.post("/api/facebook-pages", requireAuth, asyncHandler(async (req, res) => {
 }));
 
 app.get("/api/knowledge-base", requireAuth, asyncHandler(async (req, res) => {
-  res.json(await prisma.knowledgeBase.findMany({ where: { company_id: req.companyId }, orderBy: { updated_at: "desc" } }));
+  // Inactive rows are retained as history, but showing them beside the current
+  // row made a successful save look as if stale content had won.
+  res.json(await prisma.knowledgeBase.findMany({
+    where: { company_id: req.companyId, active: true },
+    orderBy: { updated_at: "desc" }
+  }));
 }));
 
 app.post("/api/knowledge-base", requireAuth, asyncHandler(async (req, res) => {
@@ -4237,9 +4579,13 @@ app.post("/api/intake/step/:stepId", requireAuth, asyncHandler(async (req, res) 
     sourceName: z.string().max(300).optional().nullable(),
     sourceKind: z.string().max(40).optional().nullable(),
     data: z.array(z.object({
-      label: z.string().max(200).optional().default(""),
-      value: z.string().max(200).optional().default(""),
-      note: z.string().max(200).optional().default("")
+      // These rows are typed in ordinary text inputs and are also folded into
+      // the already-bounded 3,000-word answer. The old 200-character ceiling
+      // was invisible in the form and rejected legitimate one-sentence pain /
+      // solution details with only a generic "Validation failed" message.
+      label: z.string().max(500).optional().default(""),
+      value: z.string().max(4000).optional().default(""),
+      note: z.string().max(2000).optional().default("")
     })).optional().nullable()
   }).parse(req.body);
 
@@ -4702,8 +5048,81 @@ function requirePlatformRole(req, res, next) {
 }
 
 /** Which model runs which function, plus the catalogue for the dropdown. */
+/* Local (Bosgame) model router: one model in memory at a time. Selecting a
+ * local model asks the router to load it now (it unloads the previous one),
+ * so the first customer does not wait for the load. */
+function localRouterBase() {
+  return String(process.env.LOCAL_LLM_BASE_URL || "").replace(/\/v1\/?$/, "").replace(/\/$/, "");
+}
+async function localModelStatus() {
+  const base = localRouterBase();
+  if (!base) return { reachable: false, models: {} };
+  try {
+    const response = await fetch(`${base}/models`, { signal: AbortSignal.timeout(5000) });
+    const data = await response.json();
+    return { reachable: true, models: Object.fromEntries((data.data || []).map((item) => [item.id, item.status?.value || "unknown"])) };
+  } catch (error) {
+    return { reachable: false, error: error.message, models: {} };
+  }
+}
+/**
+ * Switch the Bosgame to `model`. The router holds one model (--models-max 1)
+ * and refuses a load with "model limit reached" while another model is still
+ * loaded or loading, so: unload every other model, wait until memory is free,
+ * then load, retrying while the router is busy. Runs in the background; the
+ * AI Studio page polls /api/models for progress.
+ */
+let localSwitchSeq = 0;
+async function routerCall(path, body, timeoutMs = 15000) {
+  const response = await fetch(`${localRouterBase()}${path}`, {
+    method: body ? "POST" : "GET",
+    headers: body ? { "Content-Type": "application/json" } : undefined,
+    body: body ? JSON.stringify(body) : undefined,
+    signal: AbortSignal.timeout(timeoutMs)
+  });
+  const text = await response.text();
+  let json = null;
+  try { json = JSON.parse(text); } catch { /* text */ }
+  return { ok: response.ok, status: response.status, json, text };
+}
+async function switchLocalModel(model) {
+  const seq = ++localSwitchSeq;
+  const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
+  const deadline = Date.now() + 10 * 60 * 1000;
+  while (Date.now() < deadline) {
+    if (seq !== localSwitchSeq) return; // a newer selection took over
+    const listing = await routerCall("/models").catch(() => null);
+    const models = listing?.json?.data || [];
+    const target = models.find((item) => item.id === model);
+    if (!target) throw new Error(`The Bosgame router does not know ${model}.`);
+    const state = target.status?.value;
+    if (state === "loaded" || state === "loading") {
+      if (state === "loaded") { console.log("[models] local switch done model=%s", model); return; }
+      await sleep(5000);
+      continue;
+    }
+    const others = models.filter((item) => item.id !== model && ["loaded", "loading"].includes(item.status?.value));
+    for (const other of others) {
+      await routerCall("/models/unload", { model: other.id }).catch(() => null);
+      console.log("[models] local unload requested model=%s (switching to %s)", other.id, model);
+    }
+    if (others.length) { await sleep(3000); continue; }
+    const load = await routerCall("/models/load", { model }).catch((error) => ({ ok: false, text: error.message }));
+    if (load.ok) console.log("[models] local load requested model=%s", model);
+    else console.warn("[models] local load retry model=%s: %s", model, String(load.text).slice(0, 160));
+    await sleep(load.ok ? 5000 : 4000);
+  }
+  console.error("[models] local switch to %s did not finish within 10 minutes", model);
+}
+async function loadLocalModel(model) {
+  if (!localRouterBase()) throw new Error("LOCAL_LLM_BASE_URL is not set.");
+  const listing = await routerCall("/models").catch((error) => { throw new Error(`Bosgame not reachable: ${error.message}`); });
+  if (!(listing.json?.data || []).some((item) => item.id === model)) throw new Error(`The Bosgame router does not know ${model}.`);
+  switchLocalModel(model).catch((error) => console.error("[models] local switch failed model=%s: %s", model, error.message));
+}
+
 app.get("/api/models", requireAuth, requirePermission("platform.behaviour"), asyncHandler(async (req, res) => {
-  res.json({ settings: await listSettings(), catalogue: MODEL_CATALOGUE });
+  res.json({ settings: await listSettings(), catalogue: MODEL_CATALOGUE, local: await localModelStatus() });
 }));
 
 app.post("/api/models", requireAuth, requirePermission("platform.behaviour"), asyncHandler(async (req, res) => {
@@ -4715,7 +5134,14 @@ app.post("/api/models", requireAuth, requirePermission("platform.behaviour"), as
   const saved = await setModelFor({ ...body, updatedBy: req.user.email });
   if (!saved) return res.status(400).json({ ok: false, error: "Unknown function" });
   if (saved.error) return res.status(400).json({ ok: false, error: saved.error });
-  res.json({ ok: true });
+  if (body.provider === "local") {
+    try {
+      await loadLocalModel(body.model);
+    } catch (error) {
+      return res.status(502).json({ ok: false, error: `Saved, but ${error.message}` });
+    }
+  }
+  res.json({ ok: true, loading: body.provider === "local" });
 }));
 
 /** Current instructions plus the full revision history. */
@@ -4788,6 +5214,27 @@ app.post("/api/prompts/demo-page/activate", requireAuth, requirePermission("plat
  * assembles it. Available to the CUSTOMER too (no platform role required), so
  * they can verify their extra instructions were understood.
  */
+/** Every instruction Closer combines, in the order it uses them (read-only review). Added 2026-10-20. */
+async function closerInstructionLayers(companyId, settings) {
+  const layers = [{ kind: "company", title: "Closer instructions — every channel", text: String(settings?.ai_custom_instructions || "").trim(), edit: "/admin/settings#closer-instructions" }];
+  const engines = await prisma.tenantEngine.findMany({ where: { company_id: companyId, enabled: true }, include: { engine: { select: { key: true, name: true } } }, orderBy: { created_at: "asc" } }).catch(() => []);
+  for (const row of engines) {
+    const text = row.instruction_enabled === false ? "" : (String(row.tenant_instruction || "").trim() || String(row.default_instruction_snapshot || "").trim());
+    layers.push({ kind: "engine", title: `Business Engine — ${row.engine?.name || row.engine?.key}`, text, note: String(row.tenant_instruction || "").trim() ? "custom" : "platform default", edit: "/admin/settings/business-engines" });
+    if (row.engine?.key === "customer_service") {
+      const rules = require("./scheduling-rules").normalize(row.scheduling_rules || {});
+      layers.push({ kind: "rule", title: "Scheduling — Customer Service", text: `${rules.enabled ? `Daily cut-off ${rules.cutoff_time}; preparation items: ${rules.prep_keywords.join(", ") || "none"}.` : "No cut-off."} Customers ${rules.tell_customer_schedule ? "may be told the target day" : "are never told a schedule day, date or time, and nothing is promised"}.`, edit: "/admin/settings/business-engines" });
+    }
+  }
+  const rs = require("./reply-style");
+  const names = { facebook_messenger: "Facebook Messenger", email: "Email", website_chat: "Website chat", mobile_phone: "Mobile phone" };
+  for (const key of Object.keys(names)) {
+    const cfg = await rs.channelSettings(companyId, key);
+    layers.push({ kind: "channel", title: `Channel — ${names[key]} (${cfg.style === "formal" ? "Formal" : "Casual"} replies)`, text: cfg.instructions, edit: "/admin/settings/channels" });
+  }
+  return layers;
+}
+
 app.get("/api/prompts/closer/preview", requireAuth, asyncHandler(async (req, res) => {
   const [company, settings, active, rows, questionCount, gapCount] = await Promise.all([
     prisma.company.findUnique({ where: { id: req.companyId } }),
@@ -4847,7 +5294,8 @@ app.get("/api/prompts/closer/preview", requireAuth, asyncHandler(async (req, res
     missing,
     behaviours,
     openGaps: gapCount,
-    customInstructions: settings?.ai_custom_instructions || ""
+    customInstructions: settings?.ai_custom_instructions || "",
+    layers: await closerInstructionLayers(req.companyId, settings)
   });
 }));
 
@@ -5124,7 +5572,9 @@ app.get("/api/platform/me", requireAuth, asyncHandler(async (req, res) => {
       behaviour: can(req.user, "platform.behaviour"),
       customersView: can(req.user, "customers.view"),
       customersStatus: can(req.user, "customers.status"),
-      customersAssist: can(req.user, "customers.assist")
+      customersAssist: can(req.user, "customers.assist"),
+      phoneLines: can(req.user, "phonelines.manage"),
+      emailEngine: can(req.user, "emailengine.manage")
     }
   });
 }));
@@ -5153,7 +5603,57 @@ app.put("/api/platform/customers/:id/status", requireAuth, requirePermission("cu
 }));
 
 /**
+ * Create the handoff URL support sends to the client. The client completes
+ * Facebook Login on their own device; staff never receives their password,
+ * OTP, Facebook cookie, or personal access token.
+ */
+app.post("/api/platform/customers/:id/facebook-connection-invite", requireAuth, requirePermission("customers.assist"), asyncHandler(async (req, res) => {
+  const company = await prisma.company.findUnique({
+    where: { id: req.params.id },
+    select: { id: true, name: true, account_number: true, status: true }
+  });
+  if (!company) return res.status(404).json({ error: "Customer not found" });
+  if (company.status !== "active") {
+    return res.status(400).json({ error: "Activate this customer before requesting a Facebook connection." });
+  }
+
+  const connectMode = normalizeMetaConnectMode(req.body?.mode);
+  const invite = await createFacebookConnectionInvite({ company, user: req.user });
+  const url = `${getAppUrl(req)}/facebook-connect/#token=${encodeURIComponent(invite.rawToken)}${connectMode === "business" ? "&mode=business" : ""}`;
+  console.log("[fb-connect-invite] created invite=%s company=%s by=%s mode=%s expires=%s",
+    invite.id, company.id, req.user.email, connectMode, invite.expires_at.toISOString());
+  res.json({
+    ok: true,
+    company: { id: company.id, name: company.name, accountNumber: company.account_number },
+    url,
+    expiresAt: invite.expires_at,
+    expiresInHours: INVITE_TTL_HOURS
+  });
+}));
+
+/** Leave assist mode and return to your own workspace. */
+app.post("/api/platform/assist/exit", requireAuth, asyncHandler(async (req, res) => {
+  const user = await prisma.user.findUnique({
+    where: { id: req.user.id },
+    select: { company_id: true, company: { select: { name: true } } }
+  });
+
+  await prisma.assistSession.updateMany({
+    where: { staff_user_id: req.user.id, ended_at: null },
+    data: { ended_at: new Date() }
+  });
+
+  setSessionCookie(res, signSession(req.user));
+  console.log("[assist] %s exited assist mode", req.user.email);
+  res.json({ ok: true, company: user.company });
+}));
+
+/**
  * Enter a customer's workspace.
+ *
+ * Keep this parameterized route after /assist/exit. Express matches routes in
+ * registration order, so putting /:companyId first makes the literal word
+ * "exit" look like a customer id and returns "Customer not found".
  *
  * Recorded on ENTRY rather than exit, so an abandoned session is still logged.
  * The session cookie is re-issued against their company id — the same
@@ -5181,30 +5681,12 @@ app.post("/api/platform/assist/:companyId", requireAuth, requirePermission("cust
   console.log("[assist] %s entered %s (%s) session=%s",
     req.user.email, company.account_number, company.name, session.id);
 
-  setSessionCookie(res, signSession({
-    sub: req.user.id,
+  setSessionCookie(res, signSession(req.user, {
     companyId: company.id,
     assistSessionId: session.id
   }));
 
   res.json({ ok: true, company, sessionId: session.id });
-}));
-
-/** Leave assist mode and return to your own workspace. */
-app.post("/api/platform/assist/exit", requireAuth, asyncHandler(async (req, res) => {
-  const user = await prisma.user.findUnique({
-    where: { id: req.user.id },
-    select: { company_id: true, company: { select: { name: true } } }
-  });
-
-  await prisma.assistSession.updateMany({
-    where: { staff_user_id: req.user.id, ended_at: null },
-    data: { ended_at: new Date() }
-  });
-
-  setSessionCookie(res, signSession({ sub: req.user.id, companyId: user.company_id }));
-  console.log("[assist] %s exited assist mode", req.user.email);
-  res.json({ ok: true, company: user.company });
 }));
 
 /** Who has been in whose workspace. Visible to anyone who can view customers. */
@@ -5310,6 +5792,185 @@ app.put("/api/platform/users/:id", requireAuth, requirePermission("platform.user
 // Pitch voice-agent admin (pipeline switch, Piper voices, previews).
 // Own module so voice settings evolve without touching this file.
 app.use("/api/pitch-admin", require("./routes/pitch-admin").buildRouter({ requireAuth }));
+app.use("/api/integrations", require("./routes/integrations").buildRouter({ requireAuth }));
+app.use("/api/business-engines", require("./routes/business-engines").buildRouter({ requireAuth }));
+app.use("/api/channels", require("./routes/channels").buildRouter({ requireAuth }));
+// Email Engine (2026-10-22): bulk email to many recipients — Settings > Email Engine, Platform > Email Engine, public /u/ unsubscribe.
+app.use("/api/email-engine", require("./routes/email-engine").buildRouter({ requireAuth }));
+app.use("/api/platform/email-engine", require("./routes/email-engine").buildPlatformRouter({ requireAuth }));
+app.use("/u", require("./routes/email-engine").buildPublicRouter());
+app.use("/api/platform/phone-lines", require("./routes/phone-lines").buildPlatformRouter({ requireAuth }));
+
+// Voice turn (Phone now, Website Call later): the caller's words go through the same
+// Director as the website chat widget; the reply text goes back to be spoken.
+// The caller's message is already saved by the voice service; the spoken reply is saved by it too.
+app.post("/api/internal/pitch/turn", async (req, res) => {
+  const token = process.env.PITCH_PLATFORM_TOKEN;
+  if (!token || req.get("x-pitch-token") !== token) return res.status(401).json({ error: "unauthorized" });
+  const { conversation_id: conversationId, company_id: companyId, caller, text } = req.body || {};
+  const message = String(text || "").trim().slice(0, 2000);
+  if (!message) return res.status(400).json({ error: "empty text" });
+  const started = Date.now();
+  try {
+    const conversation = await prisma.conversation.findFirst({ where: { id: String(conversationId || ""), company_id: String(companyId || "") } });
+    if (!conversation) return res.status(404).json({ error: "conversation not found" });
+    // Each call starts fresh (Mike 2026-10-21): calls from one number share a thread, so the first turn after
+    // 5+ minutes of silence moves the "history starts here" marker to this call. The Director's notes and
+    // the chat history of earlier calls are left behind; the customer profile (who they are) is kept.
+    // A "needs a person" flag left by an earlier call is cleared (the hand-over record stays for staff).
+    {
+      const rows = await prisma.$queryRawUnsafe(
+        `select created_at from messages where conversation_id=$1 order by created_at desc limit 400`, conversation.id).catch(() => []);
+      let callStart = null;
+      for (let i = 0; i < rows.length; i += 1) {
+        const t = new Date(rows[i].created_at);
+        const older = rows[i + 1] ? new Date(rows[i + 1].created_at) : null;
+        if (!older || t - older > 5 * 60 * 1000) { callStart = t; break; }
+      }
+      if (callStart && (!conversation.ai_history_from || new Date(conversation.ai_history_from) < callStart)) {
+        await prisma.conversation.update({ where: { id: conversation.id }, data: {
+          ai_history_from: callStart, ...(conversation.needs_human ? { needs_human: false, status: "open" } : {}) } }).catch(() => {});
+        conversation.ai_history_from = callStart;
+        try { require("./director").clearVoiceFlow(conversation.id); } catch {}
+        conversation.needs_human = false;
+        console.log("[voice-turn] new call: fresh start from %s conversation=%s", callStart.toISOString(), conversation.id);
+      }
+    }
+    const settings = await prisma.companySetting.findUnique({ where: { company_id: conversation.company_id } });
+    if (!settings?.ai_enabled) return res.json({ reply: null, reason: "ai_disabled" });
+    if (conversation.needs_human) return res.json({ reply: null, reason: "needs_human" });
+    let lead = await prisma.lead.findFirst({ where: { company_id: conversation.company_id, conversation_id: conversation.id } });
+    if (!lead) {
+      lead = await prisma.lead.create({ data: { company_id: conversation.company_id, conversation_id: conversation.id, lead_status: "new",
+        mobile_number: caller || conversation.contact_number || null, customer_name: conversation.customer_name || null } }).catch(() => null);
+    }
+    // Phone Director (Mike 2026-10-22): fixed call script, code-written lines (src/voice-director.js).
+    // VOICE_DIRECTOR=off sends calls through the old Closer + Director path below.
+    if (process.env.VOICE_DIRECTOR !== "off") {
+      try {
+        const vd = await require("./voice-director").turn({ conversation, companyId: conversation.company_id, message, caller });
+        if (vd?.reply) {
+          console.log("[voice-director] company=%s conversation=%s ms=%d reply=%s", conversation.company_id, conversation.id, Date.now() - started, JSON.stringify(vd.reply).slice(0, 160));
+          return res.json({ reply: vd.reply, needs_human: false, intent: "voice:service_request", subject: "voice_director", asr: vd.asr || null, asr_label: vd.asr_label || null, ms: Date.now() - started });
+        }
+      } catch (error) {
+        console.error("[voice-director] FAILED conversation=%s: %s", conversation.id, error.stack || error.message);
+      }
+    }
+    const { generateSalesReply, leadUpdateDataForAi } = require("./ai");
+    // A short language request ("Do you speak English?") is not a new request: the Director continues the
+    // same step, and the reply language follows the request (director.js spokenLanguage).
+    const langAsk = message.length <= 60 && /\b(english|ingles|tagalog|filipino|taglish)\b/i.test(message);
+    const directorMessage = langAsk ? `(The caller asked to continue in ${/english|ingles/i.test(message) ? "English" : "Tagalog"}. Continue the current step.)` : message;
+    // Voice subject router: code decides what happens; the AI only labels the subject (src/voice-router.js).
+    const router = require("./voice-router");
+    // Voice uses exactly Closer's rules (Mike 2026-10-21): every turn goes through Closer + the Director like chat.
+    // The separate voice router (own answers for sales / small talk / off-topic) is OFF unless VOICE_ROUTER=on.
+    const decision = process.env.VOICE_ROUTER === "on"
+      ? await router.route({ companyId: conversation.company_id, conversationId: conversation.id, message: langAsk ? "(hello)" : message })
+      : { subject: langAsk ? "language_request" : "closer", action: "director", ms: 0 };
+    if (process.env.VOICE_ROUTER === "on" && langAsk && decision.action !== "director") { decision.subject = "language_request"; decision.action = "small_talk"; }
+    if (langAsk && decision.action === "director") decision.subject = decision.subject === "in_workflow" ? "in_workflow" : "language_request";
+    // The caller is answering the quote question (name / company): stay in sales.
+    if (conversation.intent === "voice:sales" && ["small_talk", "business_question"].includes(decision.subject) && (decision.name || decision.company)) {
+      decision.subject = "sales"; decision.action = "answer";
+    }
+    console.log("[voice-router] company=%s conversation=%s subject=%s action=%s ms=%d%s", conversation.company_id, conversation.id,
+      decision.subject, decision.action, decision.ms || 0, decision.error ? ` error=${decision.error}` : "");
+    // Details the caller said (name, company): saved by code to the lead and the conversation.
+    if (decision.name || decision.company) {
+      if (lead) await prisma.lead.update({ where: { id: lead.id }, data: {
+        ...(decision.name && !lead.customer_name ? { customer_name: decision.name } : {}),
+        ...(decision.company && !lead.company_name ? { company_name: decision.company } : {}) } }).catch(() => {});
+      if (decision.name && !conversation.customer_name) await prisma.conversation.update({ where: { id: conversation.id }, data: { customer_name: decision.name } }).catch(() => {});
+    }
+    if (decision.action === "redirect" || decision.action === "small_talk" || decision.action === "answer") {
+      const short = await router.shortReply({ companyId: conversation.company_id, conversationId: conversation.id, message, action: decision.action, subject: decision.subject }).catch((e) => { console.error("[voice-router] short reply failed:", e.message); return ""; });
+      if (short) {
+        await prisma.conversation.update({ where: { id: conversation.id }, data: { intent: `voice:${decision.subject}` } }).catch(() => {});
+        return res.json({ reply: short, needs_human: false, intent: `voice:${decision.subject}`, subject: decision.subject, ms: Date.now() - started });
+      }
+    }
+    let ai;
+    try {
+      ai = await generateSalesReply({ companyId: conversation.company_id, conversationId: conversation.id, message: directorMessage });
+    } catch (error) {
+      console.error("[voice-turn] DIRECTOR FAILED company=%s conversation=%s: %s", conversation.company_id, conversation.id, error.message);
+      return res.json({ reply: null, reason: `director_error: ${error.message}` });
+    }
+    if (lead) await prisma.lead.update({ where: { id: lead.id }, data: { ...(ai.leadPatch || {}), ...leadUpdateDataForAi(lead.lead_status, ai) } }).catch(() => {});
+    const name = ai.leadPatch?.customer_name;
+    await prisma.conversation.update({ where: { id: conversation.id }, data: {
+      intent: ai.intent, lead_score: ai.leadScore, needs_human: ai.needsHuman, status: ai.needsHuman ? "handoff" : "open",
+      ...(name && !conversation.customer_name ? { customer_name: name } : {}) } }).catch(() => {});
+    if (ai.needsHuman && settings?.human_handoff_enabled) {
+      await prisma.humanHandoff.create({ data: { company_id: conversation.company_id, conversation_id: conversation.id,
+        reason: String(ai.handoffReason || "Phone call needs a person").slice(0, 500) } }).catch(() => {});
+    }
+    const reply = [ai.reply, ...(ai.followUpMessages || [])].map((t) => String(t || "").trim()).filter(Boolean).join(" ");
+    const ms = Date.now() - started;
+    console.log("[voice-turn] company=%s conversation=%s ms=%d needs_human=%s intent=%s", conversation.company_id, conversation.id, ms, Boolean(ai.needsHuman), ai.intent);
+    res.json({ reply, needs_human: Boolean(ai.needsHuman), intent: ai.intent, subject: decision.subject, ms });
+  } catch (error) {
+    console.error("[voice-turn] failed:", error.message);
+    res.status(500).json({ reply: null, reason: error.message });
+  }
+});
+
+// Pitch (phone) asks for a person: the assistant got stuck on a live call.
+// Called by the Pitch service on the voice server with a shared token, never by browsers.
+app.post("/api/internal/pitch/handoff", async (req, res) => {
+  const token = process.env.PITCH_PLATFORM_TOKEN;
+  if (!token || req.get("x-pitch-token") !== token) return res.status(401).json({ error: "unauthorized" });
+  const { conversation_id: conversationId, company_id: companyId, caller, reason, transcript, quiet } = req.body || {};
+  try {
+    const conversation = await prisma.conversation.findFirst({ where: { id: String(conversationId || ""), company_id: String(companyId || "") } });
+    if (!conversation) return res.status(404).json({ error: "conversation not found" });
+    const why = String(reason || "The phone assistant needs a person.").slice(0, 500);
+    // quiet = a staff alert only (stuck on a call): the assistant keeps helping, nothing is handed over.
+    await prisma.$transaction([
+      ...(quiet ? [] : [prisma.conversation.update({ where: { id: conversation.id }, data: { needs_human: true, status: "handoff" } })]),
+      prisma.humanHandoff.create({ data: { company_id: conversation.company_id, conversation_id: conversation.id, reason: quiet ? `[Alert only — call continues] ${why}` : why } })
+    ]);
+    const [settings, company] = await Promise.all([
+      prisma.companySetting.findUnique({ where: { company_id: conversation.company_id } }),
+      prisma.company.findUnique({ where: { id: conversation.company_id }, select: { name: true } })
+    ]);
+    const recipients = [...String(settings?.notify_email || "").split(/[,;\s]+/), process.env.ADMIN_ALERT_EMAIL || process.env.SEED_ADMIN_EMAIL]
+      .map((v) => String(v || "").trim()).filter((v) => v.includes("@"))
+      .filter((v, i, all) => all.indexOf(v) === i);
+    const link = `${String(process.env.PUBLIC_APP_URL || "https://aistaff.click").replace(/\/$/, "")}/admin/conversations/${conversation.id}`;
+    const text = [
+      `A caller needs a person on your phone line${company?.name ? ` (${company.name})` : ""}.`, "",
+      `Caller: ${caller || conversation.contact_number || "unknown number"}`,
+      `Why: ${why}`, "",
+      transcript ? `Last part of the call:\n${String(transcript).slice(0, 2000)}` : "", "",
+      `Open the conversation: ${link}`,
+      "Call or text the customer back. Tip: if callers are often misheard, add the words they use to Settings > Channels > Mobile Phone > Words callers often say."
+    ].filter((l) => l !== null).join("\n");
+    const { sendNotification } = require("./notify");
+    for (const to of recipients) {
+      await sendNotification({ to, subject: `Phone caller needs a person — ${caller || "unknown number"}`, text, audience: "tenant", tenantName: company?.name || "" })
+        .catch((e) => console.error("[pitch-handoff] email failed:", e.message));
+    }
+    console.log("[pitch-handoff] company=%s conversation=%s caller=%s alerted=%d", conversation.company_id, conversation.id, caller, recipients.length);
+    res.json({ ok: true, alerted: recipients.length });
+  } catch (error) {
+    console.error("[pitch-handoff] failed:", error.message);
+    res.status(500).json({ error: error.message });
+  }
+});
+app.use("/api/briefing", require("./routes/briefing").buildRouter({ requireAuth }));
+app.use("/api/hooks", require("./routes/tenant-hooks").buildRouter());
+app.use(require("./routes/widget").buildRouter());
+app.use("/api/engine-scheduling", require("./routes/scheduling-rules").buildRouter({ requireAuth }));
+// After-service follow-up (2026-10-20): public "was it done?" page + Customer Service engine settings.
+app.use("/feedback", require("./routes/feedback").buildPublicRouter());
+app.use("/api/engine-feedback", require("./routes/feedback").buildAdminRouter({ requireAuth }));
+// Staff resolve loop: signed links from ACTION NEEDED / URGENT alert emails (confirm page, then POST).
+app.use("/resolve", require("./resolve-loop").buildRouter());
+// Urgent alerts: "I handled it" page (link in the email + text). src/escalations.js
+app.use("/e", require("./escalations").buildRouter());
 
 app.get("/api/ai-studio", requireAuth, asyncHandler(async (req, res) => {
   const config = await loadAistaffAiConfig(req.companyId);
@@ -5370,6 +6031,29 @@ app.post("/api/prompts/custom", requireAuth, asyncHandler(async (req, res) => {
 
   clearAistaffAiConfigCache();
   res.json({ ok: true, version: (latest?.version || 0) + 1 });
+}));
+
+/* Preview what Closer sees: the exact combined prompt (platform prompt,
+ * Closer instructions, engine instructions + tools, knowledge base, the
+ * conversation) for the current company and a sample message. Nothing is
+ * sent to the AI and no tool runs. */
+app.post("/api/closer/prompt-preview", requireAuth, asyncHandler(async (req, res) => {
+  const body = z.object({
+    message: z.string().trim().min(1).max(2000).optional().default("Hi, I need help with our printer."),
+    conversationId: z.string().trim().max(100).optional().nullable()
+  }).parse(req.body || {});
+  let conversationId = null;
+  if (body.conversationId) {
+    const owned = await prisma.conversation.findFirst({ where: { id: body.conversationId, company_id: req.companyId }, select: { id: true } });
+    if (!owned) return res.status(404).json({ error: "Conversation not found in this workspace." });
+    conversationId = owned.id;
+  }
+  const result = await generateSalesReply({ companyId: req.companyId, conversationId, message: body.message, previewOnly: true });
+  const sections = [];
+  const re = /^=== (.+?) ===$/gm;
+  let match;
+  while ((match = re.exec(result.prompt))) sections.push({ title: match[1], at: match.index });
+  res.json({ ...result, characters: result.prompt.length, sections: sections.map((section, index) => ({ title: section.title, characters: (sections[index + 1]?.at ?? result.prompt.length) - section.at })) });
 }));
 
 app.post("/api/prompts/custom/activate", requireAuth, asyncHandler(async (req, res) => {
@@ -6089,6 +6773,8 @@ app.put("/api/bookings/:id/status", requireAuth, asyncHandler(async (req, res) =
   res.json(serializeBooking(booking));
 }));
 
+app.use("/api", buildCustomerUpdateRouter({ requireAuth }));
+
 app.get("/api/follow-ups", requireAuth, asyncHandler(async (req, res) => {
   res.json(await prisma.followUp.findMany({
     where: { company_id: req.companyId },
@@ -6274,13 +6960,34 @@ app.get("*", (req, res) => {
   res.sendFile(path.join(__dirname, "..", "public", "index.html"));
 });
 
+function zodValidationMessage(error) {
+  const issue = Array.isArray(error?.errors) ? error.errors[0] : null;
+  if (!issue) return "Please check the form and try again.";
+
+  const path = Array.isArray(issue.path) ? issue.path : [];
+  let field = path.length ? String(path[path.length - 1]).replace(/_/g, " ") : "entry";
+  if (path[0] === "data" && Number.isInteger(path[1])) {
+    field = `knowledge detail ${path[1] + 1}${path[2] ? ` ${String(path[2]).replace(/_/g, " ")}` : ""}`;
+  }
+
+  if (issue.code === "too_big" && issue.type === "string") {
+    return `The ${field} is too long. Keep it under ${Number(issue.maximum).toLocaleString()} characters.`;
+  }
+  if (issue.code === "too_small" && issue.type === "string") {
+    return `Please complete the ${field}.`;
+  }
+  return `Please check the ${field}: ${issue.message || "the value is not valid"}`;
+}
+
 app.use((error, req, res, next) => {
   // console.error(error) on some Prisma/Zod errors throws inside Node's
   // inspect(), which crashes the error handler and hides the real cause —
   // the client just gets a bare HTML 500. Log the useful fields directly.
   console.error("[error]", req.method, req.originalUrl, "->", error && error.name, error && error.message);
   if (error && error.stack) console.error(String(error.stack).split("\n").slice(0, 6).join("\n"));
-  if (error.name === "ZodError") return res.status(400).json({ error: "Validation failed", details: error.errors });
+  if (error.name === "ZodError") {
+    return res.status(400).json({ error: zodValidationMessage(error), details: error.errors });
+  }
   if (error.statusCode && error.statusCode >= 400 && error.statusCode < 500) {
     return res.status(error.statusCode).json({ error: error.message || "Request failed" });
   }
@@ -6290,6 +6997,61 @@ app.use((error, req, res, next) => {
 app.listen(port, () => {
   console.log(`AI Inbox Sales Assistant running at http://localhost:${port}`);
 });
+
+// Background jobs. APP_BACKGROUND_JOBS=off disables them (preview/staging copies must
+// never send emails or replies twice). Default: on.
+if (process.env.APP_BACKGROUND_JOBS !== "off") {
+// Business Engine requests Closer started but could not finish are emailed to
+// the tenant notify list + platform admin (never left silently in drafts).
+setInterval(() => {
+  require("./business-engines").sweepStaleEngineDrafts().then((result) => {
+    if (result.notified) console.log("[engine] stale draft sweep notified=%d", result.notified);
+  }).catch((error) => console.error("[engine] stale draft sweep failed:", error.message));
+}, 15 * 60 * 1000).unref();
+
+// Missed-reply recovery (website chat + Messenger): answers customer messages whose reply was lost (restart / outage).
+setTimeout(() => require("./reply-recovery").sweep(), 20000);
+setInterval(() => require("./reply-recovery").sweep(), 60 * 1000);
+// Urgent alerts repeat (email + text) every ESCALATION_REPEAT_MIN minutes until marked handled.
+setTimeout(() => require("./escalations").sweep(), 30 * 1000);
+setInterval(() => require("./escalations").sweep(), 60 * 1000);
+// Finished jobs -> completion check email right away (checks open tickets every 5 minutes).
+setTimeout(() => require("./feedback").sweep(), 90 * 1000);
+setInterval(() => require("./feedback").sweep(), 5 * 60 * 1000);
+
+// Daily briefing report (Settings > General): checked every minute, sent once per day at each business's time.
+setInterval(() => {
+  require("./briefing").runDue().catch((error) => console.error("[briefing] run failed:", error.message));
+}, 60 * 1000).unref();
+
+// Staff resolve loop: plain replies to alert emails arrive in the AIStaff system inbox.
+let staffReplyPollRunning = false;
+setInterval(() => {
+  if (staffReplyPollRunning) return;
+  staffReplyPollRunning = true;
+  require("./resolve-loop").pollStaffReplies().then((result) => {
+    if (result.handled) console.log("[resolve] staff replies handled=%d", result.handled);
+  }).catch((error) => console.error("[resolve] staff reply poll failed:", error.message))
+    .finally(() => { staffReplyPollRunning = false; });
+}, 60 * 1000).unref();
+
+// Email channel (Settings > Channels > Email): read each connected tenant inbox every minute.
+// One read at a time per inbox; only mail that arrived after the channel was turned on.
+let emailPollRunning = false;
+setInterval(() => {
+  if (emailPollRunning) return;
+  emailPollRunning = true;
+  require("./email-channel").pollAllEmailChannels().then((result) => {
+    if (result.handled) console.log("[email-channel] poll handled=%d channels=%d", result.handled, result.channels);
+  }).catch((error) => console.error("[email-channel] poll failed:", error.message))
+    .finally(() => { emailPollRunning = false; });
+}, 60 * 1000).unref();
+
+// Email Engine: sends queued campaign emails slowly, inside each mailbox daily limit.
+require("./email-engine").startWorker();
+} else {
+  console.log("[jobs] background jobs are OFF (APP_BACKGROUND_JOBS=off)");
+}
 
 // ---------------------------------------------------------------------
 // Process-level resilience.

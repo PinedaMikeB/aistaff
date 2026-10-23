@@ -1,0 +1,201 @@
+{
+  "title": "PHILGEPS + UNGM OPPORTUNITY BRIEFING",
+  "date_iso": "2026-10-18",
+  "executive_summary": {
+    "philgeps_opportunities_scanned": 107,
+    "ungm_opportunities_scanned": 8,
+    "new_relevant_opportunities": 2,
+    "source_access_notes": "All six official PhilGEPS public category pages and relevant notice abstracts were checked without login. Eight official public UNGM notice pages were checked directly because the UNGM search endpoint remains unreliable. Some full solicitation packages require vendor registration or portal opt-in; no restricted or paid documents were accessed.",
+    "bid_count": 0,
+    "high_priority_review_count": 1,
+    "review_count": 1,
+    "skip_count": 4
+  },
+  "best_opportunities": [
+    {
+      "source": "UNGM",
+      "match_rating": "STRONG MATCH",
+      "score": 8.5,
+      "project": "Development of a Rabies Communication and Community Engagement Package",
+      "buyer_organization": "World Health Organization (WHO) Philippines",
+      "country": "Philippines",
+      "reference_number": "WPRO/DAF/SAO/SUP/P/0009630 / UNGM Notice 318491",
+      "budget_contract_value": "Not stated publicly.",
+      "deadline": "October 29, 2026 5:00 PM GMT+8 / PHT",
+      "days_remaining": 11,
+      "procurement_type": "Request for proposal",
+      "published": "October 16, 2026",
+      "why_it_fits_aistaff": "Brandee is directly aligned with the requested campaign strategy, scriptwriting, storyboarding, graphic design, awareness video, digital communication materials, content production, and publication-ready outputs. The Philippines delivery context and eleven-day preparation window make this the most realistic new lead.",
+      "what_they_need": "An institutional contractor to deliver end-to-end audience and behavioural insights, creative strategy, messaging, rabies awareness video, IEC and digital materials, audiovisual production, post-production, audience assessment, printing coordination, and final delivery under WHO branding and its Communication for Health framework.",
+      "eligibility": [
+        "UNGM Basic registration and submission through the WHO eTendering platform (In-Tend); the notice permits email fallback only for technical upload difficulties.",
+        "Separate technical and financial proposals following the public RFP and Returnable Forms package.",
+        "Evidence of institutional creative-campaign, health or behaviour-change communications, video-production, graphic-design, and audience-research capability.",
+        "A Philippines-capable production team and compliance with WHO branding, consultation, and final-output requirements."
+      ],
+      "blockers_risks": [
+        "The public notice does not state budget or the detailed evaluation weights; the RFP attachment controls.",
+        "The scope is broader than AI-assisted content alone and includes full audiovisual production, audience assessment, printing coordination, and likely relevant institutional references.",
+        "AIStaff should not bid without named production, research, and health-communications personnel and confirmed capacity for physical production work."
+      ],
+      "how_we_could_qualify": [
+        "Lead the digital-content, creative workflow, automation, and campaign-reporting work through Brandee.",
+        "Team with an experienced Philippine video-production and public-health communications specialist if the RFP requires prior comparable institutional campaigns."
+      ],
+      "recommended_next_action": "Download and review the public RFP and Returnable Forms today; build a requirement/evaluation matrix, verify comparable-project and team-CV thresholds, confirm WHO In-Tend access, and identify a Philippine video/public-health communications partner before a go/no-go decision.",
+      "official_link": "https://www.ungm.org/Public/Notice/318491"
+    },
+    {
+      "source": "UNGM",
+      "match_rating": "POSSIBLE MATCH",
+      "score": 7.1,
+      "project": "Provision of Digital Intelligence and SEO Services",
+      "buyer_organization": "UNICEF Supply Division - Service Contracting Centre",
+      "country": "Multiple destinations, including the Philippines",
+      "reference_number": "RFPS-NYH-2026-503962 / UNGM Notice 317910",
+      "budget_contract_value": "Not stated publicly.",
+      "deadline": "November 11, 2026 11:59 PM GMT+1 / CET",
+      "days_remaining": 24,
+      "procurement_type": "Request for proposal",
+      "published": "October 13, 2026",
+      "why_it_fits_aistaff": "Brandee and AIStaff's custom analytics capabilities overlap SEO intelligence, content insight, competitive research, dashboards, and reporting automation. The global scope and longer preparation window are favorable if the experience thresholds are attainable.",
+      "what_they_need": "Digital intelligence and SEO services under UNICEF's published RFP, Terms of Reference, and financial proposal template, with technical and commercial proposals submitted separately by email.",
+      "eligibility": [
+        "Follow the binding PDF RFP, Annex B TOR, and Annex C financial template; alterations to required forms may disqualify the proposal.",
+        "Technical and commercial proposals must be sent as separate emails, each within the stated 25 MB limit, with no email links.",
+        "Proposal validity of at least 180 days and likely evidence of enterprise/global SEO and digital-intelligence delivery.",
+        "Clarification questions are due October 21, 2026 11:59 PM CEST."
+      ],
+      "blockers_risks": [
+        "The scope may demand mature global SEO tooling, multilingual coverage, large-scale analytics, and substantial institutional references beyond AIStaff's current public track record.",
+        "UNGM registration level is not displayed on the public notice; vendor eligibility must be confirmed from the RFP.",
+        "The budget is not public and the response burden may be significant."
+      ],
+      "how_we_could_qualify": [
+        "Bid only if the TOR permits a focused specialist team and AIStaff can evidence comparable SEO/digital-intelligence outcomes.",
+        "Consider a partnership with an established SEO research and multilingual analytics firm, with AIStaff delivering automation, dashboards, and AI-assisted insight workflows."
+      ],
+      "recommended_next_action": "Review Annex B and the signed RFP this week, decide whether experience and geographic-coverage thresholds are attainable, and submit any clarification questions before October 21 without acknowledging participation or making commitments until management approves.",
+      "official_link": "https://www.ungm.org/Public/Notice/317910"
+    }
+  ],
+  "urgent_deadlines": [
+    {
+      "source": "PhilGEPS",
+      "title": "Procurement of one (1) lot - Influencer Marketing Service",
+      "buyer_organization": "Philippine Postal Corporation",
+      "reference_number": "13290357 / RFQ#129-09-26",
+      "deadline": "October 19, 2026 10:00 AM PHT per notice/RFQ body",
+      "days_remaining": 1,
+      "note": "Strong carry-forward, but only pursue if the complete corporate package, influencer roster, TOR response, and physical Manila delivery are ready today; the earlier category-listing deadline conflict remains unresolved.",
+      "url": "https://notices.philgeps.gov.ph/GEPSNONPILOT/Tender/SplashBidNoticeAbstractUI.aspx?menuIndex=3&refID=13290357&DirectFrom=OpenOpp"
+    },
+    {
+      "source": "PhilGEPS",
+      "title": "Procurement of Services as Media Partner of the MTIT BARMM",
+      "buyer_organization": "Ministry of Trade, Investments & Tourism - BARMM",
+      "reference_number": "13289046 / 2026-109",
+      "deadline": "October 19, 2026 12:00 AM PHT in the notice header; category listing displayed October 19, 2026 9:00 AM",
+      "days_remaining": 1,
+      "note": "Carry-forward only with immediate written BAC deadline clarification and a qualified BARMM media-delivery partner.",
+      "url": "https://notices.philgeps.gov.ph/GEPSNONPILOT/Tender/SplashBidNoticeAbstractUI.aspx?menuIndex=3&refID=13289046&DirectFrom=OpenOpp"
+    },
+    {
+      "source": "UNGM",
+      "title": "Machine-Assisted Crisis Simulation Methodology, Toolkit and Prototype Simulations",
+      "buyer_organization": "United Nations System Staff College",
+      "reference_number": "UNSSC/RFQ/2026/07 / UNGM Notice 316352",
+      "deadline": "October 19, 2026 11:59 PM GMT+2",
+      "days_remaining": 1,
+      "note": "Proceed only if the revised response, qualified crisis-simulation methodology lead, references, and pricing are already nearly complete.",
+      "url": "https://www.ungm.org/Public/Notice/316352"
+    },
+    {
+      "source": "UNGM",
+      "title": "Digital Marketing and Product Promotion Support Services for Women Producer Groups",
+      "buyer_organization": "Food and Agriculture Organization",
+      "reference_number": "2026/FAMYA/FAMYA/138545 / UNGM Notice 317029",
+      "deadline": "October 20, 2026 11:00 PM GMT+6:30",
+      "days_remaining": 2,
+      "note": "Pursue only if a qualified Myanmar delivery partner, local-market capability, relevant references, and compliant portal submission are already available.",
+      "url": "https://www.ungm.org/Public/Notice/317029"
+    }
+  ],
+  "not_recommended": [
+    {
+      "source": "PhilGEPS",
+      "title": "For SB Secretariat Office Usage",
+      "procuring_entity": "Municipality of Carmen, Bohol",
+      "reference_number": "13294405",
+      "reason": "The only new Information Technology category listing today is a generic office-use supply requirement, not a verified custom AI, software, automation, content, or integration service.",
+      "official_link": "https://notices.philgeps.gov.ph/GEPSNONPILOT/Tender/SplashBidNoticeAbstractUI.aspx?menuIndex=3&refID=13294405&DirectFrom=OpenOpp"
+    },
+    {
+      "source": "UNGM",
+      "title": "Alternative local market access and digital ordering tool for Jordan Valley farmers",
+      "buyer_organization": "Food and Agriculture Organization",
+      "reference_number": "2026/FNJOR/FNJOR/138657 / UNGM Notice 318377",
+      "reason": "The digital tool is only one part of a Jordan-based agricultural market-access and buyer-linkage program requiring local HORECA/B2B/B2C networks and in-country delivery that AIStaff has not established.",
+      "url": "https://www.ungm.org/Public/Notice/318377"
+    },
+    {
+      "source": "UNGM",
+      "title": "Digitization of Village Savings & Loan Associations",
+      "buyer_organization": "United Nations Capital Development Fund",
+      "reference_number": "UNCDF-00696 / UNGM Notice 316015",
+      "reason": "Despite IVR and system-development overlap, the Sierra Leone fintech scope requires regulated KYC, financial-institution and mobile-money integrations, field capacity building, consumer protection, and rapid submission by October 19; too complex and late for a responsible new-supplier bid.",
+      "url": "https://www.ungm.org/Public/Notice/316015"
+    },
+    {
+      "source": "UNGM",
+      "title": "AI-powered digital extension services platform for Tanzania agriculture",
+      "buyer_organization": "Food and Agriculture Organization",
+      "reference_number": "2026/FRURT/FRURT/138628 / UNGM Notice 317721",
+      "reason": "Technically relevant but likely requires agricultural extension expertise, Tanzania delivery capacity, public-sector systems experience, and a substantial platform team; unchanged from the previously reported possible lead and not currently the most accessible opportunity.",
+      "url": "https://www.ungm.org/Public/Notice/317721"
+    }
+  ],
+  "todays_recommendation": {
+    "best_opportunity": "WHO Philippines rabies communication and community engagement package (WPRO/DAF/SAO/SUP/P/0009630). It is the clearest Brandee fit, but only proceed after the full RFP confirms achievable comparable-project, staffing, production, and evaluation requirements.",
+    "documents_to_prepare": [
+      "UNGM/WHO vendor profile and In-Tend access confirmation",
+      "Company profile, registration, tax, and corporate authorization documents",
+      "Brandee creative and digital-content portfolio with measurable campaign outcomes",
+      "Comparable institutional campaign references and completion evidence",
+      "Named team CVs for strategy, public-health communications, research, scriptwriting, design, video production, and project management",
+      "Technical methodology, work plan, production schedule, quality assurance, and financial proposal inputs"
+    ],
+    "clarifications_to_request": [
+      "Confirm minimum comparable-project count/value and whether consortium or subcontractor experience is accepted.",
+      "Confirm required geographic coverage, languages, printing quantities, production locations, and whether travel is expected.",
+      "Confirm evaluation weights, contract duration, ownership/source-file requirements, and any budget ceiling if not stated in the RFP.",
+      "For the UNICEF SEO RFP, confirm registration level, minimum annual turnover, required country/language coverage, and acceptable subcontracting structure before the October 21 clarification deadline."
+    ]
+  },
+  "source_urls_checked": [
+    "https://notices.philgeps.gov.ph/GEPSNONPILOT/Tender/SplashOpportunitiesSearchUI.aspx?BusCatID=10&ClickFrom=OpenOpp&menuIndex=3&type=category",
+    "https://notices.philgeps.gov.ph/GEPSNONPILOT/Tender/SplashOpportunitiesSearchUI.aspx?BusCatID=43&ClickFrom=OpenOpp&menuIndex=3&type=category",
+    "https://notices.philgeps.gov.ph/GEPSNONPILOT/Tender/SplashOpportunitiesSearchUI.aspx?BusCatID=37&ClickFrom=OpenOpp&menuIndex=3&type=category",
+    "https://notices.philgeps.gov.ph/GEPSNONPILOT/Tender/SplashOpportunitiesSearchUI.aspx?BusCatID=23&ClickFrom=OpenOpp&menuIndex=3&type=category",
+    "https://notices.philgeps.gov.ph/GEPSNONPILOT/Tender/SplashOpportunitiesSearchUI.aspx?BusCatID=17&ClickFrom=OpenOpp&menuIndex=3&type=category",
+    "https://notices.philgeps.gov.ph/GEPSNONPILOT/Tender/SplashOpportunitiesSearchUI.aspx?BusCatID=157&ClickFrom=OpenOpp&menuIndex=3&type=category",
+    "https://notices.philgeps.gov.ph/GEPSNONPILOT/Tender/SplashBidNoticeAbstractUI.aspx?menuIndex=3&refID=13294405&DirectFrom=OpenOpp",
+    "https://notices.philgeps.gov.ph/GEPSNONPILOT/Tender/SplashBidNoticeAbstractUI.aspx?menuIndex=3&refID=13290357&DirectFrom=OpenOpp",
+    "https://notices.philgeps.gov.ph/GEPSNONPILOT/Tender/SplashBidNoticeAbstractUI.aspx?menuIndex=3&refID=13289046&DirectFrom=OpenOpp",
+    "https://www.ungm.org/Public/Notice/318491",
+    "https://www.ungm.org/Public/Notice/317910",
+    "https://www.ungm.org/Public/Notice/318377",
+    "https://www.ungm.org/Public/Notice/317721",
+    "https://www.ungm.org/Public/Notice/316015",
+    "https://www.ungm.org/Public/Notice/316352",
+    "https://www.ungm.org/Public/Notice/317029",
+    "https://www.ungm.org/Public/Notice/315247"
+  ],
+  "notes": [
+    "The six PhilGEPS category pages showed 107 visible listings: 20 Information Technology, 20 Consulting Services, 17 Communication Equipment and Parts, 20 Services, 20 Office Equipment, and 10 Advertising and Marketing Services.",
+    "No new October 18 PhilGEPS listing was a genuine AIStaff match after screening for service compatibility, supplier accessibility, complexity, and delivery burden.",
+    "Eight official UNGM notice pages were checked. Public attachments referenced include the WHO RFP and Returnable Forms, UNICEF signed RFP, Annex B TOR and Annex C financial template, UNSSC RFQ/technical/financial forms and Q&A, and standard FAO bidder instructions.",
+    "UNICEF Cambodia notice 315247 still contains conflicting deadline text: the header shows October 22 while the description says the deadline was extended to October 15. The inconsistency is unresolved and the opportunity was not elevated today.",
+    "No bid, EOI, vendor registration, procurement email, or commitment was submitted."
+  ]
+}

@@ -1,0 +1,230 @@
+{
+  "title": "PHILGEPS + UNGM OPPORTUNITY BRIEFING",
+  "date_iso": "2026-10-20",
+  "executive_summary": {
+    "philgeps_opportunities_scanned": 104,
+    "ungm_opportunities_scanned": 8,
+    "new_relevant_opportunities": 3,
+    "source_access_notes": "All six official PhilGEPS public category first pages were checked without login and 104 visible listings were screened. The official UNGM public search page and eight official notice records were checked. The UNGM JSON helper returned HTTP 400 and the public keyword UI intermittently returned stale/unfiltered rows, so direct official notice pages and the active listing surface were used for the bounded scan. No access control was bypassed.",
+    "bid_count": 0,
+    "high_priority_review_count": 1,
+    "review_count": 2,
+    "skip_count": 5
+  },
+  "best_opportunities": [
+    {
+      "source": "PhilGEPS",
+      "match_rating": "STRONG MATCH",
+      "score": 7.4,
+      "project": "Supply, Delivery, Installation, Configuration, Integration Support, Testing, Training and Commissioning of Smart Attendance and HRIS Enablement System",
+      "procuring_entity": "City Government of Tanauan, Batangas",
+      "country": "Philippines",
+      "reference_number": "13295395 / CGT-GOODS-2026-00091",
+      "abc": "PHP 3,000,000.00",
+      "deadline": "November 9, 2026 10:00 AM PHT",
+      "days_remaining": 20,
+      "procurement_method": "Public Bidding; Goods / Information Technology",
+      "published": "October 20, 2026",
+      "why_it_fits_aistaff": "The project requires centralized attendance connectivity, HRIS integration, testing, training, and ongoing integration support. AIStaff can credibly deliver the integration, workflow, dashboard, and support layers, subject to a hardware/biometrics partner.",
+      "what_they_need": "Two smart attendance kiosks with touchscreen, facial recognition, fingerprint and RFID readers; centralized multi-location synchronization; integration with the city's existing HRIS; setup, testing, commissioning, training, and coordination with HRMDO/MIS.",
+      "important_requirements": [
+        "Filipino eligibility restrictions apply under the public-bidding rules.",
+        "Bidding documents cost PHP 5,000; pre-bid conference is October 28 at 10:00 AM PHT in Tanauan City.",
+        "Manual bids are due November 9 at 10:00 AM PHT and require bid security.",
+        "The full bidding documents control the exact similar-contract, financial, hardware, warranty, data-privacy, and integration requirements."
+      ],
+      "risks_or_blockers": [
+        "The notice header states a 0-day delivery period and the body does not clearly state a delivery duration; this must be clarified.",
+        "Biometric kiosks and identity-verification hardware require an established supplier and manufacturer support.",
+        "Public bidding, manual submission, bid security, and potential similar-contract requirements create a meaningful eligibility burden for a new supplier.",
+        "The existing HRIS interface, API availability, data-protection controls, and acceptance criteria are not public in the abstract."
+      ],
+      "how_we_could_qualify": [
+        "Lead the system integration, attendance workflow, dashboard, training, and support scope while partnering with a proven biometric-kiosk supplier.",
+        "Use an experienced prime or joint-venture partner if the bidding documents require completed contracts beyond AIStaff's current evidence."
+      ],
+      "recommended_next_action": "Obtain the full bidding documents, attend the October 28 pre-bid conference, clarify delivery duration and HRIS integration interfaces, and secure a biometric hardware/eligibility partner before a go/no-go decision.",
+      "official_link": "https://notices.philgeps.gov.ph/GEPSNONPILOT/Tender/SplashBidNoticeAbstractUI.aspx?menuIndex=3&refID=13295395&DirectFrom=OpenOpp"
+    },
+    {
+      "source": "PhilGEPS",
+      "match_rating": "POSSIBLE MATCH",
+      "score": 7.2,
+      "project": "Supply, Delivery and Installation of Customized Human Resource Information Management System (HRIMS)",
+      "procuring_entity": "Laguna Lake Development Authority, DENR",
+      "country": "Philippines",
+      "reference_number": "13295435 / S26-398 / ITB HRIMS-2026-08",
+      "abc": "PHP 3,000,000.00",
+      "deadline": "November 10, 2026 10:00 AM PHT",
+      "days_remaining": 21,
+      "procurement_method": "Public Bidding; Goods / Information Technology",
+      "published": "October 20, 2026",
+      "why_it_fits_aistaff": "A customized HRIMS aligns with AIStaff's custom systems, dashboards, workflow automation, notifications, integrations, and support capabilities.",
+      "what_they_need": "A customized HRIMS delivered and installed within 90 calendar days from Notice to Proceed.",
+      "important_requirements": [
+        "Bidders should have completed similar contracts within the five years before bid submission; the detailed bidding documents govern the threshold.",
+        "Bidding documents cost PHP 5,000; pre-bid conference is October 27 at 1:00 PM PHT in Quezon City.",
+        "Manual bids are due November 10 at 10:00 AM PHT and require bid security.",
+        "Philippine ownership/reciprocity eligibility restrictions apply."
+      ],
+      "risks_or_blockers": [
+        "The public abstract does not expose HR/payroll modules, integrations, migration volume, security, hosting, warranty, or acceptance criteria.",
+        "The five-year similar-contract window may still require contract evidence AIStaff cannot independently satisfy.",
+        "Ninety days may be aggressive for a fully customized HRIMS if migration and payroll integrations are extensive."
+      ],
+      "how_we_could_qualify": [
+        "Partner with an HRIS implementer able to evidence comparable completed contracts while AIStaff supplies automation, dashboards, AI assistance, and integrations."
+      ],
+      "recommended_next_action": "Acquire and review the full documents, attend the October 27 pre-bid conference, confirm the SLCC threshold and all modules/integrations, and identify an experienced HRIS prime or JV partner.",
+      "official_link": "https://notices.philgeps.gov.ph/GEPSNONPILOT/Tender/SplashBidNoticeAbstractUI.aspx?menuIndex=3&refID=13295435&DirectFrom=OpenOpp"
+    },
+    {
+      "source": "PhilGEPS",
+      "match_rating": "POSSIBLE MATCH",
+      "score": 6.2,
+      "project": "Website Development and Computer Server (Re-bid)",
+      "procuring_entity": "City Government of Zamboanga",
+      "country": "Philippines",
+      "reference_number": "13295508 / Goods 26-1020-0224R / PR 100-26-09-1959",
+      "abc": "PHP 2,000,000.00",
+      "deadline": "October 28, 2026 10:00 AM PHT",
+      "days_remaining": 8,
+      "procurement_method": "Public Bidding; Goods / Information Technology; re-bid",
+      "published": "October 20, 2026",
+      "why_it_fits_aistaff": "Website development is directly compatible with AIStaff's custom web-system capability and could incorporate integrations or an AI assistant if permitted by the specifications.",
+      "what_they_need": "One website-development set and one computer server delivered within 60 calendar days.",
+      "important_requirements": [
+        "A similar completed contract within five years valued at at least 50% of the PHP 2,000,000 ABC is required.",
+        "Bidding documents cost PHP 2,000 and manual bids are due October 28 at 10:00 AM PHT.",
+        "Bid security, separate technical and financial components, manufacturer/brand information, and product brochures are required."
+      ],
+      "risks_or_blockers": [
+        "Only eight days remain and submission is manual in Zamboanga City.",
+        "The PHP 1,000,000 similar-contract threshold may disqualify AIStaff without a qualified prime/JV partner.",
+        "The bundled physical server makes this partly a hardware-resale and onsite-delivery project.",
+        "The detailed website functions, hosting architecture, cybersecurity, migration, and support requirements are not stated in the abstract."
+      ],
+      "how_we_could_qualify": [
+        "Partner with a Zamboanga-capable systems integrator that can satisfy the SLCC and server-supply requirements, with AIStaff delivering the website and integrations."
+      ],
+      "recommended_next_action": "Treat as partner-only: immediately review the free bidding package and proceed only if an eligible local integrator can satisfy the PHP 1,000,000 SLCC, server, bid-security, and manual-submission requirements.",
+      "official_link": "https://notices.philgeps.gov.ph/GEPSNONPILOT/Tender/SplashBidNoticeAbstractUI.aspx?menuIndex=3&refID=13295508&DirectFrom=OpenOpp"
+    }
+  ],
+  "urgent_deadlines": [
+    {
+      "source": "PhilGEPS",
+      "title": "Cloud services with generative-AI tools and penetration testing",
+      "buyer_organization": "City Government of Trece Martires",
+      "reference_number": "13283232",
+      "deadline": "October 20, 2026 12:00 PM PHT",
+      "days_remaining": 0,
+      "note": "Previously reported carry-forward; pursue only if the full quotation, exact cloud/AI specifications, Platinum PhilGEPS eligibility, and a qualified penetration-testing partner are already ready.",
+      "url": "https://notices.philgeps.gov.ph/GEPSNONPILOT/Tender/SplashBidNoticeAbstractUI.aspx?menuIndex=3&refID=13283232&DirectFrom=OpenOpp"
+    },
+    {
+      "source": "UNGM",
+      "title": "Digital Marketing and Product Promotion Support Services for Women Producer Groups",
+      "buyer_organization": "Food and Agriculture Organization",
+      "reference_number": "2026/FAMYA/FAMYA/138545 / UNGM 317029",
+      "deadline": "October 20, 2026 11:00 PM GMT+6:30",
+      "days_remaining": 0,
+      "note": "Previously reported carry-forward; pursue only if a Myanmar-capable delivery partner, references, pricing, and portal submission are already complete.",
+      "url": "https://www.ungm.org/Public/Notice/317029"
+    },
+    {
+      "source": "UNGM",
+      "title": "Legal AI Solution EOI",
+      "buyer_organization": "World Food Programme",
+      "reference_number": "HQ26NF194 / UNGM 317650",
+      "deadline": "October 23, 2026 4:00 PM GMT+2",
+      "days_remaining": 3,
+      "note": "Previously reported carry-forward; respond only if AIStaff can evidence a mature legal-AI solution, technical and financial capacity, and all EOI documents by the deadline.",
+      "url": "https://www.ungm.org/Public/Notice/317650"
+    }
+  ],
+  "not_recommended": [
+    {
+      "source": "PhilGEPS",
+      "project": "Formulation of the Tourism Marketing Strategy and 3-Year Development Plan for Baler",
+      "procuring_entity": "Municipality of Baler, Aurora",
+      "reference_number": "13296255",
+      "reason": "The marketing overlap is superficial; this is a specialist municipal tourism-planning consultancy likely requiring tourism-development credentials rather than Brandee content production or an AI system.",
+      "official_link": "https://notices.philgeps.gov.ph/GEPSNONPILOT/Tender/SplashBidNoticeAbstractUI.aspx?menuIndex=3&refID=13296255&DirectFrom=OpenOpp"
+    },
+    {
+      "source": "PhilGEPS",
+      "project": "4G LTE Push-to-Talk radios / communications equipment listings",
+      "procuring_entity": "Various Philippine LGUs",
+      "reference_number": "13297455 and related category listings",
+      "reason": "These are radio, network, conference-system, or public-address hardware procurements rather than AI voice agents, IVR, contact-center software, or custom communications systems.",
+      "official_link": "https://notices.philgeps.gov.ph/GEPSNONPILOT/Tender/SplashOpportunitiesSearchUI.aspx?BusCatID=37&ClickFrom=OpenOpp&menuIndex=3&type=category"
+    },
+    {
+      "source": "UNGM",
+      "project": "Supply and Delivery of ICT & Camera Equipment for the Ministry of Health, Samoa",
+      "procuring_entity": "UNICEF",
+      "reference_number": "LRFQ-2026-9206749 / UNGM 318688",
+      "reason": "This is hardware supply and is expressly restricted to vendors established in Fiji; AIStaff is ineligible and the work does not match its service offering.",
+      "official_link": "https://www.ungm.org/Public/Notice/318688"
+    },
+    {
+      "source": "UNGM",
+      "project": "Provision of Standardized and Customizable Assessment Content Services",
+      "procuring_entity": "United Nations Secretariat",
+      "reference_number": "EOIUNPD24822 / UNGM 318614",
+      "reason": "The scale and core requirement are mature psychometric assessment content, validation, and global high-volume delivery, not an AIStaff agent or ordinary custom-system implementation.",
+      "official_link": "https://www.ungm.org/Public/Notice/318614"
+    },
+    {
+      "source": "UNGM",
+      "project": "Integrated Library System SaaS and Related Services",
+      "procuring_entity": "OSCE",
+      "reference_number": "SEC-773152-2026 / UNGM 318386",
+      "reason": "This requires a specialized, established integrated-library-system SaaS product and references that AIStaff does not currently have.",
+      "official_link": "https://www.ungm.org/Public/Notice/318386"
+    }
+  ],
+  "todays_recommendation": {
+    "best_opportunity": "The best overall active opportunity remains the WHO Philippines rabies communication and community engagement RFP (WPRO/DAF/SAO/SUP/P/0009630), closing October 29. Among today's new notices, the Tanauan smart attendance/HRIS project is the best technical fit, but it should be pursued only with a proven biometric-hardware and public-bidding eligibility partner.",
+    "documents_to_prepare": [
+      "WHO/UNGM Basic vendor profile and WHO In-Tend access confirmation",
+      "Brandee campaign, video, IEC, digital-content, audience-research, and public-health portfolio with comparable references",
+      "PhilGEPS registration, company registration, tax, mayor's permit, corporate authorization, bid-security and financial-capacity documents",
+      "HRIS/attendance integration architecture, data-privacy and security approach, implementation plan, team CVs, training/support plan, and similar-contract evidence",
+      "Biometric kiosk supplier authorization, specifications, warranties, and local support credentials"
+    ],
+    "clarifications_to_request": [
+      "For Tanauan, confirm the delivery period, existing HRIS product/API/data model, data migration, privacy/security requirements, device specifications, warranty/SLA, acceptance testing, and exact SLCC threshold.",
+      "For LLDA, confirm all HRIMS modules, payroll/timekeeping integrations, hosting, migration, security, warranty, support, and the exact similar-contract value requirement.",
+      "For WHO, confirm comparable-project thresholds, accepted partner/subcontractor experience, evaluation weights, languages, production locations, printing quantities, travel, and budget ceiling."
+    ]
+  },
+  "source_urls_checked": [
+    "https://notices.philgeps.gov.ph/GEPSNONPILOT/Tender/SplashOpportunitiesSearchUI.aspx?BusCatID=10&ClickFrom=OpenOpp&menuIndex=3&type=category",
+    "https://notices.philgeps.gov.ph/GEPSNONPILOT/Tender/SplashOpportunitiesSearchUI.aspx?BusCatID=43&ClickFrom=OpenOpp&menuIndex=3&type=category",
+    "https://notices.philgeps.gov.ph/GEPSNONPILOT/Tender/SplashOpportunitiesSearchUI.aspx?BusCatID=37&ClickFrom=OpenOpp&menuIndex=3&type=category",
+    "https://notices.philgeps.gov.ph/GEPSNONPILOT/Tender/SplashOpportunitiesSearchUI.aspx?BusCatID=23&ClickFrom=OpenOpp&menuIndex=3&type=category",
+    "https://notices.philgeps.gov.ph/GEPSNONPILOT/Tender/SplashOpportunitiesSearchUI.aspx?BusCatID=17&ClickFrom=OpenOpp&menuIndex=3&type=category",
+    "https://notices.philgeps.gov.ph/GEPSNONPILOT/Tender/SplashOpportunitiesSearchUI.aspx?BusCatID=157&ClickFrom=OpenOpp&menuIndex=3&type=category",
+    "https://notices.philgeps.gov.ph/GEPSNONPILOT/Tender/SplashBidNoticeAbstractUI.aspx?menuIndex=3&refID=13295395&DirectFrom=OpenOpp",
+    "https://notices.philgeps.gov.ph/GEPSNONPILOT/Tender/SplashBidNoticeAbstractUI.aspx?menuIndex=3&refID=13295435&DirectFrom=OpenOpp",
+    "https://notices.philgeps.gov.ph/GEPSNONPILOT/Tender/SplashBidNoticeAbstractUI.aspx?menuIndex=3&refID=13295508&DirectFrom=OpenOpp",
+    "https://www.ungm.org/Public/Notice",
+    "https://www.ungm.org/Public/Notice/318491",
+    "https://www.ungm.org/Public/Notice/317910",
+    "https://www.ungm.org/Public/Notice/318518",
+    "https://www.ungm.org/Public/Notice/318614",
+    "https://www.ungm.org/Public/Notice/318386",
+    "https://www.ungm.org/Public/Notice/318688",
+    "https://www.ungm.org/Public/Notice/317650",
+    "https://www.ungm.org/Public/Notice/317029"
+  ],
+  "notes": [
+    "The six PhilGEPS category first pages contained 104 visible listings: 20 Information Technology, 20 Consulting Services, 19 Communication Equipment and Parts, 20 Services, 20 Office Equipment, and 5 Advertising Agency Services.",
+    "The official UNGM JSON helper returned HTTP 400. The public search UI intermittently returned stale/unfiltered rows after keyword searches, so the count is limited to eight official direct notice records that were actually checked.",
+    "Public attachments referenced on UNGM included the WHO rabies RFP and returnable forms, UNICEF digital-intelligence/SEO TOR and proposal files, WFP Legal AI EOI, FAO bidder instructions, and UNICEF Samoa RFQ/TOR. No restricted documents were accessed.",
+    "Tanauan PhilGEPS notice 13295395 contains a delivery inconsistency: the header states 0 days and the body does not provide a clear delivery duration.",
+    "No bid, EOI, vendor registration, procurement email, portal acknowledgement, document purchase, or commitment was submitted."
+  ]
+}

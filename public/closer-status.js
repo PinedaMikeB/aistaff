@@ -26,6 +26,8 @@ function closerReasonText(reason) {
       return `${reason.count} repl${reason.count === 1 ? "y" : "ies"} failed in the last ${reason.windowMinutes} minutes.`;
     case "no_page_connected":
       return "No Facebook Page is connected, so messages cannot reach Closer.";
+    case "page_token_expired":
+      return "Facebook ended this Page session. Reconnect the Page in Settings to resume replies.";
     case "ai_disabled":
       return "AI is switched off in Settings.";
     case "auto_reply_disabled":

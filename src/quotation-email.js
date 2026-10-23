@@ -1,4 +1,5 @@
 const fs = require("fs");
+require("./mail-ipv4");
 const nodemailer = require("nodemailer");
 
 function isEmailConfigured() {

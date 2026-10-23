@@ -277,11 +277,11 @@ function normaliseLinks(text) {
  * The whole knowledge base as prompt text, grouped so house rules land last and
  * therefore closest to the model's output.
  */
-function renderKnowledgeForPrompt(rows, now = new Date(), companyId = null) {
+function renderKnowledgeForPrompt(rows, now = new Date(), companyId = null, budget = PROMPT_BUDGET_CHARS) {
   const readable = agentReadableRows(rows, now);
   if (!readable.length) return "";
 
-  const within = selectWithinBudget(readable, PROMPT_BUDGET_CHARS, companyId);
+  const within = selectWithinBudget(readable, budget, companyId);
 
   const ordered = [...within].sort((a, b) => {
     const aRule = a.kind === KINDS.INSTRUCTION ? 1 : 0;

@@ -8,85 +8,107 @@ datasource db {
 }
 
 model Company {
-  id                 String                  @id @default(uuid())
+  id                          String                     @id @default(uuid())
   // Human-readable tenant reference (AIS-2026-0001). The customer's accountant
   // puts this on purchase orders and bank-transfer remittance slips, and both
   // sides say it out loud on support calls. NOT an identity key — `id` is.
   // One per serviced workspace, so a payer running two businesses can split
   // the cost across their own books.
-  account_number     String?                 @unique
-  name               String
+  account_number              String?                    @unique
+  name                        String
   /// The real person we deal with — who answers when we call about their
   /// account. `name` is the business; this is the human. Added 2026-08-17
   /// because support calls and the live-data assessment both need a name to
   /// ask for, and "AIStaff.click Demo Company" is not a person.
-  contact_person     String?
-  industry           String?
-  website            String?
-  contact_email      String?
-  contact_number     String?
-  status             String                  @default("active")
-  created_at         DateTime                @default(now())
-  updated_at         DateTime                @updatedAt
-  users              User[]
-  settings           CompanySetting?
-  facebook_pages     FacebookPage[]
-  knowledge_base     KnowledgeBase[]
-  knowledge_gaps     KnowledgeGap[]
-  qualification_questions QualificationQuestion[]
-  conversations      Conversation[]
-  messages           Message[]
-  website_events     WebsiteEvent[]
-  subscriptions      Subscription[]
-  leads              Lead[]
-  quotation_templates QuotationTemplate[]
-  quotations         Quotation[]
-  follow_ups         FollowUp[]
-  booking_settings   BookingSetting?
-  booking_services   BookingService[]
-  bookings           Booking[]
-  human_handoffs     HumanHandoff[]
-  ai_logs            AiLog[]
+  contact_person              String?
+  industry                    String?
+  website                     String?
+  contact_email               String?
+  contact_number              String?
+  status                      String                     @default("active")
+  created_at                  DateTime                   @default(now())
+  updated_at                  DateTime                   @updatedAt
+  users                       User[]
+  settings                    CompanySetting?
+  facebook_pages              FacebookPage[]
+  integration_connections     IntegrationConnection[]
+  integration_actions         IntegrationAction[]
+  integration_executions      IntegrationExecution[]
+  tenant_engines              TenantEngine[]
+  tenant_engine_fields        TenantEngineField[]
+  tenant_engine_operations    TenantEngineOperation[]
+  engine_operation_mappings   EngineOperationMapping[]
+  business_operation_requests BusinessOperationRequest[]
+  capability_gaps             CapabilityGap[]
+  tenant_audit_logs           TenantAuditLog[]
+  knowledge_base              KnowledgeBase[]
+  knowledge_gaps              KnowledgeGap[]
+  qualification_questions     QualificationQuestion[]
+  conversations               Conversation[]
+  messages                    Message[]
+  website_events              WebsiteEvent[]
+  subscriptions               Subscription[]
+  leads                       Lead[]
+  quotation_templates         QuotationTemplate[]
+  quotations                  Quotation[]
+  follow_ups                  FollowUp[]
+  customer_update_templates   CustomerUpdateTemplate[]
+  customer_update_deliveries  CustomerUpdateDelivery[]
+  booking_settings            BookingSetting?
+  booking_services            BookingService[]
+  bookings                    Booking[]
+  human_handoffs              HumanHandoff[]
+  ai_logs                     AiLog[]
+  tenant_channels             TenantChannel[]
+  contact_profiles            ContactProfile[]
+  customer_feedback           CustomerFeedback[]
+  email_message_logs          EmailMessageLog[]
+  staff_resolve_actions       StaffResolveAction[]
+  sip_devices                 SipDevice[]
+  email_engine_setting        EmailEngineSetting?
+  email_contacts              EmailContact[]
+  email_campaigns             EmailCampaign[]
+  email_suppressions          EmailSuppression[]
 
   @@map("companies")
 }
 
 model User {
-  id            String    @id @default(uuid())
-  company_id    String
-  name          String
-  email         String    @unique
-  password_hash String
-  role          String    @default("admin")
-  status        String    @default("active")
+  id                    String               @id @default(uuid())
+  company_id            String
+  name                  String
+  email                 String               @unique
+  password_hash         String
+  role                  String               @default("admin")
+  status                String               @default("active")
   // Global AIStaff platform role — independent of the tenant-scoped `role`
   // field above. Null for ordinary tenant users. Only ever set server-side
   // (CLI bootstrap script or an authenticated SUPERADMIN action); never
   // accepted from public signup or client-supplied request bodies.
-  platform_role String?
-  mfa_enabled   Boolean   @default(false)
+  platform_role         String?
+  mfa_enabled           Boolean              @default(false)
   // Encrypted (not plaintext) TOTP secret — see src/crypto.js encryptSecret,
   // the same helper already used for facebook_pages.page_access_token_encrypted.
   mfa_secret_encrypted  String?
-  mfa_backup_codes_hash String[] @default([])
+  mfa_backup_codes_hash String[]             @default([])
   // Bumped whenever every existing session for this user must die at once:
   // password reset, password change, forced logout. The value is embedded in
   // the JWT and compared on every request. Without this a stateless 8h JWT
   // stays valid AFTER a reset, so an attacker keeps their session for up to
   // 8 hours and the reset achieves nothing.
-  session_epoch Int      @default(0)
-  last_login_at DateTime?
-  created_at    DateTime  @default(now())
-  updated_at    DateTime  @updatedAt
-  company       Company   @relation(fields: [company_id], references: [id], onDelete: Cascade)
-  assigned_leads Lead[]   @relation("LeadAssignedTo")
-  prepared_quotations Quotation[] @relation("QuotationPreparedBy")
-  approved_quotations Quotation[] @relation("QuotationApprovedBy")
-  assigned_followups FollowUp[] @relation("FollowUpAssignedTo")
-  assigned_handoffs HumanHandoff[] @relation("HandoffAssignedTo")
-  carts         Cart[]
-  customers     Customer[]
-  admin_audit_logs AdminAuditLog[] @relation("AdminAuditActor")
+  session_epoch         Int                  @default(0)
+  last_login_at         DateTime?
+  created_at            DateTime             @default(now())
+  updated_at            DateTime             @updatedAt
+  company               Company              @relation(fields: [company_id], references: [id], onDelete: Cascade)
+  assigned_leads        Lead[]               @relation("LeadAssignedTo")
+  prepared_quotations   Quotation[]          @relation("QuotationPreparedBy")
+  approved_quotations   Quotation[]          @relation("QuotationApprovedBy")
+  assigned_followups    FollowUp[]           @relation("FollowUpAssignedTo")
+  assigned_handoffs     HumanHandoff[]       @relation("HandoffAssignedTo")
+  carts                 Cart[]
+  customers             Customer[]
+  admin_audit_logs      AdminAuditLog[]      @relation("AdminAuditActor")
   password_reset_tokens PasswordResetToken[]
 
   @@index([platform_role])
@@ -96,17 +118,17 @@ model User {
 // Append-only (by application convention — no update/delete API is ever
 // exposed for this model) audit trail for every AIStaff Super Admin action.
 model AdminAuditLog {
-  id             String   @id @default(uuid())
-  actor_user_id  String
-  actor_role     String
-  action         String
-  target_type    String
-  target_id      String?
-  ip_address     String?
-  user_agent     String?
-  metadata       Json?
-  created_at     DateTime @default(now())
-  actor          User     @relation("AdminAuditActor", fields: [actor_user_id], references: [id], onDelete: Restrict)
+  id            String   @id @default(uuid())
+  actor_user_id String
+  actor_role    String
+  action        String
+  target_type   String
+  target_id     String?
+  ip_address    String?
+  user_agent    String?
+  metadata      Json?
+  created_at    DateTime @default(now())
+  actor         User     @relation("AdminAuditActor", fields: [actor_user_id], references: [id], onDelete: Restrict)
 
   @@index([actor_user_id])
   @@index([action])
@@ -116,20 +138,25 @@ model AdminAuditLog {
 }
 
 model CompanySetting {
-  id                                String   @id @default(uuid())
-  company_id                        String   @unique
-  ai_enabled                        Boolean  @default(true)
-  auto_reply_enabled                Boolean  @default(true)
-  business_hours_only               Boolean  @default(false)
-  human_handoff_enabled             Boolean  @default(true)
-  default_language                  String   @default("en")
-  tone                              String   @default("polite_professional")
-  quotation_mode                    String   @default("approval_required")
-  allow_ai_quotation_drafts         Boolean  @default(true)
-  allow_auto_send_quotation         Boolean  @default(false)
-  quotation_requires_admin_approval Boolean  @default(true)
+  id                                String    @id @default(uuid())
+  company_id                        String    @unique
+  ai_enabled                        Boolean   @default(true)
+  auto_reply_enabled                Boolean   @default(true)
+  business_hours_only               Boolean   @default(false)
+  human_handoff_enabled             Boolean   @default(true)
+  default_language                  String    @default("en")
+  tone                              String    @default("polite_professional")
+  quotation_mode                    String    @default("approval_required")
+  allow_ai_quotation_drafts         Boolean   @default(true)
+  allow_auto_send_quotation         Boolean   @default(false)
+  quotation_requires_admin_approval Boolean   @default(true)
   notify_email                      String?
-  ai_custom_instructions            String?  @db.Text
+  alert_contacts                    Json      @default("[]")
+  /// Daily briefing report (Settings > General): { enabled, days [0-6, 0=Sun], time "HH:MM" Manila, sections {...}, last_sent_date }.
+  briefing_settings                 Json      @default("{}")
+  /// sha256 of the key the tenant's own system uses for POST /api/hooks/tenant-alert (src/routes/tenant-hooks.js).
+  alert_hook_key_hash               String?
+  ai_custom_instructions            String?   @db.Text
   lead_qualification_rules          Json?
   /// Intake wizard state: { industryPack, currentStep, completed: [stepId],
   /// skipped: [stepId] }. Progress must survive leaving the page — an owner
@@ -141,27 +168,382 @@ model CompanySetting {
   /// step. Closer reads this to be honest about what it can confirm; it does
   /// NOT activate any integration.
   live_data_source                  String?
-  live_data_interest                Boolean  @default(false)
-  created_at                        DateTime @default(now())
-  updated_at                        DateTime @updatedAt
-  company                           Company  @relation(fields: [company_id], references: [id], onDelete: Cascade)
+  live_data_interest                Boolean   @default(false)
+  created_at                        DateTime  @default(now())
+  updated_at                        DateTime  @updatedAt
+  company                           Company   @relation(fields: [company_id], references: [id], onDelete: Cascade)
 
   @@map("company_settings")
 }
 
 model FacebookPage {
-  id                          String         @id @default(uuid())
+  id                          String                   @id @default(uuid())
   company_id                  String
-  page_id                     String         @unique
+  page_id                     String                   @unique
   page_name                   String
   page_access_token_encrypted String
-  status                      String         @default("active")
-  created_at                  DateTime       @default(now())
-  updated_at                  DateTime       @updatedAt
-  company                     Company        @relation(fields: [company_id], references: [id], onDelete: Cascade)
+  status                      String                   @default("active")
+  created_at                  DateTime                 @default(now())
+  updated_at                  DateTime                 @updatedAt
+  company                     Company                  @relation(fields: [company_id], references: [id], onDelete: Cascade)
   conversations               Conversation[]
+  customer_update_templates   CustomerUpdateTemplate[]
+  customer_update_deliveries  CustomerUpdateDelivery[]
 
   @@map("facebook_pages")
+}
+
+/// One tenant-owned connection to a custom application API.
+///
+/// Secrets are encrypted before they reach this table. The OpenAPI document is
+/// stored as a versioned snapshot so Closer never discovers new write
+/// operations from a changing remote document in the middle of a conversation.
+model IntegrationConnection {
+  id                     String                 @id @default(uuid())
+  company_id             String
+  name                   String
+  base_url               String
+  source_url             String?
+  spec_source_url        String?
+  openapi_spec           Json
+  connection_type        String                 @default("rest_openapi")
+  discovery_status       String                 @default("succeeded")
+  discovery_message      String?
+  discovery_metadata     Json?
+  wizard_step            String                 @default("review")
+  auth_type              String                 @default("none")
+  auth_config            Json?
+  auth_secret_encrypted  String?
+  credential_status      String                 @default("unverified")
+  credential_updated_at  DateTime?
+  oauth_state_hash       String?
+  oauth_pkce_encrypted   String?
+  oauth_state_expires_at DateTime?
+  api_version            String?
+  behavior_config        Json?
+  status                 String                 @default("draft")
+  last_tested_at         DateTime?
+  last_test_status       String?
+  last_test_message      String?
+  last_success_at        DateTime?
+  disabled_at            DateTime?
+  created_by             String?
+  created_at             DateTime               @default(now())
+  updated_at             DateTime               @updatedAt
+  company                Company                @relation(fields: [company_id], references: [id], onDelete: Cascade)
+  actions                IntegrationAction[]
+  executions             IntegrationExecution[]
+
+  @@unique([company_id, name])
+  @@index([company_id, status])
+  @@map("integration_connections")
+}
+
+/// A single OpenAPI operation exposed to Closer as a function.
+///
+/// `input_schema` is what the model sees. `request_config` maps those safe,
+/// flat arguments back to path/query/header/body fields for the real request.
+model IntegrationAction {
+  id                      String                   @id @default(uuid())
+  company_id              String
+  connection_id           String
+  operation_id            String
+  tool_name               String
+  display_name            String
+  description             String
+  http_method             String
+  path                    String
+  input_schema            Json
+  request_config          Json
+  enabled                 Boolean                  @default(false)
+  category                String                   @default("other")
+  risk_level              String                   @default("write")
+  approval_policy         String                   @default("staff_approval")
+  minimum_approval_policy String                   @default("staff_approval")
+  is_high_impact          Boolean                  @default(false)
+  source                  String                   @default("openapi")
+  validated               Boolean                  @default(false)
+  response_schema         Json?
+  created_at              DateTime                 @default(now())
+  updated_at              DateTime                 @updatedAt
+  company                 Company                  @relation(fields: [company_id], references: [id], onDelete: Cascade)
+  connection              IntegrationConnection    @relation(fields: [connection_id], references: [id], onDelete: Cascade)
+  executions              IntegrationExecution[]
+  engine_mappings         EngineOperationMapping[]
+
+  @@unique([connection_id, operation_id])
+  @@unique([company_id, tool_name])
+  @@index([company_id, enabled])
+  @@map("integration_actions")
+}
+
+/// Platform-owned reusable engine definition. This table contains no
+/// tenant-specific or MARGA-specific behavior.
+model BusinessEngine {
+  id                  String                      @id @default(uuid())
+  key                 String                      @unique
+  name                String
+  description         String
+  default_instruction String                      @db.Text
+  catalog_version     Int                         @default(1)
+  active              Boolean                     @default(true)
+  display_order       Int                         @default(0)
+  created_at          DateTime                    @default(now())
+  updated_at          DateTime                    @updatedAt
+  fields              EngineFieldDefinition[]
+  operations          EngineOperationDefinition[]
+  tenant_engines      TenantEngine[]
+
+  @@index([active, display_order])
+  @@map("business_engines")
+}
+
+model EngineFieldDefinition {
+  id               String         @id @default(uuid())
+  engine_id        String
+  field_key        String
+  label            String
+  description      String?
+  data_type        String         @default("string")
+  default_enabled  Boolean        @default(true)
+  default_required Boolean        @default(false)
+  display_order    Int            @default(0)
+  created_at       DateTime       @default(now())
+  updated_at       DateTime       @updatedAt
+  engine           BusinessEngine @relation(fields: [engine_id], references: [id], onDelete: Cascade)
+
+  @@unique([engine_id, field_key])
+  @@index([engine_id, display_order])
+  @@map("engine_field_definitions")
+}
+
+model EngineOperationDefinition {
+  id                String                  @id @default(uuid())
+  engine_id         String
+  operation_key     String
+  name              String
+  description       String
+  operation_type    String
+  required_fields   Json                    @default("[]")
+  default_policy    String
+  minimum_policy    String
+  default_fallback  String                  @default("create_human_task")
+  display_order     Int                     @default(0)
+  created_at        DateTime                @default(now())
+  updated_at        DateTime                @updatedAt
+  engine            BusinessEngine          @relation(fields: [engine_id], references: [id], onDelete: Cascade)
+  tenant_operations TenantEngineOperation[]
+
+  @@unique([engine_id, operation_key])
+  @@index([engine_id, display_order])
+  @@map("engine_operation_definitions")
+}
+
+/// Tenant activation and instruction snapshot. Disabling an engine leaves
+/// connector and mapping configuration intact but removes it from AI runtime.
+model TenantEngine {
+  id                           String                  @id @default(uuid())
+  company_id                   String
+  engine_id                    String
+  enabled                      Boolean                 @default(false)
+  instruction_enabled          Boolean                 @default(true)
+  default_instruction_snapshot String                  @db.Text
+  /// Scheduling cut-off rules for this engine (src/scheduling-rules.js). Off unless enabled. Added 2026-10-20.
+  scheduling_rules             Json                    @default("{}")
+  /// After-service follow-up: completion check + survey frequency per topic (src/feedback.js). Added 2026-10-20.
+  feedback_rules               Json                    @default("{}")
+  tenant_instruction           String?                 @db.Text
+  catalog_version              Int                     @default(1)
+  enabled_at                   DateTime?
+  updated_by                   String?
+  created_at                   DateTime                @default(now())
+  updated_at                   DateTime                @updatedAt
+  company                      Company                 @relation(fields: [company_id], references: [id], onDelete: Cascade)
+  engine                       BusinessEngine          @relation(fields: [engine_id], references: [id], onDelete: Restrict)
+  fields                       TenantEngineField[]
+  operations                   TenantEngineOperation[]
+
+  @@unique([company_id, engine_id])
+  @@index([company_id, enabled])
+  @@map("tenant_engines")
+}
+
+model TenantEngineField {
+  id               String       @id @default(uuid())
+  company_id       String
+  tenant_engine_id String
+  definition_id    String?
+  field_key        String
+  label            String
+  description      String?
+  data_type        String       @default("string")
+  enabled          Boolean      @default(true)
+  required         Boolean      @default(false)
+  is_custom        Boolean      @default(false)
+  external_field   String?
+  display_order    Int          @default(0)
+  created_at       DateTime     @default(now())
+  updated_at       DateTime     @updatedAt
+  company          Company      @relation(fields: [company_id], references: [id], onDelete: Cascade)
+  tenant_engine    TenantEngine @relation(fields: [tenant_engine_id], references: [id], onDelete: Cascade)
+
+  @@unique([tenant_engine_id, field_key])
+  @@index([company_id, tenant_engine_id])
+  @@map("tenant_engine_fields")
+}
+
+model TenantEngineOperation {
+  id                      String                     @id @default(uuid())
+  company_id              String
+  tenant_engine_id        String
+  operation_definition_id String
+  enabled                 Boolean                    @default(true)
+  policy                  String
+  fallback_policy         String                     @default("create_human_task")
+  created_at              DateTime                   @default(now())
+  updated_at              DateTime                   @updatedAt
+  company                 Company                    @relation(fields: [company_id], references: [id], onDelete: Cascade)
+  tenant_engine           TenantEngine               @relation(fields: [tenant_engine_id], references: [id], onDelete: Cascade)
+  definition              EngineOperationDefinition  @relation(fields: [operation_definition_id], references: [id], onDelete: Restrict)
+  mapping                 EngineOperationMapping?
+  requests                BusinessOperationRequest[]
+  capability_gap          CapabilityGap?
+
+  @@unique([tenant_engine_id, operation_definition_id])
+  @@index([company_id, enabled])
+  @@map("tenant_engine_operations")
+}
+
+model EngineOperationMapping {
+  id                         String                @id @default(uuid())
+  company_id                 String
+  tenant_engine_operation_id String                @unique
+  integration_action_id      String
+  field_mapping              Json                  @default("{}")
+  response_mapping           Json?                 @default("{}")
+  /// Integration blueprint (value labels, field notes, steps, derived fields,
+  /// anchors). See docs/MASTERPLAN-integration-blueprints.md.
+  workflow_config            Json                  @default("{}")
+  status                     String                @default("mapped")
+  created_at                 DateTime              @default(now())
+  updated_at                 DateTime              @updatedAt
+  company                    Company               @relation(fields: [company_id], references: [id], onDelete: Cascade)
+  tenant_operation           TenantEngineOperation @relation(fields: [tenant_engine_operation_id], references: [id], onDelete: Cascade)
+  integration_action         IntegrationAction     @relation(fields: [integration_action_id], references: [id], onDelete: Restrict)
+
+  @@index([company_id, status])
+  @@index([integration_action_id])
+  @@map("engine_operation_mappings")
+}
+
+/// Logical operation history. External HTTP facts remain in
+/// integration_executions; this table also represents unmapped fallbacks.
+model BusinessOperationRequest {
+  id                         String                @id @default(uuid())
+  company_id                 String
+  tenant_engine_operation_id String
+  conversation_id            String?
+  integration_execution_id   String?
+  status                     String
+  policy                     String
+  requested_arguments        Json
+  result                     Json?
+  error_message              String?
+  fallback_used              String?
+  requested_by               String?
+  /// Cases (2026-10-20): one open case per customer need. need_key = tenant job + the job's case keys
+  /// (Marga: customer, branch, machine, category). followups = history of customer follow-ups and
+  /// replaced attempts. replaced_by_id = the newer case that replaced this one (status "replaced").
+  /// last_alert_at = last staff alert for this case (URGENT throttle: one per 15 minutes).
+  need_key                   String?
+  followups                  Json                  @default("[]")
+  replaced_by_id             String?
+  last_alert_at              DateTime?
+  /// Case lifecycle (no expiry): waiting (no reference yet) | ticket_open (reference, not done) |
+  /// done | cancelled | closed (by staff) | merged (added to another case). reference = tenant ticket no.
+  case_status                String?
+  reference                  String?
+  closed_at                  DateTime?
+  approved_by                String?
+  approved_at                DateTime?
+  completed_at               DateTime?
+  created_at                 DateTime              @default(now())
+  updated_at                 DateTime              @updatedAt
+  company                    Company               @relation(fields: [company_id], references: [id], onDelete: Cascade)
+  tenant_operation           TenantEngineOperation @relation(fields: [tenant_engine_operation_id], references: [id], onDelete: Restrict)
+
+  @@index([company_id, status])
+  @@index([company_id, created_at])
+  @@index([conversation_id, status])
+  @@index([company_id, need_key, status])
+  @@index([company_id, case_status])
+  @@index([conversation_id, case_status])
+  @@index([integration_execution_id])
+  @@map("business_operation_requests")
+}
+
+model CapabilityGap {
+  id                         String                @id @default(uuid())
+  company_id                 String
+  tenant_engine_operation_id String                @unique
+  operation_key              String
+  frequency_count            Int                   @default(1)
+  last_request_context       Json?
+  fallback_used              String?
+  first_seen_at              DateTime              @default(now())
+  last_seen_at               DateTime              @default(now())
+  company                    Company               @relation(fields: [company_id], references: [id], onDelete: Cascade)
+  tenant_operation           TenantEngineOperation @relation(fields: [tenant_engine_operation_id], references: [id], onDelete: Cascade)
+
+  @@index([company_id, frequency_count])
+  @@map("capability_gaps")
+}
+
+/// Append-only tenant configuration history. Secret values are never placed
+/// in metadata; callers must pass only masked and non-sensitive facts.
+model TenantAuditLog {
+  id          String   @id @default(uuid())
+  company_id  String
+  actor_id    String?
+  actor_email String?
+  action      String
+  target_type String
+  target_id   String?
+  metadata    Json?
+  created_at  DateTime @default(now())
+  company     Company  @relation(fields: [company_id], references: [id], onDelete: Cascade)
+
+  @@index([company_id, created_at])
+  @@index([company_id, action])
+  @@map("tenant_audit_logs")
+}
+
+/// Append-only execution and approval history for tenant custom actions.
+model IntegrationExecution {
+  id                  String                @id @default(uuid())
+  company_id          String
+  connection_id       String
+  action_id           String
+  conversation_id     String?
+  status              String
+  approval_policy     String
+  requested_arguments Json
+  result              Json?
+  error_message       String?
+  requested_by        String?
+  approved_by         String?
+  approved_at         DateTime?
+  started_at          DateTime?
+  completed_at        DateTime?
+  created_at          DateTime              @default(now())
+  company             Company               @relation(fields: [company_id], references: [id], onDelete: Cascade)
+  connection          IntegrationConnection @relation(fields: [connection_id], references: [id], onDelete: Cascade)
+  action              IntegrationAction     @relation(fields: [action_id], references: [id], onDelete: Cascade)
+
+  @@index([company_id, created_at])
+  @@index([company_id, status])
+  @@index([conversation_id, status])
+  @@map("integration_executions")
 }
 
 /// A record of AIStaff staff entering a customer's workspace to help.
@@ -187,6 +569,28 @@ model AssistSession {
   @@index([company_id, started_at])
   @@index([staff_user_id, started_at])
   @@map("assist_sessions")
+}
+
+/// A one-time handoff link that lets a client authorize their own Facebook
+/// Page without sharing a Facebook password or giving support remote control.
+/// Only the SHA-256 hash is stored; the raw token exists solely in the link.
+model FacebookConnectionInvite {
+  id                  String    @id @default(uuid())
+  company_id          String
+  company_name        String
+  token_hash          String    @unique
+  created_by_user_id  String
+  created_by_email    String
+  expires_at          DateTime
+  used_at             DateTime?
+  revoked_at          DateTime?
+  connected_page_id   String?
+  connected_page_name String?
+  created_at          DateTime  @default(now())
+
+  @@index([company_id, created_at])
+  @@index([expires_at])
+  @@map("facebook_connection_invites")
 }
 
 /// A question a real customer asked that Closer could not answer.
@@ -291,49 +695,49 @@ model PromptRevision {
 /// RULE 2 (docs/handoff-masterplan.md): every field here is a FACT. Never store
 /// a sentence for the agent to recite. The model writes the words at reply time.
 model KnowledgeBase {
-  id         String   @id @default(uuid())
-  company_id String
-  category   String
+  id            String    @id @default(uuid())
+  company_id    String
+  category      String
   /// qa | prose | pricelist | promo | policy | shipping | media | instruction
   /// Controls how buildGuardrailPrompt renders the row. Unknown kinds fall
   /// back to prose rendering rather than being dropped.
-  kind       String   @default("qa")
+  kind          String    @default("qa")
   /// Human label for non-Q&A rows ("Mission and vision", "Shipping rates").
   /// A price list is not a question and must not be forced into one.
-  title      String?
+  title         String?
   /// Only kind="qa" rows have a question. Nullable since 2026-08-17.
-  question   String?
-  answer     String
+  question      String?
+  answer        String
   /// Structured rows for tabular kinds: shipping rates by area, spec tables,
   /// price rows. Prose in a prompt makes the model do lookup and arithmetic in
   /// a paragraph; rows let it read one line. Shape: [{label, value, note}].
-  data       Json?
-  media      Json?    // [{type: "video"|"image"|"pdf", url, caption}] — lets the agent send actual files when asked, not just describe them
+  data          Json?
+  media         Json? // [{type: "video"|"image"|"pdf", url, caption}] — lets the agent send actual files when asked, not just describe them
   /// NULL = no expiry, which is the common case and the wizard default outside
   /// the promo step. Set for anything dated. Promos auto-deactivate on expiry;
   /// prices and policies only flag for review — see src/knowledge-base.js.
-  valid_until DateTime?
+  valid_until   DateTime?
   /// Where this came from, so the wizard can show its source ("from
   /// pricelist-aug.xlsx"). A suggestion with no source must never be stored:
   /// an invented fact served for months is §9's phantom pricing at scale.
-  source_name String?
+  source_name   String?
   /// upload | facebook_page | website | typed — how we obtained it.
-  source_kind String?
+  source_kind   String?
   /// ISO code for any amounts in this row. DemoSession learned this the hard
   /// way: "100" read off a US store and quoted as ₱100 is a number the
   /// business gets held to.
-  currency    String?
+  currency      String?
   /// TRUE by default on purpose. Anything a human typed or saved is confirmed
   /// by that act, and defaulting false would have silently dropped the 6
   /// existing rows out of the prompt on migration. Only the AI-suggestion path
   /// writes false, and unconfirmed rows never reach the agent.
-  confirmed   Boolean  @default(true)
-  display_order Int    @default(0)
-  tags       String[] @default([])
-  active     Boolean  @default(true)
-  created_at DateTime @default(now())
-  updated_at DateTime @updatedAt
-  company    Company  @relation(fields: [company_id], references: [id], onDelete: Cascade)
+  confirmed     Boolean   @default(true)
+  display_order Int       @default(0)
+  tags          String[]  @default([])
+  active        Boolean   @default(true)
+  created_at    DateTime  @default(now())
+  updated_at    DateTime  @updatedAt
+  company       Company   @relation(fields: [company_id], references: [id], onDelete: Cascade)
 
   @@index([company_id, active, kind])
   @@map("knowledge_base")
@@ -355,13 +759,13 @@ model QualificationQuestion {
 }
 
 model Conversation {
-  id               String         @id @default(uuid())
-  company_id       String
-  facebook_page_id String?
-  psid             String?
-  external_id      String?
-  contact_number   String?
-  customer_name    String?
+  id                         String                   @id @default(uuid())
+  company_id                 String
+  facebook_page_id           String?
+  psid                       String?
+  external_id                String?
+  contact_number             String?
+  customer_name              String?
   /// Facebook profile picture URL, fetched once from the Graph API on the
   /// first message. Added 2026-08-19 so the inquiry list shows a face and a
   /// real name instead of a 17-digit PSID.
@@ -369,29 +773,39 @@ model Conversation {
   /// NOTE: Meta's profile_pic URLs are signed and EXPIRE, so this is a
   /// convenience for the dashboard, not durable storage. A broken image is
   /// expected after a while and the initials fallback covers it.
-  profile_pic_url  String?
+  profile_pic_url            String?
   /// When we last asked Meta for this profile, so we do not re-fetch on every
   /// message.
-  profile_fetched_at DateTime?
-  channel          String         @default("facebook_messenger")
-  status           String         @default("open")
-  intent           String?
-  lead_score       String         @default("cold")
-  needs_human      Boolean        @default(false)
-  last_message_at  DateTime       @default(now())
-  created_at       DateTime       @default(now())
-  updated_at       DateTime       @updatedAt
-  company          Company        @relation(fields: [company_id], references: [id], onDelete: Cascade)
-  facebook_page    FacebookPage?  @relation(fields: [facebook_page_id], references: [id], onDelete: SetNull)
-  messages         Message[]
-  leads            Lead[]
-  quotations       Quotation[]
-  follow_ups       FollowUp[]
-  bookings         Booking[]
-  human_handoffs   HumanHandoff[]
-  ai_logs          AiLog[]
-  website_events   WebsiteEvent[]
-  source_orders     Order[]        @relation("OrderSourceConversation")
+  profile_fetched_at         DateTime?
+  channel                    String                   @default("facebook_messenger")
+  status                     String                   @default("open")
+  intent                     String?
+  lead_score                 String                   @default("cold")
+  needs_human                Boolean                  @default(false)
+  /// Closer only reads messages, drafts and lookups created at or after this
+  /// moment ("start from zero"). Set after a request is recorded so the next
+  /// request starts clean; older messages stay stored for staff.
+  ai_history_from            DateTime?
+  /// What Closer remembers about this Messenger account across requests:
+  /// name, how to address them, contact number, company, branch/department,
+  /// machines. Never past requests (those are looked up on demand).
+  customer_profile           Json                     @default("{}")
+  last_message_at            DateTime                 @default(now())
+  created_at                 DateTime                 @default(now())
+  updated_at                 DateTime                 @updatedAt
+  company                    Company                  @relation(fields: [company_id], references: [id], onDelete: Cascade)
+  facebook_page              FacebookPage?            @relation(fields: [facebook_page_id], references: [id], onDelete: SetNull)
+  messages                   Message[]
+  leads                      Lead[]
+  quotations                 Quotation[]
+  follow_ups                 FollowUp[]
+  bookings                   Booking[]
+  human_handoffs             HumanHandoff[]
+  ai_logs                    AiLog[]
+  website_events             WebsiteEvent[]
+  source_orders              Order[]                  @relation("OrderSourceConversation")
+  customer_update_deliveries CustomerUpdateDelivery[]
+  email_message_logs         EmailMessageLog[]
 
   @@unique([company_id, psid])
   @@unique([company_id, channel, external_id])
@@ -422,52 +836,52 @@ model Message {
 }
 
 model Lead {
-  id                String       @id @default(uuid())
-  company_id        String
-  conversation_id   String
-  customer_name     String?
-  mobile_number     String?
-  email             String?
-  company_name      String?
-  location          String?
-  service_needed    String?
-  budget            String?
-  urgency           String?
-  notes             String?
-  lead_status       String       @default("new")
-  lead_score        String       @default("cold")
-  lead_qualification_status String @default("unknown")
-  lead_qualification_reason String? @db.Text
+  id                            String         @id @default(uuid())
+  company_id                    String
+  conversation_id               String
+  customer_name                 String?
+  mobile_number                 String?
+  email                         String?
+  company_name                  String?
+  location                      String?
+  service_needed                String?
+  budget                        String?
+  urgency                       String?
+  notes                         String?
+  lead_status                   String         @default("new")
+  lead_score                    String         @default("cold")
+  lead_qualification_status     String         @default("unknown")
+  lead_qualification_reason     String?        @db.Text
   lead_qualification_confidence Int?
-  lead_next_action  String?
-  quotation_ready   Boolean      @default(false)
-  source_channel    String?
-  source_label      String?
-  source_url        String?
-  landing_page      String?
-  referrer          String?
-  utm_source        String?
-  utm_medium        String?
-  utm_campaign      String?
-  utm_content       String?
-  utm_term          String?
-  fbclid            String?
-  gclid             String?
-  visitor_id        String?
-  first_seen_at     DateTime?
-  last_touch_at     DateTime?
-  touch_count       Int          @default(0)
-  assigned_to       String?
-  follow_up_date    DateTime?
-  created_at        DateTime     @default(now())
-  updated_at        DateTime     @updatedAt
-  company           Company      @relation(fields: [company_id], references: [id], onDelete: Cascade)
-  conversation      Conversation @relation(fields: [conversation_id], references: [id], onDelete: Cascade)
-  assigned_user     User?        @relation("LeadAssignedTo", fields: [assigned_to], references: [id], onDelete: SetNull)
-  quotations        Quotation[]
-  follow_ups        FollowUp[]
-  bookings          Booking[]
-  website_events    WebsiteEvent[]
+  lead_next_action              String?
+  quotation_ready               Boolean        @default(false)
+  source_channel                String?
+  source_label                  String?
+  source_url                    String?
+  landing_page                  String?
+  referrer                      String?
+  utm_source                    String?
+  utm_medium                    String?
+  utm_campaign                  String?
+  utm_content                   String?
+  utm_term                      String?
+  fbclid                        String?
+  gclid                         String?
+  visitor_id                    String?
+  first_seen_at                 DateTime?
+  last_touch_at                 DateTime?
+  touch_count                   Int            @default(0)
+  assigned_to                   String?
+  follow_up_date                DateTime?
+  created_at                    DateTime       @default(now())
+  updated_at                    DateTime       @updatedAt
+  company                       Company        @relation(fields: [company_id], references: [id], onDelete: Cascade)
+  conversation                  Conversation   @relation(fields: [conversation_id], references: [id], onDelete: Cascade)
+  assigned_user                 User?          @relation("LeadAssignedTo", fields: [assigned_to], references: [id], onDelete: SetNull)
+  quotations                    Quotation[]
+  follow_ups                    FollowUp[]
+  bookings                      Booking[]
+  website_events                WebsiteEvent[]
 
   @@index([company_id, source_channel])
   @@index([company_id, utm_campaign])
@@ -512,65 +926,65 @@ model WebsiteEvent {
 }
 
 model QuotationTemplate {
-  id                String    @id @default(uuid())
+  id                String   @id @default(uuid())
   company_id        String
   template_name     String
   service_type      String
   description       String?
-  pricing_type      String    @default("range")
-  fixed_price       Decimal?  @db.Decimal(12, 2)
-  price_min         Decimal?  @db.Decimal(12, 2)
-  price_max         Decimal?  @db.Decimal(12, 2)
+  pricing_type      String   @default("range")
+  fixed_price       Decimal? @db.Decimal(12, 2)
+  price_min         Decimal? @db.Decimal(12, 2)
+  price_max         Decimal? @db.Decimal(12, 2)
   terms             String?
-  validity_days     Int       @default(15)
-  auto_send_allowed Boolean   @default(false)
-  active            Boolean   @default(true)
-  created_at        DateTime  @default(now())
-  updated_at        DateTime  @updatedAt
-  company           Company   @relation(fields: [company_id], references: [id], onDelete: Cascade)
+  validity_days     Int      @default(15)
+  auto_send_allowed Boolean  @default(false)
+  active            Boolean  @default(true)
+  created_at        DateTime @default(now())
+  updated_at        DateTime @updatedAt
+  company           Company  @relation(fields: [company_id], references: [id], onDelete: Cascade)
 
   @@map("quotation_templates")
 }
 
 model Quotation {
-  id                 String          @id @default(uuid())
-  company_id         String
-  lead_id            String
-  conversation_id    String
-  quotation_number   String          @unique
-  customer_name      String?
-  customer_company   String?
-  service_needed     String?
-  quotation_details  String
-  amount             Decimal?        @db.Decimal(12, 2)
-  terms              String?
-  status             String          @default("draft")
-  mode               String          @default("approval_required")
-  prepared_by        String?
-  approved_by        String?
-  sent_at            DateTime?
-  created_at         DateTime        @default(now())
-  updated_at         DateTime        @updatedAt
-  company            Company         @relation(fields: [company_id], references: [id], onDelete: Cascade)
-  lead               Lead            @relation(fields: [lead_id], references: [id], onDelete: Cascade)
-  conversation       Conversation    @relation(fields: [conversation_id], references: [id], onDelete: Cascade)
-  prepared_user      User?           @relation("QuotationPreparedBy", fields: [prepared_by], references: [id], onDelete: SetNull)
-  approved_user      User?           @relation("QuotationApprovedBy", fields: [approved_by], references: [id], onDelete: SetNull)
-  items              QuotationItem[]
+  id                String          @id @default(uuid())
+  company_id        String
+  lead_id           String
+  conversation_id   String
+  quotation_number  String          @unique
+  customer_name     String?
+  customer_company  String?
+  service_needed    String?
+  quotation_details String
+  amount            Decimal?        @db.Decimal(12, 2)
+  terms             String?
+  status            String          @default("draft")
+  mode              String          @default("approval_required")
+  prepared_by       String?
+  approved_by       String?
+  sent_at           DateTime?
+  created_at        DateTime        @default(now())
+  updated_at        DateTime        @updatedAt
+  company           Company         @relation(fields: [company_id], references: [id], onDelete: Cascade)
+  lead              Lead            @relation(fields: [lead_id], references: [id], onDelete: Cascade)
+  conversation      Conversation    @relation(fields: [conversation_id], references: [id], onDelete: Cascade)
+  prepared_user     User?           @relation("QuotationPreparedBy", fields: [prepared_by], references: [id], onDelete: SetNull)
+  approved_user     User?           @relation("QuotationApprovedBy", fields: [approved_by], references: [id], onDelete: SetNull)
+  items             QuotationItem[]
 
   @@map("quotations")
 }
 
 model QuotationItem {
-  id            String    @id @default(uuid())
-  quotation_id  String
-  item_name     String
-  description   String?
-  quantity      Decimal   @default(1) @db.Decimal(10, 2)
-  unit_price    Decimal?  @db.Decimal(12, 2)
-  total_price   Decimal?  @db.Decimal(12, 2)
-  created_at    DateTime  @default(now())
-  quotation     Quotation @relation(fields: [quotation_id], references: [id], onDelete: Cascade)
+  id           String    @id @default(uuid())
+  quotation_id String
+  item_name    String
+  description  String?
+  quantity     Decimal   @default(1) @db.Decimal(10, 2)
+  unit_price   Decimal?  @db.Decimal(12, 2)
+  total_price  Decimal?  @db.Decimal(12, 2)
+  created_at   DateTime  @default(now())
+  quotation    Quotation @relation(fields: [quotation_id], references: [id], onDelete: Cascade)
 
   @@map("quotation_items")
 }
@@ -592,6 +1006,76 @@ model FollowUp {
   assigned_user   User?        @relation("FollowUpAssignedTo", fields: [assigned_to], references: [id], onDelete: SetNull)
 
   @@map("follow_ups")
+}
+
+/// A reusable, Meta-approved Utility Message template owned by one Page.
+///
+/// The neutral `key` is stable across industries; businesses can call the
+/// assigned person a technician, driver, adviser, clinician, or any other
+/// role inside the template variables without changing the workflow.
+model CustomerUpdateTemplate {
+  id                   String                   @id @default(uuid())
+  company_id           String
+  facebook_page_id     String
+  key                  String
+  version              Int                      @default(1)
+  display_name         String
+  description          String?                  @db.Text
+  ai_usage_instruction String                   @db.Text
+  meta_template_name   String
+  language             String                   @default("en_US")
+  body_text            String                   @db.Text
+  variable_keys        String[]                 @default([])
+  variable_examples    Json                     @default("{}")
+  status               String                   @default("DRAFT")
+  active               Boolean                  @default(true)
+  meta_template_id     String?
+  meta_error           String?                  @db.Text
+  archived_at          DateTime?
+  created_by_email     String?
+  created_at           DateTime                 @default(now())
+  updated_at           DateTime                 @updatedAt
+  company              Company                  @relation(fields: [company_id], references: [id], onDelete: Cascade)
+  facebook_page        FacebookPage             @relation(fields: [facebook_page_id], references: [id], onDelete: Cascade)
+  deliveries           CustomerUpdateDelivery[]
+
+  @@unique([company_id, facebook_page_id, key, version])
+  @@unique([facebook_page_id, meta_template_name])
+  @@index([company_id, active, status])
+  @@index([company_id, facebook_page_id, key, version])
+  @@map("customer_update_templates")
+}
+
+/// Append-only delivery audit for every attempted Customer Update.
+///
+/// `variables` and `rendered_text` are snapshots of what staff confirmed.
+/// A unique idempotency key prevents a double-click from sending twice.
+model CustomerUpdateDelivery {
+  id               String                 @id @default(uuid())
+  company_id       String
+  facebook_page_id String
+  conversation_id  String
+  template_id      String
+  status           String                 @default("sending")
+  recipient_name   String?
+  recipient_psid   String
+  variables        Json
+  rendered_text    String                 @db.Text
+  meta_message_id  String?
+  meta_error       String?                @db.Text
+  idempotency_key  String                 @unique
+  created_by_email String?
+  created_at       DateTime               @default(now())
+  sent_at          DateTime?
+  company          Company                @relation(fields: [company_id], references: [id], onDelete: Cascade)
+  facebook_page    FacebookPage           @relation(fields: [facebook_page_id], references: [id], onDelete: Restrict)
+  conversation     Conversation           @relation(fields: [conversation_id], references: [id], onDelete: Restrict)
+  template         CustomerUpdateTemplate @relation(fields: [template_id], references: [id], onDelete: Restrict)
+
+  @@index([company_id, created_at])
+  @@index([conversation_id, created_at])
+  @@index([status, created_at])
+  @@map("customer_update_deliveries")
 }
 
 model BookingSetting {
@@ -682,15 +1166,15 @@ model HumanHandoff {
 }
 
 model AiLog {
-  id                String       @id @default(uuid())
+  id                String        @id @default(uuid())
   company_id        String
   conversation_id   String?
   model             String
-  prompt_tokens     Int          @default(0)
-  completion_tokens Int          @default(0)
-  cost_estimate     Decimal?     @db.Decimal(10, 6)
-  created_at        DateTime     @default(now())
-  company           Company      @relation(fields: [company_id], references: [id], onDelete: Cascade)
+  prompt_tokens     Int           @default(0)
+  completion_tokens Int           @default(0)
+  cost_estimate     Decimal?      @db.Decimal(10, 6)
+  created_at        DateTime      @default(now())
+  company           Company       @relation(fields: [company_id], references: [id], onDelete: Cascade)
   conversation      Conversation? @relation(fields: [conversation_id], references: [id], onDelete: SetNull)
 
   @@map("ai_logs")
@@ -700,7 +1184,7 @@ model Product {
   id            String        @id @default(uuid())
   name          String
   slug          String        @unique
-  description   String       @db.Text
+  description   String        @db.Text
   status        String        @default("active")
   created_at    DateTime      @default(now())
   updated_at    DateTime      @updatedAt
@@ -710,20 +1194,20 @@ model Product {
 }
 
 model PricingPlan {
-  id                  String        @id @default(uuid())
+  id                  String         @id @default(uuid())
   product_id          String
   name                String
-  slug                String        @unique
-  monthly_price       Decimal       @db.Decimal(12, 2)
-  annual_price        Decimal       @db.Decimal(12, 2)
-  currency            String        @default("PHP")
+  slug                String         @unique
+  monthly_price       Decimal        @db.Decimal(12, 2)
+  annual_price        Decimal        @db.Decimal(12, 2)
+  currency            String         @default("PHP")
   conversation_limit  Int
   facebook_page_limit Int
   features            Json
-  active              Boolean       @default(true)
-  created_at          DateTime      @default(now())
-  updated_at          DateTime      @updatedAt
-  product             Product       @relation(fields: [product_id], references: [id], onDelete: Cascade)
+  active              Boolean        @default(true)
+  created_at          DateTime       @default(now())
+  updated_at          DateTime       @updatedAt
+  product             Product        @relation(fields: [product_id], references: [id], onDelete: Cascade)
   subscriptions       Subscription[]
 
   @@index([product_id])
@@ -732,16 +1216,16 @@ model PricingPlan {
 }
 
 model AddOn {
-  id          String   @id @default(uuid())
-  name        String
-  slug        String   @unique
-  description String   @db.Text
-  price       Decimal  @db.Decimal(12, 2)
-  currency    String   @default("PHP")
+  id           String   @id @default(uuid())
+  name         String
+  slug         String   @unique
+  description  String   @db.Text
+  price        Decimal  @db.Decimal(12, 2)
+  currency     String   @default("PHP")
   billing_type String
-  active      Boolean  @default(true)
-  created_at  DateTime @default(now())
-  updated_at  DateTime @updatedAt
+  active       Boolean  @default(true)
+  created_at   DateTime @default(now())
+  updated_at   DateTime @updatedAt
 
   @@index([active])
   @@map("add_ons")
@@ -788,7 +1272,7 @@ model CartItem {
 }
 
 model Customer {
-  id                          String         @id @default(uuid())
+  id                          String                    @id @default(uuid())
   user_id                     String?
   full_name                   String
   company_name                String?
@@ -808,9 +1292,9 @@ model Customer {
   estimated_monthly_inquiries String?
   main_products_or_services   String?
   preferred_onboarding_date   DateTime?
-  created_at                  DateTime       @default(now())
-  updated_at                  DateTime       @updatedAt
-  user                        User?          @relation(fields: [user_id], references: [id], onDelete: SetNull)
+  created_at                  DateTime                  @default(now())
+  updated_at                  DateTime                  @updatedAt
+  user                        User?                     @relation(fields: [user_id], references: [id], onDelete: SetNull)
   orders                      Order[]
   subscriptions               Subscription[]
   invoices                    Invoice[]
@@ -822,35 +1306,35 @@ model Customer {
 }
 
 model Order {
-  id                    String      @id @default(uuid())
-  order_number          String      @unique
-  customer_id           String
-  cart_id               String?
-  subtotal              Decimal     @db.Decimal(12, 2)
-  tax                   Decimal     @default(0) @db.Decimal(12, 2)
-  total                 Decimal     @db.Decimal(12, 2)
-  currency              String      @default("PHP")
-  billing_frequency     String
-  payment_provider      String
-  payment_status        String      @default("pending")
-  order_status          String      @default("awaiting_payment")
-  external_payment_id   String?
-  external_checkout_url String?
+  id                     String               @id @default(uuid())
+  order_number           String               @unique
+  customer_id            String
+  cart_id                String?
+  subtotal               Decimal              @db.Decimal(12, 2)
+  tax                    Decimal              @default(0) @db.Decimal(12, 2)
+  total                  Decimal              @db.Decimal(12, 2)
+  currency               String               @default("PHP")
+  billing_frequency      String
+  payment_provider       String
+  payment_status         String               @default("pending")
+  order_status           String               @default("awaiting_payment")
+  external_payment_id    String?
+  external_checkout_url  String?
   /// Messenger/source conversation that created this checkout link. This lets
   /// payment webhooks send the post-payment onboarding message back to the same
   /// chat instead of guessing by email.
   source_conversation_id String?
-  paid_at               DateTime?
-  created_at            DateTime    @default(now())
-  updated_at            DateTime    @updatedAt
-  customer              Customer    @relation(fields: [customer_id], references: [id], onDelete: Restrict)
-  cart                  Cart?       @relation(fields: [cart_id], references: [id], onDelete: SetNull)
-  source_conversation   Conversation? @relation("OrderSourceConversation", fields: [source_conversation_id], references: [id], onDelete: SetNull)
-  items                 OrderItem[]
-  payments              Payment[]
-  subscriptions         Subscription[]
-  invoices              Invoice[]
-  manual_payment_proofs ManualPaymentProof[]
+  paid_at                DateTime?
+  created_at             DateTime             @default(now())
+  updated_at             DateTime             @updatedAt
+  customer               Customer             @relation(fields: [customer_id], references: [id], onDelete: Restrict)
+  cart                   Cart?                @relation(fields: [cart_id], references: [id], onDelete: SetNull)
+  source_conversation    Conversation?        @relation("OrderSourceConversation", fields: [source_conversation_id], references: [id], onDelete: SetNull)
+  items                  OrderItem[]
+  payments               Payment[]
+  subscriptions          Subscription[]
+  invoices               Invoice[]
+  manual_payment_proofs  ManualPaymentProof[]
 
   @@index([customer_id])
   @@index([cart_id])
@@ -988,40 +1472,40 @@ model Invoice {
 // the newest ACTIVE version of a given `slug` is offered to new projects.
 // ===========================================================================
 model StaticAdTemplate {
-  id                    String    @id @default(uuid())
-  slug                  String
-  name                  String
-  description           String    @db.Text
-  category              String
-  frameworkKey          String?
+  id                      String    @id @default(uuid())
+  slug                    String
+  name                    String
+  description             String    @db.Text
+  category                String
+  frameworkKey            String?
   // PRODUCT | SERVICE | UNIVERSAL — which example this specific template
   // visual is (most frameworks were imported with one product-oriented and
   // one service-oriented real example; see templateImport.js).
-  audienceType          String    @default("UNIVERSAL")
+  audienceType            String    @default("UNIVERSAL")
   // Short "best for X" customer-facing label (PART 4/7), distinct from the
   // longer `description`.
-  idealFor              String?   @db.Text
+  idealFor                String?   @db.Text
   // Dominant colors sampled from the source asset at import time, hex
   // strings — used for personalized-thumbnail color hints (PART 8) and
   // Super Admin preview only, never as the sole indicator of anything.
-  dominantColors        String[]  @default([])
+  dominantColors          String[]  @default([])
   // SHA-256 of the original imported file's bytes — lets the importer
   // (scripts/brandee-import-static-templates.js) detect an already-imported
   // file on a safe rerun without depending on filename stability.
-  sourceChecksum        String?
+  sourceChecksum          String?
   // Original filename from the import source, kept for provenance/audit only
   // (never used at runtime, never exposed as a public asset path).
-  importedFromFilename  String?
-  previewImageUrl       String?
-  thumbnailUrl          String?
-  sourceAssetUrl        String?
+  importedFromFilename    String?
+  previewImageUrl         String?
+  thumbnailUrl            String?
+  sourceAssetUrl          String?
   // Editable overlay areas (product image/logo/headline/price/CTA/etc.) as
   // normalized-coordinate bounding boxes — see overlaySchema shape documented
   // in src/brandee/templateSchemas.js. Validated with Zod before every write.
-  overlaySchema         Json      @default("{}")
-  requiredFieldsSchema  Json      @default("[]")
-  optionalFieldsSchema  Json      @default("[]")
-  proofRequirements     Json      @default("[]")
+  overlaySchema           Json      @default("{}")
+  requiredFieldsSchema    Json      @default("[]")
+  optionalFieldsSchema    Json      @default("[]")
+  proofRequirements       Json      @default("[]")
   // Art direction for the AI_GENERATED_LAYOUT render mode: describes the
   // LAYOUT and VISUAL STYLE this framework should produce (columns, badge,
   // palette, photography mood) — never the customer's actual copy, which
@@ -1029,25 +1513,25 @@ model StaticAdTemplate {
   // this with those answers into the final GPT Image 2 prompt (see
   // creativePlanner.composeImagePrompt). Null = this template stays on the
   // deterministic SVG compositor.
-  imageGenPrompt        String?   @db.Text
-  supportedAspectRatios Json      @default("[]")
-  defaultAspectRatio    String    @default("4:5")
-  defaultLanguage       String    @default("english")
-  renderMode            String    @default("COMPOSITE_TEMPLATE") // COMPOSITE_TEMPLATE | AI_GENERATED_LAYOUT
-  tags                  String[]  @default([])
-  sortOrder             Int       @default(0)
-  status                String    @default("DRAFT") // DRAFT | ACTIVE | INACTIVE | ARCHIVED
-  isFeatured            Boolean   @default(false)
-  isPremium             Boolean   @default(false)
-  version               Int       @default(1)
-  parentTemplateId      String?
-  publishedAt           DateTime?
-  retiredAt             DateTime?
+  imageGenPrompt          String?   @db.Text
+  supportedAspectRatios   Json      @default("[]")
+  defaultAspectRatio      String    @default("4:5")
+  defaultLanguage         String    @default("english")
+  renderMode              String    @default("COMPOSITE_TEMPLATE") // COMPOSITE_TEMPLATE | AI_GENERATED_LAYOUT
+  tags                    String[]  @default([])
+  sortOrder               Int       @default(0)
+  status                  String    @default("DRAFT") // DRAFT | ACTIVE | INACTIVE | ARCHIVED
+  isFeatured              Boolean   @default(false)
+  isPremium               Boolean   @default(false)
+  version                 Int       @default(1)
+  parentTemplateId        String?
+  publishedAt             DateTime?
+  retiredAt               DateTime?
   createdByPlatformUserId String?
   updatedByPlatformUserId String?
-  createdAt             DateTime  @default(now())
-  updatedAt             DateTime  @updatedAt
-  archivedAt             DateTime?
+  createdAt               DateTime  @default(now())
+  updatedAt               DateTime  @updatedAt
+  archivedAt              DateTime?
 
   @@index([slug])
   @@index([status])
@@ -1058,43 +1542,43 @@ model StaticAdTemplate {
 }
 
 model UgcTemplate {
-  id                    String    @id @default(uuid())
-  slug                  String
-  name                  String
-  description           String    @db.Text
-  category              String
-  previewPosterUrl      String?
-  previewVideoUrl       String?
-  sourceAssetUrl        String?
-  storyboardSchema      Json      @default("{}")
-  sceneSchema           Json      @default("[]")
-  creatorRequirements   Json      @default("{}")
-  voiceRequirements     Json      @default("{}")
-  scriptSchema          Json      @default("{}")
-  requiredFieldsSchema  Json      @default("[]")
-  optionalFieldsSchema  Json      @default("[]")
-  proofRequirements     Json      @default("[]")
-  supportedDurations    Json      @default("[]")
-  supportedAspectRatios Json      @default("[]")
-  supportedLanguages    Json      @default("[]")
+  id                      String    @id @default(uuid())
+  slug                    String
+  name                    String
+  description             String    @db.Text
+  category                String
+  previewPosterUrl        String?
+  previewVideoUrl         String?
+  sourceAssetUrl          String?
+  storyboardSchema        Json      @default("{}")
+  sceneSchema             Json      @default("[]")
+  creatorRequirements     Json      @default("{}")
+  voiceRequirements       Json      @default("{}")
+  scriptSchema            Json      @default("{}")
+  requiredFieldsSchema    Json      @default("[]")
+  optionalFieldsSchema    Json      @default("[]")
+  proofRequirements       Json      @default("[]")
+  supportedDurations      Json      @default("[]")
+  supportedAspectRatios   Json      @default("[]")
+  supportedLanguages      Json      @default("[]")
   // Safe provider identifiers/config ONLY — never a secret/API key. Enforced
   // by templateAdmin.js's scrubProviderConfiguration() before every write.
-  modelProvider         String?
-  providerConfiguration Json      @default("{}")
-  tags                  String[]  @default([])
-  sortOrder             Int       @default(0)
-  status                String    @default("DRAFT")
-  isFeatured            Boolean   @default(false)
-  isPremium             Boolean   @default(false)
-  version               Int       @default(1)
-  parentTemplateId      String?
-  publishedAt           DateTime?
-  retiredAt             DateTime?
+  modelProvider           String?
+  providerConfiguration   Json      @default("{}")
+  tags                    String[]  @default([])
+  sortOrder               Int       @default(0)
+  status                  String    @default("DRAFT")
+  isFeatured              Boolean   @default(false)
+  isPremium               Boolean   @default(false)
+  version                 Int       @default(1)
+  parentTemplateId        String?
+  publishedAt             DateTime?
+  retiredAt               DateTime?
   createdByPlatformUserId String?
   updatedByPlatformUserId String?
-  createdAt             DateTime  @default(now())
-  updatedAt             DateTime  @updatedAt
-  archivedAt             DateTime?
+  createdAt               DateTime  @default(now())
+  updatedAt               DateTime  @updatedAt
+  archivedAt              DateTime?
 
   @@index([slug])
   @@index([status])
@@ -1138,8 +1622,8 @@ model BrandeeEntitlementEvent {
   id              String   @id @default(uuid())
   customer_id     String
   subscription_id String?
-  unit            String   // IMAGE_FINAL | VIDEO_SECONDS
-  eventType       String   // RESERVE | CONSUME | RELEASE | REFUND
+  unit            String // IMAGE_FINAL | VIDEO_SECONDS
+  eventType       String // RESERVE | CONSUME | RELEASE | REFUND
   amount          Int
   // References a project in the JSON-file product-ad project store
   // (productAdProjectStore.js), not a Postgres FK — that store is
@@ -1164,24 +1648,23 @@ model BrandeeEntitlementEvent {
 }
 
 model ManualPaymentProof {
-  id                    String    @id @default(uuid())
+  id                    String   @id @default(uuid())
   order_id              String
   transaction_reference String
   payment_date          DateTime
   sender_name           String
-  amount_sent           Decimal   @db.Decimal(12, 2)
+  amount_sent           Decimal  @db.Decimal(12, 2)
   proof_file_url        String?
-  status                String    @default("awaiting_verification")
-  admin_notes           String?   @db.Text
-  created_at            DateTime  @default(now())
-  updated_at            DateTime  @updatedAt
-  order                 Order     @relation(fields: [order_id], references: [id], onDelete: Cascade)
+  status                String   @default("awaiting_verification")
+  admin_notes           String?  @db.Text
+  created_at            DateTime @default(now())
+  updated_at            DateTime @updatedAt
+  order                 Order    @relation(fields: [order_id], references: [id], onDelete: Cascade)
 
   @@index([order_id])
   @@index([status])
   @@map("manual_payment_proofs")
 }
-
 
 // Product-ad project (image/video flow) — was a lightweight JSON-file store
 // (productAdProjectStore.js), explicitly documented in its own header as an
@@ -1281,17 +1764,17 @@ model ProductAdImageAsset {
 /// Single use, short lived, and all of a user's outstanding tokens are
 /// invalidated when any one of them is redeemed.
 model PasswordResetToken {
-  id         String   @id @default(uuid())
-  user_id    String
+  id           String    @id @default(uuid())
+  user_id      String
   /// sha256 hex of the raw token. Unique so redemption is a single indexed
   /// lookup rather than a scan — this is the hot path at scale.
-  token_hash String   @unique
-  expires_at DateTime
-  used_at    DateTime?
+  token_hash   String    @unique
+  expires_at   DateTime
+  used_at      DateTime?
   /// Recorded for abuse investigation, not for access decisions.
   requested_ip String?
-  created_at DateTime @default(now())
-  user       User     @relation(fields: [user_id], references: [id], onDelete: Cascade)
+  created_at   DateTime  @default(now())
+  user         User      @relation(fields: [user_id], references: [id], onDelete: Cascade)
 
   @@index([user_id])
   @@index([expires_at])
@@ -1312,18 +1795,18 @@ model PasswordResetToken {
 /// or reuse it when the prospect bought. That reuse is exactly what the
 /// setup fee covers.
 model DemoSession {
-  id             String    @id @default(uuid())
-  name           String
-  email          String
+  id              String    @id @default(uuid())
+  name            String
+  email           String
   /// E.164, normalised by src/phone.js. The ONLY number the demo will text —
   /// the model composes the message but never chooses the recipient.
-  mobile_number  String?
-  website_url    String?
-  facebook_url   String?
-  business_name  String?
+  mobile_number   String?
+  website_url     String?
+  facebook_url    String?
+  business_name   String?
   /// Structured output of buildPresenceSnapshot(). Facts only; the model
   /// writes every word it says (docs/handoff-masterplan.md).
-  snapshot       Json?
+  snapshot        Json?
   /// Plain text pulled from an uploaded price list (image, PDF, spreadsheet or
   /// doc). A Facebook Page can publish every price inside promo GRAPHICS,
   /// which Open Graph scraping cannot see — this is how those prices reach
@@ -1335,20 +1818,366 @@ model DemoSession {
   /// Filipino customer as if it were pesos.
   price_currency  String?
   price_list_name String?
-  scrape_status  String    @default("pending")
-  scrape_error   String?
-  message_count  Int       @default(0)
-  sms_sent       Int       @default(0)
-  requested_ip   String?
+  scrape_status   String    @default("pending")
+  scrape_error    String?
+  message_count   Int       @default(0)
+  sms_sent        Int       @default(0)
+  requested_ip    String?
   /// Retention limit. A stranger's business data and mobile number are
   /// personal data under the Data Privacy Act — purged, not kept forever.
-  expires_at     DateTime
-  converted_at   DateTime?
-  created_at     DateTime  @default(now())
-  updated_at     DateTime  @updatedAt
+  expires_at      DateTime
+  converted_at    DateTime?
+  created_at      DateTime  @default(now())
+  updated_at      DateTime  @updatedAt
 
   @@index([email])
   @@index([expires_at])
   @@index([created_at])
   @@map("demo_sessions")
+}
+
+/// One row per company per customer channel (Settings › Channels). Added 2026-10-20.
+/// channel_key: facebook_messenger | email | website_chat | mobile_phone.
+/// enabled = box ticked (unticking pauses; settings kept). ai_replies = Closer answers on this channel.
+/// config = non-secret settings. secret_encrypted = channel password (src/crypto.js AES-GCM), never returned by the API.
+/// tested_fingerprint = fingerprint of the settings that last passed "Test connection" (required before enabling).
+model TenantChannel {
+  id                 String    @id @default(uuid())
+  company_id         String
+  channel_key        String
+  enabled            Boolean   @default(false)
+  ai_replies         Boolean   @default(true)
+  config             Json      @default("{}")
+  secret_encrypted   String?
+  tested_fingerprint String?
+  last_tested_at     DateTime?
+  last_ok_at         DateTime?
+  last_error         String?
+  last_error_at      DateTime?
+  created_at         DateTime  @default(now())
+  updated_at         DateTime  @updatedAt
+  company            Company   @relation(fields: [company_id], references: [id], onDelete: Cascade)
+
+  @@unique([company_id, channel_key])
+  @@map("tenant_channels")
+}
+
+/// Every email the email channel read or sent: de-duplication (message_id), threading
+/// (In-Reply-To / References) and loop protection. Skipped mail keeps its skip_reason.
+model EmailMessageLog {
+  id                String        @id @default(uuid())
+  company_id        String
+  conversation_id   String?
+  direction         String
+  message_id        String
+  in_reply_to       String?
+  references_header String?       @db.Text
+  from_address      String?
+  to_address        String?
+  subject           String?
+  skip_reason       String?
+  imap_uid          Int?
+  created_at        DateTime      @default(now())
+  company           Company       @relation(fields: [company_id], references: [id], onDelete: Cascade)
+  conversation      Conversation? @relation(fields: [conversation_id], references: [id], onDelete: SetNull)
+
+  @@unique([company_id, message_id])
+  @@index([conversation_id, created_at])
+  @@index([company_id, to_address, created_at])
+  @@map("email_message_log")
+}
+
+/// Staff resolve loop (added 2026-10-20): every button press or email reply on an
+/// ACTION NEEDED / URGENT alert. action: retry | manual | handle. via: link | email.
+/// outcome: done | still_failing | not_found | claimed | busy | already_done | unclear.
+/// message_id (email replies) makes each reply act once.
+model StaffResolveAction {
+  id          String   @id @default(uuid())
+  company_id  String
+  request_id  String
+  action      String
+  actor_email String?
+  via         String
+  reference   String?
+  outcome     String
+  detail      String?  @db.Text
+  message_id  String?  @unique
+  created_at  DateTime @default(now())
+  company     Company  @relation(fields: [company_id], references: [id], onDelete: Cascade)
+
+  @@index([request_id, created_at])
+  @@map("staff_resolve_actions")
+}
+
+/// Saved contacts, kept ONLY with the customer's permission (src/contacts.js). Added 2026-10-20.
+/// One row per company + channel identity (email address, Messenger PSID, chat id, phone number).
+/// consent "yes" = reuse and greet by name; "no" = asked not to be remembered.
+model ContactProfile {
+  id              String    @id @default(uuid())
+  company_id      String
+  channel         String
+  identity        String
+  conversation_id String?
+  name            String?
+  address_as      String?
+  phone           String?
+  phone_key       String?
+  email           String?
+  organization    String?
+  branch          String?
+  department      String?
+  details         Json      @default("{}")
+  consent         String    @default("yes")
+  consent_at      DateTime?
+  created_at      DateTime  @default(now())
+  updated_at      DateTime  @updatedAt
+  company         Company   @relation(fields: [company_id], references: [id], onDelete: Cascade)
+
+  @@unique([company_id, channel, identity])
+  @@index([company_id, phone_key])
+  @@map("contact_profiles")
+}
+
+/// After-service follow-up per finished job (src/feedback.js, added 2026-10-20): "was it done?" right
+/// after the job is closed/delivered, plus survey ratings for the topics due for this customer.
+model CustomerFeedback {
+  id              String    @id @default(uuid())
+  company_id      String
+  request_id      String    @unique
+  conversation_id String?
+  token_hash      String    @unique
+  reference       String?
+  customer_key    String?
+  customer_name   String?
+  customer_email  String?
+  job_label       String?
+  staff_name      String?
+  staff_role      String?
+  finished_at     String?
+  topics          Json      @default("[]")
+  sent_at         DateTime?
+  send_error      String?
+  answered_at     DateTime?
+  done            String?
+  answers         Json      @default("{}")
+  alerted_at      DateTime?
+  created_at      DateTime  @default(now())
+  updated_at      DateTime  @updatedAt
+  company         Company   @relation(fields: [company_id], references: [id], onDelete: Cascade)
+
+  @@index([company_id, customer_key])
+  @@index([company_id, answered_at])
+  @@map("customer_feedback")
+}
+
+/// A Pitch phone line: one VoLTE router (e.g. AIO100) with its SIM.
+/// Added by AIStaff staff in Platform > Phone Lines, handed to a tenant with a
+/// one-time setup code, claimed by the tenant in Settings > Channels > Mobile Phone.
+/// auth_username is the key src/pitch/tenant.js resolves a call to a company by.
+model SipDevice {
+  id                      String    @id @default(uuid())
+  company_id              String?
+  model                   String    @default("AIO100-1V")
+  /// "aistaff" = hosted and managed at AIStaff (default); "customer" = at the customer's site
+  location                String    @default("aistaff")
+  device_serial           String    @unique
+  sim_number              String?
+  carrier                 String?
+  phone_number            String?
+  gateway_host            String?
+  gateway_port            Int?
+  auth_username           String    @unique
+  auth_password_encrypted String?
+  status                  String    @default("in_stock")
+  max_channels            Int       @default(1)
+  setup_code              String?   @unique
+  setup_code_expires_at   DateTime?
+  assigned_at             DateTime?
+  claimed_at              DateTime?
+  last_check_at           DateTime?
+  last_check_ok           Boolean?
+  last_seen_at            DateTime?
+  last_call_at            DateTime?
+  last_call_from          String?
+  last_call_seconds       Int?
+  last_call_mode          String?
+  notes                   String?
+  created_at              DateTime  @default(now())
+  updated_at              DateTime  @updatedAt
+  company                 Company?  @relation(fields: [company_id], references: [id], onDelete: SetNull)
+
+  @@index([company_id])
+  @@map("sip_devices")
+}
+
+/// Email Engine (added 2026-10-22). Sends one email to many recipients (one message
+/// per recipient), throttled, with unsubscribe. First block of the future Marketing engine.
+/// Tenant settings: Settings › Email Engine. Platform limits: Platform › Email Engine.
+model EmailEngineSetting {
+  id                  String    @id @default(uuid())
+  company_id          String    @unique
+  /// "channel" = the tenant's Email channel inbox (Settings › Channels › Email); "mailbox" = a separate sending mailbox
+  sender_mode         String    @default("channel")
+  mailbox_config      Json      @default("{}")
+  mailbox_secret      String?
+  mailbox_tested_at   DateTime?
+  mailbox_tested_hash String?
+  reply_to            String?
+  per_minute          Int       @default(10)
+  /// Daily limit of the mailbox from the email plan (Hostinger Business Starter = 1000/day)
+  mailbox_daily_limit Int       @default(1000)
+  /// Kept free every day for Closer replies and customer status emails from the same inbox
+  reserve_for_closer  Int       @default(200)
+  footer_text         String?   @db.Text
+  unsubscribe_label   String?
+  test_address        String?
+  /// Outreach (one-to-one prospecting) mailbox - must be on a different domain from the tenant main mail
+  outreach_config      Json      @default("{}")
+  outreach_secret      String?
+  outreach_tested_hash String?
+  outreach_tested_at   DateTime?
+  outreach_poll        Json      @default("{}")
+  outreach_last_error  String?
+  outreach_footer      String?   @db.Text
+  created_at          DateTime  @default(now())
+  updated_at          DateTime  @updatedAt
+  company             Company   @relation(fields: [company_id], references: [id], onDelete: Cascade)
+
+  @@map("email_engine_settings")
+}
+
+model EmailContact {
+  id           String   @id @default(uuid())
+  company_id   String
+  email        String
+  name         String?
+  organization String?
+  lists        String[] @default([])
+  source       String?
+  created_at   DateTime @default(now())
+  updated_at   DateTime @updatedAt
+  company      Company  @relation(fields: [company_id], references: [id], onDelete: Cascade)
+
+  @@unique([company_id, email])
+  @@index([company_id, created_at])
+  @@map("email_contacts")
+}
+
+model EmailCampaign {
+  id            String                   @id @default(uuid())
+  company_id    String
+  name          String
+  subject       String
+  body_text     String                   @db.Text
+  /// draft | sending | paused | done | cancelled
+  status        String                   @default("draft")
+  pause_reason  String?
+  from_address  String?
+  total         Int                      @default(0)
+  sent_count    Int                      @default(0)
+  failed_count  Int                      @default(0)
+  skipped_count Int                      @default(0)
+  created_by    String?
+  started_at    DateTime?
+  finished_at   DateTime?
+  last_error    String?
+  last_error_at DateTime?
+  alerted_at    DateTime?
+  /// broadcast = same email to many; outreach = one-to-one, AI-drafted per company, with follow-ups
+  kind           String    @default("broadcast")
+  /// Pace: at most pace_count emails every pace_hours hours (null = no extra pace)
+  pace_count     Int?
+  pace_hours     Int?
+  /// {"weekdays_only":true,"from":"08:00","to":"18:00"} in Asia/Manila; {} = any time
+  send_window    Json      @default("{}")
+  followups      Int       @default(0)
+  followup_days  Int       @default(4)
+  require_review Boolean   @default(true)
+  brief          String?   @db.Text
+  sender_person  Json      @default("{}")
+  pia            Json      @default("{}")
+  pia_done_at    DateTime?
+  pia_by         String?
+  last_sent_at   DateTime?
+  created_at    DateTime                 @default(now())
+  updated_at    DateTime                 @updatedAt
+  company       Company                  @relation(fields: [company_id], references: [id], onDelete: Cascade)
+  recipients    EmailCampaignRecipient[]
+
+  @@index([company_id, created_at])
+  @@index([status])
+  @@map("email_campaigns")
+}
+
+model EmailCampaignRecipient {
+  id           String        @id @default(uuid())
+  campaign_id  String
+  company_id   String
+  email        String
+  name         String?
+  /// pending | sending | sent | failed | skipped
+  status       String        @default("pending")
+  attempts     Int           @default(0)
+  error        String?
+  message_id   String?
+  from_address String?
+  sent_at      DateTime?
+  next_try_at  DateTime?
+  organization  String?
+  /// outreach: where the address was found and why this company was chosen
+  source_note   String?
+  reason_note   String?   @db.Text
+  /// role (info@, sales@) | personal (name@company) | freemail (gmail...)
+  address_type  String?
+  /// 0 = first email, 1-2 = follow-ups
+  step          Int       @default(0)
+  draft_subject String?
+  draft_body    String?   @db.Text
+  draft_error   String?
+  message_ids   String[]  @default([])
+  next_step_at  DateTime?
+  /// replied | opted_out | bounced | no_reply
+  outcome       String?
+  reply_snippet String?   @db.Text
+  replied_at    DateTime?
+  events        Json      @default("[]")
+  created_at   DateTime      @default(now())
+  updated_at   DateTime      @updatedAt
+  campaign     EmailCampaign @relation(fields: [campaign_id], references: [id], onDelete: Cascade)
+
+  @@unique([campaign_id, email])
+  @@index([campaign_id, status])
+  @@index([from_address, sent_at])
+  @@map("email_campaign_recipients")
+}
+
+model EmailSuppression {
+  id         String   @id @default(uuid())
+  company_id String
+  email      String
+  /// unsubscribed | bounced | manual
+  reason     String
+  note       String?
+  created_at DateTime @default(now())
+  company    Company  @relation(fields: [company_id], references: [id], onDelete: Cascade)
+
+  @@unique([company_id, email])
+  @@map("email_suppressions")
+}
+
+/// One row (id = "global"): limits AIStaff staff set for every tenant.
+model EmailEnginePlatform {
+  id             String   @id @default("global")
+  paused_all     Boolean  @default(false)
+  pause_note     String?
+  max_per_minute Int      @default(30)
+  max_per_day    Int      @default(3000)
+  outreach_enabled     Boolean  @default(true)
+  outreach_max_per_day Int      @default(50)
+  /// Domains outreach may never send from (AIStaff main domain etc.)
+  protected_domains    String[] @default(["aistaff.click"])
+  updated_by     String?
+  updated_at     DateTime @updatedAt
+
+  @@map("email_engine_platform")
 }

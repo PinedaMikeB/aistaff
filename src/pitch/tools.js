@@ -18,9 +18,30 @@ const { config } = require("./config");
  *   - recipient defaults to the verified caller ID from the INVITE
  */
 
+const SAVE_CALLER = {
+  name: "save_caller_details",
+  description:
+    "Save the caller's details with their phone number (always, no permission " +
+    "question) so next time they are greeted by name and not asked again. Call it " +
+    "once you have their name. Set consent=false ONLY if the caller asks you to " +
+    "delete or not keep their details.",
+  parameters: {
+    type: "OBJECT",
+    properties: {
+      consent: { type: "BOOLEAN", description: "Leave out (saved). false only if the caller asked to delete their details." },
+      name: { type: "STRING", description: "The caller's full name as they said it." },
+      address_as: { type: "STRING", description: "How to address them, e.g. Ma'am Ana or Sir Jun." },
+      organization: { type: "STRING", description: "Their company." },
+      branch: { type: "STRING", description: "Their branch or site." },
+      department: { type: "STRING", description: "Their department." },
+    },
+    required: ["name"],
+  },
+};
+
 function declarations() {
-  if (!config.sms.enabled) return [];
-  return [{
+  if (!config.sms.enabled) return [SAVE_CALLER];
+  return [SAVE_CALLER, {
     name: "send_sms",
     description:
       "Send a text message to the caller. Only use this after the caller has " +
@@ -54,6 +75,18 @@ function declarations() {
  * `state` is per-call scratch so limits survive across turns.
  */
 async function execute({ name, args, ua, callerId, state, log }) {
+  if (name === "save_caller_details") {
+    try {
+      const result = await require("../contacts").saveCaller(process.env.PITCH_COMPANY_ID || null, callerId, {
+        ...args, consent: !(args.consent === false || String(args.consent).toLowerCase() === "false"),
+      });
+      log.info(`contacts: save_caller_details consent=${args.consent} -> ${JSON.stringify(result)}`);
+      return result;
+    } catch (err) {
+      log.error(`contacts: save failed — ${err.message}`);
+      return { saved: false, reason: "save_failed" };
+    }
+  }
   if (name !== "send_sms") {
     return { error: "unknown_tool", detail: `no tool named ${name}` };
   }

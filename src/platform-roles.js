@@ -30,7 +30,11 @@ const PERMISSIONS = {
   // Hiding inactive/test workspaces from the live customer queue.
   "customers.status": ["admin"],
   // Entering a customer workspace to help.
-  "customers.assist": ["admin", "manager", "support"]
+  "customers.assist": ["admin", "manager", "support"],
+  // Pitch routers: add, assign to a customer, issue setup codes, view SIP login.
+  "phonelines.manage": ["admin", "manager"],
+  // Email Engine: pause all tenant campaigns, set global sending limits.
+  "emailengine.manage": ["admin", "support"]
 };
 
 /** Normalise legacy values. STAFF/SUPERADMIN predate the three-role model. */

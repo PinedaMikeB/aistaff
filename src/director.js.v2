@@ -1,0 +1,277 @@
+/**
+ * Closer Director — code-controlled workflows (docs/MASTERPLAN-director.md).
+ *
+ * The AI only (1) INTERPRETS a customer message into commands and (2) WRITES
+ * the reply for a task the code chose. This module decides what is missing,
+ * runs identification lookups, submits, and reports — reusing the blueprint
+ * engine (must-ask fields, dry run, confirmation, idempotency, customer scope,
+ * staff alerts, memory reset) through executeBusinessEngineTool.
+ *
+ * Nothing here is tenant-specific: a flow is an engine operation whose
+ * blueprint has a `director` block, e.g.
+ *   "director": {
+ *     "enabled": true,
+ *     "trigger": "Customer wants ink/toner delivered or a technician visit",
+ *     "identify": { "operation": "customer_service.find_machine", "input": "serialnumber",
+ *                   "list": "machines", "set": { "machineid": "id", "customerid": "customerId", "branchid": "branchId" },
+ *                   "describe": ["customerName", "branchName", "model", "serial"],
+ *                   "ask": "the machine serial number (sticker on the machine)" }
+ *   }
+ */
+const { prisma } = require("./db");
+const be = require("./business-engines");
+const { normalizeBlueprint, fieldFacts, labelArguments } = require("./engine-blueprint");
+
+const ACTIVE_STATUSES = ["collecting", "pending_customer_confirmation"];
+
+async function loadFlows(companyId) {
+  const rows = await prisma.tenantEngineOperation.findMany({
+    where: { company_id: companyId, enabled: true, tenant_engine: { enabled: true } },
+    include: { definition: true, tenant_engine: { include: { engine: true } }, mapping: { include: { integration_action: true } } }
+  });
+  return rows
+    .filter((op) => op.mapping?.integration_action && op.mapping.workflow_config?.director?.enabled === true)
+    .map((op) => {
+      const config = op.mapping.workflow_config;
+      return {
+        id: op.id,
+        key: `${op.tenant_engine.engine.key}.${op.definition.operation_key}`,
+        tool: be.logicalToolName(op.tenant_engine.engine.key, op.definition.operation_key),
+        name: op.definition.name,
+        trigger: String(config.director.trigger || op.definition.description || op.definition.name),
+        identify: config.director.identify || null,
+        action: op.mapping.integration_action,
+        blueprint: normalizeBlueprint(config, op.mapping.integration_action)
+      };
+    });
+}
+
+function toolForKey(key) {
+  const [engine, operation] = String(key || "").split(".");
+  return engine && operation ? be.logicalToolName(engine, operation) : null;
+}
+
+async function activeDraft(companyId, conversationId, flows) {
+  if (!conversationId || !flows.length) return null;
+  const from = await be.historyStart(conversationId);
+  const draft = await prisma.businessOperationRequest.findFirst({
+    where: {
+      company_id: companyId,
+      conversation_id: conversationId,
+      tenant_engine_operation_id: { in: flows.map((flow) => flow.id) },
+      status: { in: ACTIVE_STATUSES },
+      created_at: { gte: from },
+      updated_at: { gt: new Date(Date.now() - 24 * 60 * 60 * 1000) }
+    },
+    orderBy: { updated_at: "desc" }
+  });
+  if (!draft) return null;
+  return { draft, flow: flows.find((flow) => flow.id === draft.tenant_engine_operation_id) };
+}
+
+/** Fields the interpreter may set: the action's fields minus server-owned and identification-owned ones. */
+function interpreterFields(flow) {
+  const props = flow.action.input_schema?.properties || {};
+  const owned = new Set([...flow.blueprint.hidden, ...flow.blueprint.derived.map((rule) => rule.field), ...Object.keys(flow.identify?.set || {})]);
+  return Object.keys(props).filter((key) => !owned.has(key)).map((key) => fieldFacts(flow.action, flow.blueprint, key));
+}
+
+function interpreterPrompt({ companyName, flows, active, state, collected, missing, history, message }) {
+  const flowList = flows.map((flow) => ({ flow: flow.key, when: flow.trigger }));
+  const activePart = active ? {
+    flow: active.key,
+    fields: interpreterFields(active),
+    already_collected: collected,
+    still_missing: missing,
+    identified: state.identified || null,
+    waiting_for: state.confirmation_id ? "the customer to confirm the summary (yes/no)"
+      : state.choices ? `the customer to choose one of: ${state.choices.map((choice, index) => `${index + 1}) ${choice.label}`).join("; ")}`
+      : null
+  } : null;
+  return [
+    `You read ONE customer message sent to ${companyName} on Messenger and convert it into commands for a workflow system. You do not reply to the customer.`,
+    "",
+    `Workflows this business handles: ${JSON.stringify(flowList)}`,
+    activePart ? `Workflow in progress: ${JSON.stringify(activePart)}` : "No workflow is in progress.",
+    "",
+    "Recent conversation:",
+    history.length ? history.map((m) => `${m.sender_type === "ai" ? "Business" : "Customer"}: ${String(m.message_text || "").slice(0, 400)}`).join("\n") : "(none)",
+    `Customer's new message: ${message}`,
+    "",
+    "Return JSON only: {\"commands\": [ ... ], \"language\": \"taglish|tagalog|english\"}. Allowed commands:",
+    "{\"type\":\"start_flow\",\"flow\":\"<flow>\"} — the customer asks for something a listed workflow handles (only if none is in progress).",
+    "{\"type\":\"identify\",\"value\":\"<identifier exactly as the customer wrote it>\"} — e.g. a machine serial number.",
+    "{\"type\":\"set\",\"field\":\"<field>\",\"value\":<value>} — ONLY for fields listed in the workflow, ONLY for what the customer actually said in this or earlier messages. Map words to allowed values (e.g. 'gumagana pa, okay print' -> the value whose label means running/print OK). Use numbers for numeric codes. For a description field, write a short summary of what they need in their words.",
+    "{\"type\":\"choose\",\"option\":<number>} — ONLY when waiting_for lists records to choose from. A number answering a numbered field question (like machine condition 1-4) is a set command for that field.",
+    "{\"type\":\"confirm\",\"answer\":\"yes\"|\"no\"} — the customer answered the summary confirmation.",
+    "{\"type\":\"cancel\"} — the customer no longer wants the request.",
+    "{\"type\":\"question\"} — the customer asks something else (prices, information, small talk).",
+    "{\"type\":\"handoff\"} — the customer asks for a person or is upset.",
+    "Several commands may be returned. Never invent values the customer did not give."
+  ].join("\n");
+}
+
+function communicatorPrompt({ companyName, tone, addressAs, history, message, language, task }) {
+  return [
+    `You write ONE Messenger reply for ${companyName}.`,
+    tone ? `Business tone and identity: ${tone}` : "",
+    addressAs ? `Address the customer as: ${addressAs}.` : "If you do not know the customer's name yet, do not invent one.",
+    /taglish|tagalog|filipino/i.test(String(language)) || /\b(po|opo|ko|ng|na|ba|ang|kailangan|gumagana|pa)\b/i.test(String(message))
+      ? "The customer writes in Tagalog/Taglish, so you MUST reply in natural Taglish (mostly Tagalog with common English words), with po/opo. Do not reply in plain English."
+      : "Reply in the same language the customer used.",
+    "",
+    "Recent conversation:",
+    history.length ? history.slice(-4).map((m) => `${m.sender_type === "ai" ? "Business" : "Customer"}: ${String(m.message_text || "").slice(0, 300)}`).join("\n") : "(none)",
+    `Customer's new message: ${message}`,
+    "",
+    `Your task (decided by the system — say only this, nothing more): ${JSON.stringify(task)}`,
+    "Rules: 1-3 short, warm sentences in your own words (never copy the task text). Convey every point in tell, ask for every item in ask in one message, and offer allowed options as a short numbered list. Never invent numbers, dates, names, staff, references, prices or promises. Never write a reference number yourself; the system adds it.",
+    "Return JSON only: {\"reply\": \"...\"}"
+  ].filter(Boolean).join("\n");
+}
+
+function readPath(node, path) {
+  return String(path || "").split(".").reduce((value, part) => (value && typeof value === "object" ? value[part] : undefined), node);
+}
+
+/**
+ * Run one customer turn through the Director. Returns null when no workflow
+ * applies (the normal Closer path answers), or { reply, needsHuman, handoffReason, task }.
+ */
+async function runDirectorTurn({ companyId, conversationId, message, history, companyName, tone, profile, callModelJSON, turnStartedAt }) {
+  const flows = await loadFlows(companyId);
+  if (!flows.length || !conversationId) return null;
+  let current = await activeDraft(companyId, conversationId, flows);
+  let active = current?.flow || null;
+  const state = { ...((current?.draft?.result && current.draft.result.director) || {}) };
+  const collected = current ? labelArguments(current.draft.requested_arguments || {}, active.blueprint) : {};
+  const missingNow = current ? (current.draft.result?.last_missing || []) : [];
+
+  const interpreted = await callModelJSON(interpreterPrompt({ companyName, flows, active, state, collected, missing: missingNow, history, message }), "interpreter");
+  const commands = Array.isArray(interpreted?.commands) ? interpreted.commands.filter((item) => item && typeof item === "object") : [];
+  const language = interpreted?.language || "";
+  const has = (type) => commands.some((item) => item.type === type);
+  const call = (tool, args) => be.executeBusinessEngineTool({ companyId, conversationId, name: tool, args, turnStartedAt, requestedBy: "director" });
+
+  if (!active) {
+    const start = commands.find((item) => item.type === "start_flow" && flows.some((flow) => flow.key === item.flow));
+    if (!start) return null; // not a workflow message: normal Closer answers
+    active = flows.find((flow) => flow.key === start.flow);
+  } else if (!commands.some((item) => ["set", "identify", "choose", "confirm", "cancel", "handoff"].includes(item.type))) {
+    if (has("question")) return null; // digression: normal Closer answers; the request stays open and resumes
+  }
+
+  let task;
+  let needsHuman = false;
+  let handoffReason = "";
+  const args = {};
+  const allowed = new Set(interpreterFields(active).map((field) => field.field));
+  for (const item of commands) if (item.type === "set" && allowed.has(item.field) && item.value !== undefined && item.value !== null && item.value !== "") args[item.field] = item.value;
+
+  if (has("handoff")) {
+    needsHuman = true;
+    handoffReason = "The customer asked for a person during a request.";
+    task = { task: "handoff", tell: ["a team member will take over this conversation"] };
+  } else if (has("cancel") && current) {
+    await prisma.businessOperationRequest.update({ where: { id: current.draft.id }, data: { status: "cancelled", completed_at: new Date() } });
+    return { reply: await writeReply({ task: { task: "cancelled", tell: ["the request is cancelled as they asked"] } }), needsHuman: false, handoffReason: "", task: "cancelled" };
+  }
+
+  // Identification (code runs the lookup, never the model).
+  // "1" answering a numbered question is a value for that field, not a record choice.
+  if (!Array.isArray(state.choices) && state.last_options_field) {
+    for (const item of commands) {
+      if (item.type === "choose" && Number(item.option) > 0 && args[state.last_options_field] === undefined) args[state.last_options_field] = Number(item.option);
+    }
+  }
+  const identifyCommand = commands.find((item) => item.type === "identify" && item.value);
+  const choose = commands.find((item) => item.type === "choose" && Number(item.option) > 0);
+  if (!task && active.identify && choose && Array.isArray(state.choices)) {
+    const picked = state.choices[Number(choose.option) - 1];
+    if (picked) { Object.assign(args, picked.set); state.identified = picked.label; state.choices = null; }
+  }
+  if (!task && active.identify && identifyCommand) {
+    const lookupTool = toolForKey(active.identify.operation);
+    const found = await call(lookupTool, { [active.identify.input]: String(identifyCommand.value).trim() });
+    const list = found?.ok ? (readPath(found.facts, active.identify.list) || []) : [];
+    const options = (Array.isArray(list) ? list : []).map((item) => ({
+      set: Object.fromEntries(Object.entries(active.identify.set || {}).map(([field, path]) => [field, readPath(item, path)])),
+      label: (active.identify.describe || []).map((path) => readPath(item, path)).filter(Boolean).join(" — ")
+    }));
+    if (options.length === 1) { Object.assign(args, options[0].set); state.identified = options[0].label; state.choices = null; }
+    else if (options.length > 1) { state.choices = options.slice(0, 6); task = { task: "choose", tell: ["several records match"], ask_to_choose: state.choices.map((option, index) => `${index + 1}) ${option.label}`) }; }
+    else task = { task: "not_found", tell: [`no record matches "${identifyCommand.value}"`], ask: [{ item: active.identify.ask || "the identifier", note: "ask them to check it again" }] };
+  }
+
+  // Confirmation of a summary prepared in an earlier turn.
+  if (!task && state.confirmation_id && has("confirm")) {
+    const answer = commands.find((item) => item.type === "confirm").answer;
+    if (answer === "yes") {
+      const result = await call(active.tool, { _confirmation_id: state.confirmation_id });
+      state.confirmation_id = null;
+      if (result?.executed) {
+        task = { task: "submitted", tell: ["the request is saved and the team will handle it"], reference: result.reference || null };
+      } else if (result?.staff_notified) {
+        task = { task: "blocked", tell: ["their request details were passed to our team", "the team will contact them to arrange it"], do_not_give_reference: true };
+      } else {
+        needsHuman = true; handoffReason = `Director could not submit: ${result?.detail || result?.error || "unknown error"}`;
+        task = { task: "error", tell: ["it could not be saved", "a team member will follow up"], do_not_give_reference: true };
+      }
+    } else {
+      state.confirmation_id = null;
+      task = { task: "ask_change", ask: [{ item: "what they want to change in the request" }] };
+    }
+  }
+
+  // Collect / check / prepare confirmation through the blueprint engine.
+  if (!task) {
+    const result = await call(active.tool, args);
+    if (result?.status === "needs_information") {
+      const ask = [];
+      if (active.identify && !state.identified && (result.missing || []).some((key) => Object.keys(active.identify.set || {}).includes(key))) ask.push({ item: active.identify.ask || "an identifier" });
+      for (const key of result.missing || []) {
+        if (active.identify && Object.keys(active.identify.set || {}).includes(key)) continue;
+        const facts = fieldFacts(active.action, active.blueprint, key);
+        ask.push({ item: facts.description || key, options: facts.allowed ? facts.allowed.map((option) => `${option.value} = ${option.label || option.value}`) : undefined });
+      }
+      task = { task: "ask_missing", identified: state.identified || undefined, ask: ask.slice(0, 3) };
+      const optionsField = (result.missing || []).find((key) => fieldFacts(active.action, active.blueprint, key).allowed);
+      state.last_options_field = optionsField || null;
+      if (result.not_yet_confirmed) task.confirm_what_they_said = result.not_yet_confirmed;
+      state.last_missing = result.missing || [];
+    } else if (result?.status === "awaiting_customer_confirmation") {
+      state.confirmation_id = result.confirmation_id;
+      task = { task: "confirm_summary", identified: state.identified || undefined, summary: result.summary, ask: [{ item: "confirmation that the summary is correct (oo/hindi)" }] };
+    } else if (result?.status === "blocked" || result?.staff_notified) {
+      task = { task: "blocked", tell: ["their request details were passed to our team", "the team will contact them to arrange it"], do_not_give_reference: true };
+    } else if (result?.executed) {
+      task = { task: "submitted", tell: ["the request is saved and the team will handle it"], reference: result.reference || null };
+    } else if (result && result.ok === false) {
+      needsHuman = true; handoffReason = `Director: ${result.detail || result.error || "request failed"}`;
+      task = { task: "error", tell: ["something went wrong", "a team member will follow up"], do_not_give_reference: true };
+    }
+  }
+
+  // Persist Director state on the draft (survives restarts; next turn resumes).
+  const refreshed = await activeDraft(companyId, conversationId, [active]);
+  if (refreshed?.draft) {
+    await prisma.businessOperationRequest.update({
+      where: { id: refreshed.draft.id },
+      data: { result: { ...(refreshed.draft.result || {}), director: { identified: state.identified || null, choices: state.choices || null, confirmation_id: state.confirmation_id || null, last_options_field: state.last_options_field || null }, last_missing: state.last_missing || refreshed.draft.result?.last_missing || [] } }
+    }).catch(() => {});
+  }
+
+  async function writeReply({ task: t }) {
+    const written = await callModelJSON(communicatorPrompt({ companyName, tone, addressAs: profile?.address_as || profile?.known?.callername || "", history, message, language, task: t }), "communicator");
+    return String(written?.reply || "").trim();
+  }
+
+  let reply = await writeReply({ task });
+  if (!reply) throw new Error("Director communicator returned an empty reply");
+  // Critical values are attached by code, never typed by the model.
+  if (task.task === "submitted" && task.reference) reply = `${reply}\n\nReference number: ${task.reference}`;
+  console.log("[director] company=%s flow=%s commands=%s task=%s", companyId, active.key, JSON.stringify(commands).slice(0, 300), task.task);
+  return { reply, needsHuman, handoffReason, task: task.task, reference: task.reference || null };
+}
+
+module.exports = { runDirectorTurn, loadFlows, interpreterPrompt, communicatorPrompt };

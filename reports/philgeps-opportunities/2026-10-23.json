@@ -1,0 +1,130 @@
+{
+  "title": "PHILGEPS + UNGM OPPORTUNITY BRIEFING",
+  "date_iso": "2026-10-23",
+  "executive_summary": {
+    "philgeps_opportunities_scanned": 108,
+    "ungm_opportunities_scanned": 2,
+    "new_relevant_opportunities": 2,
+    "source_access_notes": "Six public PhilGEPS category first pages were checked without login. The official UNGM public notice page was checked, but its public search endpoint returned HTTP 400; two active official direct notices were verified."
+  },
+  "best_opportunities": [
+    {
+      "source": "PhilGEPS",
+      "rating": "STRONG MATCH",
+      "score": "8.1/10",
+      "project": "Procurement of one (1) lot – Influencer Marketing Service",
+      "entity": "Philippine Postal Corporation (PHLPost)",
+      "ref": "13302752 / RFQ 129-09-26",
+      "budget": "PHP 1,999,826.96",
+      "deadline": "26 October 2026, 10:00 AM PHT",
+      "method": "Negotiated Procurement – Small Value Procurement (Sec. 34); RFQ",
+      "fit": "Direct Brandee fit: influencer plan, recommended influencer list, content deployment calendar, monthly campaign performance reports, and social-media analytics.",
+      "requirements": "Current PhilGEPS registration certificate/number, Mayor’s or Business Permit, notarized NGPA Omnibus Sworn Statement, income/business-tax return, and corporate authority documents; signed quotation; 30-working-day price validity. Personal/sealed submission at PHLPost Annex II, Manila is stated.",
+      "risks": "Only three days remain; the TOR is not public without the associated component path. AIStaff must substantiate an influencer roster, campaign delivery capability, and on-site Manila submission. The notice says a three-month delivery period but text says complete by 31 December 2026.",
+      "next": "Obtain/review the TOR immediately; confirm submission logistics and evaluation criteria; prepare a defensible influencer shortlist, calendar, sample content workflow, analytics/reporting template, and all 2026 eligibility documents.",
+      "url": "https://notices.philgeps.gov.ph/GEPSNONPILOT/Tender/SplashBidNoticeAbstractUI.aspx?menuIndex=3&refID=13302752&DirectFrom=OpenOpp"
+    },
+    {
+      "source": "PhilGEPS",
+      "rating": "POSSIBLE MATCH",
+      "score": "6.6/10",
+      "project": "Open Journal System web-hosting package with DOI integration, themes, and website domain",
+      "entity": "Rizal Technological University",
+      "ref": "13301835",
+      "budget": "PHP 183,000.00",
+      "deadline": "28 October 2026, 5:00 PM PHT",
+      "method": "Negotiated Procurement – Small Value Procurement (Sec. 34); RFQ",
+      "fit": "A contained custom web/hosting and integration assignment compatible with AIStaff’s website, dashboard, support, and integration capability.",
+      "requirements": "Sealed signed quotation at RTU BAC Secretariat, Mandaluyong, with a photocopy of the PhilGEPS Registration Certificate. The attached RFQ is controlling.",
+      "risks": "Small value and a specialized academic publishing stack; full scope, SLA, DOI provider, migration, support, and acceptance terms are in an attachment not publicly accessible without login.",
+      "next": "Request the public RFQ through the contact person, validate OJS/DOI capability and support expectations, and pursue only if scope can be delivered profitably and without unsupported specialist claims.",
+      "url": "https://notices.philgeps.gov.ph/GEPSNONPILOT/Tender/SplashBidNoticeAbstractUI.aspx?menuIndex=3&refID=13301835&DirectFrom=OpenOpp"
+    },
+    {
+      "source": "UNGM",
+      "rating": "POSSIBLE MATCH",
+      "score": "5.8/10",
+      "project": "Legal AI Solution EOI",
+      "entity": "World Food Programme (WFP)",
+      "ref": "HQ26NF194 / UNGM 317650",
+      "budget": "Not stated publicly",
+      "deadline": "23 October 2026, 16:00 GMT+2 (22:00 PHT)",
+      "method": "Request for Expression of Interest; UNGM Basic registration",
+      "fit": "The specified UNSPSC includes contact-center and reference software, and AIStaff’s custom AI/workflow capability overlaps the technical theme.",
+      "requirements": "WFP seeks suppliers with verified technical and financial capacity; submit the EOI response form and requested documents by email. UNGM Basic registration is shown.",
+      "risks": "Closes today; the legal-AI domain needs credible governance, legal-content, security, and capacity evidence. Do not imply a mature legal-AI product unless it is demonstrable.",
+      "next": "Only submit if AIStaff already has a truthful legal-AI capability package, completed EOI form, capacity evidence, and approval-ready submission materials before deadline.",
+      "url": "https://www.ungm.org/Public/Notice/317650"
+    }
+  ],
+  "urgent_deadlines": [
+    {
+      "source": "PhilGEPS",
+      "reference": "13302752",
+      "deadline": "26 October 2026, 10:00 AM PHT",
+      "url": "https://notices.philgeps.gov.ph/GEPSNONPILOT/Tender/SplashBidNoticeAbstractUI.aspx?menuIndex=3&refID=13302752&DirectFrom=OpenOpp"
+    },
+    {
+      "source": "UNGM",
+      "reference": "HQ26NF194 / UNGM 317650",
+      "deadline": "23 October 2026, 16:00 GMT+2",
+      "url": "https://www.ungm.org/Public/Notice/317650"
+    }
+  ],
+  "not_recommended": [
+    {
+      "source": "PhilGEPS",
+      "project": "Emergency Response and Public Safety Command Center Upgrade",
+      "ref": "13303860",
+      "reason": "Potential systems integration appears hardware/command-center heavy and is a public bid with inconsistent dates: the header closes 6 November while the description says bid opening is 18 November. Full technical and eligibility documents are needed before any match assessment.",
+      "url": "https://notices.philgeps.gov.ph/GEPSNONPILOT/Tender/SplashBidNoticeAbstractUI.aspx?menuIndex=3&refID=13303860&DirectFrom=OpenOpp"
+    },
+    {
+      "source": "PhilGEPS",
+      "project": "Groundwater Information System and Telemetry Systems (Phase 1)",
+      "ref": "13301691",
+      "reason": "Although it mentions an information system, it is a PHP 18.96M groundwater/telemetry consultancy with specialist domain, field telemetry, and public-bidding demands beyond AIStaff’s demonstrated services.",
+      "url": "https://notices.philgeps.gov.ph/GEPSNONPILOT/Tender/SplashBidNoticeAbstractUI.aspx?menuIndex=3&refID=13301691&DirectFrom=OpenOpp"
+    },
+    {
+      "source": "UNGM",
+      "project": "UNHCR Web/App Development and Maintenance Services for MENA",
+      "ref": "EOI/2026/003/MENA/PSP / UNGM 316449",
+      "reason": "Directly relevant but expired on 22 October 2026; do not treat it as actionable.",
+      "url": "https://www.ungm.org/Public/Notice/316449"
+    }
+  ],
+  "todays_recommendation": "Prioritize PHLPost Influencer Marketing Service (13302752), conditional on TOR review, credible influencer roster, and sealed-submission confirmation.",
+  "notes": "No access controls were bypassed. UNGM public search returned HTTP 400; direct public notices were checked.",
+  "source_urls_checked": [
+    "https://notices.philgeps.gov.ph/GEPSNONPILOT/Tender/SplashOpportunitiesSearchUI.aspx?BusCatID=10&ClickFrom=OpenOpp&menuIndex=3&type=category",
+    "https://notices.philgeps.gov.ph/GEPSNONPILOT/Tender/SplashOpportunitiesSearchUI.aspx?BusCatID=43&ClickFrom=OpenOpp&menuIndex=3&type=category",
+    "https://notices.philgeps.gov.ph/GEPSNONPILOT/Tender/SplashOpportunitiesSearchUI.aspx?BusCatID=37&ClickFrom=OpenOpp&menuIndex=3&type=category",
+    "https://notices.philgeps.gov.ph/GEPSNONPILOT/Tender/SplashOpportunitiesSearchUI.aspx?BusCatID=23&ClickFrom=OpenOpp&menuIndex=3&type=category",
+    "https://notices.philgeps.gov.ph/GEPSNONPILOT/Tender/SplashOpportunitiesSearchUI.aspx?BusCatID=17&ClickFrom=OpenOpp&menuIndex=3&type=category",
+    "https://notices.philgeps.gov.ph/GEPSNONPILOT/Tender/SplashOpportunitiesSearchUI.aspx?BusCatID=157&ClickFrom=OpenOpp&menuIndex=3&type=category",
+    "https://www.ungm.org/Public/Notice",
+    "https://www.ungm.org/Public/Notice/317650",
+    "https://www.ungm.org/Public/Notice/318491",
+    "https://www.ungm.org/Public/Notice/316449",
+    "https://notices.philgeps.gov.ph/GEPSNONPILOT/Tender/SplashBidNoticeAbstractUI.aspx?menuIndex=3&refID=13302752&DirectFrom=OpenOpp",
+    "https://notices.philgeps.gov.ph/GEPSNONPILOT/Tender/SplashBidNoticeAbstractUI.aspx?menuIndex=3&refID=13301835&DirectFrom=OpenOpp",
+    "https://notices.philgeps.gov.ph/GEPSNONPILOT/Tender/SplashBidNoticeAbstractUI.aspx?menuIndex=3&refID=13303860&DirectFrom=OpenOpp",
+    "https://notices.philgeps.gov.ph/GEPSNONPILOT/Tender/SplashBidNoticeAbstractUI.aspx?menuIndex=3&refID=13301691&DirectFrom=OpenOpp"
+  ],
+  "scan_metadata": {
+    "generated_at": "2026-10-22T23:07:50.151Z",
+    "repo_path": "/srv/apps/aistaff",
+    "email": {
+      "ok": true,
+      "reason": "sent",
+      "recipient": "mpineda@aistaff.click",
+      "messageId": "<f7a5787c-5618-cdb5-29d9-099284318ace@aistaff.click>",
+      "auth_source": "NOTIFY_SMTP_USER/NOTIFY_SMTP_PASS"
+    },
+    "source_counts": {
+      "philgeps": 108,
+      "ungm": 2
+    }
+  }
+}

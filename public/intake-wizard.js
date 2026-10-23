@@ -1158,6 +1158,13 @@ function wireIntakeSubmit(step) {
       return;
     }
 
+    const submitButton = form.querySelector('button[type="submit"]');
+    const submitLabel = submitButton?.textContent || "Save and continue";
+    if (submitButton) {
+      submitButton.disabled = true;
+      submitButton.textContent = editRow ? "Saving changes..." : "Saving...";
+    }
+
     try {
       if (editRow) {
         const raw = Object.fromEntries(new FormData(form));
@@ -1172,6 +1179,10 @@ function wireIntakeSubmit(step) {
       // Show what the server actually said. Previously this threw into the
       // console and the screen simply did nothing.
       toast(error.message || "Could not save that — please try again");
+      if (submitButton) {
+        submitButton.disabled = false;
+        submitButton.textContent = submitLabel;
+      }
       return;
     }
     toast(editRow ? "Updated — Closer uses this now" : "Saved — Closer knows this now");

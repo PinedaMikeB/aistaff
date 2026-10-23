@@ -1,6 +1,80 @@
 # AIStaff Live Deployment
 
-**Your setup:** Domain `aistaff.click` on Hostinger + Cloudflare Tunnel for the live API.
+## Current production authority (verified 2026-10-14)
+
+The live source of truth is the Ryzen host, not a Mac checkout.
+
+| Item | Production value |
+|---|---|
+| Public hostname | `https://aistaff.click` |
+| SSH host | `aistaff` (hostname `aistaff`) |
+| Repository | `/srv/apps/aistaff` |
+| Node service | user unit `aistaff-api.service` |
+| Service wrapper | `/home/mike/srv/ryzen-start-aistaff-api.sh` |
+| Working directory | `/srv/apps/aistaff` |
+| Listening port | `3000` |
+| Environment | `NODE_ENV=production` |
+| Environment file | `/srv/apps/aistaff/.env` |
+| Database | PostgreSQL `aistaff_click` at `127.0.0.1:5432` |
+| Cloudflare ingress | `/home/mike/.cloudflared/marga-api.yml` → `127.0.0.1:3000` |
+
+The public hostname reaches this service through the production proxy/tunnel route. Do not build, migrate, deploy, or overwrite production from `/Volumes/Wotg Drive Mike/GitHub/AIStaff`; that Mac checkout is reference-only unless the owner explicitly changes the authority.
+
+### Established deployment procedure
+
+1. SSH to `aistaff` and work in `/srv/apps/aistaff`.
+2. Inspect the dirty worktree and preserve unrelated changes. Apply only a reviewed narrow patch; never replace whole files from a mirror.
+3. Before a database migration, create a timestamped PostgreSQL dump outside the repository.
+4. Run `./node_modules/.bin/prisma validate`,
+   `./node_modules/.bin/prisma migrate deploy`, and
+   `./node_modules/.bin/prisma generate` when the patch contains a migration.
+5. Run `npm test` and the relevant syntax/feature tests.
+6. Restart with `systemctl --user restart aistaff-api.service` and confirm `systemctl --user is-active aistaff-api.service` reports `active`.
+7. Verify `https://aistaff.click/api/health`, the authenticated workflow, and recent service logs. A local test alone is not a live verification.
+
+The remaining sections below are historical deployment alternatives. They are not the current production path.
+
+### Universal Connections & Actions release (2026-10-14)
+
+- Migration: `20261013235500_smart_integration_discovery`
+- Rollback branch: `codex/rollback-universal-connections-20261013-2346`
+- Backup directory:
+  `/srv/apps/aistaff/.codex-backups/20261013T2346-universal-connections-preupgrade`
+- Validated custom dump: `aistaff-pre-universal-connections.dump`
+- Service verification: `aistaff-api.service` active and
+  `https://aistaff.click/api/health` healthy after restart.
+
+The release is additive. A database rollback requires restoring the validated
+dump because Prisma does not provide an automatic down migration. For a code
+rollback, first disable newly configured connections, restore the repository
+state from the rollback branch or targeted file archive, restore the dump if
+the schema must be reversed, regenerate Prisma, restart the user service, and
+verify the public hostname.
+
+### Guided Business Engine setup update (2026-10-14)
+
+- No database migration is required; the existing Business Engine schema is
+  reused and the catalog is versioned in application code.
+- Backup: `/srv/apps/aistaff/.codex-backups/20261014T1645-engine-guided-setup`
+- Settings flow: connect application → review suggested jobs and uncertain
+  field matches → safe connection test → activate selected jobs.
+- A connected application never activates an engine by itself.
+- Tenant instructions live only in Settings > General > Closer Instructions.
+  AI Studio remains the global platform layer; Knowledge Base stores facts;
+  Business Engines contribute system-owned capability guidance and policies.
+- Marga currently has no documented serial-number lookup endpoint. Do not map
+  customer search or machine detail to serial lookup unless Marga's OpenAPI
+  document explicitly adds that capability.
+- Roll back code by restoring only the files from the backup directory and
+  restarting `aistaff-api.service`; no schema rollback is needed.
+- Verification: 33/33 focused tests passed; a self-cleaning temporary-tenant
+  sample proved the guided activation transaction and runtime tool exposure;
+  cleanup returned zero temporary tenants; local and public health checks were
+  healthy after the Ryzen service restart.
+
+---
+
+**Historical setup:** Domain `aistaff.click` on Hostinger + Cloudflare Tunnel for the live API.
 
 ---
 

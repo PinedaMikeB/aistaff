@@ -17,6 +17,7 @@ const { prisma } = require("./db");
 
 /** Every AI call in the product, so nothing is invisible. */
 const FUNCTIONS = [
+  { fn: "voice_reply", label: "Voice replies (Phone + Website Call)", detail: "Each spoken turn through the Director. The caller is waiting, so it must be fast.", provider: "local", model: "sealion" },
   { fn: "closer_reply", label: "Closer conversation", detail: "Every Messenger and website reply. Large prompt, short answer — input price dominates.", provider: "openai", model: "gpt-4.1-mini" },
   { fn: "upload_relevance", label: "Upload relevance check", detail: "Decides whether an uploaded file matches the wizard step.", provider: "openai", model: "gpt-4.1-mini" },
   { fn: "rate_structuring", label: "Rate card to rows", detail: "Flattens a courier matrix into editable shipping rows.", provider: "openai", model: "gpt-4.1-mini" },
@@ -40,7 +41,18 @@ const CATALOGUE = [
   { provider: "gemini", model: "gemini-3.1-flash-lite", label: "Gemini 3.1 Flash-Lite", vision: true, inCents: 25, outCents: 150, note: "Cheap, fast." },
   { provider: "gemini", model: "gemini-3.5-flash-lite", label: "Gemini 3.5 Flash-Lite", vision: true, inCents: null, outCents: null, note: "Current vision and demo model. Measured clean Taglish." },
   { provider: "gemini", model: "gemini-3.7-flash", label: "Gemini 3.7 Flash", vision: true, inCents: 75, outCents: 375, note: "INTRO price to 31 Dec 2026, then 150/750. Strong at coding and agents." },
-  { provider: "gemini", model: "gemini-3-flash", label: "Gemini 3 Flash", vision: true, inCents: 50, outCents: 300, note: "Middle option." }
+  { provider: "gemini", model: "gemini-3-flash", label: "Gemini 3 Flash", vision: true, inCents: 50, outCents: 300, note: "Middle option." },
+  // Local models on the Bosgame (llama.cpp router, ONE model loaded at a
+  // time: selecting one here unloads the previous and loads it). No per-token
+  // cost. Closer only. Needs LOCAL_LLM_BASE_URL (LAN proxy to the router).
+  // Small models (SEA-LION, Qwen3 8B) were removed 2026-10-19: they could not
+  // follow the full prompt or carry a multi-step workflow.
+  { provider: "local", model: "qwen3.8-27b", label: "Qwen3.8 27B dense BF16 (local · Bosgame)", inCents: 0, outCents: 0, functions: ["closer_reply"], note: "Highest local quality, full prompt, 262K context. Slower (about 30-60 s per reply)." },
+  { provider: "local", model: "sealion", label: "SEA-LION v4.5 E2B Q8 — Pitch's voice server (always loaded, fastest)", inCents: 0, outCents: 0, functions: ["voice_reply"], baseUrlEnv: "VOICE_LLM_BASE_URL", note: "The SEA-LION server Pitch already runs on the Bosgame (port 8090, thinking off). Does not swap models in the router, so Closer's Winnow stays loaded." },
+  { provider: "local", model: "sea-lion-v4.5-e2b", label: "Gemma SEA-LION v4.5 E2B Q8 (local · Bosgame)", inCents: 0, outCents: 0, functions: ["closer_reply", "voice_reply"], note: "AI Singapore model tuned for Southeast Asian languages (Taglish). The same model Pitch uses on the phone; very fast, small (about 2B). Re-added 2026-10-21 to compare with Winnow: it was removed on 2026-10-19 because it could not follow the full Closer prompt. Thinking is switched off in the router." },
+  { provider: "local", model: "winnow-12b", label: "Winnow 12B Q8 (local · Bosgame)", inCents: 0, outCents: 0, functions: ["closer_reply", "voice_reply"], note: "Gemma 4 12B fine-tuned for typed decisions; also chats. Faster than 27B; Taglish and tool use not yet proven." },
+  { provider: "local", model: "gemma-4-12b-it", label: "Gemma 4 12B Instruct Q8 (local · Bosgame)", inCents: 0, outCents: 0, functions: ["closer_reply"], note: "Plain Gemma 4 12B Instruct (Winnow's base). Faster than 27B; Taglish and tool use not yet proven." },
+  { provider: "local", model: "qwen3.8-moe-q8", label: "Qwen3.8 27B MoE Q8 (local · Bosgame)", inCents: 0, outCents: 0, functions: ["closer_reply"], note: "Mixture-of-experts version: faster per reply; compare Taglish quality before using live." }
 ];
 
 /** Reads fall back to the seeded default, so a missing row never breaks a reply. */
@@ -92,6 +104,13 @@ async function listSettings() {
 async function setModelFor({ fn, provider, model, updatedBy }) {
   const known = FUNCTIONS.find((f) => f.fn === fn);
   if (!known) return null;
+  const entry = CATALOGUE.find((c) => c.provider === provider && c.model === model);
+  if (entry && Array.isArray(entry.functions) && !entry.functions.includes(fn)) {
+    return { error: `${entry.label} can only be used for ${entry.functions.join(", ")}.` };
+  }
+  if (provider === "local" && fn !== "closer_reply") {
+    return { error: "Local models are available for Closer conversation only." };
+  }
   // Vision functions need a model that can read images. The dropdown offered
   // every model for every function, so "Price list reading (vision)" could be
   // set to a text-only model and every upload would fail. Guarded here rather

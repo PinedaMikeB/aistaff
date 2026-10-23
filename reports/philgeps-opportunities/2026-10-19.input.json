@@ -1,0 +1,168 @@
+{
+  "title": "PHILGEPS + UNGM OPPORTUNITY BRIEFING",
+  "date_iso": "2026-10-19",
+  "executive_summary": {
+    "philgeps_opportunities_scanned": 110,
+    "ungm_opportunities_scanned": 8,
+    "new_relevant_opportunities": 1,
+    "source_access_notes": "All six official PhilGEPS public category pages were checked without login and 110 first-page listings were screened. Eight official UNGM notice/search records were checked; the UNGM JSON search endpoint returned HTTP 400, so the public search page, indexed official listings, and direct notice pages were used. Some full solicitation packages require portal registration, vendor login, or an NDA; no access control was bypassed.",
+    "bid_count": 0,
+    "high_priority_review_count": 0,
+    "review_count": 1,
+    "skip_count": 5
+  },
+  "best_opportunities": [
+    {
+      "source": "PhilGEPS",
+      "match_rating": "POSSIBLE MATCH",
+      "score": 6.7,
+      "project": "Supply, Delivery and Installation of Document Management System",
+      "procuring_entity": "City Government of Mandaue, Cebu",
+      "country": "Philippines",
+      "reference_number": "13289356 / PR-2026-1101-00001",
+      "abc": "PHP 15,000,000.00",
+      "deadline": "November 10, 2026 9:00 AM PHT",
+      "days_remaining": 22,
+      "procurement_method": "Public Bidding; Goods / Information Technology",
+      "published": "October 19, 2026",
+      "why_it_fits_aistaff": "AIStaff's custom systems, dashboards, workflow automation, knowledge-management, search, document handling, and integrations align directly with a document-management implementation. The budget and 22-day preparation window justify serious review.",
+      "what_they_need": "Supply, delivery, and installation of a document management system within six months of the purchase order. The notice states a public-bidding process, manual bid submission, bid security, and similar completed contracts.",
+      "important_requirements": [
+        "Bidders should have completed contracts similar to the project within at least the two years preceding bid submission; the bidding documents control the exact threshold.",
+        "A complete bidding package costs PHP 25,000 and bids require an acceptable bid-security form.",
+        "Pre-bid conference: October 27, 2026 at 9:00 AM PHT in Mandaue City.",
+        "Manual submission is due November 10, 2026 at 9:00 AM PHT; bid opening follows at 9:01 AM.",
+        "The notice restricts eligibility under Philippine ownership/reciprocity rules and requires compliance with RA 12009 procurement documents."
+      ],
+      "risks_or_blockers": [
+        "The header says Delivery Period 0 days while the body says six months; the body likely controls but this inconsistency must be clarified.",
+        "AIStaff may not independently satisfy the similar-contract, financial-capacity, bid-security, and full public-bidding documentary requirements as a new supplier.",
+        "The detailed functional, migration, hosting, security, support, and acceptance requirements are not visible in the notice abstract.",
+        "The scale is materially larger than a simple SVP/RFQ and may require a proven document-management implementation partner."
+      ],
+      "how_we_could_qualify": [
+        "Review the paid/full bidding documents and map every eligibility and technical requirement before committing.",
+        "Consider joining with an established Philippine systems integrator that can evidence comparable DMS contracts, while AIStaff delivers workflow automation, AI search/assistant, dashboards, and integrations."
+      ],
+      "recommended_next_action": "Attend or obtain the October 27 pre-bid materials, request clarification of the 0-day versus six-month delivery inconsistency, confirm the exact similar-contract/SLCC and financial-capacity thresholds, and identify a qualified prime or joint-venture partner before buying bid documents.",
+      "official_link": "https://notices.philgeps.gov.ph/GEPSNONPILOT/Tender/SplashBidNoticeAbstractUI.aspx?menuIndex=3&refID=13289356&DirectFrom=OpenOpp"
+    }
+  ],
+  "urgent_deadlines": [
+    {
+      "source": "PhilGEPS",
+      "title": "Procurement of one lot - Influencer Marketing Service",
+      "buyer_organization": "Philippine Postal Corporation",
+      "reference_number": "13290357 / RFQ#129-09-26",
+      "deadline": "October 19, 2026 10:00 AM PHT per notice/RFQ body",
+      "days_remaining": 0,
+      "note": "Carry-forward only if the complete corporate package, influencer roster, TOR response, and physical Manila submission are already ready; do not start a rushed bid today.",
+      "url": "https://notices.philgeps.gov.ph/GEPSNONPILOT/Tender/SplashBidNoticeAbstractUI.aspx?menuIndex=3&refID=13290357&DirectFrom=OpenOpp"
+    },
+    {
+      "source": "UNGM",
+      "title": "Machine-Assisted Crisis Simulation Methodology, Toolkit and Prototype Simulations",
+      "buyer_organization": "United Nations System Staff College",
+      "reference_number": "UNSSC/RFQ/2026/07 / UNGM Notice 316352",
+      "deadline": "October 19, 2026 11:59 PM GMT+2",
+      "days_remaining": 0,
+      "note": "Carry-forward only if a compliant response and qualified crisis-simulation methodology lead are already substantially complete.",
+      "url": "https://www.ungm.org/Public/Notice/316352"
+    },
+    {
+      "source": "UNGM",
+      "title": "Digital Marketing and Product Promotion Support Services for Women Producer Groups",
+      "buyer_organization": "Food and Agriculture Organization",
+      "reference_number": "2026/FAMYA/FAMYA/138545 / UNGM Notice 317029",
+      "deadline": "October 20, 2026 11:00 PM GMT+6:30",
+      "days_remaining": 1,
+      "note": "Pursue only if a qualified Myanmar delivery partner, local-market capability, relevant references, and compliant portal submission are already available.",
+      "url": "https://www.ungm.org/Public/Notice/317029"
+    }
+  ],
+  "not_recommended": [
+    {
+      "source": "PhilGEPS",
+      "project": "5 lots Subscription to Various Software Programs",
+      "procuring_entity": "Pamantasan ng Lungsod ng Maynila",
+      "reference_number": "13293734 / 24ad2026",
+      "reason": "The SVP is accessible and includes an AI-workplace subscription, but it is a tightly specified resale bundle of multimedia, PDF/OCR, Canva, Microsoft-style workplace AI, and hosting subscriptions rather than custom AIStaff services.",
+      "official_link": "https://notices.philgeps.gov.ph/GEPSNONPILOT/Tender/SplashBidNoticeAbstractUI.aspx?menuIndex=3&refID=13293734&DirectFrom=OpenOpp"
+    },
+    {
+      "source": "PhilGEPS",
+      "project": "Procurement of Source Code Management and Development Collaboration Platform",
+      "procuring_entity": "Philippine Retirement Authority",
+      "reference_number": "13292799 / IT-10-26-015",
+      "reason": "This is an urgent PHP 450,000 platform subscription/resale RFQ closing October 20, not a custom software-development or AI-agent engagement; the full TOR is needed and preparation time is inadequate.",
+      "official_link": "https://notices.philgeps.gov.ph/GEPSNONPILOT/Tender/SplashBidNoticeAbstractUI.aspx?menuIndex=3&refID=13292799&DirectFrom=OpenOpp"
+    },
+    {
+      "source": "UNGM",
+      "project": "LTA for UNICEF China's Digital Fundraising Platforms Service",
+      "procuring_entity": "UNICEF China",
+      "reference_number": "LRPS-2026-9206735 / UNGM Notice 318518",
+      "reason": "The system-development and fundraising overlap is real, but the full requirements are NDA-restricted and likely require China-market fundraising, payment, regulatory, language, and long-term platform experience not evidenced by AIStaff today.",
+      "official_link": "https://www.ungm.org/Public/Notice/318518"
+    },
+    {
+      "source": "UNGM",
+      "project": "Provision of Standardized and Customizable Assessment Content Services",
+      "procuring_entity": "United Nations Secretariat",
+      "reference_number": "EOIUNPD24822 / UNGM Notice 318614",
+      "reason": "The opportunity seeks mature skills-assessment content and professional-services capability for global HR selection, not an AI assistant, customer-service platform, or general custom-system build; specialist psychometric content experience is central.",
+      "official_link": "https://www.ungm.org/Public/Notice/318614"
+    },
+    {
+      "source": "UNGM",
+      "project": "Provision of integrated library system SaaS and related services",
+      "procuring_entity": "Organization for Security and Co-operation in Europe",
+      "reference_number": "SEC-773152-2026 / UNGM Notice 318386",
+      "reason": "This is a specialized off-the-shelf library-system SaaS requirement. AIStaff does not have an established integrated-library-system product or implementation references.",
+      "official_link": "https://www.ungm.org/Public/Notice/318386"
+    }
+  ],
+  "todays_recommendation": {
+    "best_opportunity": "The best overall active opportunity remains the WHO Philippines rabies communication and community engagement RFP (WPRO/DAF/SAO/SUP/P/0009630), reported yesterday and closing October 29. Today's new Mandaue City document-management-system bid is worth a partner-led go/no-go review, but not a solo bid without comparable-contract proof.",
+    "documents_to_prepare": [
+      "WHO/UNGM Basic vendor profile and WHO In-Tend access confirmation",
+      "Company registration, tax, mayor's permit, PhilGEPS registration, corporate authorization, and latest financial-capacity documents",
+      "Brandee campaign/content portfolio and comparable institutional references for the WHO opportunity",
+      "DMS capability statement, architecture, migration/security/support approach, team CVs, and evidence of similar completed systems",
+      "Potential prime/JV partner credentials and comparable DMS contract evidence"
+    ],
+    "clarifications_to_request": [
+      "For Mandaue DMS, confirm whether the body’s six-month delivery term overrides the 0-day header and provide the detailed functional, migration, hosting, security, warranty, and acceptance specifications.",
+      "For Mandaue DMS, confirm exact similar-contract/SLCC, financial-capacity, licensing, and joint-venture requirements.",
+      "For WHO, confirm comparable-project thresholds, accepted partner/subcontractor experience, evaluation weights, production locations, languages, travel, printing quantities, and budget ceiling."
+    ]
+  },
+  "source_urls_checked": [
+    "https://notices.philgeps.gov.ph/GEPSNONPILOT/Tender/SplashOpportunitiesSearchUI.aspx?BusCatID=10&ClickFrom=OpenOpp&menuIndex=3&type=category",
+    "https://notices.philgeps.gov.ph/GEPSNONPILOT/Tender/SplashOpportunitiesSearchUI.aspx?BusCatID=43&ClickFrom=OpenOpp&menuIndex=3&type=category",
+    "https://notices.philgeps.gov.ph/GEPSNONPILOT/Tender/SplashOpportunitiesSearchUI.aspx?BusCatID=37&ClickFrom=OpenOpp&menuIndex=3&type=category",
+    "https://notices.philgeps.gov.ph/GEPSNONPILOT/Tender/SplashOpportunitiesSearchUI.aspx?BusCatID=23&ClickFrom=OpenOpp&menuIndex=3&type=category",
+    "https://notices.philgeps.gov.ph/GEPSNONPILOT/Tender/SplashOpportunitiesSearchUI.aspx?BusCatID=17&ClickFrom=OpenOpp&menuIndex=3&type=category",
+    "https://notices.philgeps.gov.ph/GEPSNONPILOT/Tender/SplashOpportunitiesSearchUI.aspx?BusCatID=157&ClickFrom=OpenOpp&menuIndex=3&type=category",
+    "https://notices.philgeps.gov.ph/GEPSNONPILOT/Tender/SplashBidNoticeAbstractUI.aspx?menuIndex=3&refID=13289356&DirectFrom=OpenOpp",
+    "https://notices.philgeps.gov.ph/GEPSNONPILOT/Tender/SplashBidNoticeAbstractUI.aspx?menuIndex=3&refID=13293734&DirectFrom=OpenOpp",
+    "https://notices.philgeps.gov.ph/GEPSNONPILOT/Tender/SplashBidNoticeAbstractUI.aspx?menuIndex=3&refID=13292799&DirectFrom=OpenOpp",
+    "https://www.ungm.org/Public/Notice",
+    "https://www.ungm.org/Public/Notice/318491",
+    "https://www.ungm.org/Public/Notice/317910",
+    "https://www.ungm.org/Public/Notice/318518",
+    "https://www.ungm.org/Public/Notice/318614",
+    "https://www.ungm.org/Public/Notice/318386",
+    "https://www.ungm.org/Public/Notice/318412",
+    "https://www.ungm.org/Public/Notice/318462",
+    "https://www.ungm.org/Public/Notice/317975"
+  ],
+  "notes": [
+    "The six PhilGEPS category first pages contained 110 visible listings: 20 Information Technology, 20 Consulting Services, 19 Communication Equipment and Parts, 20 Services, 20 Office Equipment, and 11 Advertising Agency Services.",
+    "The official UNGM JSON search helper returned HTTP 400. The official public search surface and eight direct/indexed official notice records were checked instead.",
+    "Public attachments referenced include the WHO RFP/Returnable Forms, UNICEF China public bid and TOR/evaluation attachments, ITC digital-media RFQ attachments, and prior carry-forward solicitation attachments. No restricted files were accessed.",
+    "Mandaue DMS notice 13289356 contains a delivery inconsistency: the notice header says 0 days while the detailed invitation says six months from purchase order.",
+    "Ormoc publication notice 13294690 contains a deadline inconsistency: the header says October 23 at 5:00 PM, while the RFQ schedule says submission October 26 at 10:00 AM; it was rejected as print-publication work regardless.",
+    "No bid, EOI, vendor registration, procurement email, NDA request, or commitment was submitted."
+  ]
+}

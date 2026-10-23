@@ -27,9 +27,14 @@ const FAILURE_WINDOW_MINUTES = 60;
 async function getCloserHealth(companyId) {
   const since = new Date(Date.now() - FAILURE_WINDOW_MINUTES * 60 * 1000);
 
-  const [page, settings, knowledgeCount, lastAiMessage, recentFailures] = await Promise.all([
+  const [page, expiredPage, settings, knowledgeCount, lastAiMessage, recentFailures] = await Promise.all([
     prisma.facebookPage.findFirst({
       where: { company_id: companyId, status: "active" },
+      select: { page_name: true, page_id: true }
+    }),
+    prisma.facebookPage.findFirst({
+      where: { company_id: companyId, status: "token_expired" },
+      orderBy: { updated_at: "desc" },
       select: { page_name: true, page_id: true }
     }),
     prisma.companySetting.findUnique({ where: { company_id: companyId } }),
@@ -58,7 +63,10 @@ async function getCloserHealth(companyId) {
     status = "down";
     reasons.push({ code: "reply_failures", count: recentFailures, windowMinutes: FAILURE_WINDOW_MINUTES });
   }
-  if (!page) {
+  if (expiredPage) {
+    status = "down";
+    reasons.push({ code: "page_token_expired" });
+  } else if (!page) {
     status = "down";
     reasons.push({ code: "no_page_connected" });
   }
@@ -81,7 +89,7 @@ async function getCloserHealth(companyId) {
     status,
     reasons,
     pageConnected: Boolean(page),
-    pageName: page?.page_name || null,
+    pageName: page?.page_name || expiredPage?.page_name || null,
     aiEnabled: Boolean(settings?.ai_enabled),
     autoReplyEnabled: Boolean(settings?.auto_reply_enabled),
     knowledgeCount,

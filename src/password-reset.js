@@ -18,6 +18,7 @@
  */
 
 const crypto = require("crypto");
+require("./mail-ipv4");
 const nodemailer = require("nodemailer");
 const { prisma } = require("./db");
 const { hashPassword } = require("./auth");

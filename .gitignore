@@ -41,3 +41,10 @@ local-runtime/
 
 # Customer-uploaded media. Real files, not source — kept out of git.
 public/media/
+data/staff-reply-inbox.json
+
+# Safety copies made while editing (history is in git)
+*.backup-*
+*.backup
+.env.*
+!.env.example
