@@ -335,7 +335,7 @@ function buildInstructions({
 const PROMPT_CACHE_MS = 30000;
 const TENANT_CACHE_MS = 60000;
 const promptCache = new Map();
-let tenantCache = { data: null, expiresAt: 0 };
+const tenantCaches = new Map(); // companyId -> { data, expiresAt }
 
 function pitchPrisma() {
   const { PrismaClient } = require("@prisma/client");
@@ -395,14 +395,16 @@ async function ensurePitchPrompts() {
  * one business. For multiple tenants this becomes a per-call lookup —
  * inbound SIM -> device -> company — and nothing downstream changes.
  */
-async function loadTenantContext() {
+async function loadTenantContext(companyId) {
   const now = Date.now();
+  const ck = companyId || process.env.PITCH_COMPANY_ID || "default";
+  const tenantCache = tenantCaches.get(ck) || { data: null, expiresAt: 0 };
   if (tenantCache.data && tenantCache.expiresAt > now) return tenantCache.data;
 
   const out = { businessName: null, knowledge: "" };
   try {
     const { loadAistaffAiConfig, formatKnowledgeBaseForPrompt } = require("../aistaff-ai-config");
-    const cfg = await loadAistaffAiConfig(process.env.PITCH_COMPANY_ID || undefined);
+    const cfg = await loadAistaffAiConfig(companyId || process.env.PITCH_COMPANY_ID || undefined);
     out.businessName = cfg.company && cfg.company.name ? cfg.company.name : null;
 
     // Closer's budget is 60,000 characters. That is fine for Messenger, where
@@ -421,12 +423,12 @@ async function loadTenantContext() {
   } catch {
     // A ringing phone must not fail because the knowledge base is unreachable.
   }
-  tenantCache = { data: out, expiresAt: now + TENANT_CACHE_MS };
+  tenantCaches.set(ck, { data: out, expiresAt: now + TENANT_CACHE_MS });
   return out;
 }
 
 /** The instructions for THIS call — entirely from AI Studio. */
-async function loadInstructions({ businessName, agentName, callerId, smsEnabled, pipeline }) {
+async function loadInstructions({ businessName, agentName, callerId, smsEnabled, pipeline, tenant: lineTenant }) {
   const key = PROMPT_KEYS[pipeline] || PROMPT_KEYS["gemini-live"];
   let text = null;
   try {
@@ -440,7 +442,7 @@ async function loadInstructions({ businessName, agentName, callerId, smsEnabled,
   }
   text = normalizePromptForPipeline(text, pipeline);
 
-  const tenant = await loadTenantContext();
+  const tenant = await loadTenantContext(lineTenant && lineTenant.companyId);
   const filled = fillVariables(text, {
     // The tenant record wins over the env fallback: the business name belongs
     // to the company, not to this process's configuration.
@@ -449,14 +451,37 @@ async function loadInstructions({ businessName, agentName, callerId, smsEnabled,
     callerId,
     knowledge: tenant.knowledge,
   });
+  const withLine = filled + tenantPhoneSettings(lineTenant);
   if (pipeline === "local") {
     const voice = require("./runtime-config").readConfig().local?.piperVoice;
-    return `${filled}\n\n${buildPiperLanguageGuidance(voice)}`;
+    return `${withLine}\n\n${buildPiperLanguageGuidance(voice)}`;
   }
-  return filled;
+  return withLine;
 }
 
-function clearPitchPromptCache() { promptCache.clear(); }
+/**
+ * The tenant's own phone settings (Settings > Channels > Mobile Phone), as facts and
+ * rules for the model. Never spoken text: the model still writes every word.
+ */
+function tenantPhoneSettings(t) {
+  if (!t || !t.pitch) return "";
+  const p = t.pitch;
+  const lines = [];
+  if (p.hours_days || p.hours_open || p.hours_close) {
+    lines.push(`- Staff working hours: ${[p.hours_days, p.hours_open && p.hours_close ? `${p.hours_open} to ${p.hours_close}` : ""].filter(Boolean).join(", ")} (Philippine time). You answer at any hour.`);
+    lines.push(p.after_hours === "message"
+      ? "- Outside staff working hours, take a message with the caller's details and say staff will follow up on the next working day."
+      : "- Outside staff working hours, still take and record the full request; say staff act on it from the next working day. Never promise anyone will act tonight.");
+  }
+  if (p.allow_sms === false) lines.push("- This business has not enabled text messages from this line. Do not offer to send an SMS.");
+  if (p.allow_booking === false) lines.push("- This business has not enabled booking from this line. Do not book appointments; record the request instead.");
+  if (t.mode === "test") lines.push("- This is a test call by the business owner or staff before going live. Behave exactly as with a real customer.");
+  const extra = String(t.instructions || "").trim();
+  if (!lines.length && !extra) return "";
+  return `\n\n## This business's phone settings\n${lines.join("\n")}${extra ? `\n\n## Extra instructions from the business\n${extra}` : ""}`;
+}
+
+function clearPitchPromptCache() { promptCache.clear(); tenantCaches.clear(); }
 
 module.exports = {
   PROMPT_KEYS,

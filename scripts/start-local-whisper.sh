@@ -1,21 +1,21 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
-WHISPER_DIR="$ROOT/local-runtime/whisper.cpp"
-MODEL="${PITCH_WHISPER_CPP_MODEL:-$WHISPER_DIR/models/ggml-base.bin}"
+WHISPER_DIR="${PITCH_WHISPER_CPP_DIR:-/home/ai-server/projects/whisper}"
+MODEL="${PITCH_WHISPER_CPP_MODEL:-$WHISPER_DIR/models/ggml-small.bin}"
+SERVER="${PITCH_WHISPER_CPP_SERVER:-$WHISPER_DIR/build-hip/bin/whisper-server}"
 HOST="${PITCH_WHISPER_CPP_HOST:-127.0.0.1}"
-PORT="${PITCH_WHISPER_CPP_PORT:-8080}"
-THREADS="${PITCH_WHISPER_CPP_THREADS:-6}"
+PORT="${PITCH_WHISPER_CPP_PORT:-8188}"
+THREADS="${PITCH_WHISPER_CPP_THREADS:-8}"
 
-exec "$WHISPER_DIR/build/bin/whisper-server" \
+ROCM_SITE="${PITCH_ROCM_SITE:-/home/ai-server/projects/zonos/Zonos/venv/lib/python3.12/site-packages}"
+ROCM_CORE="$ROCM_SITE/_rocm_sdk_core"
+ROCM_GFX="$ROCM_SITE/_rocm_sdk_libraries_gfx1151"
+export LD_LIBRARY_PATH="$ROCM_CORE/lib:$ROCM_GFX/lib${LD_LIBRARY_PATH:+:$LD_LIBRARY_PATH}"
+
+exec "$SERVER" \
   --host "$HOST" \
   --port "$PORT" \
   --model "$MODEL" \
   --language auto \
-  --max-context 0 \
-  --vad \
-  --vad-threshold "${PITCH_WHISPER_CPP_VAD_THRESHOLD:-0.50}" \
-  --vad-min-speech-duration-ms "${PITCH_WHISPER_CPP_VAD_MIN_SPEECH_MS:-250}" \
-  --vad-min-silence-duration-ms "${PITCH_WHISPER_CPP_VAD_MIN_SILENCE_MS:-500}" \
   --threads "$THREADS"

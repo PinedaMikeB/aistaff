@@ -130,18 +130,32 @@ class Call {
     // Connect the brain BEFORE answering. If the model is unreachable we
     // would rather the caller hear a busy tone than dead air on an answered
     // call — dead air makes people think the business is broken.
+    // Live transcript into Inquiries (one thread per caller number). Never blocks the call.
+    try { this.inbox = require("./inbox").forCall(this.tenant, this.dialog.callerId, this.dialog.callId || this.dialog.id); }
+    catch (err) { log.warn(`inbox: ${err.message}`); this.inbox = null; }
+
     this.brain = createBrain({
       callerId: this.dialog.callerId,
       tools: tools.declarations(),
+      tenant: this.tenant,
+      inbox: this.inbox,
     });
 
     // Tool execution. The model decides IF and WHEN; limits are enforced in
     // tools.js, and the result handed back is facts, never words to speak.
     this.brain.on("tool_call", async ({ id, name, args }) => {
+      // The tenant decides what its assistant may do (Settings > Channels > Mobile Phone).
+      const allow = this.tenant?.pitch || {};
+      if ((name === "send_sms" && allow.allow_sms === false) || (name === "book_appointment" && allow.allow_booking === false)) {
+        try { this.brain.toolResult(id, name, { ok: false, error: "not_enabled_for_this_business" }); } catch { /* noop */ }
+        return;
+      }
       const result = await tools.execute({
         name, args,
         ua: this.ua,
         callerId: this.dialog.callerId,
+        companyId: this.tenant?.companyId || null,
+        callId: this.callId,
         state: this.toolState,
         log,
       });
@@ -178,6 +192,8 @@ class Call {
       this.transcript.push({ role, text, at: Date.now() });
       this._appendConversationEvent({ type: "message", role, text });
       log.info(`[${role}] ${text}`);
+      if (this.inbox) this.inbox.add(role, text);
+      this._checkStuck(role, text);
     });
 
     this.rtp.on("audio", (pcm8k) => {
@@ -200,12 +216,112 @@ class Call {
     return true;
   }
 
+  // --- Stuck: the assistant keeps asking the same thing (the caller is hard to hear). ---
+  _checkStuck(role, text) {
+    if (role !== "pitch" || this.stuckHandled) return;
+    const words = (t) => new Set(String(t).toLowerCase().replace(/[^a-z0-9\u00c0-\u024f ]/g, " ").split(/\s+/).filter((w) => w.length > 2));
+    const same = (a, b) => {
+      const A = words(a), B = words(b);
+      if (!A.size || !B.size) return false;
+      let n = 0; for (const w of A) if (B.has(w)) n += 1;
+      return n / Math.min(A.size, B.size) >= 0.6;
+    };
+    this.recentAsks = (this.recentAsks || []).concat(text).slice(-3);
+    if (this.recentAsks.length === 3 && same(this.recentAsks[0], this.recentAsks[1]) && same(this.recentAsks[1], this.recentAsks[2])) {
+      this.stuckHandled = true;
+      this._handleStuck().catch((err) => log.warn(`stuck: ${err.message}`));
+    }
+  }
+
+  async _handleStuck() {
+    // No hand-over on calls unless the caller asks (Mike 2026-10-21): staff get a quiet alert, the assistant
+    // keeps helping, nothing is texted. Set PITCH_STUCK_HANDOFF=on for the old behaviour (apologise + SMS).
+    if (process.env.PITCH_STUCK_HANDOFF !== "on") {
+      const tail = (this.transcript || []).slice(-8).map((t) => `${t.role === "caller" ? "Caller" : "Assistant"}: ${t.text}`).join("\n");
+      const url = process.env.PITCH_PLATFORM_URL, token = process.env.PITCH_PLATFORM_TOKEN;
+      log.warn(`stuck: same question 3 times on call from ${this.dialog.callerId} — quiet staff alert, call continues`);
+      if (url && token && this.inbox?.conversationId) {
+        try {
+          const r = await fetch(`${url.replace(/\/$/, "")}/api/internal/pitch/handoff`, {
+            method: "POST",
+            headers: { "content-type": "application/json", "x-pitch-token": token },
+            body: JSON.stringify({ conversation_id: this.inbox.conversationId, company_id: this.inbox.companyId, caller: this.dialog.callerId, quiet: true,
+              reason: "The phone assistant asked the same question 3 times. The call is continuing; please review it.", transcript: tail }),
+            signal: AbortSignal.timeout(8000),
+          });
+          log.info(`stuck: quiet alert ${r.ok ? "sent" : "failed " + r.status}`);
+        } catch (err) { log.warn(`stuck: quiet alert failed — ${err.message}`); }
+      }
+      // Watch for the next repeat again later in the call.
+      this.recentAsks = []; this.stuckHandled = false;
+      return;
+    }
+    const allowSms = this.tenant?.pitch?.allow_sms !== false;
+    log.warn(`stuck: same question 3 times on call from ${this.dialog.callerId} — alerting staff${allowSms ? " and texting the caller" : ""}`);
+
+    // 1) The next spoken turn: the model writes the words, this only states the facts.
+    if (this.brain && typeof this.brain.systemPrompt === "string") {
+      this.brain.systemPrompt += "\n\n## Right now\nYou have asked the same thing several times and the caller is hard to understand on this line. "
+        + "On your next turn, apologise briefly, say a staff member has been alerted and will follow up"
+        + (allowSms ? ", and that a text message is being sent to this number so they can reply with the details in writing." : ".")
+        + " Then stop asking for the missing detail.";
+    }
+
+    // 2) Staff alert + 'needs human' on the conversation (the web app sends the email).
+    const tail = (this.transcript || []).slice(-8).map((t) => `${t.role === "caller" ? "Caller" : "Assistant"}: ${t.text}`).join("\n");
+    if (this.inbox) await this.inbox.done();
+    const url = process.env.PITCH_PLATFORM_URL, token = process.env.PITCH_PLATFORM_TOKEN;
+    if (url && token && this.inbox?.conversationId) {
+      try {
+        const r = await fetch(`${url.replace(/\/$/, "")}/api/internal/pitch/handoff`, {
+          method: "POST",
+          headers: { "content-type": "application/json", "x-pitch-token": token },
+          body: JSON.stringify({ conversation_id: this.inbox.conversationId, company_id: this.inbox.companyId, caller: this.dialog.callerId,
+            reason: "The phone assistant asked the same question 3 times — the caller may be hard to hear on the line.", transcript: tail }),
+          signal: AbortSignal.timeout(8000),
+        });
+        log.info(`stuck: staff alert ${r.ok ? "sent" : "failed " + r.status}`);
+      } catch (err) { log.warn(`stuck: staff alert failed — ${err.message}`); }
+    } else {
+      log.warn("stuck: PITCH_PLATFORM_URL / PITCH_PLATFORM_TOKEN not set — no staff alert");
+    }
+
+    // 3) SMS to the caller, written by the model (no fixed copy), sent through the router's SIM.
+    if (!allowSms) return;
+    const lp = require("./config").config.localPipeline || {};
+    const business = this.tenant?.businessName || "the business";
+    const agent = this.tenant?.pitch?.agent_name || "the assistant";
+    let message = "";
+    try {
+      const r = await fetch(lp.qwenApiUrl, {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({ model: lp.qwenModel, temperature: 0.3, max_tokens: 160, messages: [
+          { role: "system", content: `You write one text message (SMS) from ${agent}, the AI assistant of ${business}, to a caller who was hard to understand on a phone call that is still going on. `
+            + "At most 280 characters. Use the same language the caller used (English, Tagalog or Taglish). Say a staff member will follow up, and ask them to reply to this text with the details needed to help them. "
+            + "No links, no emoji. Output only the message text." },
+          { role: "user", content: tail || "(no transcript)" },
+        ] }),
+        signal: AbortSignal.timeout(15000),
+      });
+      const j = await r.json();
+      message = String(j?.choices?.[0]?.message?.content || "").replace(/^["'\s]+|["'\s]+$/g, "").slice(0, 300);
+    } catch (err) { log.warn(`stuck: could not write the SMS — ${err.message}`); }
+    if (!message) return;
+    const tools = require("./tools");
+    const result = await tools.execute({ name: "send_sms", args: { message }, ua: this.ua, callerId: this.dialog.callerId,
+      companyId: this.tenant?.companyId || null, callId: this.callId, state: this.toolState, log });
+    log.info(`stuck: SMS ${result && result.sent ? "sent" : "not sent (" + (result && result.reason) + ")"}`);
+    if (result && result.sent && this.inbox) this.inbox.add("sms", message);
+  }
+
   end(reason = "ended") {
     if (this.ended) return;
     this.ended = true;
     clearTimeout(this.maxTimer);
 
     const seconds = ((Date.now() - this.dialog.startedAt) / 1000).toFixed(1);
+    require("./tenant").recordCall(this.tenant, { callerId: this.dialog.callerId, seconds, mode: this.tenant?.mode || null });
     const stats = this.rtp?.stats;
     log.info(
       `call: ended reason=${reason} duration=${seconds}s ` +

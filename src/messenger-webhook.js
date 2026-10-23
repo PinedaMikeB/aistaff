@@ -424,7 +424,7 @@ function bookingNeedsExclusiveTime(setting, serviceName, fieldValues = {}) {
     || /online|video|jitsi|zoom|meet|meeting|consult|consultation|onboarding|demo|call/.test(haystack);
 }
 
-async function createMessengerBooking({ companyId, conversationId, lead, request }) {
+async function createMessengerBooking({ companyId, conversationId, lead, request, source }) {
   const setting = await prisma.bookingSetting.findUnique({ where: { company_id: companyId } });
   if (!setting?.enabled) return { ok: false, reason: "booking_disabled" };
 
@@ -494,7 +494,7 @@ async function createMessengerBooking({ companyId, conversationId, lead, request
       start_at: start,
       end_at: end,
       status: "pending_confirmation",
-      source: "messenger",
+      source: source || "messenger",
       field_values: fieldValues,
       notes: cleanText(request.notes || request.note || fieldValues.notes_remarks, 3000) || null
     }
@@ -1048,6 +1048,7 @@ function extractLeadContactFromMessengerEvent(event) {
 }
 
 module.exports = {
+  createMessengerBooking,
   verifyMessengerSignature,
   handleMessengerWebhook,
   sendMessengerText,

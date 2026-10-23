@@ -13,10 +13,14 @@ const { config } = require("../config");
  * greet(), close(), and the events audio / barge_in / transcript / error —
  * and registering it here. No call-handling code should need to change.
  */
-function createBrain({ callerId, tools } = {}) {
+function createBrain({ callerId, tools, tenant, inbox } = {}) {
+  // A claimed phone line uses its tenant's own name and greeting
+  // (Settings > Channels > Mobile Phone); otherwise AI Studio's defaults.
+  const p = (tenant && tenant.pitch) || {};
   const shared = {
-    businessName: config.business.name,
-    agentName: config.business.agentName,
+    businessName: (tenant && tenant.businessName) || config.business.name,
+    agentName: p.agent_name || config.business.agentName,
+    tenant,
     // Per-call, not config: what the INVITE presented for this caller.
     callerId,
     tools,
@@ -50,10 +54,18 @@ function createBrain({ callerId, tools } = {}) {
       return new LocalPipelineBrain({
         geminiApiKey: config.gemini.apiKey,
         openaiApiKey: config.openai.apiKey,
-        localConfig: config.localPipeline,
+        // Tenant greeting + tenant hint words (Settings > Channels > Mobile Phone) on top of
+        // AI Studio's global ASR context. The ASR gets the combined list on every request.
+        localConfig: Object.assign({}, config.localPipeline,
+          p.greeting ? { greetingText: p.greeting } : {},
+          Array.isArray(p.asr_words) && p.asr_words.length
+            ? { asrContext: [config.localPipeline.asrContext, p.asr_words.join(", ")].filter(Boolean).join(", ") }
+            : {}),
         businessName: shared.businessName,
         agentName: shared.agentName,
         callerId: shared.callerId,
+        tenant,
+        inbox,
       });
 
     default:

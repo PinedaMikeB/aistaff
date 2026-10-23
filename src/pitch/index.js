@@ -7,7 +7,7 @@ const { SipUa } = require("./sip/ua");
 const { Call } = require("./call");
 const { startInternalApi } = require("./internal-api");
 const { CallRegistry } = require("./call-registry");
-const { resolveCompany } = require("./tenant");
+const { resolveCompany, isTestCaller } = require("./tenant");
 
 /**
  * Pitch entry point — its own process, separate from src/server.js.
@@ -28,11 +28,16 @@ function preflight() {
     if (config.localPipeline.brainProvider === "openai" && !config.openai.apiKey) {
       problems.push("OPENAI_API_KEY is empty — local pipeline is set to OpenAI text");
     }
-    if (config.localPipeline.brainProvider !== "openai" && !config.gemini.apiKey) {
+    if (config.localPipeline.brainProvider === "gemini" && !config.gemini.apiKey) {
       problems.push("GEMINI_API_KEY is empty — local pipeline is set to Gemini text");
     }
-    if (!config.localPipeline.whisperUrl) problems.push("PITCH_LOCAL_WHISPER_URL is empty — local pipeline needs whisper.cpp");
-    if (!config.localPipeline.voxcpmUrl) problems.push("PITCH_VOXCPM2_URL is empty — local pipeline needs VoxCPM2 TTS");
+    if (config.localPipeline.brainProvider === "qwen" && !config.localPipeline.qwenApiUrl) {
+      problems.push("PITCH_LOCAL_QWEN_API_URL is empty — Stack 4 needs SEA-LION");
+    }
+    if (!config.localPipeline.whisperUrl) problems.push("PITCH_LOCAL_ASR_URL is empty — Stack 4 needs Qwen3-ASR");
+    if (config.localPipeline.ttsEngine === "piper" && !config.localPipeline.piperUrl) {
+      problems.push("PITCH_LOCAL_PIPER_URL is empty — Stack 4 needs Piper");
+    }
   }
   if (config.sip.localHost.startsWith("127.")) {
     problems.push("PITCH_SIP_LOCAL_HOST is loopback — the gateway cannot send RTP there; use the LAN IP");
@@ -52,10 +57,13 @@ async function main() {
     process.exit(1);
   }
 
+  const localModel = config.localPipeline.brainProvider === "qwen"
+    ? config.localPipeline.qwenModel
+    : config.localPipeline[`${config.localPipeline.brainProvider}TextModel`];
   log.info(
     `starting — extension ${config.sip.username} -> ${config.sip.gatewayHost}:${config.sip.gatewayPort}, ` +
     `local ${config.sip.localHost}:${config.sip.localPort}, brain=${config.brainProvider}, ` +
-    `model=${config.brainProvider === "local" ? config.localPipeline[`${config.localPipeline.brainProvider}TextModel`] : config.brainProvider === "gemini" ? config.gemini.liveModel : config.openai.realtimeModel}`
+    `model=${config.brainProvider === "local" ? localModel : config.brainProvider === "gemini" ? config.gemini.liveModel : config.openai.realtimeModel}`
   );
 
   ua = new SipUa(config.sip);
@@ -83,6 +91,16 @@ async function main() {
     const tenant = await resolveCompany({
       authUsername: dialog.authUsername || dialog.toUser || null,
     });
+
+    // Test mode: until the tenant presses Go live, only their test numbers reach the assistant.
+    if (tenant.source === "sip-device") {
+      tenant.mode = tenant.live ? "live" : "test";
+      if (!tenant.live && !isTestCaller(tenant, dialog.callerId)) {
+        log.warn(`test mode: ${dialog.callerId} is not a test number for ${tenant.businessName || tenant.companyId} — not answering until Go live`);
+        return controls.reject(480, "Temporarily Unavailable");
+      }
+      log.info(`call for ${tenant.businessName || tenant.companyId} (${tenant.mode}) — assistant "${tenant.pitch?.agent_name || "default"}"`);
+    }
 
     if (tenant.maxChannels === 0) {
       log.warn(`rejecting ${dialog.callerId} — tenant ${tenant.source}`);

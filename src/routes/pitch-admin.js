@@ -17,12 +17,14 @@ const { readConfig, writeConfig, CONFIG_PATH } = require("../pitch/runtime-confi
 const { listVoices, listLanguages, VOICE_DIR } = require("../pitch/voice-catalogue");
 
 const REPO_ROOT = path.join(__dirname, "..", "..");
-const PIPER_BIN = path.join(REPO_ROOT, "local-runtime", "venvs", "piper", "bin", "piper");
+const PIPER_ROOT = process.env.PITCH_PIPER_ROOT || "/home/ai-server/projects/piper-serve";
+const PIPER_BIN = path.join(PIPER_ROOT, "venv", "bin", "piper");
+const PIPER_EXTERNAL_VOICES = path.join(PIPER_ROOT, "voices");
 const WHISPER_MODELS = path.join(REPO_ROOT, "local-runtime", "whisper.cpp", "models");
 const PREVIEW_DIR = path.join(REPO_ROOT, "local-runtime", "piper", "previews");
 
-const PIPER_HEALTH = "http://127.0.0.1:9891/health";
-const WHISPER_HEALTH = "http://127.0.0.1:8080/";
+const QWEN_ASR_HEALTH = "http://127.0.0.1:8190/health";
+const SEA_LION_HEALTH = "http://127.0.0.1:8090/health";
 const HF_BASE = "https://huggingface.co/rhasspy/piper-voices/resolve/main";
 
 // Gemini Live prebuilt voices. These are Google's, not ours — no download,
@@ -58,6 +60,9 @@ const OPENAI_FALLBACK_MODELS = [
 ];
 
 const LOCAL_TEXT_MODELS = {
+  qwen: [
+    { model: "sealion", label: "SEA-LION (local)" },
+  ],
   gemini: [
     { model: "gemini-3.7-flash", label: "Gemini 3.7 Flash" },
     { model: "gemini-3.5-flash-lite", label: "Gemini 3.5 Flash-Lite" },
@@ -69,6 +74,23 @@ const LOCAL_TEXT_MODELS = {
 
 function safeModel(value) {
   return String(value || "").trim().replace(/[^\w.\-:]/g, "").slice(0, 120);
+}
+
+function safeText(value, max = 120) {
+  return String(value || "").trim().slice(0, max);
+}
+
+function safeUrl(value) {
+  const text = safeText(value, 300);
+  try {
+    const url = new URL(text);
+    return ["http:", "https:"].includes(url.protocol) ? url.toString() : "";
+  } catch { return ""; }
+}
+
+function finiteIn(value, min, max) {
+  const number = Number(value);
+  return Number.isFinite(number) && number >= min && number <= max ? number : undefined;
 }
 
 let openAiModelCache = { expiresAt: 0, models: null, error: null };
@@ -159,6 +181,29 @@ async function probe(url, ms = 2500) {
   } catch { return false; }
 }
 
+function probeTcp(port, host = "127.0.0.1", ms = 1500) {
+  return new Promise((resolve) => {
+    const net = require("net");
+    const socket = net.createConnection({ port, host });
+    const finish = (ok) => {
+      socket.destroy();
+      resolve(ok);
+    };
+    socket.setTimeout(ms);
+    socket.once("connect", () => finish(true));
+    socket.once("timeout", () => finish(false));
+    socket.once("error", () => finish(false));
+  });
+}
+
+function piperModelPath(voice) {
+  const file = `${String(voice || "").replace(/[^\w.\-]/g, "")}.onnx`;
+  const external = path.join(PIPER_EXTERNAL_VOICES, file);
+  if (fs.existsSync(external)) return external;
+  const local = path.join(VOICE_DIR, file);
+  return fs.existsSync(local) ? local : null;
+}
+
 function whisperModels() {
   try {
     return fs.readdirSync(WHISPER_MODELS)
@@ -207,13 +252,13 @@ function buildRouter({ requireAuth } = {}) {
 
   // ---- current state -------------------------------------------------
   r.get("/", guard, wrap(async (req, res) => {
-    const [piperUp, whisperUp, pid, openaiModels] = await Promise.all([
-      probe(PIPER_HEALTH), probe(WHISPER_HEALTH), pitchProcess(), openAiModels(),
+    const [qwenAsrUp, seaLionUp, piperUp, pid, openaiModels] = await Promise.all([
+      probe(QWEN_ASR_HEALTH), probe(SEA_LION_HEALTH), probeTcp(5001), pitchProcess(), openAiModels(),
     ]);
     res.json({
       config: readConfig(),
       configPath: CONFIG_PATH,
-      services: { piper: piperUp, whisper: whisperUp, pitchPid: pid },
+      services: { qwenAsr: qwenAsrUp, seaLion: seaLionUp, piper: piperUp, pitchPid: pid },
       runningPipeline: runningPipeline(),
       whisperModels: whisperModels(),
       languages: listLanguages(),
@@ -271,8 +316,8 @@ function buildRouter({ requireAuth } = {}) {
     const voice = String(req.body.voice || cfg.local.piperVoice).replace(/[^\w.\-]/g, "");
     const text = String(req.body.text || "").trim().slice(0, 400)
       || "Good afternoon! Thank you for calling. How can I help you today?";
-    const model = path.join(VOICE_DIR, `${voice}.onnx`);
-    if (!fs.existsSync(model)) {
+    const model = piperModelPath(voice);
+    if (!model) {
       return res.status(400).json({ error: `voice not installed: ${voice}` });
     }
 
@@ -330,26 +375,70 @@ function buildRouter({ requireAuth } = {}) {
       if (b.openaiRealtime.model) patch.openaiRealtime.model = safeModel(b.openaiRealtime.model);
       if (b.openaiRealtime.voice) patch.openaiRealtime.voice = safeModel(b.openaiRealtime.voice);
     }
+    if (b.business && typeof b.business === "object") {
+      patch.business = {};
+      const name = safeText(b.business.name, 120);
+      const agentName = safeText(b.business.agentName, 80);
+      if (name) patch.business.name = name;
+      if (agentName) patch.business.agentName = agentName;
+    }
     if (b.local && typeof b.local === "object") {
       patch.local = {};
       const L = b.local;
-      if (L.brainProvider === "gemini" || L.brainProvider === "openai") patch.local.brainProvider = L.brainProvider;
-      if (L.geminiTextModel) patch.local.geminiTextModel = safeModel(L.geminiTextModel);
-      if (L.openaiTextModel) patch.local.openaiTextModel = safeModel(L.openaiTextModel);
-      if (L.ttsEngine) patch.local.ttsEngine = String(L.ttsEngine);
-      if (L.piperVoice) patch.local.piperVoice = String(L.piperVoice).replace(/[^\w.\-]/g, "");
-      if (L.whisperModel) patch.local.whisperModel = String(L.whisperModel).replace(/[^\w.\-]/g, "");
-      if (L.whisperLanguage) patch.local.whisperLanguage = String(L.whisperLanguage).slice(0, 8);
+      patch.local.brainProvider = "qwen";
+      for (const k of ["asrUrl", "qwenApiUrl", "piperUrl"]) {
+        const url = safeUrl(L[k]);
+        if (url) patch.local[k] = url;
+      }
+      if (L.qwenModel !== undefined) {
+        if (L.qwenModel !== "sealion") return res.status(400).json({ error: "local LLM is not available" });
+        patch.local.qwenModel = "sealion";
+      }
+      if (typeof L.asrContext === "string") patch.local.asrContext = L.asrContext.trim().slice(0, 500);
+      if (L.ttsEngine === "piper") patch.local.ttsEngine = "piper";
+      if (L.piperVoice) {
+        const voice = String(L.piperVoice).replace(/[^\w.\-]/g, "");
+        if (!piperModelPath(voice)) return res.status(400).json({ error: `voice not installed: ${voice}` });
+        patch.local.piperVoice = voice;
+      }
+      if (L.whisperModel !== undefined) {
+        if (L.whisperModel !== "Qwen3-ASR-0.6B") return res.status(400).json({ error: "local STT model is not available" });
+        patch.local.whisperModel = "Qwen3-ASR-0.6B";
+      }
+      if (["taglish", "auto", "en", "fil"].includes(L.whisperLanguage)) patch.local.whisperLanguage = L.whisperLanguage;
       if (typeof L.greetingText === "string") {
         const text = L.greetingText.trim().slice(0, 500);
         if (text) patch.local.greetingText = text;
       }
       if (L.piperSpeakerId !== undefined) {
-        patch.local.piperSpeakerId = L.piperSpeakerId === null || L.piperSpeakerId === ""
-          ? null : Number(L.piperSpeakerId);
+        if (L.piperSpeakerId === null || L.piperSpeakerId === "") {
+          patch.local.piperSpeakerId = null;
+        } else {
+          const speakerId = Number(L.piperSpeakerId);
+          if (!Number.isInteger(speakerId) || speakerId < 0) {
+            return res.status(400).json({ error: "speaker ID must be a non-negative integer" });
+          }
+          patch.local.piperSpeakerId = speakerId;
+        }
       }
-      for (const k of ["piperLengthScale", "piperNoiseScale", "piperVolumeDb", "greetingStartDelayMs"]) {
-        if (L[k] !== undefined && Number.isFinite(Number(L[k]))) patch.local[k] = Number(L[k]);
+      const ranges = {
+        piperLengthScale: [0.6, 1.6], piperNoiseScale: [0, 1.5], piperVolumeDb: [-12, 3],
+        greetingStartDelayMs: [0, 3000], maxOutputTokens: [20, 500], temperature: [0, 2],
+        historyTurns: [2, 30], requestTimeoutMs: [1000, 120000],
+        vadPositiveSpeechThreshold: [0.1, 0.95], vadNegativeSpeechThreshold: [0.05, 0.9],
+        vadMinSpeechMsSilero: [64, 2000], vadPreSpeechPadMs: [0, 3000], vadRedemptionMs: [100, 5000],
+        vadMaxSpeechMs: [1000, 60000], vadBargeInThreshold: [0.1, 0.95], vadBargeInSustainMs: [32, 2000],
+      };
+      for (const [k, range] of Object.entries(ranges)) {
+        if (L[k] === undefined) continue;
+        const value = finiteIn(L[k], range[0], range[1]);
+        if (value === undefined) {
+          return res.status(400).json({ error: `${k} must be between ${range[0]} and ${range[1]}` });
+        }
+        patch.local[k] = value;
+      }
+      if (patch.local.vadPositiveSpeechThreshold <= patch.local.vadNegativeSpeechThreshold) {
+        return res.status(400).json({ error: "speech start threshold must be higher than speech end threshold" });
       }
     }
     res.json({ config: writeConfig(patch), saved: true });
@@ -357,9 +446,9 @@ function buildRouter({ requireAuth } = {}) {
 
   // ---- restart the voice services --------------------------------------
   r.post("/restart", guard, wrap(async (req, res) => {
-    const script = path.join(REPO_ROOT, "local-runtime", "bin", "restart-voice-stack.sh");
+    const script = path.join(REPO_ROOT, "scripts", "restart-pitch-stack.sh");
     if (!fs.existsSync(script)) {
-      return res.status(500).json({ error: "restart-voice-stack.sh not found" });
+      return res.status(500).json({ error: "restart-pitch-stack.sh not found" });
     }
     const child = spawn("bash", [script], {
       detached: true, stdio: "ignore", cwd: REPO_ROOT,
@@ -466,9 +555,11 @@ function promptRoutes(r, guard) {
       pipeline
     );
     let content = fillVariables(text, {
-        businessName: process.env.PITCH_BUSINESS_NAME || "your business",
-        agentName: process.env.PITCH_AGENT_NAME || "Pitch",
-        callerId: "+639171234567",
+        businessName: safeText(req.query.businessName, 120)
+          || runtime.business?.name || process.env.PITCH_BUSINESS_NAME || "your business",
+        agentName: safeText(req.query.agentName, 80)
+          || runtime.business?.agentName || process.env.PITCH_AGENT_NAME || "Pitch",
+        callerId: safeText(req.query.callerNumber, 40) || "+639171234567",
       });
     if (pipeline === "local") {
       const { buildPiperLanguageGuidance } = require("../pitch/voice-language");

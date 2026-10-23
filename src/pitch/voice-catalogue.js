@@ -14,6 +14,8 @@ const path = require("path");
 const PIPER_DIR = path.join(__dirname, "..", "..", "local-runtime", "piper");
 const INDEX_PATH = path.join(PIPER_DIR, "voices.json");
 const VOICE_DIR = path.join(PIPER_DIR, "voices");
+const EXTERNAL_VOICE_DIR = process.env.PITCH_PIPER_VOICE_DIR
+  || "/home/ai-server/projects/piper-serve/voices";
 
 // Curated gender map. Sources: the original datasets behind each voice.
 const GENDER = {
@@ -37,6 +39,42 @@ const GENDER = {
 const QUALITY_ORDER = { low: 0, medium: 1, high: 2 };
 
 const CUSTOM_VOICES = [
+  {
+    key: "zonos1110_22050_epoch180",
+    name: "Taglish epoch 180",
+    language: "fil_PH",
+    languageName: "Filipino Taglish",
+    country: "Philippines",
+    quality: "custom",
+    gender: "female",
+    numSpeakers: 1,
+    speakerIds: null,
+    custom: true,
+  },
+  {
+    key: "zonos1110_22050_epoch25",
+    name: "Taglish epoch 25",
+    language: "fil_PH",
+    languageName: "Filipino Taglish",
+    country: "Philippines",
+    quality: "custom",
+    gender: "female",
+    numSpeakers: 1,
+    speakerIds: null,
+    custom: true,
+  },
+  {
+    key: "irenz_e3289",
+    name: "Irenz",
+    language: "en_US",
+    languageName: "English",
+    country: "United States",
+    quality: "custom",
+    gender: "female",
+    numSpeakers: 1,
+    speakerIds: null,
+    custom: true,
+  },
   {
     key: "gab_taglish_epoch29",
     name: "Gab epoch 29",
@@ -85,15 +123,15 @@ function loadIndex() {
 
 /** Which voices are actually downloaded and ready to use right now. */
 function installedVoices() {
+  const names = new Set();
+  for (const dir of [VOICE_DIR, EXTERNAL_VOICE_DIR]) {
   try {
-    return new Set(
-      fs.readdirSync(VOICE_DIR)
-        .filter((f) => f.endsWith(".onnx"))
-        .map((f) => f.replace(/\.onnx$/, ""))
-    );
-  } catch {
-    return new Set();
+      for (const file of fs.readdirSync(dir)) {
+        if (file.endsWith(".onnx")) names.add(file.replace(/\.onnx$/, ""));
+      }
+    } catch {}
   }
+  return names;
 }
 
 /**

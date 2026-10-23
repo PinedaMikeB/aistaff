@@ -96,8 +96,10 @@ function startInternalApi({ getUa, isCallActive }) {
     log.error(`internal api: not listening — ${error.message}`);
   });
 
-  server.listen(port, "127.0.0.1", () => {
-    log.info(`internal api: listening on 127.0.0.1:${port}`);
+  // PITCH_INTERNAL_HOST lets Ryzen (urgent staff texts, src/escalations.js) reach it on the wired LAN; token still required.
+  const host = process.env.PITCH_INTERNAL_HOST || "127.0.0.1";
+  server.listen(port, host, () => {
+    log.info(`internal api: listening on ${host}:${port}`);
   });
 
   return server;

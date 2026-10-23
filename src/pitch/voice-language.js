@@ -39,7 +39,7 @@ const LANGUAGE_NAMES = {
 
 function piperVoiceLanguage(voiceKey) {
   const key = String(voiceKey || "").trim();
-  if (/^gab_taglish_/i.test(key) || /^fil_PH/i.test(key)) {
+  if (/^gab_taglish_/i.test(key) || /^fil_PH/i.test(key) || /^zonos1110(?:_|$)/i.test(key)) {
     return {
       mode: "taglish",
       languageName: "Filipino Taglish",
